@@ -46,6 +46,7 @@ export type Database = {
       }
       work_orders: {
         Row: {
+          assignee: string | null
           created_at: string
           description: string
           ecosure: string
@@ -61,6 +62,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assignee?: string | null
           created_at?: string
           description: string
           ecosure: string
@@ -76,6 +78,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assignee?: string | null
           created_at?: string
           description?: string
           ecosure?: string

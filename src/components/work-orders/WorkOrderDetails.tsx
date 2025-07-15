@@ -37,6 +37,17 @@ const ecoSureColors = {
   'Imminent Health': 'bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90',
 };
 
+const assigneeOptions = [
+  { value: '', label: 'Unassigned' },
+  { value: 'Anthony Luna', label: 'Anthony Luna' },
+  { value: 'Grant Gelecki', label: 'Grant Gelecki' },
+  { value: 'Dwayne Parks', label: 'Dwayne Parks' },
+  { value: 'Whitney Bramlitt', label: 'Whitney Bramlitt' },
+  { value: 'Ryan McMurtrie', label: 'Ryan McMurtrie' },
+  { value: 'GM/DM', label: 'GM/DM' },
+  { value: 'Director', label: 'Director' },
+];
+
 export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDetailsProps) {
   const [newNote, setNewNote] = useState('');
   const [isAddingNote, setIsAddingNote] = useState(false);
@@ -63,6 +74,14 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     toast({
       title: "EcoSure Updated", 
       description: `Work order EcoSure level changed to ${newEcoSure}`,
+    });
+  };
+
+  const handleAssigneeChange = (newAssignee: string) => {
+    onUpdate({ assignee: newAssignee || undefined });
+    toast({
+      title: "Assignee Updated",
+      description: `Work order assignee changed to ${newAssignee || 'Unassigned'}`,
     });
   };
 
@@ -120,6 +139,23 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Description</Label>
             <p className="mt-1 p-3 bg-muted rounded-md">{workOrder.description}</p>
+          </div>
+
+          {/* Assignee Section */}
+          <div>
+            <Label className="text-sm font-medium text-muted-foreground mb-2 block">Assignee</Label>
+            <Select value={workOrder.assignee || ''} onValueChange={handleAssigneeChange}>
+              <SelectTrigger className="w-full max-w-md">
+                <SelectValue placeholder="Select assignee" />
+              </SelectTrigger>
+              <SelectContent>
+                {assigneeOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Interactive Badges */}

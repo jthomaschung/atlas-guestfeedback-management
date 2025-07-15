@@ -34,6 +34,7 @@ export interface WorkOrderFormData {
   market: Market;
   priority: WorkOrderPriority;
   ecosure: EcoSure;
+  assignee?: string;
   image?: File;
 }
 
@@ -47,6 +48,7 @@ export interface WorkOrder {
   priority: WorkOrderPriority;
   ecosure: EcoSure;
   status: WorkOrderStatus;
+  assignee?: string;
   image_url?: string;
   notes?: string[];
   created_at: string;

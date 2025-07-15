@@ -46,6 +46,7 @@ export function WorkOrderTable({ workOrders, onStatusChange, onEdit, onViewDetai
             <TableHead>Priority</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Ecosure</TableHead>
+            <TableHead>Assignee</TableHead>
             <TableHead>Created</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
@@ -87,6 +88,11 @@ export function WorkOrderTable({ workOrders, onStatusChange, onEdit, onViewDetai
                 >
                   {workOrder.ecosure}
                 </Badge>
+              </TableCell>
+              <TableCell>
+                <span className="text-sm text-muted-foreground">
+                  {workOrder.assignee || 'Unassigned'}
+                </span>
               </TableCell>
               <TableCell>
                 <div className="flex items-center text-sm text-muted-foreground">
