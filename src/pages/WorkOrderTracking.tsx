@@ -293,10 +293,8 @@ const WorkOrderTracking = () => {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
-                <TableHead className="w-8"></TableHead>
                 <TableHead className="min-w-[200px]">Repair Description</TableHead>
                 <TableHead className="w-[100px]">Assigned To</TableHead>
-                <TableHead className="w-[100px]">Response</TableHead>
                 <TableHead className="w-[80px]">Status</TableHead>
                 <TableHead className="w-[80px]">Priority</TableHead>
                 <TableHead className="w-[100px]">Repair Type</TableHead>
@@ -310,9 +308,6 @@ const WorkOrderTracking = () => {
             <TableBody>
               {filteredAndSortedWorkOrders.map((workOrder) => (
                 <TableRow key={workOrder.id} className="hover:bg-muted/50">
-                  <TableCell>
-                    <input type="checkbox" className="rounded" />
-                  </TableCell>
                   <TableCell className="font-medium">
                     {workOrder.description}
                   </TableCell>
@@ -328,13 +323,6 @@ const WorkOrderTracking = () => {
                         </div>
                       )}
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${getResponseColor(workOrder.status)}`}>
-                      {workOrder.status === 'pending' ? 'Pending' : 
-                       workOrder.status === 'in-progress' ? 'Yes' :
-                       workOrder.status === 'completed' ? 'Yes' : 'No'}
-                    </span>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
