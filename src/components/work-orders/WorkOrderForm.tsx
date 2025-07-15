@@ -78,8 +78,37 @@ export function WorkOrderForm({ onSubmit, onCancel, initialData }: WorkOrderForm
     ecosure: initialData?.ecosure || 'N/A',
   });
 
+  const [storeNumberError, setStoreNumberError] = useState('');
+
+  const validateStoreNumber = (value: string) => {
+    const pattern = /^#?\d{3,4}$/;
+    if (!value) {
+      setStoreNumberError('Store number is required');
+      return false;
+    }
+    if (!pattern.test(value)) {
+      setStoreNumberError('Store number must be 3-4 digits (e.g., #1234 or 1234)');
+      return false;
+    }
+    setStoreNumberError('');
+    return true;
+  };
+
+  const handleStoreNumberChange = (value: string) => {
+    // Auto-add # prefix if user enters just numbers
+    let formattedValue = value;
+    if (value && !value.startsWith('#') && /^\d/.test(value)) {
+      formattedValue = '#' + value;
+    }
+    setFormData({ ...formData, store_number: formattedValue });
+    validateStoreNumber(formattedValue);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateStoreNumber(formData.store_number)) {
+      return;
+    }
     onSubmit(formData);
   };
 
@@ -153,10 +182,14 @@ export function WorkOrderForm({ onSubmit, onCancel, initialData }: WorkOrderForm
               <Input
                 id="store_number"
                 value={formData.store_number}
-                onChange={(e) => setFormData({ ...formData, store_number: e.target.value })}
-                placeholder="e.g., 001, 045"
+                onChange={(e) => handleStoreNumberChange(e.target.value)}
+                placeholder="#1234"
                 required
+                className={storeNumberError ? 'border-destructive' : ''}
               />
+              {storeNumberError && (
+                <p className="text-sm text-destructive mt-1">{storeNumberError}</p>
+              )}
             </div>
             
             <div>

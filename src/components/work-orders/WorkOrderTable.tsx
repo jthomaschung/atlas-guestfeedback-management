@@ -12,15 +12,23 @@ interface WorkOrderTableProps {
 }
 
 const statusColors = {
-  pending: 'bg-yellow-500/10 text-yellow-700 border-yellow-200',
-  'in-progress': 'bg-blue-500/10 text-blue-700 border-blue-200',
-  completed: 'bg-green-500/10 text-green-700 border-green-200',
+  pending: 'bg-warning/10 text-warning-foreground border-warning/20',
+  'in-progress': 'bg-info/10 text-info-foreground border-info/20',
+  completed: 'bg-success/10 text-success-foreground border-success/20',
 };
 
 const priorityColors = {
-  Low: 'bg-gray-500/10 text-gray-700 border-gray-200',
-  Important: 'bg-orange-500/10 text-orange-700 border-orange-200',
-  Critical: 'bg-red-500/10 text-red-700 border-red-200',
+  Low: 'bg-muted text-muted-foreground border-muted-foreground/20',
+  Important: 'bg-warning/10 text-warning-foreground border-warning/20',
+  Critical: 'bg-destructive/10 text-destructive-foreground border-destructive/20',
+};
+
+const ecoSureColors = {
+  'N/A': 'bg-muted text-muted-foreground border-muted-foreground/20',
+  'Minor': 'bg-info/10 text-info-foreground border-info/20',
+  'Major': 'bg-warning/10 text-warning-foreground border-warning/20',
+  'Critical': 'bg-destructive/10 text-destructive-foreground border-destructive/20',
+  'Imminent Health': 'bg-destructive text-destructive-foreground border-destructive',
 };
 
 export function WorkOrderTable({ workOrders, onStatusChange, onEdit }: WorkOrderTableProps) {
@@ -61,7 +69,11 @@ export function WorkOrderTable({ workOrders, onStatusChange, onEdit }: WorkOrder
                   {workOrder.status.replace('-', ' ')}
                 </Badge>
               </TableCell>
-              <TableCell>{workOrder.ecosure}</TableCell>
+              <TableCell>
+                <Badge className={ecoSureColors[workOrder.ecosure as keyof typeof ecoSureColors]}>
+                  {workOrder.ecosure}
+                </Badge>
+              </TableCell>
               <TableCell>
                 <div className="flex items-center text-sm text-muted-foreground">
                   <Calendar className="h-3 w-3 mr-1" />
