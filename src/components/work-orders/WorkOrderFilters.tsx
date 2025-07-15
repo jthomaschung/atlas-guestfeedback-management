@@ -16,6 +16,8 @@ interface WorkOrderFiltersProps {
   marketFilter: string;
   onMarketFilterChange: (value: string) => void;
   onClearFilters: () => void;
+  availableStores: string[];
+  availableMarkets: string[];
 }
 
 const statusOptions = [
@@ -25,13 +27,6 @@ const statusOptions = [
   { value: 'completed', label: 'Completed' },
 ];
 
-const storeOptions = [
-  { value: 'all', label: 'All Stores' },
-];
-
-const marketOptions = [
-  { value: 'all', label: 'All Markets' },
-];
 
 const priorityOptions = [
   { value: 'all', label: 'All Priorities' },
@@ -52,7 +47,18 @@ export function WorkOrderFilters({
   marketFilter,
   onMarketFilterChange,
   onClearFilters,
+  availableStores,
+  availableMarkets,
 }: WorkOrderFiltersProps) {
+  const storeOptions = [
+    { value: 'all', label: 'All Stores' },
+    ...availableStores.map(store => ({ value: store, label: `Store ${store}` }))
+  ];
+
+  const marketOptions = [
+    { value: 'all', label: 'All Markets' },
+    ...availableMarkets.map(market => ({ value: market, label: market }))
+  ];
   const hasActiveFilters = 
     searchTerm !== '' ||
     statusFilter !== 'all' ||

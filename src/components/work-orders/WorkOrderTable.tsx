@@ -76,7 +76,7 @@ export function WorkOrderTable({ workOrders, onStatusChange, onEdit, onViewDetai
                   onClick={() => onViewDetails(workOrder)}
                   title="Click to view/edit details"
                 >
-                  {workOrder.status.replace('-', ' ')}
+                  {workOrder.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                 </Badge>
               </TableCell>
               <TableCell>

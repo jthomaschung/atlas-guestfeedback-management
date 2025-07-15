@@ -66,6 +66,16 @@ const Index = () => {
   
   const { toast } = useToast();
 
+  const availableStores = useMemo(() => {
+    const stores = [...new Set(workOrders.map(wo => wo.store_number))];
+    return stores.sort();
+  }, [workOrders]);
+
+  const availableMarkets = useMemo(() => {
+    const markets = [...new Set(workOrders.map(wo => wo.market))];
+    return markets.sort();
+  }, [workOrders]);
+
   const filteredWorkOrders = useMemo(() => {
     return workOrders.filter(wo => {
       const matchesSearch = wo.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -214,6 +224,8 @@ const Index = () => {
           marketFilter={marketFilter}
           onMarketFilterChange={setMarketFilter}
           onClearFilters={clearFilters}
+          availableStores={availableStores}
+          availableMarkets={availableMarkets}
         />
 
         {filteredWorkOrders.length === 0 ? (
