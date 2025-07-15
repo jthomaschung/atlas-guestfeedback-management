@@ -4,8 +4,9 @@ import { WorkOrderFilters } from "@/components/work-orders/WorkOrderFilters";
 import { WorkOrderDetails } from "@/components/work-orders/WorkOrderDetails";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUpDown, Calendar, Clock, MapPin, User, Wrench, AlertTriangle } from "lucide-react";
+import { ArrowUpDown, Calendar, Clock, MapPin, User, Wrench, AlertTriangle, Eye, FileText } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 
 // Sample data - in a real app this would come from API
@@ -13,44 +14,58 @@ const sampleWorkOrders: WorkOrder[] = [
   {
     id: '1',
     user_id: 'sample-user',
-    description: 'The ice machine in the bar area is not producing ice. Needs immediate attention as it affects drink service.',
-    repair_type: 'Ice Machine',
-    store_number: '001',
-    market: 'AZ1',
+    description: 'Cold table not working',
+    repair_type: 'Cold Tables',
+    store_number: '1955',
+    market: 'AZ4',
     priority: 'Critical',
     ecosure: 'Minor',
     status: 'pending',
     assignee: 'John Smith',
-    created_at: new Date('2024-01-10').toISOString(),
-    updated_at: new Date('2024-01-10').toISOString()
+    created_at: new Date('2024-02-21').toISOString(),
+    updated_at: new Date('2024-02-21').toISOString()
   },
   {
     id: '2',
     user_id: 'sample-user',
-    description: 'Walk-in freezer door seal is damaged and not maintaining proper temperature.',
-    repair_type: 'Walk In Cooler / Freezer',
-    store_number: '045',
-    market: 'FL1',
-    priority: 'Important',
+    description: 'Retarder feels less cool, Ive adjusted temp',
+    repair_type: 'Retarder',
+    store_number: '4024',
+    market: 'IE/LA',
+    priority: 'Critical',
     ecosure: 'Major',
     status: 'in-progress',
     assignee: 'Sarah Johnson',
-    created_at: new Date('2024-01-12').toISOString(),
-    updated_at: new Date('2024-01-12').toISOString()
+    created_at: new Date('2024-07-09').toISOString(),
+    updated_at: new Date('2024-07-09').toISOString()
   },
   {
     id: '3',
     user_id: 'sample-user',
-    description: 'General maintenance needed for dining area equipment.',
-    repair_type: 'General Maintenance',
-    store_number: '023',
-    market: 'OC',
-    priority: 'Low',
+    description: 'Walk-In hovering around 50',
+    repair_type: 'Walk In Cooler / Freezer',
+    store_number: '3187',
+    market: 'FL3',
+    priority: 'Critical',
     ecosure: 'N/A',
     status: 'completed',
-    completed_at: new Date('2024-01-11').toISOString(),
-    created_at: new Date('2024-01-08').toISOString(),
-    updated_at: new Date('2024-01-11').toISOString()
+    assignee: 'Mike Wilson',
+    completed_at: new Date('2024-01-24').toISOString(),
+    created_at: new Date('2024-01-24').toISOString(),
+    updated_at: new Date('2024-01-24').toISOString()
+  },
+  {
+    id: '4',
+    user_id: 'sample-user',
+    description: 'AC handler on rooftop damaged side panel',
+    repair_type: 'AC / Heating',
+    store_number: '3612',
+    market: 'FL1',
+    priority: 'Critical',
+    ecosure: 'Major',
+    status: 'pending',
+    created_at: new Date('2024-05-15').toISOString(),
+    updated_at: new Date('2024-05-15').toISOString()
   },
 ];
 
@@ -180,22 +195,32 @@ const WorkOrderTracking = () => {
     });
   };
 
-  const getStatusBadgeVariant = (status: WorkOrderStatus) => {
+  const getStatusColor = (status: WorkOrderStatus) => {
     switch (status) {
-      case 'pending': return 'secondary';
-      case 'in-progress': return 'default';
-      case 'completed': return 'outline';
-      case 'cancelled': return 'destructive';
-      default: return 'secondary';
+      case 'pending': return 'bg-yellow-500';
+      case 'in-progress': return 'bg-blue-500';
+      case 'completed': return 'bg-green-500';
+      case 'cancelled': return 'bg-red-500';
+      default: return 'bg-gray-500';
     }
   };
 
-  const getPriorityBadgeVariant = (priority: WorkOrderPriority) => {
+  const getResponseColor = (status: WorkOrderStatus) => {
+    switch (status) {
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'in-progress': return 'bg-blue-100 text-blue-800';
+      case 'completed': return 'bg-green-100 text-green-800';
+      case 'cancelled': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getPriorityColor = (priority: WorkOrderPriority) => {
     switch (priority) {
-      case 'Critical': return 'destructive';
-      case 'Important': return 'default';
-      case 'Low': return 'secondary';
-      default: return 'secondary';
+      case 'Critical': return 'bg-red-100 text-red-800';
+      case 'Important': return 'bg-orange-100 text-orange-800';
+      case 'Low': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -264,67 +289,100 @@ const WorkOrderTracking = () => {
           </div>
         </div>
 
-        <div className="space-y-3">
-          {filteredAndSortedWorkOrders.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-muted-foreground">
-                <Wrench className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <h3 className="text-lg font-medium mb-2">No work orders found</h3>
-                <p>Try adjusting your filters or search terms.</p>
-              </div>
-            </div>
-          ) : (
-            filteredAndSortedWorkOrders.map((workOrder) => (
-              <div
-                key={workOrder.id}
-                className="bg-card border border-border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => handleViewDetails(workOrder)}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <Badge variant={getStatusBadgeVariant(workOrder.status)}>
-                        {workOrder.status.replace('-', ' ').toUpperCase()}
-                      </Badge>
-                      <Badge variant={getPriorityBadgeVariant(workOrder.priority)}>
-                        {workOrder.priority === 'Critical' && <AlertTriangle className="h-3 w-3 mr-1" />}
-                        {workOrder.priority}
-                      </Badge>
-                      <span className="text-sm text-muted-foreground flex items-center gap-1">
-                        <Wrench className="h-3 w-3" />
-                        {workOrder.repair_type}
-                      </span>
-                      <span className="text-sm text-muted-foreground flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        Store {workOrder.store_number} - {workOrder.market}
-                      </span>
-                    </div>
-                    
-                    <p className="text-foreground font-medium">{workOrder.description}</p>
-                    
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        Created: {formatDate(workOrder.created_at)}
-                      </span>
-                      {workOrder.assignee && (
-                        <span className="flex items-center gap-1">
-                          <User className="h-3 w-3" />
-                          {workOrder.assignee}
-                        </span>
-                      )}
-                      {workOrder.completed_at && (
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          Completed: {formatDate(workOrder.completed_at)}
-                        </span>
+        <div className="border rounded-lg overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50">
+                <TableHead className="w-8"></TableHead>
+                <TableHead className="min-w-[200px]">Repair Description</TableHead>
+                <TableHead className="w-[100px]">Assigned To</TableHead>
+                <TableHead className="w-[100px]">Response</TableHead>
+                <TableHead className="w-[80px]">Status</TableHead>
+                <TableHead className="w-[80px]">Priority</TableHead>
+                <TableHead className="w-[100px]">Repair Type</TableHead>
+                <TableHead className="w-[120px]">Date Submitted</TableHead>
+                <TableHead className="w-[80px]">Store #</TableHead>
+                <TableHead className="w-[80px]">Market</TableHead>
+                <TableHead className="w-[100px]">Date Closed</TableHead>
+                <TableHead className="w-[40px]">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredAndSortedWorkOrders.map((workOrder) => (
+                <TableRow key={workOrder.id} className="hover:bg-muted/50">
+                  <TableCell>
+                    <input type="checkbox" className="rounded" />
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {workOrder.description}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center justify-center">
+                      {workOrder.assignee ? (
+                        <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-medium">
+                          {workOrder.assignee.split(' ').map(n => n[0]).join('')}
+                        </div>
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                          <User className="h-4 w-4 text-gray-500" />
+                        </div>
                       )}
                     </div>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
+                  </TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${getResponseColor(workOrder.status)}`}>
+                      {workOrder.status === 'pending' ? 'Pending' : 
+                       workOrder.status === 'in-progress' ? 'Yes' :
+                       workOrder.status === 'completed' ? 'Yes' : 'No'}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      <div className={`w-3 h-3 rounded-full ${getStatusColor(workOrder.status)}`}></div>
+                      <span className="text-xs font-medium">
+                        {workOrder.status === 'pending' ? 'Pending' :
+                         workOrder.status === 'in-progress' ? 'In Progress' :
+                         workOrder.status === 'completed' ? 'Completed' : 'Cancelled'}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded text-xs font-medium flex items-center gap-1 ${getPriorityColor(workOrder.priority)}`}>
+                      {workOrder.priority === 'Critical' && <AlertTriangle className="h-3 w-3" />}
+                      {workOrder.priority}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="text-xs">
+                      {workOrder.repair_type}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-xs">
+                    {formatDate(workOrder.created_at)}
+                  </TableCell>
+                  <TableCell className="text-center font-medium">
+                    {workOrder.store_number}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {workOrder.market}
+                  </TableCell>
+                  <TableCell className="text-xs">
+                    {workOrder.completed_at ? formatDate(workOrder.completed_at) : '-'}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleViewDetails(workOrder)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
 
         {viewingWorkOrder && (
