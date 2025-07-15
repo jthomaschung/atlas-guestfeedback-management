@@ -24,7 +24,7 @@ const statusColors = {
 };
 
 const priorityColors = {
-  Low: 'bg-muted/20 text-muted-foreground border-muted-foreground/40 hover:bg-muted/30',
+  Low: 'bg-muted/40 text-muted-foreground border-muted-foreground/40 hover:bg-muted/30',
   Important: 'bg-warning/20 text-warning-foreground border-warning/40 hover:bg-warning/30',
   Critical: 'bg-destructive/20 text-destructive-foreground border-destructive/40 hover:bg-destructive/30',
 };
