@@ -4,9 +4,10 @@ import { ClipboardList, Clock, CheckCircle, AlertTriangle } from "lucide-react";
 
 interface WorkOrderStatsProps {
   workOrders: WorkOrder[];
+  onFilterChange: (type: 'status' | 'priority', value: string) => void;
 }
 
-export function WorkOrderStats({ workOrders }: WorkOrderStatsProps) {
+export function WorkOrderStats({ workOrders, onFilterChange }: WorkOrderStatsProps) {
   const totalOrders = workOrders.length;
   const pending = workOrders.filter(wo => wo.status === 'pending').length;
   const inProgress = workOrders.filter(wo => wo.status === 'in-progress').length;
@@ -15,35 +16,43 @@ export function WorkOrderStats({ workOrders }: WorkOrderStatsProps) {
 
   const stats = [
     {
-      title: 'Total Orders',
+      title: 'Total Work Orders',
       value: totalOrders,
       icon: ClipboardList,
       color: 'text-primary',
+      onClick: () => onFilterChange('status', 'all'),
     },
     {
       title: 'In Progress',
       value: inProgress,
       icon: Clock,
       color: 'text-info',
+      onClick: () => onFilterChange('status', 'in-progress'),
     },
     {
       title: 'Completed',
       value: completed,
       icon: CheckCircle,
       color: 'text-success',
+      onClick: () => onFilterChange('status', 'completed'),
     },
     {
       title: 'Critical',
       value: critical,
       icon: AlertTriangle,
       color: 'text-destructive',
+      onClick: () => onFilterChange('priority', 'Critical'),
     },
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {stats.map((stat) => (
-        <Card key={stat.title}>
+        <Card 
+          key={stat.title} 
+          className="cursor-pointer hover:shadow-md transition-shadow"
+          onClick={stat.onClick}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               {stat.title}

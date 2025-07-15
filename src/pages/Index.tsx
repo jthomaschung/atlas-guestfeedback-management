@@ -183,6 +183,21 @@ const Index = () => {
     setMarketFilter('all');
   };
 
+  const handleStatsFilterChange = (type: 'status' | 'priority', value: string) => {
+    if (type === 'status') {
+      setStatusFilter(value as WorkOrderStatus | 'all');
+      // Reset other filters when clicking stats
+      setPriorityFilter('all');
+    } else if (type === 'priority') {
+      setPriorityFilter(value as WorkOrderPriority | 'all');
+      // Reset other filters when clicking stats
+      setStatusFilter('all');
+    }
+    setSearchTerm('');
+    setStoreFilter('all');
+    setMarketFilter('all');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-6 space-y-6">
@@ -210,7 +225,7 @@ const Index = () => {
           </Dialog>
         </div>
 
-        <WorkOrderStats workOrders={workOrders} />
+        <WorkOrderStats workOrders={workOrders} onFilterChange={handleStatsFilterChange} />
 
         <WorkOrderFilters
           searchTerm={searchTerm}
