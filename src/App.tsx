@@ -9,6 +9,7 @@ import { AppSidebar } from '@/components/AppSidebar';
 import Welcome from '@/pages/Welcome';
 import Index from '@/pages/Index';
 import SubmitWorkOrder from '@/pages/SubmitWorkOrder';
+import WorkOrderTracking from '@/pages/WorkOrderTracking';
 import Reporting from '@/pages/Reporting';
 
 const queryClient = new QueryClient();
@@ -91,6 +92,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <SubmitWorkOrder />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/tracking" 
+                element={
+                  <ProtectedRoute>
+                    <WorkOrderTracking />
                   </ProtectedRoute>
                 } 
               />

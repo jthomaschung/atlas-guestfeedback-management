@@ -1,4 +1,4 @@
-import { PlusCircle, LayoutDashboard, BarChart3 } from "lucide-react";
+import { PlusCircle, LayoutDashboard, BarChart3, ClipboardList } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
 import {
@@ -17,6 +17,7 @@ import {
 const items = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Submit New Work Order", url: "/submit", icon: PlusCircle },
+  { title: "Work Order Tracking", url: "/tracking", icon: ClipboardList },
   { title: "Reporting", url: "/reporting", icon: BarChart3 },
 ];
 
