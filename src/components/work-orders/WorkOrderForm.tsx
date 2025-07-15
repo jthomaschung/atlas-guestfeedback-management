@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { WorkOrderFormData, WorkOrderCategory, WorkOrderPriority } from "@/types/work-order";
+import { WorkOrderFormData, RepairType, WorkOrderPriority, Market } from "@/types/work-order";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,40 +18,64 @@ interface WorkOrderFormProps {
   initialData?: Partial<WorkOrderFormData>;
 }
 
-const categories: { value: WorkOrderCategory; label: string }[] = [
-  { value: 'equipment', label: 'Equipment' },
-  { value: 'cleaning', label: 'Cleaning' },
-  { value: 'maintenance', label: 'Maintenance' },
-  { value: 'supplies', label: 'Supplies' },
-  { value: 'other', label: 'Other' },
+const repairTypes: { value: RepairType; label: string }[] = [
+  { value: 'AC / Heating', label: 'AC / Heating' },
+  { value: 'Walk In Cooler / Freezer', label: 'Walk In Cooler / Freezer' },
+  { value: 'Ice Machine', label: 'Ice Machine' },
+  { value: 'Cold Tables', label: 'Cold Tables' },
+  { value: 'Oven / Proofer', label: 'Oven / Proofer' },
+  { value: 'Plumbing', label: 'Plumbing' },
+  { value: 'Electrical', label: 'Electrical' },
+  { value: 'General Maintenance', label: 'General Maintenance' },
+  { value: 'Exterior Signage', label: 'Exterior Signage' },
+  { value: 'Retarder', label: 'Retarder' },
+  { value: 'Toasted Sandwich Oven', label: 'Toasted Sandwich Oven' },
+  { value: 'POS / Network', label: 'POS / Network' },
+  { value: 'Doors / Windows', label: 'Doors / Windows' },
 ];
 
 const priorities: { value: WorkOrderPriority; label: string }[] = [
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'High' },
-  { value: 'urgent', label: 'Urgent' },
+  { value: 'Low', label: 'Low' },
+  { value: 'Important', label: 'Important' },
+  { value: 'Critical', label: 'Critical' },
 ];
 
-const staffMembers = [
-  'John Smith',
-  'Maria Garcia',
-  'David Chen',
-  'Sarah Johnson',
-  'Mike Williams',
-  'Lisa Brown',
+const markets: { value: Market; label: string }[] = [
+  { value: 'AZ1', label: 'AZ1' },
+  { value: 'AZ2', label: 'AZ2' },
+  { value: 'AZ3', label: 'AZ3' },
+  { value: 'AZ4', label: 'AZ4' },
+  { value: 'AZ5', label: 'AZ5' },
+  { value: 'IE/LA', label: 'IE/LA' },
+  { value: 'OC', label: 'OC' },
+  { value: 'MN1', label: 'MN1' },
+  { value: 'MN2', label: 'MN2' },
+  { value: 'NE1', label: 'NE1' },
+  { value: 'NE2', label: 'NE2' },
+  { value: 'NE3', label: 'NE3' },
+  { value: 'NE4', label: 'NE4' },
+  { value: 'FL1', label: 'FL1' },
+  { value: 'FL2', label: 'FL2' },
+  { value: 'FL3', label: 'FL3' },
+  { value: 'PA', label: 'PA' },
+];
+
+const ecoSureOptions = [
+  { value: 'N/A', label: 'N/A' },
+  { value: 'Minor', label: 'Minor' },
+  { value: 'Major', label: 'Major' },
+  { value: 'Critical', label: 'Critical' },
+  { value: 'Imminent Health', label: 'Imminent Health' },
 ];
 
 export function WorkOrderForm({ onSubmit, onCancel, initialData }: WorkOrderFormProps) {
   const [formData, setFormData] = useState<WorkOrderFormData>({
-    title: initialData?.title || '',
     description: initialData?.description || '',
-    category: initialData?.category || 'maintenance',
-    priority: initialData?.priority || 'medium',
-    assignedTo: initialData?.assignedTo || '',
-    dueDate: initialData?.dueDate || new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
-    location: initialData?.location || '',
-    estimatedHours: initialData?.estimatedHours || undefined,
+    repair_type: initialData?.repair_type || 'General Maintenance',
+    store_number: initialData?.store_number || '',
+    market: initialData?.market || 'AZ1',
+    priority: initialData?.priority || 'Low',
+    ecosure: initialData?.ecosure || 'N/A',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -71,17 +95,6 @@ export function WorkOrderForm({ onSubmit, onCancel, initialData }: WorkOrderForm
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <Label htmlFor="title">Title *</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="Brief description of the work needed"
-                required
-              />
-            </div>
-            
-            <div className="md:col-span-2">
               <Label htmlFor="description">Description *</Label>
               <Textarea
                 id="description"
@@ -94,20 +107,20 @@ export function WorkOrderForm({ onSubmit, onCancel, initialData }: WorkOrderForm
             </div>
             
             <div>
-              <Label>Category *</Label>
+              <Label>Repair Type *</Label>
               <Select 
-                value={formData.category} 
-                onValueChange={(value: WorkOrderCategory) => 
-                  setFormData({ ...formData, category: value })
+                value={formData.repair_type} 
+                onValueChange={(value: RepairType) => 
+                  setFormData({ ...formData, repair_type: value })
                 }
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.value} value={category.value}>
-                      {category.label}
+                  {repairTypes.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -136,20 +149,31 @@ export function WorkOrderForm({ onSubmit, onCancel, initialData }: WorkOrderForm
             </div>
             
             <div>
-              <Label>Assigned To *</Label>
+              <Label htmlFor="store_number">Store Number *</Label>
+              <Input
+                id="store_number"
+                value={formData.store_number}
+                onChange={(e) => setFormData({ ...formData, store_number: e.target.value })}
+                placeholder="e.g., 001, 045"
+                required
+              />
+            </div>
+            
+            <div>
+              <Label>Market *</Label>
               <Select 
-                value={formData.assignedTo} 
-                onValueChange={(value) => 
-                  setFormData({ ...formData, assignedTo: value })
+                value={formData.market} 
+                onValueChange={(value: Market) => 
+                  setFormData({ ...formData, market: value })
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select staff member" />
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {staffMembers.map((staff) => (
-                    <SelectItem key={staff} value={staff}>
-                      {staff}
+                  {markets.map((market) => (
+                    <SelectItem key={market.value} value={market.value}>
+                      {market.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -157,56 +181,33 @@ export function WorkOrderForm({ onSubmit, onCancel, initialData }: WorkOrderForm
             </div>
             
             <div>
-              <Label>Due Date *</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !formData.dueDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.dueDate ? format(formData.dueDate, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={formData.dueDate}
-                    onSelect={(date) => date && setFormData({ ...formData, dueDate: date })}
-                    disabled={(date) => date < new Date()}
-                    initialFocus
-                    className="p-3 pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
+              <Label>EcoSure *</Label>
+              <Select 
+                value={formData.ecosure} 
+                onValueChange={(value) => 
+                  setFormData({ ...formData, ecosure: value as any })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ecoSureOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             
             <div>
-              <Label htmlFor="location">Location</Label>
+              <Label htmlFor="image">Image (Optional)</Label>
               <Input
-                id="location"
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                placeholder="e.g., Kitchen, Dining Room, Storage"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="estimatedHours">Estimated Hours</Label>
-              <Input
-                id="estimatedHours"
-                type="number"
-                step="0.5"
-                min="0"
-                value={formData.estimatedHours || ''}
-                onChange={(e) => setFormData({ 
-                  ...formData, 
-                  estimatedHours: e.target.value ? Number(e.target.value) : undefined 
-                })}
-                placeholder="2.5"
+                id="image"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setFormData({ ...formData, image: e.target.files?.[0] })}
               />
             </div>
           </div>

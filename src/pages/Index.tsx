@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { WorkOrder, WorkOrderFormData, WorkOrderStatus, WorkOrderCategory, WorkOrderPriority } from "@/types/work-order";
+import { WorkOrder, WorkOrderFormData, WorkOrderStatus, WorkOrderPriority, RepairType } from "@/types/work-order";
 import { WorkOrderCard } from "@/components/work-orders/WorkOrderCard";
 import { WorkOrderForm } from "@/components/work-orders/WorkOrderForm";
 import { WorkOrderStats } from "@/components/work-orders/WorkOrderStats";
@@ -13,74 +13,42 @@ import { useToast } from "@/hooks/use-toast";
 const sampleWorkOrders: WorkOrder[] = [
   {
     id: '1',
-    title: 'Fix broken ice machine',
+    user_id: 'sample-user',
     description: 'The ice machine in the bar area is not producing ice. Needs immediate attention as it affects drink service.',
-    category: 'equipment',
-    priority: 'urgent',
+    repair_type: 'Ice Machine',
+    store_number: '001',
+    market: 'AZ1',
+    priority: 'Critical',
+    ecosure: 'Minor',
     status: 'pending',
-    assignedTo: 'John Smith',
-    createdBy: 'Manager',
-    createdAt: new Date('2024-01-10'),
-    dueDate: new Date('2024-01-15'),
-    location: 'Bar Area',
-    estimatedHours: 2,
+    created_at: new Date('2024-01-10').toISOString(),
+    updated_at: new Date('2024-01-10').toISOString(),
   },
   {
     id: '2',
-    title: 'Deep clean fryer',
-    description: 'Weekly deep cleaning of the main fryer unit including oil change and filter replacement.',
-    category: 'cleaning',
-    priority: 'medium',
+    user_id: 'sample-user',
+    description: 'Walk-in freezer door seal is damaged and not maintaining proper temperature.',
+    repair_type: 'Walk In Cooler / Freezer',
+    store_number: '045',
+    market: 'FL1',
+    priority: 'Important',
+    ecosure: 'Major',
     status: 'in-progress',
-    assignedTo: 'Maria Garcia',
-    createdBy: 'Head Chef',
-    createdAt: new Date('2024-01-12'),
-    dueDate: new Date('2024-01-18'),
-    location: 'Kitchen',
-    estimatedHours: 3,
+    created_at: new Date('2024-01-12').toISOString(),
+    updated_at: new Date('2024-01-12').toISOString(),
   },
   {
     id: '3',
-    title: 'Replace dining room light bulbs',
-    description: 'Several light bulbs in the main dining area need replacement. Check all fixtures.',
-    category: 'maintenance',
-    priority: 'low',
+    user_id: 'sample-user',
+    description: 'General maintenance needed for dining area equipment.',
+    repair_type: 'General Maintenance',
+    store_number: '023',
+    market: 'OC',
+    priority: 'Low',
+    ecosure: 'N/A',
     status: 'completed',
-    assignedTo: 'David Chen',
-    createdBy: 'Floor Manager',
-    createdAt: new Date('2024-01-08'),
-    dueDate: new Date('2024-01-12'),
-    completedAt: new Date('2024-01-11'),
-    location: 'Dining Room',
-    estimatedHours: 1,
-  },
-  {
-    id: '4',
-    title: 'Repair freezer door seal',
-    description: 'Walk-in freezer door seal is damaged and not maintaining proper temperature.',
-    category: 'equipment',
-    priority: 'high',
-    status: 'pending',
-    assignedTo: 'Sarah Johnson',
-    createdBy: 'Kitchen Manager',
-    createdAt: new Date('2024-01-13'),
-    dueDate: new Date('2024-01-14'),
-    location: 'Kitchen Storage',
-    estimatedHours: 1.5,
-  },
-  {
-    id: '5',
-    title: 'Restock cleaning supplies',
-    description: 'Running low on sanitizer, paper towels, and cleaning chemicals for the kitchen.',
-    category: 'supplies',
-    priority: 'medium',
-    status: 'pending',
-    assignedTo: 'Mike Williams',
-    createdBy: 'Assistant Manager',
-    createdAt: new Date('2024-01-13'),
-    dueDate: new Date('2024-01-16'),
-    location: 'Storage Room',
-    estimatedHours: 0.5,
+    created_at: new Date('2024-01-08').toISOString(),
+    updated_at: new Date('2024-01-11').toISOString(),
   },
 ];
 
@@ -90,7 +58,7 @@ const Index = () => {
   const [editingWorkOrder, setEditingWorkOrder] = useState<WorkOrder | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<WorkOrderStatus | 'all'>('all');
-  const [categoryFilter, setCategoryFilter] = useState<WorkOrderCategory | 'all'>('all');
+  const [categoryFilter, setCategoryFilter] = useState<RepairType | 'all'>('all');
   const [priorityFilter, setPriorityFilter] = useState<WorkOrderPriority | 'all'>('all');
   const [assigneeFilter, setAssigneeFilter] = useState('All Assignees');
   
@@ -98,14 +66,14 @@ const Index = () => {
 
   const filteredWorkOrders = useMemo(() => {
     return workOrders.filter(wo => {
-      const matchesSearch = wo.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           wo.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           wo.assignedTo.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = wo.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           wo.repair_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           wo.store_number.includes(searchTerm);
       
       const matchesStatus = statusFilter === 'all' || wo.status === statusFilter;
-      const matchesCategory = categoryFilter === 'all' || wo.category === categoryFilter;
+      const matchesCategory = categoryFilter === 'all' || wo.repair_type === categoryFilter;
       const matchesPriority = priorityFilter === 'all' || wo.priority === priorityFilter;
-      const matchesAssignee = assigneeFilter === 'All Assignees' || wo.assignedTo === assigneeFilter;
+      const matchesAssignee = assigneeFilter === 'All Assignees'; // No assignee field in new structure
       
       return matchesSearch && matchesStatus && matchesCategory && matchesPriority && matchesAssignee;
     });
@@ -114,10 +82,11 @@ const Index = () => {
   const handleCreateWorkOrder = (formData: WorkOrderFormData) => {
     const newWorkOrder: WorkOrder = {
       id: Date.now().toString(),
+      user_id: 'current-user',
       ...formData,
       status: 'pending',
-      createdBy: 'Current User',
-      createdAt: new Date(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
     
     setWorkOrders(prev => [newWorkOrder, ...prev]);
@@ -125,7 +94,7 @@ const Index = () => {
     
     toast({
       title: "Work order created",
-      description: `"${formData.title}" has been created and assigned to ${formData.assignedTo}.`,
+      description: `Work order for ${formData.repair_type} at store ${formData.store_number} has been created.`,
     });
   };
 
@@ -135,6 +104,7 @@ const Index = () => {
     const updatedWorkOrder: WorkOrder = {
       ...editingWorkOrder,
       ...formData,
+      updated_at: new Date().toISOString(),
     };
     
     setWorkOrders(prev => 
@@ -144,7 +114,7 @@ const Index = () => {
     
     toast({
       title: "Work order updated",
-      description: `"${formData.title}" has been updated.`,
+      description: `Work order for ${formData.repair_type} has been updated.`,
     });
   };
 
@@ -155,7 +125,7 @@ const Index = () => {
           ? {
               ...wo,
               status: newStatus,
-              completedAt: newStatus === 'completed' ? new Date() : undefined,
+              updated_at: new Date().toISOString(),
             }
           : wo
       )
@@ -165,7 +135,7 @@ const Index = () => {
     if (workOrder) {
       toast({
         title: "Status updated",
-        description: `"${workOrder.title}" is now ${newStatus.replace('-', ' ')}.`,
+        description: `Work order for ${workOrder.repair_type} is now ${newStatus.replace('-', ' ')}.`,
       });
     }
   };

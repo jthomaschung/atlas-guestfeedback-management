@@ -1,4 +1,4 @@
-import { WorkOrderStatus, WorkOrderCategory, WorkOrderPriority } from "@/types/work-order";
+import { WorkOrderStatus, WorkOrderPriority, RepairType } from "@/types/work-order";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,8 +9,8 @@ interface WorkOrderFiltersProps {
   onSearchChange: (value: string) => void;
   statusFilter: WorkOrderStatus | 'all';
   onStatusFilterChange: (value: WorkOrderStatus | 'all') => void;
-  categoryFilter: WorkOrderCategory | 'all';
-  onCategoryFilterChange: (value: WorkOrderCategory | 'all') => void;
+  categoryFilter: RepairType | 'all';
+  onCategoryFilterChange: (value: RepairType | 'all') => void;
   priorityFilter: WorkOrderPriority | 'all';
   onPriorityFilterChange: (value: WorkOrderPriority | 'all') => void;
   assigneeFilter: string;
@@ -27,19 +27,26 @@ const statusOptions = [
 
 const categoryOptions = [
   { value: 'all', label: 'All Categories' },
-  { value: 'equipment', label: 'Equipment' },
-  { value: 'cleaning', label: 'Cleaning' },
-  { value: 'maintenance', label: 'Maintenance' },
-  { value: 'supplies', label: 'Supplies' },
-  { value: 'other', label: 'Other' },
+  { value: 'AC / Heating', label: 'AC / Heating' },
+  { value: 'Walk In Cooler / Freezer', label: 'Walk In Cooler / Freezer' },
+  { value: 'Ice Machine', label: 'Ice Machine' },
+  { value: 'Cold Tables', label: 'Cold Tables' },
+  { value: 'Oven / Proofer', label: 'Oven / Proofer' },
+  { value: 'Plumbing', label: 'Plumbing' },
+  { value: 'Electrical', label: 'Electrical' },
+  { value: 'General Maintenance', label: 'General Maintenance' },
+  { value: 'Exterior Signage', label: 'Exterior Signage' },
+  { value: 'Retarder', label: 'Retarder' },
+  { value: 'Toasted Sandwich Oven', label: 'Toasted Sandwich Oven' },
+  { value: 'POS / Network', label: 'POS / Network' },
+  { value: 'Doors / Windows', label: 'Doors / Windows' },
 ];
 
 const priorityOptions = [
   { value: 'all', label: 'All Priorities' },
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'High' },
-  { value: 'urgent', label: 'Urgent' },
+  { value: 'Low', label: 'Low' },
+  { value: 'Important', label: 'Important' },
+  { value: 'Critical', label: 'Critical' },
 ];
 
 const staffMembers = [

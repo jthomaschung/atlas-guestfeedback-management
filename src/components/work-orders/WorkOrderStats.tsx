@@ -11,9 +11,7 @@ export function WorkOrderStats({ workOrders }: WorkOrderStatsProps) {
   const pending = workOrders.filter(wo => wo.status === 'pending').length;
   const inProgress = workOrders.filter(wo => wo.status === 'in-progress').length;
   const completed = workOrders.filter(wo => wo.status === 'completed').length;
-  const overdue = workOrders.filter(wo => 
-    wo.dueDate < new Date() && wo.status !== 'completed'
-  ).length;
+  const critical = workOrders.filter(wo => wo.priority === 'Critical').length;
 
   const stats = [
     {
@@ -35,8 +33,8 @@ export function WorkOrderStats({ workOrders }: WorkOrderStatsProps) {
       color: 'text-success',
     },
     {
-      title: 'Overdue',
-      value: overdue,
+      title: 'Critical',
+      value: critical,
       icon: AlertTriangle,
       color: 'text-destructive',
     },

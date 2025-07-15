@@ -12,24 +12,15 @@ interface WorkOrderCardProps {
 }
 
 const priorityColors = {
-  low: 'bg-muted text-muted-foreground',
-  medium: 'bg-info text-info-foreground',
-  high: 'bg-warning text-warning-foreground',
-  urgent: 'bg-destructive text-destructive-foreground',
+  Low: 'bg-muted text-muted-foreground',
+  Important: 'bg-warning text-warning-foreground',
+  Critical: 'bg-destructive text-destructive-foreground',
 };
 
 const statusColors = {
   pending: 'bg-muted text-muted-foreground',
   'in-progress': 'bg-info text-info-foreground',
   completed: 'bg-success text-success-foreground',
-};
-
-const categoryLabels = {
-  equipment: 'Equipment',
-  cleaning: 'Cleaning',
-  maintenance: 'Maintenance',
-  supplies: 'Supplies',
-  other: 'Other',
 };
 
 export function WorkOrderCard({ workOrder, onStatusChange, onEdit }: WorkOrderCardProps) {
@@ -68,23 +59,24 @@ export function WorkOrderCard({ workOrder, onStatusChange, onEdit }: WorkOrderCa
     }
   };
 
-  const isOverdue = workOrder.dueDate < new Date() && workOrder.status !== 'completed';
-
   return (
-    <Card className={`transition-all hover:shadow-md ${isOverdue ? 'border-destructive' : ''}`}>
+    <Card className="transition-all hover:shadow-md">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="space-y-2">
-            <h3 className="font-semibold text-card-foreground">{workOrder.title}</h3>
+            <h3 className="font-semibold text-card-foreground">{workOrder.description}</h3>
             <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="outline" className="text-xs">
-                {categoryLabels[workOrder.category]}
+                {workOrder.repair_type}
               </Badge>
               <Badge className={`text-xs ${priorityColors[workOrder.priority]}`}>
-                {workOrder.priority.toUpperCase()}
+                {workOrder.priority}
               </Badge>
               <Badge className={`text-xs ${statusColors[workOrder.status]}`}>
                 {workOrder.status.replace('-', ' ').toUpperCase()}
+              </Badge>
+              <Badge className={`text-xs ${workOrder.ecosure === 'N/A' ? 'bg-muted' : 'bg-warning'}`}>
+                {workOrder.ecosure}
               </Badge>
             </div>
           </div>
@@ -93,42 +85,16 @@ export function WorkOrderCard({ workOrder, onStatusChange, onEdit }: WorkOrderCa
       </CardHeader>
       
       <CardContent className="pt-0">
-        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-          {workOrder.description}
-        </p>
-        
         <div className="space-y-2 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
-            <User className="h-3 w-3" />
-            <span>Assigned to: {workOrder.assignedTo}</span>
+            <MapPin className="h-3 w-3" />
+            <span>Store #{workOrder.store_number} - {workOrder.market}</span>
           </div>
-          
-          {workOrder.location && (
-            <div className="flex items-center gap-2">
-              <MapPin className="h-3 w-3" />
-              <span>{workOrder.location}</span>
-            </div>
-          )}
-          
-          <div className="flex items-center gap-2">
-            <Clock className="h-3 w-3" />
-            <span className={isOverdue ? 'text-destructive font-medium' : ''}>
-              Due: {format(workOrder.dueDate, 'MMM d, yyyy')}
-              {isOverdue && ' (Overdue)'}
-            </span>
-          </div>
-          
-          {workOrder.estimatedHours && (
-            <div className="flex items-center gap-2">
-              <Clock className="h-3 w-3" />
-              <span>Est. {workOrder.estimatedHours}h</span>
-            </div>
-          )}
         </div>
         
         <div className="flex justify-between items-center mt-4 pt-3 border-t">
           <span className="text-xs text-muted-foreground">
-            Created {format(workOrder.createdAt, 'MMM d')}
+            Created {format(new Date(workOrder.created_at), 'MMM d')}
           </span>
           <Button
             variant="ghost"
