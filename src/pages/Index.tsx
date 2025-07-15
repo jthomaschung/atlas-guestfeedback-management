@@ -195,26 +195,21 @@ const Index = () => {
           onClearFilters={clearFilters}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredWorkOrders.map(workOrder => (
-            <WorkOrderCard
-              key={workOrder.id}
-              workOrder={workOrder}
-              onStatusChange={handleStatusChange}
-              onEdit={handleEdit}
-            />
-          ))}
-          
-          {filteredWorkOrders.length === 0 && (
-            <div className="col-span-full text-center py-12">
-              <div className="text-muted-foreground">
-                <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <h3 className="text-lg font-medium mb-2">No work orders found</h3>
-                <p>Try adjusting your filters or create a new work order.</p>
-              </div>
+        {filteredWorkOrders.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-muted-foreground">
+              <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <h3 className="text-lg font-medium mb-2">No work orders found</h3>
+              <p>Try adjusting your filters or create a new work order.</p>
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <WorkOrderTable
+            workOrders={filteredWorkOrders}
+            onStatusChange={handleStatusChange}
+            onEdit={handleEdit}
+          />
+        )}
 
         {editingWorkOrder && (
           <Dialog open={!!editingWorkOrder} onOpenChange={() => setEditingWorkOrder(null)}>
