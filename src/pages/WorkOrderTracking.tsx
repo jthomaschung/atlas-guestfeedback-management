@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { WorkOrder, WorkOrderStatus, WorkOrderPriority } from "@/types/work-order";
 import { WorkOrderFilters } from "@/components/work-orders/WorkOrderFilters";
 import { WorkOrderDetails } from "@/components/work-orders/WorkOrderDetails";
@@ -8,66 +8,8 @@ import { ArrowUpDown, Calendar, Clock, MapPin, User, Wrench, AlertTriangle, Eye,
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-
-// Sample data - in a real app this would come from API
-const sampleWorkOrders: WorkOrder[] = [
-  {
-    id: '1',
-    user_id: 'sample-user',
-    description: 'Cold table not working',
-    repair_type: 'Cold Tables',
-    store_number: '1955',
-    market: 'AZ4',
-    priority: 'Critical',
-    ecosure: 'Minor',
-    status: 'pending',
-    assignee: 'John Smith',
-    created_at: new Date('2024-02-21').toISOString(),
-    updated_at: new Date('2024-02-21').toISOString()
-  },
-  {
-    id: '2',
-    user_id: 'sample-user',
-    description: 'Retarder feels less cool, Ive adjusted temp',
-    repair_type: 'Retarder',
-    store_number: '4024',
-    market: 'IE/LA',
-    priority: 'Critical',
-    ecosure: 'Major',
-    status: 'in-progress',
-    assignee: 'Sarah Johnson',
-    created_at: new Date('2024-07-09').toISOString(),
-    updated_at: new Date('2024-07-09').toISOString()
-  },
-  {
-    id: '3',
-    user_id: 'sample-user',
-    description: 'Walk-In hovering around 50',
-    repair_type: 'Walk In Cooler / Freezer',
-    store_number: '3187',
-    market: 'FL3',
-    priority: 'Critical',
-    ecosure: 'N/A',
-    status: 'completed',
-    assignee: 'Mike Wilson',
-    completed_at: new Date('2024-01-24').toISOString(),
-    created_at: new Date('2024-01-24').toISOString(),
-    updated_at: new Date('2024-01-24').toISOString()
-  },
-  {
-    id: '4',
-    user_id: 'sample-user',
-    description: 'AC handler on rooftop damaged side panel',
-    repair_type: 'AC / Heating',
-    store_number: '3612',
-    market: 'FL1',
-    priority: 'Critical',
-    ecosure: 'Major',
-    status: 'pending',
-    created_at: new Date('2024-05-15').toISOString(),
-    updated_at: new Date('2024-05-15').toISOString()
-  },
-];
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 type SortField = 'created_at' | 'priority' | 'status' | 'store_number' | 'repair_type';
 type SortDirection = 'asc' | 'desc';
@@ -86,7 +28,8 @@ const statusOrder: Record<WorkOrderStatus, number> = {
 };
 
 const WorkOrderTracking = () => {
-  const [workOrders, setWorkOrders] = useState<WorkOrder[]>(sampleWorkOrders);
+  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
+  const [loading, setLoading] = useState(true);
   const [viewingWorkOrder, setViewingWorkOrder] = useState<WorkOrder | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<WorkOrderStatus | 'all'>('all');
@@ -96,6 +39,44 @@ const WorkOrderTracking = () => {
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // Fetch work orders from Supabase
+  const fetchWorkOrders = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('work_orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching work orders:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load work orders. Please try refreshing the page.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setWorkOrders((data || []) as WorkOrder[]);
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchWorkOrders();
+    }
+  }, [user]);
 
   const availableStores = useMemo(() => {
     const stores = [...new Set(workOrders.map(wo => wo.store_number))];
@@ -181,18 +162,43 @@ const WorkOrderTracking = () => {
     setViewingWorkOrder(workOrder);
   };
 
-  const handleUpdateWorkOrder = (updates: Partial<WorkOrder>) => {
+  const handleUpdateWorkOrder = async (updates: Partial<WorkOrder>) => {
     if (!viewingWorkOrder) return;
-    const updatedWorkOrder = {
-      ...viewingWorkOrder,
-      ...updates
-    };
-    setWorkOrders(workOrders.map(wo => wo.id === updatedWorkOrder.id ? updatedWorkOrder : wo));
-    setViewingWorkOrder(updatedWorkOrder);
-    toast({
-      title: "Work Order Updated",
-      description: "Changes have been saved successfully."
-    });
+
+    try {
+      const { error } = await supabase
+        .from('work_orders')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', viewingWorkOrder.id);
+
+      if (error) {
+        console.error('Error updating work order:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update work order. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const updatedWorkOrder = { ...viewingWorkOrder, ...updates, updated_at: new Date().toISOString() };
+      setWorkOrders(workOrders.map(wo => wo.id === updatedWorkOrder.id ? updatedWorkOrder : wo));
+      setViewingWorkOrder(updatedWorkOrder);
+      toast({
+        title: "Work Order Updated",
+        description: "Changes have been saved successfully."
+      });
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const getStatusColor = (status: WorkOrderStatus) => {
@@ -280,7 +286,24 @@ const WorkOrderTracking = () => {
         </div>
 
         <div className="border rounded-lg overflow-hidden">
-          <Table>
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="text-muted-foreground">
+                <Wrench className="h-12 w-12 mx-auto mb-4 opacity-50 animate-spin" />
+                <h3 className="text-lg font-medium mb-2">Loading work orders...</h3>
+                <p>Please wait while we fetch your data.</p>
+              </div>
+            </div>
+          ) : filteredAndSortedWorkOrders.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-muted-foreground">
+                <Wrench className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <h3 className="text-lg font-medium mb-2">No work orders found</h3>
+                <p>Try adjusting your filters or search terms.</p>
+              </div>
+            </div>
+          ) : (
+            <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
                 <TableHead className="min-w-[200px]">Repair Description</TableHead>
@@ -357,7 +380,8 @@ const WorkOrderTracking = () => {
                 </TableRow>
               ))}
             </TableBody>
-          </Table>
+            </Table>
+          )}
         </div>
 
         {viewingWorkOrder && (

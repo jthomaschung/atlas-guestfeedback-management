@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { WorkOrder, WorkOrderFormData, WorkOrderStatus, WorkOrderPriority, RepairType } from "@/types/work-order";
+import { useState, useMemo, useEffect } from "react";
+import { WorkOrder, WorkOrderFormData, WorkOrderStatus, WorkOrderPriority } from "@/types/work-order";
 import { WorkOrderTable } from "@/components/work-orders/WorkOrderTable";
 import { WorkOrderForm } from "@/components/work-orders/WorkOrderForm";
 import { WorkOrderStats } from "@/components/work-orders/WorkOrderStats";
@@ -9,47 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
-// Sample data
-const sampleWorkOrders: WorkOrder[] = [{
-  id: '1',
-  user_id: 'sample-user',
-  description: 'The ice machine in the bar area is not producing ice. Needs immediate attention as it affects drink service.',
-  repair_type: 'Ice Machine',
-  store_number: '001',
-  market: 'AZ1',
-  priority: 'Critical',
-  ecosure: 'Minor',
-  status: 'pending',
-  created_at: new Date('2024-01-10').toISOString(),
-  updated_at: new Date('2024-01-10').toISOString()
-}, {
-  id: '2',
-  user_id: 'sample-user',
-  description: 'Walk-in freezer door seal is damaged and not maintaining proper temperature.',
-  repair_type: 'Walk In Cooler / Freezer',
-  store_number: '045',
-  market: 'FL1',
-  priority: 'Important',
-  ecosure: 'Major',
-  status: 'in-progress',
-  created_at: new Date('2024-01-12').toISOString(),
-  updated_at: new Date('2024-01-12').toISOString()
-}, {
-  id: '3',
-  user_id: 'sample-user',
-  description: 'General maintenance needed for dining area equipment.',
-  repair_type: 'General Maintenance',
-  store_number: '023',
-  market: 'OC',
-  priority: 'Low',
-  ecosure: 'N/A',
-  status: 'completed',
-  created_at: new Date('2024-01-08').toISOString(),
-  updated_at: new Date('2024-01-11').toISOString()
-}];
 const Index = () => {
-  const [workOrders, setWorkOrders] = useState<WorkOrder[]>(sampleWorkOrders);
+  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingWorkOrder, setEditingWorkOrder] = useState<WorkOrder | null>(null);
   const [viewingWorkOrder, setViewingWorkOrder] = useState<WorkOrder | null>(null);
@@ -58,9 +23,45 @@ const Index = () => {
   const [priorityFilter, setPriorityFilter] = useState<WorkOrderPriority | 'all'>('all');
   const [storeFilter, setStoreFilter] = useState('all');
   const [marketFilter, setMarketFilter] = useState('all');
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+  const { user } = useAuth();
+
+  // Fetch work orders from Supabase
+  const fetchWorkOrders = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('work_orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching work orders:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load work orders. Please try refreshing the page.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setWorkOrders((data || []) as WorkOrder[]);
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchWorkOrders();
+    }
+  }, [user]);
   const availableStores = useMemo(() => {
     const stores = [...new Set(workOrders.map(wo => wo.store_number))];
     return stores.sort();
@@ -79,48 +80,151 @@ const Index = () => {
       return matchesSearch && matchesStatus && matchesPriority && matchesStore && matchesMarket;
     });
   }, [workOrders, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter]);
-  const handleCreateWorkOrder = (formData: WorkOrderFormData) => {
-    const newWorkOrder: WorkOrder = {
-      id: Date.now().toString(),
-      user_id: 'current-user',
-      ...formData,
-      status: 'pending',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
-    setWorkOrders(prev => [newWorkOrder, ...prev]);
-    setIsFormOpen(false);
-    toast({
-      title: "Work order created",
-      description: `Work order for ${formData.repair_type} at store ${formData.store_number} has been created.`
-    });
-  };
-  const handleEditWorkOrder = (formData: WorkOrderFormData) => {
-    if (!editingWorkOrder) return;
-    const updatedWorkOrder: WorkOrder = {
-      ...editingWorkOrder,
-      ...formData,
-      updated_at: new Date().toISOString()
-    };
-    setWorkOrders(prev => prev.map(wo => wo.id === editingWorkOrder.id ? updatedWorkOrder : wo));
-    setEditingWorkOrder(null);
-    toast({
-      title: "Work order updated",
-      description: `Work order for ${formData.repair_type} has been updated.`
-    });
-  };
-  const handleStatusChange = (id: string, newStatus: WorkOrderStatus) => {
-    setWorkOrders(prev => prev.map(wo => wo.id === id ? {
-      ...wo,
-      status: newStatus,
-      completed_at: newStatus === 'completed' ? new Date().toISOString() : undefined,
-      updated_at: new Date().toISOString()
-    } : wo));
-    const workOrder = workOrders.find(wo => wo.id === id);
-    if (workOrder) {
+  const handleCreateWorkOrder = async (formData: WorkOrderFormData) => {
+    if (!user) {
       toast({
-        title: "Status updated",
-        description: `Work order for ${workOrder.repair_type} is now ${newStatus.replace('-', ' ')}.`
+        title: "Authentication Error",
+        description: "You must be logged in to create work orders.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('work_orders')
+        .insert([{
+          user_id: user.id,
+          description: formData.description,
+          repair_type: formData.repair_type,
+          store_number: formData.store_number,
+          market: formData.market,
+          priority: formData.priority,
+          ecosure: formData.ecosure,
+          status: 'pending'
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating work order:', error);
+        toast({
+          title: "Error",
+          description: "Failed to create work order. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Add the new work order to the local state
+      setWorkOrders(prev => [data as WorkOrder, ...prev]);
+      setIsFormOpen(false);
+      toast({
+        title: "Work order created",
+        description: `Work order for ${formData.repair_type} at store ${formData.store_number} has been created.`
+      });
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+  const handleEditWorkOrder = async (formData: WorkOrderFormData) => {
+    if (!editingWorkOrder) return;
+
+    try {
+      const { error } = await supabase
+        .from('work_orders')
+        .update({
+          description: formData.description,
+          repair_type: formData.repair_type,
+          store_number: formData.store_number,
+          market: formData.market,
+          priority: formData.priority,
+          ecosure: formData.ecosure,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', editingWorkOrder.id);
+
+      if (error) {
+        console.error('Error updating work order:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update work order. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Update local state
+      setWorkOrders(prev => prev.map(wo => 
+        wo.id === editingWorkOrder.id 
+          ? { ...wo, ...formData, updated_at: new Date().toISOString() }
+          : wo
+      ));
+      setEditingWorkOrder(null);
+      toast({
+        title: "Work order updated",
+        description: `Work order for ${formData.repair_type} has been updated.`
+      });
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+  const handleStatusChange = async (id: string, newStatus: WorkOrderStatus) => {
+    try {
+      const updates: any = {
+        status: newStatus,
+        updated_at: new Date().toISOString()
+      };
+
+      if (newStatus === 'completed') {
+        updates.completed_at = new Date().toISOString();
+      }
+
+      const { error } = await supabase
+        .from('work_orders')
+        .update(updates)
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error updating work order status:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update work order status. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Update local state
+      setWorkOrders(prev => prev.map(wo => 
+        wo.id === id 
+          ? { ...wo, ...updates }
+          : wo
+      ));
+
+      const workOrder = workOrders.find(wo => wo.id === id);
+      if (workOrder) {
+        toast({
+          title: "Status updated",
+          description: `Work order for ${workOrder.repair_type} is now ${newStatus.replace('-', ' ')}.`
+        });
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
       });
     }
   };
@@ -130,18 +234,43 @@ const Index = () => {
   const handleViewDetails = (workOrder: WorkOrder) => {
     setViewingWorkOrder(workOrder);
   };
-  const handleUpdateWorkOrder = (updates: Partial<WorkOrder>) => {
+  const handleUpdateWorkOrder = async (updates: Partial<WorkOrder>) => {
     if (!viewingWorkOrder) return;
-    const updatedWorkOrder = {
-      ...viewingWorkOrder,
-      ...updates
-    };
-    setWorkOrders(workOrders.map(wo => wo.id === updatedWorkOrder.id ? updatedWorkOrder : wo));
-    setViewingWorkOrder(updatedWorkOrder);
-    toast({
-      title: "Work Order Updated",
-      description: "Changes have been saved successfully."
-    });
+
+    try {
+      const { error } = await supabase
+        .from('work_orders')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', viewingWorkOrder.id);
+
+      if (error) {
+        console.error('Error updating work order:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update work order. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const updatedWorkOrder = { ...viewingWorkOrder, ...updates, updated_at: new Date().toISOString() };
+      setWorkOrders(workOrders.map(wo => wo.id === updatedWorkOrder.id ? updatedWorkOrder : wo));
+      setViewingWorkOrder(updatedWorkOrder);
+      toast({
+        title: "Work Order Updated",
+        description: "Changes have been saved successfully."
+      });
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
   const clearFilters = () => {
     setSearchTerm('');
@@ -191,7 +320,15 @@ const Index = () => {
 
         <WorkOrderFilters searchTerm={searchTerm} onSearchChange={setSearchTerm} statusFilter={statusFilter} onStatusFilterChange={setStatusFilter} priorityFilter={priorityFilter} onPriorityFilterChange={setPriorityFilter} storeFilter={storeFilter} onStoreFilterChange={setStoreFilter} marketFilter={marketFilter} onMarketFilterChange={setMarketFilter} onClearFilters={clearFilters} availableStores={availableStores} availableMarkets={availableMarkets} />
 
-        {filteredWorkOrders.length === 0 ? <div className="text-center py-12">
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="text-muted-foreground">
+              <Settings className="h-12 w-12 mx-auto mb-4 opacity-50 animate-spin" />
+              <h3 className="text-lg font-medium mb-2">Loading work orders...</h3>
+              <p>Please wait while we fetch your data.</p>
+            </div>
+          </div>
+        ) : filteredWorkOrders.length === 0 ? <div className="text-center py-12">
             <div className="text-muted-foreground">
               <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <h3 className="text-lg font-medium mb-2">No work orders found</h3>
