@@ -69,7 +69,7 @@ const ecoSureOptions = [
 ];
 
 const assigneeOptions = [
-  { value: '', label: 'Unassigned' },
+  { value: 'unassigned', label: 'Unassigned' },
   { value: 'Anthony Luna', label: 'Anthony Luna' },
   { value: 'Grant Gelecki', label: 'Grant Gelecki' },
   { value: 'Dwayne Parks', label: 'Dwayne Parks' },
@@ -87,7 +87,7 @@ export function WorkOrderForm({ onSubmit, onCancel, initialData }: WorkOrderForm
     market: initialData?.market || 'AZ1',
     priority: initialData?.priority || 'Low',
     ecosure: initialData?.ecosure || 'N/A',
-    assignee: initialData?.assignee || '',
+    assignee: initialData?.assignee || 'unassigned',
   });
 
   const [storeNumberError, setStoreNumberError] = useState('');
@@ -249,9 +249,9 @@ export function WorkOrderForm({ onSubmit, onCancel, initialData }: WorkOrderForm
             <div>
               <Label>Assignee</Label>
               <Select 
-                value={formData.assignee || ''} 
+                value={formData.assignee || 'unassigned'} 
                 onValueChange={(value) => 
-                  setFormData({ ...formData, assignee: value || undefined })
+                  setFormData({ ...formData, assignee: value === 'unassigned' ? undefined : value })
                 }
               >
                 <SelectTrigger>

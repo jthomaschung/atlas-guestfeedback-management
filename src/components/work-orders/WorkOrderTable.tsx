@@ -91,7 +91,7 @@ export function WorkOrderTable({ workOrders, onStatusChange, onEdit, onViewDetai
               </TableCell>
               <TableCell>
                 <span className="text-sm text-muted-foreground">
-                  {workOrder.assignee || 'Unassigned'}
+                  {workOrder.assignee && workOrder.assignee !== 'unassigned' ? workOrder.assignee : 'Unassigned'}
                 </span>
               </TableCell>
               <TableCell>

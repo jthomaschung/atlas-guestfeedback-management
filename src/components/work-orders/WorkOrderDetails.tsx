@@ -38,7 +38,7 @@ const ecoSureColors = {
 };
 
 const assigneeOptions = [
-  { value: '', label: 'Unassigned' },
+  { value: 'unassigned', label: 'Unassigned' },
   { value: 'Anthony Luna', label: 'Anthony Luna' },
   { value: 'Grant Gelecki', label: 'Grant Gelecki' },
   { value: 'Dwayne Parks', label: 'Dwayne Parks' },
@@ -78,10 +78,11 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
   };
 
   const handleAssigneeChange = (newAssignee: string) => {
-    onUpdate({ assignee: newAssignee || undefined });
+    const assignee = newAssignee === 'unassigned' ? undefined : newAssignee;
+    onUpdate({ assignee });
     toast({
       title: "Assignee Updated",
-      description: `Work order assignee changed to ${newAssignee || 'Unassigned'}`,
+      description: `Work order assignee changed to ${newAssignee === 'unassigned' ? 'Unassigned' : newAssignee}`,
     });
   };
 
@@ -144,7 +145,7 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
           {/* Assignee Section */}
           <div>
             <Label className="text-sm font-medium text-muted-foreground mb-2 block">Assignee</Label>
-            <Select value={workOrder.assignee || ''} onValueChange={handleAssigneeChange}>
+            <Select value={workOrder.assignee || 'unassigned'} onValueChange={handleAssigneeChange}>
               <SelectTrigger className="w-full max-w-md">
                 <SelectValue placeholder="Select assignee" />
               </SelectTrigger>
