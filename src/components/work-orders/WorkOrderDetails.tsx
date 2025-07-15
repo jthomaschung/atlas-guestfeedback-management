@@ -159,6 +159,20 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
             <p className="mt-1 p-3 bg-muted rounded-md">{workOrder.description}</p>
           </div>
 
+          {/* Image */}
+          {workOrder.image_url && (
+            <div>
+              <Label className="text-sm font-medium text-muted-foreground">Attached Image</Label>
+              <div className="mt-1">
+                <img 
+                  src={workOrder.image_url} 
+                  alt="Work order attachment" 
+                  className="max-w-full h-auto max-h-64 rounded-md border"
+                />
+              </div>
+            </div>
+          )}
+
           {/* Assignee Section */}
           <div>
             <Label className="text-sm font-medium text-muted-foreground mb-2 block">Assignee</Label>

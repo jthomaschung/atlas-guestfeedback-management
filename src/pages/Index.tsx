@@ -91,6 +91,31 @@ const Index = () => {
     }
 
     try {
+      let imageUrl = null;
+
+      // Upload image if provided
+      if (formData.image) {
+        const fileName = `${Date.now()}-${formData.image.name}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('work-orders')
+          .upload(fileName, formData.image);
+
+        if (uploadError) {
+          console.error('Error uploading image:', uploadError);
+          toast({
+            title: "Warning",
+            description: "Failed to upload image, but work order will be created without it.",
+            variant: "destructive"
+          });
+        } else {
+          // Get the public URL for the uploaded image
+          const { data: { publicUrl } } = supabase.storage
+            .from('work-orders')
+            .getPublicUrl(uploadData.path);
+          imageUrl = publicUrl;
+        }
+      }
+
       const { data, error } = await supabase
         .from('work_orders')
         .insert([{
@@ -101,7 +126,8 @@ const Index = () => {
           market: formData.market,
           priority: formData.priority,
           ecosure: formData.ecosure,
-          status: 'pending'
+          status: 'pending',
+          image_url: imageUrl
         }])
         .select()
         .single();
@@ -136,6 +162,31 @@ const Index = () => {
     if (!editingWorkOrder) return;
 
     try {
+      let imageUrl = editingWorkOrder.image_url;
+
+      // Upload new image if provided
+      if (formData.image) {
+        const fileName = `${Date.now()}-${formData.image.name}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('work-orders')
+          .upload(fileName, formData.image);
+
+        if (uploadError) {
+          console.error('Error uploading image:', uploadError);
+          toast({
+            title: "Warning",
+            description: "Failed to upload new image, keeping existing image.",
+            variant: "destructive"
+          });
+        } else {
+          // Get the public URL for the uploaded image
+          const { data: { publicUrl } } = supabase.storage
+            .from('work-orders')
+            .getPublicUrl(uploadData.path);
+          imageUrl = publicUrl;
+        }
+      }
+
       const { error } = await supabase
         .from('work_orders')
         .update({
@@ -145,6 +196,7 @@ const Index = () => {
           market: formData.market,
           priority: formData.priority,
           ecosure: formData.ecosure,
+          image_url: imageUrl,
           updated_at: new Date().toISOString()
         })
         .eq('id', editingWorkOrder.id);
@@ -162,7 +214,7 @@ const Index = () => {
       // Update local state
       setWorkOrders(prev => prev.map(wo => 
         wo.id === editingWorkOrder.id 
-          ? { ...wo, ...formData, updated_at: new Date().toISOString() }
+          ? { ...wo, ...formData, image_url: imageUrl, updated_at: new Date().toISOString() }
           : wo
       ));
       setEditingWorkOrder(null);
