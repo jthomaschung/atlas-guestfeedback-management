@@ -137,6 +137,7 @@ const Index = () => {
           ? {
               ...wo,
               status: newStatus,
+              completed_at: newStatus === 'completed' ? new Date().toISOString() : undefined,
               updated_at: new Date().toISOString(),
             }
           : wo

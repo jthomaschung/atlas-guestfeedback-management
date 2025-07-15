@@ -47,6 +47,7 @@ export type Database = {
       work_orders: {
         Row: {
           assignee: string | null
+          completed_at: string | null
           created_at: string
           description: string
           ecosure: string
@@ -63,6 +64,7 @@ export type Database = {
         }
         Insert: {
           assignee?: string | null
+          completed_at?: string | null
           created_at?: string
           description: string
           ecosure: string
@@ -79,6 +81,7 @@ export type Database = {
         }
         Update: {
           assignee?: string | null
+          completed_at?: string | null
           created_at?: string
           description?: string
           ecosure?: string

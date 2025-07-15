@@ -54,7 +54,11 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
   const { toast } = useToast();
 
   const handleStatusChange = (newStatus: WorkOrderStatus) => {
-    onUpdate({ status: newStatus });
+    const updates: Partial<WorkOrder> = { 
+      status: newStatus,
+      completed_at: newStatus === 'completed' ? new Date().toISOString() : undefined
+    };
+    onUpdate(updates);
     toast({
       title: "Status Updated",
       description: `Work order status changed to ${newStatus.replace('-', ' ')}`,
@@ -134,6 +138,15 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
                 {format(new Date(workOrder.created_at), 'MMM d, yyyy h:mm a')}
               </div>
             </div>
+            {workOrder.completed_at && (
+              <div>
+                <Label className="text-sm font-medium text-muted-foreground">Completed</Label>
+                <div className="flex items-center text-sm text-success-foreground">
+                  <Calendar className="h-3 w-3 mr-1" />
+                  {format(new Date(workOrder.completed_at), 'MMM d, yyyy h:mm a')}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Description */}
