@@ -196,32 +196,22 @@ const WorkOrderTracking = () => {
   };
 
   const getStatusColor = (status: WorkOrderStatus) => {
-    switch (status) {
-      case 'pending': return 'bg-yellow-500';
-      case 'in-progress': return 'bg-blue-500';
-      case 'completed': return 'bg-green-500';
-      case 'cancelled': return 'bg-red-500';
-      default: return 'bg-gray-500';
-    }
-  };
-
-  const getResponseColor = (status: WorkOrderStatus) => {
-    switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'in-progress': return 'bg-blue-100 text-blue-800';
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+    const statusColors = {
+      pending: 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800',
+      'in-progress': 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800',
+      completed: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800',
+      cancelled: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800',
+    };
+    return statusColors[status] || 'bg-gray-100 text-gray-800';
   };
 
   const getPriorityColor = (priority: WorkOrderPriority) => {
-    switch (priority) {
-      case 'Critical': return 'bg-red-100 text-red-800';
-      case 'Important': return 'bg-orange-100 text-orange-800';
-      case 'Low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+    const priorityColors = {
+      Low: 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300',
+      Important: 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400',
+      Critical: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400',
+    };
+    return priorityColors[priority] || 'bg-gray-100 text-gray-800';
   };
 
   const formatDate = (dateString: string) => {
@@ -325,20 +315,17 @@ const WorkOrderTracking = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1">
-                      <div className={`w-3 h-3 rounded-full ${getStatusColor(workOrder.status)}`}></div>
-                      <span className="text-xs font-medium">
-                        {workOrder.status === 'pending' ? 'Pending' :
-                         workOrder.status === 'in-progress' ? 'In Progress' :
-                         workOrder.status === 'completed' ? 'Completed' : 'Cancelled'}
-                      </span>
-                    </div>
+                    <Badge className={getStatusColor(workOrder.status)}>
+                      {workOrder.status === 'pending' ? 'Pending' :
+                       workOrder.status === 'in-progress' ? 'In Progress' :
+                       workOrder.status === 'completed' ? 'Completed' : 'Cancelled'}
+                    </Badge>
                   </TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded text-xs font-medium flex items-center gap-1 ${getPriorityColor(workOrder.priority)}`}>
+                    <Badge className={`flex items-center gap-1 ${getPriorityColor(workOrder.priority)}`}>
                       {workOrder.priority === 'Critical' && <AlertTriangle className="h-3 w-3" />}
                       {workOrder.priority}
-                    </span>
+                    </Badge>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="text-xs">
