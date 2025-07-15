@@ -285,7 +285,7 @@ const WorkOrderTracking = () => {
               <TableRow className="bg-muted/50">
                 <TableHead className="min-w-[200px]">Repair Description</TableHead>
                 <TableHead className="w-[100px]">Assigned To</TableHead>
-                <TableHead className="w-[80px]">Status</TableHead>
+                <TableHead className="w-[120px]">Status</TableHead>
                 <TableHead className="w-[80px]">Priority</TableHead>
                 <TableHead className="w-[100px]">Repair Type</TableHead>
                 <TableHead className="w-[120px]">Date Submitted</TableHead>
