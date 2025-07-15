@@ -9,12 +9,12 @@ interface WorkOrderFiltersProps {
   onSearchChange: (value: string) => void;
   statusFilter: WorkOrderStatus | 'all';
   onStatusFilterChange: (value: WorkOrderStatus | 'all') => void;
-  categoryFilter: RepairType | 'all';
-  onCategoryFilterChange: (value: RepairType | 'all') => void;
   priorityFilter: WorkOrderPriority | 'all';
   onPriorityFilterChange: (value: WorkOrderPriority | 'all') => void;
-  assigneeFilter: string;
-  onAssigneeFilterChange: (value: string) => void;
+  storeFilter: string;
+  onStoreFilterChange: (value: string) => void;
+  marketFilter: string;
+  onMarketFilterChange: (value: string) => void;
   onClearFilters: () => void;
 }
 
@@ -25,21 +25,12 @@ const statusOptions = [
   { value: 'completed', label: 'Completed' },
 ];
 
-const categoryOptions = [
-  { value: 'all', label: 'All Categories' },
-  { value: 'AC / Heating', label: 'AC / Heating' },
-  { value: 'Walk In Cooler / Freezer', label: 'Walk In Cooler / Freezer' },
-  { value: 'Ice Machine', label: 'Ice Machine' },
-  { value: 'Cold Tables', label: 'Cold Tables' },
-  { value: 'Oven / Proofer', label: 'Oven / Proofer' },
-  { value: 'Plumbing', label: 'Plumbing' },
-  { value: 'Electrical', label: 'Electrical' },
-  { value: 'General Maintenance', label: 'General Maintenance' },
-  { value: 'Exterior Signage', label: 'Exterior Signage' },
-  { value: 'Retarder', label: 'Retarder' },
-  { value: 'Toasted Sandwich Oven', label: 'Toasted Sandwich Oven' },
-  { value: 'POS / Network', label: 'POS / Network' },
-  { value: 'Doors / Windows', label: 'Doors / Windows' },
+const storeOptions = [
+  { value: 'all', label: 'All Stores' },
+];
+
+const marketOptions = [
+  { value: 'all', label: 'All Markets' },
 ];
 
 const priorityOptions = [
@@ -49,35 +40,25 @@ const priorityOptions = [
   { value: 'Critical', label: 'Critical' },
 ];
 
-const staffMembers = [
-  'All Assignees',
-  'John Smith',
-  'Maria Garcia',
-  'David Chen',
-  'Sarah Johnson',
-  'Mike Williams',
-  'Lisa Brown',
-];
-
 export function WorkOrderFilters({
   searchTerm,
   onSearchChange,
   statusFilter,
   onStatusFilterChange,
-  categoryFilter,
-  onCategoryFilterChange,
   priorityFilter,
   onPriorityFilterChange,
-  assigneeFilter,
-  onAssigneeFilterChange,
+  storeFilter,
+  onStoreFilterChange,
+  marketFilter,
+  onMarketFilterChange,
   onClearFilters,
 }: WorkOrderFiltersProps) {
   const hasActiveFilters = 
     searchTerm !== '' ||
     statusFilter !== 'all' ||
-    categoryFilter !== 'all' ||
     priorityFilter !== 'all' ||
-    assigneeFilter !== 'All Assignees';
+    storeFilter !== 'all' ||
+    marketFilter !== 'all';
 
   return (
     <div className="space-y-4">
@@ -105,19 +86,6 @@ export function WorkOrderFilters({
           </SelectContent>
         </Select>
         
-        <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {categoryOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        
         <Select value={priorityFilter} onValueChange={onPriorityFilterChange}>
           <SelectTrigger>
             <SelectValue />
@@ -131,14 +99,27 @@ export function WorkOrderFilters({
           </SelectContent>
         </Select>
         
-        <Select value={assigneeFilter} onValueChange={onAssigneeFilterChange}>
+        <Select value={storeFilter} onValueChange={onStoreFilterChange}>
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {staffMembers.map((staff) => (
-              <SelectItem key={staff} value={staff}>
-                {staff}
+            {storeOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        
+        <Select value={marketFilter} onValueChange={onMarketFilterChange}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {marketOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
               </SelectItem>
             ))}
           </SelectContent>

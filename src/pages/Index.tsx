@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { WorkOrder, WorkOrderFormData, WorkOrderStatus, WorkOrderPriority, RepairType } from "@/types/work-order";
-import { WorkOrderCard } from "@/components/work-orders/WorkOrderCard";
+import { WorkOrderTable } from "@/components/work-orders/WorkOrderTable";
 import { WorkOrderForm } from "@/components/work-orders/WorkOrderForm";
 import { WorkOrderStats } from "@/components/work-orders/WorkOrderStats";
 import { WorkOrderFilters } from "@/components/work-orders/WorkOrderFilters";
@@ -58,9 +58,9 @@ const Index = () => {
   const [editingWorkOrder, setEditingWorkOrder] = useState<WorkOrder | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<WorkOrderStatus | 'all'>('all');
-  const [categoryFilter, setCategoryFilter] = useState<RepairType | 'all'>('all');
   const [priorityFilter, setPriorityFilter] = useState<WorkOrderPriority | 'all'>('all');
-  const [assigneeFilter, setAssigneeFilter] = useState('All Assignees');
+  const [storeFilter, setStoreFilter] = useState('all');
+  const [marketFilter, setMarketFilter] = useState('all');
   
   const { toast } = useToast();
 
@@ -71,13 +71,13 @@ const Index = () => {
                            wo.store_number.includes(searchTerm);
       
       const matchesStatus = statusFilter === 'all' || wo.status === statusFilter;
-      const matchesCategory = categoryFilter === 'all' || wo.repair_type === categoryFilter;
       const matchesPriority = priorityFilter === 'all' || wo.priority === priorityFilter;
-      const matchesAssignee = assigneeFilter === 'All Assignees'; // No assignee field in new structure
+      const matchesStore = storeFilter === 'all' || wo.store_number === storeFilter;
+      const matchesMarket = marketFilter === 'all' || wo.market === marketFilter;
       
-      return matchesSearch && matchesStatus && matchesCategory && matchesPriority && matchesAssignee;
+      return matchesSearch && matchesStatus && matchesPriority && matchesStore && matchesMarket;
     });
-  }, [workOrders, searchTerm, statusFilter, categoryFilter, priorityFilter, assigneeFilter]);
+  }, [workOrders, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter]);
 
   const handleCreateWorkOrder = (formData: WorkOrderFormData) => {
     const newWorkOrder: WorkOrder = {
@@ -147,9 +147,9 @@ const Index = () => {
   const clearFilters = () => {
     setSearchTerm('');
     setStatusFilter('all');
-    setCategoryFilter('all');
     setPriorityFilter('all');
-    setAssigneeFilter('All Assignees');
+    setStoreFilter('all');
+    setMarketFilter('all');
   };
 
   return (
@@ -186,12 +186,12 @@ const Index = () => {
           onSearchChange={setSearchTerm}
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
-          categoryFilter={categoryFilter}
-          onCategoryFilterChange={setCategoryFilter}
           priorityFilter={priorityFilter}
           onPriorityFilterChange={setPriorityFilter}
-          assigneeFilter={assigneeFilter}
-          onAssigneeFilterChange={setAssigneeFilter}
+          storeFilter={storeFilter}
+          onStoreFilterChange={setStoreFilter}
+          marketFilter={marketFilter}
+          onMarketFilterChange={setMarketFilter}
           onClearFilters={clearFilters}
         />
 
