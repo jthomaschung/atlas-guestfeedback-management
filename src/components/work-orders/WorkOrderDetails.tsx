@@ -17,24 +17,24 @@ interface WorkOrderDetailsProps {
 }
 
 const statusColors = {
-  pending: 'bg-warning/20 text-warning-foreground border-warning/40 hover:bg-warning/30',
-  'in-progress': 'bg-info/20 text-info-foreground border-info/40 hover:bg-info/30',
-  completed: 'bg-success/20 text-success-foreground border-success/40 hover:bg-success/30',
-  cancelled: 'bg-muted text-muted-foreground border-muted-foreground/40 hover:bg-muted/30',
+  pending: 'bg-yellow-500 text-white border-yellow-600 hover:bg-yellow-600',
+  'in-progress': 'bg-blue-500 text-white border-blue-600 hover:bg-blue-600',
+  completed: 'bg-green-500 text-white border-green-600 hover:bg-green-600',
+  cancelled: 'bg-gray-500 text-white border-gray-600 hover:bg-gray-600',
 };
 
 const priorityColors = {
-  Low: 'bg-muted/40 text-muted-foreground border-muted-foreground/40 hover:bg-muted/30',
-  Important: 'bg-warning/20 text-warning-foreground border-warning/40 hover:bg-warning/30',
-  Critical: 'bg-destructive/20 text-destructive-foreground border-destructive/40 hover:bg-destructive/30',
+  Low: 'bg-green-500 text-white border-green-600 hover:bg-green-600',
+  Important: 'bg-orange-500 text-white border-orange-600 hover:bg-orange-600',
+  Critical: 'bg-red-500 text-white border-red-600 hover:bg-red-600',
 };
 
 const ecoSureColors = {
-  'N/A': 'bg-muted/20 text-muted-foreground border-muted-foreground/40 hover:bg-muted/30',
-  'Minor': 'bg-info/20 text-info-foreground border-info/40 hover:bg-info/30',
-  'Major': 'bg-warning/20 text-warning-foreground border-warning/40 hover:bg-warning/30',
-  'Critical': 'bg-destructive/20 text-destructive-foreground border-destructive/40 hover:bg-destructive/30',
-  'Imminent Health': 'bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90',
+  'N/A': 'bg-gray-500 text-white border-gray-600 hover:bg-gray-600',
+  'Minor': 'bg-blue-500 text-white border-blue-600 hover:bg-blue-600',
+  'Major': 'bg-orange-500 text-white border-orange-600 hover:bg-orange-600',
+  'Critical': 'bg-red-500 text-white border-red-600 hover:bg-red-600',
+  'Imminent Health': 'bg-red-700 text-white border-red-800 hover:bg-red-800',
 };
 
 const assigneeOptions = [
