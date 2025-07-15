@@ -6,9 +6,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Calendar, MessageSquare, Plus, X } from 'lucide-react';
+import { Calendar, MessageSquare, Plus, X, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 interface WorkOrderDetailsProps {
   workOrder: WorkOrder;
@@ -52,6 +53,7 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
   const [newNote, setNewNote] = useState('');
   const [isAddingNote, setIsAddingNote] = useState(false);
   const { toast } = useToast();
+  const { profile, user } = useAuth();
 
   const handleStatusChange = (newStatus: WorkOrderStatus) => {
     const updates: Partial<WorkOrder> = { 
@@ -94,8 +96,10 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     if (!newNote.trim()) return;
     
     const timestamp = new Date().toISOString();
-    const noteWithTimestamp = `${format(new Date(), 'MMM d, yyyy h:mm a')}: ${newNote.trim()}`;
-    const updatedNotes = [...(workOrder.notes || []), noteWithTimestamp];
+    const userName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
+                     user?.email || 'Unknown User';
+    const noteWithUserAndTimestamp = `${format(new Date(), 'MMM d, yyyy h:mm a')} - ${userName}: ${newNote.trim()}`;
+    const updatedNotes = [...(workOrder.notes || []), noteWithUserAndTimestamp];
     
     onUpdate({ notes: updatedNotes });
     setNewNote('');
@@ -305,8 +309,11 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
             <div className="space-y-2 max-h-60 overflow-y-auto">
               {workOrder.notes && workOrder.notes.length > 0 ? (
                 workOrder.notes.map((note, index) => (
-                  <div key={index} className="p-3 bg-muted rounded-md text-sm">
-                    {note}
+                  <div key={index} className="p-3 bg-muted rounded-md text-sm border-l-4 border-primary/20">
+                    <div className="flex items-start gap-2">
+                      <User className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                      <span className="break-words">{note}</span>
+                    </div>
                   </div>
                 ))
               ) : (
