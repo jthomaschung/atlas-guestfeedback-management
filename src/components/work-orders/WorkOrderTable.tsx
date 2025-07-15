@@ -2,36 +2,38 @@ import { WorkOrder, WorkOrderStatus } from "@/types/work-order";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Edit, Calendar } from "lucide-react";
+import { Edit, Calendar, Eye } from "lucide-react";
 import { format } from "date-fns";
 
 interface WorkOrderTableProps {
   workOrders: WorkOrder[];
   onStatusChange: (id: string, status: WorkOrderStatus) => void;
   onEdit: (workOrder: WorkOrder) => void;
+  onViewDetails: (workOrder: WorkOrder) => void;
 }
 
 const statusColors = {
-  pending: 'bg-warning/10 text-warning-foreground border-warning/20',
-  'in-progress': 'bg-info/10 text-info-foreground border-info/20',
-  completed: 'bg-success/10 text-success-foreground border-success/20',
+  pending: 'bg-warning/20 text-warning-foreground border-warning/40 cursor-pointer hover:bg-warning/30 shadow-sm',
+  'in-progress': 'bg-info/20 text-info-foreground border-info/40 cursor-pointer hover:bg-info/30 shadow-sm',
+  completed: 'bg-success/20 text-success-foreground border-success/40 cursor-pointer hover:bg-success/30 shadow-sm',
+  cancelled: 'bg-muted/20 text-muted-foreground border-muted-foreground/40 cursor-pointer hover:bg-muted/30 shadow-sm',
 };
 
 const priorityColors = {
-  Low: 'bg-muted text-muted-foreground border-muted-foreground/20',
-  Important: 'bg-warning/10 text-warning-foreground border-warning/20',
-  Critical: 'bg-destructive/10 text-destructive-foreground border-destructive/20',
+  Low: 'bg-muted/20 text-muted-foreground border-muted-foreground/40 cursor-pointer hover:bg-muted/30 shadow-sm',
+  Important: 'bg-warning/20 text-warning-foreground border-warning/40 cursor-pointer hover:bg-warning/30 shadow-sm',
+  Critical: 'bg-destructive/20 text-destructive-foreground border-destructive/40 cursor-pointer hover:bg-destructive/30 shadow-sm',
 };
 
 const ecoSureColors = {
-  'N/A': 'bg-muted text-muted-foreground border-muted-foreground/20',
-  'Minor': 'bg-info/10 text-info-foreground border-info/20',
-  'Major': 'bg-warning/10 text-warning-foreground border-warning/20',
-  'Critical': 'bg-destructive/10 text-destructive-foreground border-destructive/20',
-  'Imminent Health': 'bg-destructive text-destructive-foreground border-destructive',
+  'N/A': 'bg-muted/20 text-muted-foreground border-muted-foreground/40 cursor-pointer hover:bg-muted/30 shadow-sm',
+  'Minor': 'bg-info/20 text-info-foreground border-info/40 cursor-pointer hover:bg-info/30 shadow-sm',
+  'Major': 'bg-warning/20 text-warning-foreground border-warning/40 cursor-pointer hover:bg-warning/30 shadow-sm',
+  'Critical': 'bg-destructive/20 text-destructive-foreground border-destructive/40 cursor-pointer hover:bg-destructive/30 shadow-sm',
+  'Imminent Health': 'bg-destructive text-destructive-foreground border-destructive cursor-pointer hover:bg-destructive/90 shadow-md',
 };
 
-export function WorkOrderTable({ workOrders, onStatusChange, onEdit }: WorkOrderTableProps) {
+export function WorkOrderTable({ workOrders, onStatusChange, onEdit, onViewDetails }: WorkOrderTableProps) {
   return (
     <div className="rounded-md border">
       <Table>
@@ -60,17 +62,29 @@ export function WorkOrderTable({ workOrders, onStatusChange, onEdit }: WorkOrder
               </TableCell>
               <TableCell>{workOrder.repair_type}</TableCell>
               <TableCell>
-                <Badge className={priorityColors[workOrder.priority as keyof typeof priorityColors]}>
+                <Badge 
+                  className={priorityColors[workOrder.priority as keyof typeof priorityColors]}
+                  onClick={() => onViewDetails(workOrder)}
+                  title="Click to view/edit details"
+                >
                   {workOrder.priority}
                 </Badge>
               </TableCell>
               <TableCell>
-                <Badge className={statusColors[workOrder.status as keyof typeof statusColors]}>
+                <Badge 
+                  className={statusColors[workOrder.status as keyof typeof statusColors]}
+                  onClick={() => onViewDetails(workOrder)}
+                  title="Click to view/edit details"
+                >
                   {workOrder.status.replace('-', ' ')}
                 </Badge>
               </TableCell>
               <TableCell>
-                <Badge className={ecoSureColors[workOrder.ecosure as keyof typeof ecoSureColors]}>
+                <Badge 
+                  className={ecoSureColors[workOrder.ecosure as keyof typeof ecoSureColors]}
+                  onClick={() => onViewDetails(workOrder)}
+                  title="Click to view/edit details"
+                >
                   {workOrder.ecosure}
                 </Badge>
               </TableCell>
@@ -81,13 +95,24 @@ export function WorkOrderTable({ workOrders, onStatusChange, onEdit }: WorkOrder
                 </div>
               </TableCell>
               <TableCell>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onEdit(workOrder)}
-                >
-                  <Edit className="h-3 w-3" />
-                </Button>
+                <div className="flex gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onViewDetails(workOrder)}
+                    title="View Details"
+                  >
+                    <Eye className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onEdit(workOrder)}
+                    title="Edit Work Order"
+                  >
+                    <Edit className="h-3 w-3" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}

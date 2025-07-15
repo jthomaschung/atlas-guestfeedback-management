@@ -52,6 +52,7 @@ export type Database = {
           id: string
           image_url: string | null
           market: string
+          notes: string[] | null
           priority: string
           repair_type: string
           status: string
@@ -66,6 +67,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           market: string
+          notes?: string[] | null
           priority: string
           repair_type: string
           status?: string
@@ -80,6 +82,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           market?: string
+          notes?: string[] | null
           priority?: string
           repair_type?: string
           status?: string

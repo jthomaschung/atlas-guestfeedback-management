@@ -48,6 +48,7 @@ export interface WorkOrder {
   ecosure: EcoSure;
   status: WorkOrderStatus;
   image_url?: string;
+  notes?: string[];
   created_at: string;
   updated_at: string;
 }

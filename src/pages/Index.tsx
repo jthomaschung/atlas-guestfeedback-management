@@ -4,6 +4,7 @@ import { WorkOrderTable } from "@/components/work-orders/WorkOrderTable";
 import { WorkOrderForm } from "@/components/work-orders/WorkOrderForm";
 import { WorkOrderStats } from "@/components/work-orders/WorkOrderStats";
 import { WorkOrderFilters } from "@/components/work-orders/WorkOrderFilters";
+import { WorkOrderDetails } from "@/components/work-orders/WorkOrderDetails";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Settings } from "lucide-react";
@@ -56,6 +57,7 @@ const Index = () => {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>(sampleWorkOrders);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingWorkOrder, setEditingWorkOrder] = useState<WorkOrder | null>(null);
+  const [viewingWorkOrder, setViewingWorkOrder] = useState<WorkOrder | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<WorkOrderStatus | 'all'>('all');
   const [priorityFilter, setPriorityFilter] = useState<WorkOrderPriority | 'all'>('all');
@@ -144,6 +146,25 @@ const Index = () => {
     setEditingWorkOrder(workOrder);
   };
 
+  const handleViewDetails = (workOrder: WorkOrder) => {
+    setViewingWorkOrder(workOrder);
+  };
+
+  const handleUpdateWorkOrder = (updates: Partial<WorkOrder>) => {
+    if (!viewingWorkOrder) return;
+    
+    const updatedWorkOrder = { ...viewingWorkOrder, ...updates };
+    setWorkOrders(workOrders.map(wo => 
+      wo.id === updatedWorkOrder.id ? updatedWorkOrder : wo
+    ));
+    setViewingWorkOrder(updatedWorkOrder);
+    
+    toast({
+      title: "Work Order Updated",
+      description: "Changes have been saved successfully.",
+    });
+  };
+
   const clearFilters = () => {
     setSearchTerm('');
     setStatusFilter('all');
@@ -208,6 +229,7 @@ const Index = () => {
             workOrders={filteredWorkOrders}
             onStatusChange={handleStatusChange}
             onEdit={handleEdit}
+            onViewDetails={handleViewDetails}
           />
         )}
 
@@ -221,6 +243,14 @@ const Index = () => {
               />
             </DialogContent>
           </Dialog>
+        )}
+
+        {viewingWorkOrder && (
+          <WorkOrderDetails
+            workOrder={viewingWorkOrder}
+            onUpdate={handleUpdateWorkOrder}
+            onClose={() => setViewingWorkOrder(null)}
+          />
         )}
       </div>
     </div>
