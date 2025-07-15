@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/sidebar";
 
 const items = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Submit New Work Order", url: "/submit", icon: PlusCircle },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Work Order Tracking", url: "/tracking", icon: ClipboardList },
   { title: "Reporting", url: "/reporting", icon: BarChart3 },
 ];
