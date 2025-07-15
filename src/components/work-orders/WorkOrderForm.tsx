@@ -68,16 +68,6 @@ const ecoSureOptions = [
   { value: 'Imminent Health', label: 'Imminent Health' },
 ];
 
-const assigneeOptions = [
-  { value: 'unassigned', label: 'Unassigned' },
-  { value: 'Anthony Luna', label: 'Anthony Luna' },
-  { value: 'Grant Gelecki', label: 'Grant Gelecki' },
-  { value: 'Dwayne Parks', label: 'Dwayne Parks' },
-  { value: 'Whitney Bramlitt', label: 'Whitney Bramlitt' },
-  { value: 'Ryan McMurtrie', label: 'Ryan McMurtrie' },
-  { value: 'GM/DM', label: 'GM/DM' },
-  { value: 'Director', label: 'Director' },
-];
 
 export function WorkOrderForm({ onSubmit, onCancel, initialData }: WorkOrderFormProps) {
   const [formData, setFormData] = useState<WorkOrderFormData>({
@@ -87,7 +77,6 @@ export function WorkOrderForm({ onSubmit, onCancel, initialData }: WorkOrderForm
     market: initialData?.market || 'AZ1',
     priority: initialData?.priority || 'Low',
     ecosure: initialData?.ecosure || 'N/A',
-    assignee: initialData?.assignee || 'unassigned',
   });
 
   const [storeNumberError, setStoreNumberError] = useState('');
@@ -246,26 +235,6 @@ export function WorkOrderForm({ onSubmit, onCancel, initialData }: WorkOrderForm
               </Select>
             </div>
             
-            <div>
-              <Label>Assignee</Label>
-              <Select 
-                value={formData.assignee || 'unassigned'} 
-                onValueChange={(value) => 
-                  setFormData({ ...formData, assignee: value === 'unassigned' ? undefined : value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select assignee" />
-                </SelectTrigger>
-                <SelectContent>
-                  {assigneeOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
             
             <div>
               <Label htmlFor="image">Image (Optional)</Label>
