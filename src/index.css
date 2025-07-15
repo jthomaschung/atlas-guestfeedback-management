@@ -45,6 +45,24 @@ All colors MUST be HSL.
     --info: 199 89% 48%;
     --info-foreground: 0 0% 98%;
 
+    /* Priority colors */
+    --priority-critical: 0 84% 60%;
+    --priority-critical-foreground: 0 0% 98%;
+    --priority-important: 25 95% 53%;
+    --priority-important-foreground: 0 0% 98%;
+    --priority-low: 210 100% 56%;
+    --priority-low-foreground: 0 0% 98%;
+
+    /* Status colors */
+    --status-pending: 38 92% 50%;
+    --status-pending-foreground: 0 0% 98%;
+    --status-in-progress: 199 89% 48%;
+    --status-in-progress-foreground: 0 0% 98%;
+    --status-completed: 142 76% 36%;
+    --status-completed-foreground: 0 0% 98%;
+    --status-cancelled: 210 11% 71%;
+    --status-cancelled-foreground: 0 0% 98%;
+
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;

@@ -64,6 +64,34 @@ export default {
 					DEFAULT: 'hsl(var(--info))',
 					foreground: 'hsl(var(--info-foreground))'
 				},
+				'priority-critical': {
+					DEFAULT: 'hsl(var(--priority-critical))',
+					foreground: 'hsl(var(--priority-critical-foreground))'
+				},
+				'priority-important': {
+					DEFAULT: 'hsl(var(--priority-important))',
+					foreground: 'hsl(var(--priority-important-foreground))'
+				},
+				'priority-low': {
+					DEFAULT: 'hsl(var(--priority-low))',
+					foreground: 'hsl(var(--priority-low-foreground))'
+				},
+				'status-pending': {
+					DEFAULT: 'hsl(var(--status-pending))',
+					foreground: 'hsl(var(--status-pending-foreground))'
+				},
+				'status-in-progress': {
+					DEFAULT: 'hsl(var(--status-in-progress))',
+					foreground: 'hsl(var(--status-in-progress-foreground))'
+				},
+				'status-completed': {
+					DEFAULT: 'hsl(var(--status-completed))',
+					foreground: 'hsl(var(--status-completed-foreground))'
+				},
+				'status-cancelled': {
+					DEFAULT: 'hsl(var(--status-cancelled))',
+					foreground: 'hsl(var(--status-cancelled-foreground))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',

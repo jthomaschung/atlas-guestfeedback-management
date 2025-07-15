@@ -13,24 +13,24 @@ interface WorkOrderTableProps {
 }
 
 const statusColors = {
-  pending: 'bg-warning/20 text-warning-foreground border-warning/40 cursor-pointer hover:bg-warning/30 shadow-sm',
-  'in-progress': 'bg-info/20 text-info-foreground border-info/40 cursor-pointer hover:bg-info/30 shadow-sm',
-  completed: 'bg-success/20 text-success-foreground border-success/40 cursor-pointer hover:bg-success/30 shadow-sm',
-  cancelled: 'bg-muted/20 text-muted-foreground border-muted-foreground/40 cursor-pointer hover:bg-muted/30 shadow-sm',
+  pending: 'bg-status-pending text-status-pending-foreground border-status-pending cursor-pointer hover:bg-status-pending/90 shadow-sm',
+  'in-progress': 'bg-status-in-progress text-status-in-progress-foreground border-status-in-progress cursor-pointer hover:bg-status-in-progress/90 shadow-sm',
+  completed: 'bg-status-completed text-status-completed-foreground border-status-completed cursor-pointer hover:bg-status-completed/90 shadow-sm',
+  cancelled: 'bg-status-cancelled text-status-cancelled-foreground border-status-cancelled cursor-pointer hover:bg-status-cancelled/90 shadow-sm',
 };
 
 const priorityColors = {
-  Low: 'bg-muted/20 text-muted-foreground border-muted-foreground/40 cursor-pointer hover:bg-muted/30 shadow-sm',
-  Important: 'bg-warning/20 text-warning-foreground border-warning/40 cursor-pointer hover:bg-warning/30 shadow-sm',
-  Critical: 'bg-destructive/20 text-destructive-foreground border-destructive/40 cursor-pointer hover:bg-destructive/30 shadow-sm',
+  Low: 'bg-priority-low text-priority-low-foreground border-priority-low cursor-pointer hover:bg-priority-low/90 shadow-sm',
+  Important: 'bg-priority-important text-priority-important-foreground border-priority-important cursor-pointer hover:bg-priority-important/90 shadow-sm',
+  Critical: 'bg-priority-critical text-priority-critical-foreground border-priority-critical cursor-pointer hover:bg-priority-critical/90 shadow-sm',
 };
 
 const ecoSureColors = {
-  'N/A': 'bg-muted/20 text-muted-foreground border-muted-foreground/40 cursor-pointer hover:bg-muted/30 shadow-sm',
-  'Minor': 'bg-info/20 text-info-foreground border-info/40 cursor-pointer hover:bg-info/30 shadow-sm',
-  'Major': 'bg-warning/20 text-warning-foreground border-warning/40 cursor-pointer hover:bg-warning/30 shadow-sm',
-  'Critical': 'bg-destructive/20 text-destructive-foreground border-destructive/40 cursor-pointer hover:bg-destructive/30 shadow-sm',
-  'Imminent Health': 'bg-destructive text-destructive-foreground border-destructive cursor-pointer hover:bg-destructive/90 shadow-md',
+  'N/A': 'bg-muted text-muted-foreground border-muted cursor-pointer hover:bg-muted/90 shadow-sm',
+  'Minor': 'bg-muted text-muted-foreground border-muted cursor-pointer hover:bg-muted/90 shadow-sm',
+  'Major': 'bg-muted text-muted-foreground border-muted cursor-pointer hover:bg-muted/90 shadow-sm',
+  'Critical': 'bg-muted text-muted-foreground border-muted cursor-pointer hover:bg-muted/90 shadow-sm',
+  'Imminent Health': 'bg-muted text-muted-foreground border-muted cursor-pointer hover:bg-muted/90 shadow-sm',
 };
 
 export function WorkOrderTable({ workOrders, onStatusChange, onEdit, onViewDetails }: WorkOrderTableProps) {
