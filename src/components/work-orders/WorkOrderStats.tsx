@@ -10,7 +10,7 @@ interface WorkOrderStatsProps {
 export function WorkOrderStats({ workOrders, onFilterChange }: WorkOrderStatsProps) {
   const pending = workOrders.filter(wo => wo.status === 'pending').length;
   const inProgress = workOrders.filter(wo => wo.status === 'in-progress').length;
-  const completed = workOrders.filter(wo => wo.status === 'completed').length;
+  const pendingApproval = workOrders.filter(wo => wo.status === 'pending-approval').length;
   const totalOpenOrders = pending + inProgress; // Only count open work orders (pending + in-progress)
   const critical = workOrders.filter(wo => wo.priority === 'Critical').length;
 
@@ -30,11 +30,11 @@ export function WorkOrderStats({ workOrders, onFilterChange }: WorkOrderStatsPro
       onClick: () => onFilterChange('status', 'in-progress'),
     },
     {
-      title: 'Completed',
-      value: completed,
+      title: 'Pending Approval',
+      value: pendingApproval,
       icon: CheckCircle,
       color: 'text-success',
-      onClick: () => onFilterChange('status', 'completed'),
+      onClick: () => onFilterChange('status', 'pending-approval'),
     },
     {
       title: 'Critical',
