@@ -19,6 +19,7 @@ interface WorkOrderDetailsProps {
 
 const statusColors = {
   pending: 'bg-yellow-500 text-white border-yellow-600 hover:bg-yellow-600',
+  'pending-approval': 'bg-purple-500 text-white border-purple-600 hover:bg-purple-600',
   'in-progress': 'bg-blue-500 text-white border-blue-600 hover:bg-blue-600',
   completed: 'bg-green-500 text-white border-green-600 hover:bg-green-600',
   cancelled: 'bg-gray-500 text-white border-gray-600 hover:bg-gray-600',
@@ -196,25 +197,28 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
               <Label className="text-sm font-medium text-muted-foreground mb-2 block">Status</Label>
               <Select value={workOrder.status} onValueChange={handleStatusChange}>
                 <SelectTrigger className="w-full">
-                  <SelectValue>
-                    <Badge className={statusColors[workOrder.status]}>
-                      {workOrder.status.replace('-', ' ')}
-                    </Badge>
-                  </SelectValue>
+                   <SelectValue>
+                     <Badge className={statusColors[workOrder.status]}>
+                       {workOrder.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                     </Badge>
+                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="pending">
-                    <Badge className={statusColors.pending}>Pending</Badge>
-                  </SelectItem>
-                  <SelectItem value="in-progress">
-                    <Badge className={statusColors['in-progress']}>In Progress</Badge>
-                  </SelectItem>
-                  <SelectItem value="completed">
-                    <Badge className={statusColors.completed}>Completed</Badge>
-                  </SelectItem>
-                  <SelectItem value="cancelled">
-                    <Badge className={statusColors.cancelled}>Cancelled</Badge>
-                  </SelectItem>
+                     <Badge className={statusColors.pending}>Pending</Badge>
+                   </SelectItem>
+                   <SelectItem value="pending-approval">
+                     <Badge className={statusColors['pending-approval']}>Pending Approval</Badge>
+                   </SelectItem>
+                   <SelectItem value="in-progress">
+                     <Badge className={statusColors['in-progress']}>In Progress</Badge>
+                   </SelectItem>
+                   <SelectItem value="completed">
+                     <Badge className={statusColors.completed}>Completed</Badge>
+                   </SelectItem>
+                   <SelectItem value="cancelled">
+                     <Badge className={statusColors.cancelled}>Cancelled</Badge>
+                   </SelectItem>
                 </SelectContent>
               </Select>
             </div>

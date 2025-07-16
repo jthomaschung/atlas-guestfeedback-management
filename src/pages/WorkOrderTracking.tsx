@@ -22,9 +22,10 @@ const priorityOrder: Record<WorkOrderPriority, number> = {
 
 const statusOrder: Record<WorkOrderStatus, number> = {
   'pending': 1,
-  'in-progress': 2,
-  'completed': 3,
-  'cancelled': 4
+  'pending-approval': 2,
+  'in-progress': 3,
+  'completed': 4,
+  'cancelled': 5
 };
 
 const WorkOrderTracking = () => {

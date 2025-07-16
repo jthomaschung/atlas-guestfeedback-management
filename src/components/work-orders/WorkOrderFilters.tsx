@@ -26,6 +26,7 @@ interface WorkOrderFiltersProps {
 const statusOptions = [
   { value: 'all', label: 'All Status' },
   { value: 'pending', label: 'Pending' },
+  { value: 'pending-approval', label: 'Pending Approval' },
   { value: 'in-progress', label: 'In Progress' },
   { value: 'completed', label: 'Completed' },
 ];

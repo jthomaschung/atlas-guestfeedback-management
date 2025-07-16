@@ -14,6 +14,7 @@ interface WorkOrderCardProps {
 
 const statusColors = {
   pending: 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800',
+  'pending-approval': 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800',
   'in-progress': 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800',
   completed: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800',
   cancelled: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800',
@@ -100,10 +101,10 @@ export function WorkOrderCard({ workOrder, onEdit, onViewDetails }: WorkOrderCar
       <CardContent className="pt-0">
         <div className="space-y-3">
           {/* Status and Priority Row */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap min-h-[28px]">
             <Badge 
               className={cn(
-                "transition-colors",
+                "transition-colors whitespace-nowrap",
                 statusColors[workOrder.status as keyof typeof statusColors]
               )}
             >

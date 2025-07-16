@@ -10,6 +10,7 @@ import Welcome from '@/pages/Welcome';
 import Index from '@/pages/Index';
 import SubmitWorkOrder from '@/pages/SubmitWorkOrder';
 import WorkOrderTracking from '@/pages/WorkOrderTracking';
+import PendingApproval from '@/pages/PendingApproval';
 import Completed from '@/pages/Completed';
 import Reporting from '@/pages/Reporting';
 
@@ -101,6 +102,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <WorkOrderTracking />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/pending-approval" 
+                element={
+                  <ProtectedRoute>
+                    <PendingApproval />
                   </ProtectedRoute>
                 } 
               />

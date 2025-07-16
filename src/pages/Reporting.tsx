@@ -46,6 +46,7 @@ const Reporting = () => {
     // Status distribution
     const statusDistribution: Record<WorkOrderStatus, number> = {
       'pending': 0,
+      'pending-approval': 0,
       'in-progress': 0,
       'completed': 0,
       'cancelled': 0
