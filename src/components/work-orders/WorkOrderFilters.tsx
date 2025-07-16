@@ -58,18 +58,18 @@ export function WorkOrderFilters({
 }: WorkOrderFiltersProps) {
   const storeOptions = [
     { value: 'all', label: 'All Stores' },
-    ...availableStores.map(store => ({ value: store, label: `Store ${store}` }))
+    ...(availableStores || []).map(store => ({ value: store, label: `Store ${store}` }))
   ];
 
   const marketOptions = [
     { value: 'all', label: 'All Markets' },
-    ...availableMarkets.map(market => ({ value: market, label: market }))
+    ...(availableMarkets || []).map(market => ({ value: market, label: market }))
   ];
 
   const assigneeOptions = [
     { value: 'all', label: 'All Assignees' },
     { value: 'unassigned', label: 'Unassigned' },
-    ...availableAssignees.map(assignee => ({ value: assignee, label: assignee }))
+    ...(availableAssignees || []).map(assignee => ({ value: assignee, label: assignee }))
   ];
 
   const hasActiveFilters = 
