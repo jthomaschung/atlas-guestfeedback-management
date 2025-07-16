@@ -15,9 +15,12 @@ interface WorkOrderFiltersProps {
   onStoreFilterChange: (value: string) => void;
   marketFilter: string;
   onMarketFilterChange: (value: string) => void;
+  assigneeFilter: string;
+  onAssigneeFilterChange: (value: string) => void;
   onClearFilters: () => void;
   availableStores: string[];
   availableMarkets: string[];
+  availableAssignees: string[];
 }
 
 const statusOptions = [
@@ -46,9 +49,12 @@ export function WorkOrderFilters({
   onStoreFilterChange,
   marketFilter,
   onMarketFilterChange,
+  assigneeFilter,
+  onAssigneeFilterChange,
   onClearFilters,
   availableStores,
   availableMarkets,
+  availableAssignees,
 }: WorkOrderFiltersProps) {
   const storeOptions = [
     { value: 'all', label: 'All Stores' },
@@ -59,12 +65,20 @@ export function WorkOrderFilters({
     { value: 'all', label: 'All Markets' },
     ...availableMarkets.map(market => ({ value: market, label: market }))
   ];
+
+  const assigneeOptions = [
+    { value: 'all', label: 'All Assignees' },
+    { value: 'unassigned', label: 'Unassigned' },
+    ...availableAssignees.map(assignee => ({ value: assignee, label: assignee }))
+  ];
+
   const hasActiveFilters = 
     searchTerm !== '' ||
     statusFilter !== 'all' ||
     priorityFilter !== 'all' ||
     storeFilter !== 'all' ||
-    marketFilter !== 'all';
+    marketFilter !== 'all' ||
+    assigneeFilter !== 'all';
 
   return (
     <div className="space-y-4">
@@ -78,7 +92,7 @@ export function WorkOrderFilters({
         />
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <Select value={statusFilter} onValueChange={onStatusFilterChange}>
           <SelectTrigger>
             <SelectValue />
@@ -124,6 +138,19 @@ export function WorkOrderFilters({
           </SelectTrigger>
           <SelectContent>
             {marketOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        
+        <Select value={assigneeFilter} onValueChange={onAssigneeFilterChange}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {assigneeOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
               </SelectItem>

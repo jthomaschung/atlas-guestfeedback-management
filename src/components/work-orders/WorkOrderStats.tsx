@@ -8,16 +8,16 @@ interface WorkOrderStatsProps {
 }
 
 export function WorkOrderStats({ workOrders, onFilterChange }: WorkOrderStatsProps) {
-  const totalOrders = workOrders.length;
   const pending = workOrders.filter(wo => wo.status === 'pending').length;
   const inProgress = workOrders.filter(wo => wo.status === 'in-progress').length;
   const completed = workOrders.filter(wo => wo.status === 'completed').length;
+  const totalOpenOrders = pending + inProgress; // Only count open work orders (pending + in-progress)
   const critical = workOrders.filter(wo => wo.priority === 'Critical').length;
 
   const stats = [
     {
-      title: 'Total Work Orders',
-      value: totalOrders,
+      title: 'Total Open Work Orders',
+      value: totalOpenOrders,
       icon: ClipboardList,
       color: 'text-primary',
       onClick: () => onFilterChange('status', 'all'),

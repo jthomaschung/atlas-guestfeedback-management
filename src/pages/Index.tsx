@@ -23,6 +23,7 @@ const Index = () => {
   const [priorityFilter, setPriorityFilter] = useState<WorkOrderPriority | 'all'>('all');
   const [storeFilter, setStoreFilter] = useState('all');
   const [marketFilter, setMarketFilter] = useState('all');
+  const [assigneeFilter, setAssigneeFilter] = useState('all');
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -70,16 +71,27 @@ const Index = () => {
     const markets = [...new Set(workOrders.map(wo => wo.market))];
     return markets.sort();
   }, [workOrders]);
+
+  const availableAssignees = useMemo(() => {
+    const assignees = [...new Set(workOrders.map(wo => wo.assignee).filter(Boolean))];
+    return assignees.sort();
+  }, [workOrders]);
   const filteredWorkOrders = useMemo(() => {
     return workOrders.filter(wo => {
-      const matchesSearch = wo.description.toLowerCase().includes(searchTerm.toLowerCase()) || wo.repair_type.toLowerCase().includes(searchTerm.toLowerCase()) || wo.store_number.includes(searchTerm);
+      const matchesSearch = wo.description.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           wo.repair_type.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           wo.store_number.includes(searchTerm) ||
+                           (wo.assignee?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
       const matchesStatus = statusFilter === 'all' || wo.status === statusFilter;
       const matchesPriority = priorityFilter === 'all' || wo.priority === priorityFilter;
       const matchesStore = storeFilter === 'all' || wo.store_number === storeFilter;
       const matchesMarket = marketFilter === 'all' || wo.market === marketFilter;
-      return matchesSearch && matchesStatus && matchesPriority && matchesStore && matchesMarket;
+      const matchesAssignee = assigneeFilter === 'all' || 
+                             (assigneeFilter === 'unassigned' && !wo.assignee) ||
+                             wo.assignee === assigneeFilter;
+      return matchesSearch && matchesStatus && matchesPriority && matchesStore && matchesMarket && matchesAssignee;
     });
-  }, [workOrders, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter]);
+  }, [workOrders, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter, assigneeFilter]);
   const handleCreateWorkOrder = async (formData: WorkOrderFormData) => {
     if (!user) {
       toast({
@@ -330,6 +342,7 @@ const Index = () => {
     setPriorityFilter('all');
     setStoreFilter('all');
     setMarketFilter('all');
+    setAssigneeFilter('all');
   };
   const handleStatsFilterChange = (type: 'status' | 'priority', value: string) => {
     if (type === 'status') {
@@ -344,6 +357,7 @@ const Index = () => {
     setSearchTerm('');
     setStoreFilter('all');
     setMarketFilter('all');
+    setAssigneeFilter('all');
   };
   return <div className="min-h-screen bg-background">
       <div className="container mx-auto p-6 space-y-6">
@@ -370,7 +384,24 @@ const Index = () => {
 
         <WorkOrderStats workOrders={workOrders} onFilterChange={handleStatsFilterChange} />
 
-        <WorkOrderFilters searchTerm={searchTerm} onSearchChange={setSearchTerm} statusFilter={statusFilter} onStatusFilterChange={setStatusFilter} priorityFilter={priorityFilter} onPriorityFilterChange={setPriorityFilter} storeFilter={storeFilter} onStoreFilterChange={setStoreFilter} marketFilter={marketFilter} onMarketFilterChange={setMarketFilter} onClearFilters={clearFilters} availableStores={availableStores} availableMarkets={availableMarkets} />
+        <WorkOrderFilters 
+          searchTerm={searchTerm} 
+          onSearchChange={setSearchTerm} 
+          statusFilter={statusFilter} 
+          onStatusFilterChange={setStatusFilter} 
+          priorityFilter={priorityFilter} 
+          onPriorityFilterChange={setPriorityFilter} 
+          storeFilter={storeFilter} 
+          onStoreFilterChange={setStoreFilter} 
+          marketFilter={marketFilter} 
+          onMarketFilterChange={setMarketFilter} 
+          assigneeFilter={assigneeFilter}
+          onAssigneeFilterChange={setAssigneeFilter}
+          onClearFilters={clearFilters} 
+          availableStores={availableStores} 
+          availableMarkets={availableMarkets} 
+          availableAssignees={availableAssignees}
+        />
 
         {loading ? (
           <div className="text-center py-12">

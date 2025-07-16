@@ -10,6 +10,7 @@ import Welcome from '@/pages/Welcome';
 import Index from '@/pages/Index';
 import SubmitWorkOrder from '@/pages/SubmitWorkOrder';
 import WorkOrderTracking from '@/pages/WorkOrderTracking';
+import Completed from '@/pages/Completed';
 import Reporting from '@/pages/Reporting';
 
 const queryClient = new QueryClient();
@@ -100,6 +101,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <WorkOrderTracking />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/completed" 
+                element={
+                  <ProtectedRoute>
+                    <Completed />
                   </ProtectedRoute>
                 } 
               />
