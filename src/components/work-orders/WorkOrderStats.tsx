@@ -11,7 +11,7 @@ export function WorkOrderStats({ workOrders, onFilterChange }: WorkOrderStatsPro
   const pending = workOrders.filter(wo => wo.status === 'pending').length;
   const inProgress = workOrders.filter(wo => wo.status === 'in-progress').length;
   const pendingApproval = workOrders.filter(wo => wo.status === 'pending-approval').length;
-  const totalOpenOrders = pending + inProgress; // Only count open work orders (pending + in-progress)
+  const totalOpenOrders = pending + inProgress + pendingApproval; // Count all open work orders (pending + in-progress + pending-approval)
   const critical = workOrders.filter(wo => wo.priority === 'Critical').length;
 
   const stats = [
