@@ -196,27 +196,27 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
             <div>
               <Label className="text-sm font-medium text-muted-foreground mb-2 block">Status</Label>
               <Select value={workOrder.status} onValueChange={handleStatusChange}>
-                <SelectTrigger className="w-full min-h-[44px]">
-                  <SelectValue>
-                    <Badge className={statusColors[workOrder.status]}>
-                      {workOrder.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    </Badge>
-                  </SelectValue>
+                <SelectTrigger className="w-full">
+                   <SelectValue>
+                     <Badge className={statusColors[workOrder.status]}>
+                       {workOrder.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                     </Badge>
+                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="p-2">
-                  <SelectItem value="pending" className="py-2">
+                <SelectContent>
+                  <SelectItem value="pending">
                      <Badge className={statusColors.pending}>Pending</Badge>
                    </SelectItem>
-                   <SelectItem value="pending-approval" className="py-2">
+                   <SelectItem value="pending-approval">
                      <Badge className={statusColors['pending-approval']}>Pending Approval</Badge>
                    </SelectItem>
-                   <SelectItem value="in-progress" className="py-2">
+                   <SelectItem value="in-progress">
                      <Badge className={statusColors['in-progress']}>In Progress</Badge>
                    </SelectItem>
-                   <SelectItem value="completed" className="py-2">
+                   <SelectItem value="completed">
                      <Badge className={statusColors.completed}>Completed</Badge>
                    </SelectItem>
-                   <SelectItem value="cancelled" className="py-2">
+                   <SelectItem value="cancelled">
                      <Badge className={statusColors.cancelled}>Cancelled</Badge>
                    </SelectItem>
                 </SelectContent>
@@ -226,21 +226,21 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
             <div>
               <Label className="text-sm font-medium text-muted-foreground mb-2 block">Priority</Label>
               <Select value={workOrder.priority} onValueChange={handlePriorityChange}>
-                <SelectTrigger className="w-full min-h-[44px]">
+                <SelectTrigger className="w-full">
                   <SelectValue>
                     <Badge className={priorityColors[workOrder.priority]}>
                       {workOrder.priority}
                     </Badge>
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="p-2">
-                  <SelectItem value="Low" className="py-2">
+                <SelectContent>
+                  <SelectItem value="Low">
                     <Badge className={priorityColors.Low}>Low</Badge>
                   </SelectItem>
-                  <SelectItem value="Important" className="py-2">
+                  <SelectItem value="Important">
                     <Badge className={priorityColors.Important}>Important</Badge>
                   </SelectItem>
-                  <SelectItem value="Critical" className="py-2">
+                  <SelectItem value="Critical">
                     <Badge className={priorityColors.Critical}>Critical</Badge>
                   </SelectItem>
                 </SelectContent>
@@ -250,27 +250,27 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
             <div>
               <Label className="text-sm font-medium text-muted-foreground mb-2 block">EcoSure</Label>
               <Select value={workOrder.ecosure} onValueChange={handleEcoSureChange}>
-                <SelectTrigger className="w-full min-h-[44px]">
+                <SelectTrigger className="w-full">
                   <SelectValue>
                     <Badge className={ecoSureColors[workOrder.ecosure]}>
                       {workOrder.ecosure}
                     </Badge>
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="p-2">
-                  <SelectItem value="N/A" className="py-2">
+                <SelectContent>
+                  <SelectItem value="N/A">
                     <Badge className={ecoSureColors['N/A']}>N/A</Badge>
                   </SelectItem>
-                  <SelectItem value="Minor" className="py-2">
+                  <SelectItem value="Minor">
                     <Badge className={ecoSureColors.Minor}>Minor</Badge>
                   </SelectItem>
-                  <SelectItem value="Major" className="py-2">
+                  <SelectItem value="Major">
                     <Badge className={ecoSureColors.Major}>Major</Badge>
                   </SelectItem>
-                  <SelectItem value="Critical" className="py-2">
+                  <SelectItem value="Critical">
                     <Badge className={ecoSureColors.Critical}>Critical</Badge>
                   </SelectItem>
-                  <SelectItem value="Imminent Health" className="py-2">
+                  <SelectItem value="Imminent Health">
                     <Badge className={ecoSureColors['Imminent Health']}>Imminent Health</Badge>
                   </SelectItem>
                 </SelectContent>

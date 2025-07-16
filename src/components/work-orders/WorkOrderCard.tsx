@@ -98,10 +98,10 @@ export function WorkOrderCard({ workOrder, onEdit, onViewDetails }: WorkOrderCar
         </div>
       </CardHeader>
       
-      <CardContent className="pt-0 pb-4">
+      <CardContent className="pt-0">
         <div className="space-y-3">
           {/* Status and Priority Row */}
-          <div className="flex items-center gap-2 flex-wrap min-h-[32px] pb-1">
+          <div className="flex items-center gap-2 flex-wrap min-h-[28px]">
             <Badge 
               className={cn(
                 "transition-colors whitespace-nowrap",
@@ -113,7 +113,7 @@ export function WorkOrderCard({ workOrder, onEdit, onViewDetails }: WorkOrderCar
             
             <Badge 
               className={cn(
-                "transition-colors flex items-center gap-1 whitespace-nowrap",
+                "transition-colors flex items-center gap-1",
                 priorityColors[workOrder.priority as keyof typeof priorityColors]
               )}
             >
@@ -122,7 +122,7 @@ export function WorkOrderCard({ workOrder, onEdit, onViewDetails }: WorkOrderCar
             </Badge>
             
             {workOrder.ecosure !== 'N/A' && (
-              <Badge variant="outline" className="text-xs whitespace-nowrap">
+              <Badge variant="outline" className="text-xs">
                 Ecosure: {workOrder.ecosure}
               </Badge>
             )}
