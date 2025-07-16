@@ -274,7 +274,7 @@ const Completed = () => {
           </div>
         </div>
 
-        <div className="border rounded-lg overflow-hidden">
+        <div className="space-y-4">
           {loading ? (
             <div className="text-center py-12">
               <div className="text-muted-foreground">
@@ -292,63 +292,19 @@ const Completed = () => {
               </div>
             </div>
           ) : (
-            <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead className="min-w-[200px]">Repair Description</TableHead>
-                <TableHead className="w-[100px]">Assigned To</TableHead>
-                <TableHead className="w-[80px]">Priority</TableHead>
-                <TableHead className="w-[100px]">Repair Type</TableHead>
-                <TableHead className="w-[120px]">Date Submitted</TableHead>
-                <TableHead className="w-[80px]">Store #</TableHead>
-                <TableHead className="w-[80px]">Market</TableHead>
-                <TableHead className="w-[120px]">Date Completed</TableHead>
-                <TableHead className="w-[40px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filteredAndSortedWorkOrders.map((workOrder) => (
-                <TableRow key={workOrder.id} className="hover:bg-muted/50">
-                  <TableCell className="font-medium">
-                    {workOrder.description}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center justify-center">
-                      {workOrder.assignee ? (
-                        <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-medium">
-                          {workOrder.assignee.split(' ').map(n => n[0]).join('')}
-                        </div>
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-                          <User className="h-4 w-4 text-gray-500" />
-                        </div>
-                      )}
+                <div key={workOrder.id} className="bg-card border rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Badge className={`flex items-center gap-1 ${getPriorityColor(workOrder.priority)}`}>
+                        {workOrder.priority === 'Critical' && <AlertTriangle className="h-3 w-3" />}
+                        {workOrder.priority}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {workOrder.repair_type}
+                      </Badge>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={`flex items-center gap-1 ${getPriorityColor(workOrder.priority)}`}>
-                      {workOrder.priority === 'Critical' && <AlertTriangle className="h-3 w-3" />}
-                      {workOrder.priority}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="text-xs">
-                      {workOrder.repair_type}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-xs">
-                    {formatDate(workOrder.created_at)}
-                  </TableCell>
-                  <TableCell className="text-center font-medium">
-                    {workOrder.store_number}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {workOrder.market}
-                  </TableCell>
-                  <TableCell className="text-xs font-medium text-green-600">
-                    {workOrder.completed_at ? formatDate(workOrder.completed_at) : '-'}
-                  </TableCell>
-                  <TableCell>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -357,11 +313,47 @@ const Completed = () => {
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
-                  </TableCell>
-                </TableRow>
+                  </div>
+
+                  <h3 className="font-medium text-foreground mb-2 line-clamp-2">
+                    {workOrder.description}
+                  </h3>
+
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        Store {workOrder.store_number}
+                      </span>
+                      <span>{workOrder.market}</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        Created: {formatDate(workOrder.created_at)}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1 text-green-600 font-medium">
+                        <Clock className="h-3 w-3" />
+                        Completed: {workOrder.completed_at ? formatDate(workOrder.completed_at) : '-'}
+                      </span>
+                    </div>
+
+                    {workOrder.assignee && (
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-medium">
+                          {workOrder.assignee.split(' ').map(n => n[0]).join('')}
+                        </div>
+                        <span className="text-xs">{workOrder.assignee}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
               ))}
-            </TableBody>
-            </Table>
+            </div>
           )}
         </div>
 

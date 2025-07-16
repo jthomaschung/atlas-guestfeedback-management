@@ -96,6 +96,9 @@ const WorkOrderTracking = () => {
 
   const filteredAndSortedWorkOrders = useMemo(() => {
     let filtered = workOrders.filter(wo => {
+      // Exclude completed work orders from tracking
+      if (wo.status === 'completed') return false;
+      
       const matchesSearch = wo.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           wo.repair_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           wo.store_number.includes(searchTerm) ||

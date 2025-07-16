@@ -78,6 +78,9 @@ const Index = () => {
   }, [workOrders]);
   const filteredWorkOrders = useMemo(() => {
     return workOrders.filter(wo => {
+      // Exclude completed work orders from dashboard
+      if (wo.status === 'completed') return false;
+      
       const matchesSearch = wo.description.toLowerCase().includes(searchTerm.toLowerCase()) || 
                            wo.repair_type.toLowerCase().includes(searchTerm.toLowerCase()) || 
                            wo.store_number.includes(searchTerm) ||
