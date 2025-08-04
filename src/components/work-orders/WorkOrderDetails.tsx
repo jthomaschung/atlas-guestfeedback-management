@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { WorkOrder, WorkOrderStatus, WorkOrderPriority, EcoSure } from '@/types/work-order';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -6,10 +6,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Calendar, MessageSquare, Plus, X, User } from 'lucide-react';
+import { Calendar, MessageSquare, Plus, X, User, AtSign } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { useNotifications } from '@/hooks/useNotifications';
+import { supabase } from '@/integrations/supabase/client';
 
 interface WorkOrderDetailsProps {
   workOrder: WorkOrder;
@@ -53,15 +55,41 @@ const assigneeOptions = [
 export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDetailsProps) {
   const [newNote, setNewNote] = useState('');
   const [isAddingNote, setIsAddingNote] = useState(false);
+  const [users, setUsers] = useState<Array<{id: string, email: string, first_name?: string, last_name?: string}>>([]);
   const { toast } = useToast();
   const { profile, user } = useAuth();
+  const { sendCompletionNotification, sendTaggedNotification } = useNotifications();
 
-  const handleStatusChange = (newStatus: WorkOrderStatus) => {
+  // Load users for tagging
+  useEffect(() => {
+    const loadUsers = async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('user_id, email, first_name, last_name');
+      if (data) {
+        setUsers(data.map(profile => ({
+          id: profile.user_id,
+          email: profile.email,
+          first_name: profile.first_name,
+          last_name: profile.last_name
+        })));
+      }
+    };
+    loadUsers();
+  }, []);
+
+  const handleStatusChange = async (newStatus: WorkOrderStatus) => {
     const updates: Partial<WorkOrder> = { 
       status: newStatus,
       completed_at: newStatus === 'completed' ? new Date().toISOString() : undefined
     };
     onUpdate(updates);
+    
+    // Send completion notification if status changed to completed
+    if (newStatus === 'completed') {
+      await sendCompletionNotification(workOrder.id);
+    }
+    
     toast({
       title: "Status Updated",
       description: `Work order status changed to ${newStatus.replace('-', ' ')}`,
@@ -93,7 +121,7 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     });
   };
 
-  const handleAddNote = () => {
+  const handleAddNote = async () => {
     if (!newNote.trim()) return;
     
     const timestamp = new Date().toISOString();
@@ -102,12 +130,25 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     const noteWithUserAndTimestamp = `${format(new Date(), 'MMM d, yyyy h:mm a')} - ${userName}: ${newNote.trim()}`;
     const updatedNotes = [...(workOrder.notes || []), noteWithUserAndTimestamp];
     
+    // Check for @mentions in the note
+    const mentions = newNote.match(/@(\w+(?:\.\w+)*@\w+(?:\.\w+)*)/g) || [];
+    
     onUpdate({ notes: updatedNotes });
+    
+    // Send notifications for tagged users
+    for (const mention of mentions) {
+      const email = mention.substring(1); // Remove @ symbol
+      const taggedUser = users.find(u => u.email === email);
+      if (taggedUser) {
+        await sendTaggedNotification(workOrder.id, taggedUser.id, newNote.trim());
+      }
+    }
+    
     setNewNote('');
     setIsAddingNote(false);
     toast({
       title: "Note Added",
-      description: "Your note has been added to the work order",
+      description: mentions.length > 0 ? `Note added with ${mentions.length} user(s) tagged` : "Your note has been added to the work order",
     });
   };
 
@@ -300,11 +341,15 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
             {isAddingNote && (
               <div className="space-y-2 mb-4 p-3 border rounded-md bg-muted/20">
                 <Textarea
-                  placeholder="Add a note or update..."
+                  placeholder="Add a note or update... Use @email@domain.com to tag users"
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
                   className="min-h-[80px]"
                 />
+                <div className="text-xs text-muted-foreground mb-2 flex items-center">
+                  <AtSign className="h-3 w-3 mr-1" />
+                  Tip: Type @user@email.com to tag and notify users
+                </div>
                 <div className="flex gap-2">
                   <Button size="sm" onClick={handleAddNote}>
                     Add Note

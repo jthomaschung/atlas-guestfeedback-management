@@ -13,6 +13,7 @@ import WorkOrderTracking from '@/pages/WorkOrderTracking';
 import PendingApproval from '@/pages/PendingApproval';
 import Completed from '@/pages/Completed';
 import Reporting from '@/pages/Reporting';
+import UserHierarchy from '@/pages/UserHierarchy';
 
 const queryClient = new QueryClient();
 
@@ -126,6 +127,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Reporting />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/user-hierarchy" 
+                element={
+                  <ProtectedRoute>
+                    <UserHierarchy />
                   </ProtectedRoute>
                 } 
               />
