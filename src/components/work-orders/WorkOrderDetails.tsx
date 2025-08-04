@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { WorkOrder, WorkOrderStatus, WorkOrderPriority, EcoSure } from '@/types/work-order';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -56,6 +56,12 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
   const [newNote, setNewNote] = useState('');
   const [isAddingNote, setIsAddingNote] = useState(false);
   const [users, setUsers] = useState<Array<{user_id: string, email: string, first_name?: string, last_name?: string, display_name?: string}>>([]);
+  const [showUserSuggestions, setShowUserSuggestions] = useState(false);
+  const [userSuggestions, setUserSuggestions] = useState<Array<{user_id: string, email: string, first_name?: string, last_name?: string, display_name?: string}>>([]);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
+  const [mentionQuery, setMentionQuery] = useState('');
+  const [mentionStartPos, setMentionStartPos] = useState(0);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
   const { profile, user } = useAuth();
   const { sendCompletionNotification, sendTaggedNotification } = useNotifications();
@@ -72,6 +78,89 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     };
     loadUsers();
   }, []);
+
+  // Helper function to get display name for a user
+  const getUserDisplayName = (user: typeof users[0]) => {
+    if (user.display_name) return user.display_name;
+    const name = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+    return name || user.email.split('@')[0];
+  };
+
+  // Handle textarea changes and detect @ mentions
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    const cursorPos = e.target.selectionStart;
+    
+    setNewNote(value);
+    
+    // Find @ mentions
+    const beforeCursor = value.substring(0, cursorPos);
+    const mentionMatch = beforeCursor.match(/@(\w+(?:\s+\w*)*)$/);
+    
+    if (mentionMatch) {
+      const query = mentionMatch[1].toLowerCase();
+      setMentionQuery(query);
+      setMentionStartPos(beforeCursor.lastIndexOf('@'));
+      
+      // Filter users based on query
+      const filteredUsers = users.filter(user => {
+        const displayName = getUserDisplayName(user).toLowerCase();
+        return displayName.includes(query);
+      });
+      
+      setUserSuggestions(filteredUsers);
+      setShowUserSuggestions(filteredUsers.length > 0);
+      setSelectedSuggestionIndex(0);
+    } else {
+      setShowUserSuggestions(false);
+      setUserSuggestions([]);
+      setMentionQuery('');
+    }
+  };
+
+  // Handle keyboard navigation in suggestions
+  const handleTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (!showUserSuggestions) return;
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedSuggestionIndex(prev => 
+        prev < userSuggestions.length - 1 ? prev + 1 : 0
+      );
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedSuggestionIndex(prev => 
+        prev > 0 ? prev - 1 : userSuggestions.length - 1
+      );
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (userSuggestions[selectedSuggestionIndex]) {
+        selectUser(userSuggestions[selectedSuggestionIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      setShowUserSuggestions(false);
+    }
+  };
+
+  // Select a user from suggestions
+  const selectUser = (user: typeof users[0]) => {
+    const displayName = getUserDisplayName(user);
+    const beforeMention = newNote.substring(0, mentionStartPos);
+    const afterMention = newNote.substring(mentionStartPos + mentionQuery.length + 1);
+    const newValue = beforeMention + '@' + displayName + ' ' + afterMention;
+    
+    setNewNote(newValue);
+    setShowUserSuggestions(false);
+    
+    // Focus back to textarea and set cursor position
+    if (textareaRef.current) {
+      const newCursorPos = beforeMention.length + displayName.length + 2;
+      setTimeout(() => {
+        textareaRef.current?.focus();
+        textareaRef.current?.setSelectionRange(newCursorPos, newCursorPos);
+      }, 0);
+    }
+  };
 
   const handleStatusChange = async (newStatus: WorkOrderStatus) => {
     const updates: Partial<WorkOrder> = { 
@@ -334,13 +423,35 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
 
             {/* Add Note Form */}
             {isAddingNote && (
-              <div className="space-y-2 mb-4 p-3 border rounded-md bg-muted/20">
-                <Textarea
-                  placeholder="Add a note or update... Use @DisplayName to tag users"
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
-                  className="min-h-[80px]"
-                />
+              <div className="space-y-2 mb-4 p-3 border rounded-md bg-muted/20 relative">
+                <div className="relative">
+                  <Textarea
+                    ref={textareaRef}
+                    placeholder="Add a note or update... Use @DisplayName to tag users"
+                    value={newNote}
+                    onChange={handleTextareaChange}
+                    onKeyDown={handleTextareaKeyDown}
+                    className="min-h-[80px]"
+                  />
+                  
+                  {/* User Suggestions Dropdown */}
+                  {showUserSuggestions && (
+                    <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-background border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
+                      {userSuggestions.map((user, index) => (
+                        <div
+                          key={user.user_id}
+                          className={`px-3 py-2 cursor-pointer text-sm border-b border-border last:border-b-0 ${
+                            index === selectedSuggestionIndex ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'
+                          }`}
+                          onClick={() => selectUser(user)}
+                        >
+                          <div className="font-medium">{getUserDisplayName(user)}</div>
+                          <div className="text-xs text-muted-foreground">{user.email}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <div className="text-xs text-muted-foreground mb-2 flex items-center">
                   <AtSign className="h-3 w-3 mr-1" />
                   Tip: Type @DisplayName to tag and notify users (e.g., @John Smith)
