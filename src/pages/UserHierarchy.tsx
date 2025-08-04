@@ -81,7 +81,7 @@ export default function UserHierarchy() {
     try {
       const hierarchyData = {
         user_id: selectedUser,
-        manager_id: selectedManager || null,
+        manager_id: selectedManager === 'none' ? null : selectedManager || null,
         role: selectedRole
       };
 
@@ -167,10 +167,10 @@ export default function UserHierarchy() {
                 setSelectedUser(value);
                 const currentHierarchy = getCurrentHierarchy(value);
                 if (currentHierarchy) {
-                  setSelectedManager(currentHierarchy.manager_id || '');
+                  setSelectedManager(currentHierarchy.manager_id || 'none');
                   setSelectedRole(currentHierarchy.role);
                 } else {
-                  setSelectedManager('');
+                  setSelectedManager('none');
                   setSelectedRole('user');
                 }
               }}>
@@ -194,7 +194,7 @@ export default function UserHierarchy() {
                   <SelectValue placeholder="Select manager (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No Manager</SelectItem>
+                  <SelectItem value="none">No Manager</SelectItem>
                   {users.filter(u => u.user_id !== selectedUser).map((user) => (
                     <SelectItem key={user.user_id} value={user.user_id}>
                       {getUserDisplayName(user)}
