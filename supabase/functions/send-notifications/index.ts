@@ -107,16 +107,23 @@ const handler = async (req: Request): Promise<Response> => {
         await resend.emails.send({
           from: "Work Orders <notifications@resend.dev>",
           to: [email],
-          subject: `Work Order Completed - ${workOrder.repair_type}`,
+          subject: `Work Order Completed - Store ${workOrder.store_number} - ${workOrder.description}`,
           html: `
             <h2>Work Order Completed</h2>
-            <p><strong>Work Order #:</strong> ${workOrder.id.slice(0, 8)}</p>
-            <p><strong>Store:</strong> ${workOrder.store_number} (${workOrder.market})</p>
+            <p><strong>Work Order ID:</strong> ${workOrder.id.slice(0, 8)}</p>
+            <p><strong>Store Number:</strong> ${workOrder.store_number}</p>
+            <p><strong>Market:</strong> ${workOrder.market}</p>
             <p><strong>Repair Type:</strong> ${workOrder.repair_type}</p>
             <p><strong>Priority:</strong> ${workOrder.priority}</p>
+            <p><strong>EcoSure Level:</strong> ${workOrder.ecosure}</p>
+            <p><strong>Status:</strong> ${workOrder.status}</p>
             <p><strong>Description:</strong> ${workOrder.description}</p>
-            <p><strong>Completed by:</strong> ${workOrder.assignee || 'System'}</p>
+            <p><strong>Assignee:</strong> ${workOrder.assignee || 'Not assigned'}</p>
+            <p><strong>Created Date:</strong> ${new Date(workOrder.created_at).toLocaleDateString()}</p>
+            <p><strong>Completed Date:</strong> ${workOrder.completed_at ? new Date(workOrder.completed_at).toLocaleDateString() : 'N/A'}</p>
             <p><strong>Created by:</strong> ${creatorProfile?.first_name} ${creatorProfile?.last_name} (${creatorProfile?.email})</p>
+            ${workOrder.image_url ? `<p><strong>Image:</strong> <a href="${workOrder.image_url}">View Image</a></p>` : ''}
+            ${workOrder.notes && workOrder.notes.length > 0 ? `<p><strong>Notes:</strong><br>${workOrder.notes.join('<br>')}</p>` : ''}
             <br>
             <p>This work order has been marked as completed.</p>
           `,
@@ -143,15 +150,24 @@ const handler = async (req: Request): Promise<Response> => {
         await resend.emails.send({
           from: "Work Orders <notifications@resend.dev>",
           to: [taggedProfile.email],
-          subject: `You've been tagged in Work Order #${workOrder.id.slice(0, 8)}`,
+          subject: `You've Been Tagged - Store ${workOrder.store_number} - ${workOrder.repair_type}`,
           html: `
-            <h2>You've been tagged in a work order note</h2>
-            <p><strong>Work Order #:</strong> ${workOrder.id.slice(0, 8)}</p>
-            <p><strong>Store:</strong> ${workOrder.store_number} (${workOrder.market})</p>
+            <h2>You've Been Tagged in a Work Order Note</h2>
+            <p><strong>Work Order ID:</strong> ${workOrder.id.slice(0, 8)}</p>
+            <p><strong>Store Number:</strong> ${workOrder.store_number}</p>
+            <p><strong>Market:</strong> ${workOrder.market}</p>
             <p><strong>Repair Type:</strong> ${workOrder.repair_type}</p>
             <p><strong>Priority:</strong> ${workOrder.priority}</p>
+            <p><strong>EcoSure Level:</strong> ${workOrder.ecosure}</p>
+            <p><strong>Status:</strong> ${workOrder.status}</p>
+            <p><strong>Description:</strong> ${workOrder.description}</p>
+            <p><strong>Assignee:</strong> ${workOrder.assignee || 'Not assigned'}</p>
+            <p><strong>Created Date:</strong> ${new Date(workOrder.created_at).toLocaleDateString()}</p>
+            <p><strong>Created by:</strong> ${creatorProfile?.first_name} ${creatorProfile?.last_name} (${creatorProfile?.email})</p>
+            ${workOrder.image_url ? `<p><strong>Image:</strong> <a href="${workOrder.image_url}">View Image</a></p>` : ''}
+            ${workOrder.notes && workOrder.notes.length > 0 ? `<p><strong>Previous Notes:</strong><br>${workOrder.notes.join('<br>')}</p>` : ''}
             <br>
-            <p><strong>Note:</strong> ${note}</p>
+            <p><strong>New Note:</strong> ${note}</p>
             <br>
             <p>Tagged by: ${creatorProfile?.first_name} ${creatorProfile?.last_name} (${creatorProfile?.email})</p>
           `,
