@@ -47,7 +47,7 @@ export default function UserHierarchy() {
   const [permissions, setPermissions] = useState<UserPermissions[]>([]);
   const [selectedUser, setSelectedUser] = useState<string>('');
   const [selectedManager, setSelectedManager] = useState<string>('');
-  const [selectedRole, setSelectedRole] = useState<string>('user');
+  const [selectedRole, setSelectedRole] = useState<string>('Store Level');
   const [managingUser, setManagingUser] = useState<string>('');
   const [userNotifications, setUserNotifications] = useState<NotificationPreferences>({
     user_id: '',
@@ -60,8 +60,10 @@ export default function UserHierarchy() {
     markets: [],
     stores: []
   });
-  const [marketInput, setMarketInput] = useState('');
-  const [storeInput, setStoreInput] = useState('');
+  const [availableMarkets, setAvailableMarkets] = useState<string[]>([]);
+  const [availableStores, setAvailableStores] = useState<string[]>([]);
+  const [selectedMarket, setSelectedMarket] = useState('');
+  const [selectedStore, setSelectedStore] = useState('');
   const [loading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [checkingAdmin, setCheckingAdmin] = useState(true);
@@ -138,6 +140,27 @@ export default function UserHierarchy() {
       if (permissionData) {
         setPermissions(permissionData);
       }
+
+      // Load available markets and stores
+      const { data: marketsData } = await supabase
+        .from('work_orders')
+        .select('market')
+        .order('market');
+
+      const { data: storesData } = await supabase
+        .from('work_orders')
+        .select('store_number')
+        .order('store_number');
+
+      if (marketsData) {
+        const uniqueMarkets = [...new Set(marketsData.map(item => item.market))];
+        setAvailableMarkets(uniqueMarkets);
+      }
+
+      if (storesData) {
+        const uniqueStores = [...new Set(storesData.map(item => item.store_number))];
+        setAvailableStores(uniqueStores);
+      }
     } catch (error) {
       console.error('Error loading data:', error);
       toast({
@@ -196,7 +219,7 @@ export default function UserHierarchy() {
       // Reset form
       setSelectedUser('');
       setSelectedManager('');
-      setSelectedRole('user');
+      setSelectedRole('Store Level');
 
     } catch (error) {
       console.error('Error saving hierarchy:', error);
@@ -252,6 +275,10 @@ export default function UserHierarchy() {
         stores: []
       });
     }
+
+    // Reset dropdown selections
+    setSelectedMarket('');
+    setSelectedStore('');
   };
 
   const handleSaveNotifications = async () => {
@@ -338,12 +365,23 @@ export default function UserHierarchy() {
   };
 
   const addMarket = () => {
-    if (marketInput.trim() && !userPermissions.markets.includes(marketInput.trim())) {
-      setUserPermissions(prev => ({
-        ...prev,
-        markets: [...prev.markets, marketInput.trim()]
-      }));
-      setMarketInput('');
+    if (selectedMarket && !userPermissions.markets.includes(selectedMarket)) {
+      const managingUserRole = hierarchy.find(h => h.user_id === managingUser)?.role || 'Store Level';
+      
+      if (managingUserRole === 'Store Level') {
+        // Store Level users can only have one market
+        setUserPermissions(prev => ({
+          ...prev,
+          markets: [selectedMarket]
+        }));
+      } else {
+        // Directors and DMs can have multiple markets
+        setUserPermissions(prev => ({
+          ...prev,
+          markets: [...prev.markets, selectedMarket]
+        }));
+      }
+      setSelectedMarket('');
     }
   };
 
@@ -355,12 +393,23 @@ export default function UserHierarchy() {
   };
 
   const addStore = () => {
-    if (storeInput.trim() && !userPermissions.stores.includes(storeInput.trim())) {
-      setUserPermissions(prev => ({
-        ...prev,
-        stores: [...prev.stores, storeInput.trim()]
-      }));
-      setStoreInput('');
+    if (selectedStore && !userPermissions.stores.includes(selectedStore)) {
+      const managingUserRole = hierarchy.find(h => h.user_id === managingUser)?.role || 'Store Level';
+      
+      if (managingUserRole === 'Store Level') {
+        // Store Level users can only have one store
+        setUserPermissions(prev => ({
+          ...prev,
+          stores: [selectedStore]
+        }));
+      } else {
+        // Directors and DMs can have multiple stores
+        setUserPermissions(prev => ({
+          ...prev,
+          stores: [...prev.stores, selectedStore]
+        }));
+      }
+      setSelectedStore('');
     }
   };
 
@@ -430,7 +479,7 @@ export default function UserHierarchy() {
                   setSelectedRole(currentHierarchy.role);
                 } else {
                   setSelectedManager('none');
-                  setSelectedRole('user');
+                  setSelectedRole('Store Level');
                 }
               }}>
                 <SelectTrigger>
@@ -470,10 +519,10 @@ export default function UserHierarchy() {
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="manager">Manager</SelectItem>
-                  <SelectItem value="director">Director</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="Store Level">Store Level</SelectItem>
+                  <SelectItem value="DM">DM</SelectItem>
+                  <SelectItem value="Director">Director</SelectItem>
+                  <SelectItem value="Admin">Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -507,7 +556,7 @@ export default function UserHierarchy() {
                       <div className="flex-1">
                         <div className="font-medium">{getUserDisplayName(user)}</div>
                         <div className="text-sm text-muted-foreground">
-                          Role: {userHierarchy?.role || 'user'}
+                          Role: {userHierarchy?.role || 'Store Level'}
                         </div>
                         <div className="text-sm text-muted-foreground">
                           Manager: {getManagerName(userHierarchy?.manager_id)}
@@ -604,15 +653,23 @@ export default function UserHierarchy() {
             <CardContent className="space-y-4">
               {/* Markets */}
               <div>
-                <Label className="text-sm font-medium">Markets</Label>
+                <Label className="text-sm font-medium">
+                  Markets {hierarchy.find(h => h.user_id === managingUser)?.role === 'Store Level' ? '(Single Selection)' : '(Multiple Allowed)'}
+                </Label>
                 <div className="flex gap-2 mt-1">
-                  <Input
-                    placeholder="Add market"
-                    value={marketInput}
-                    onChange={(e) => setMarketInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && addMarket()}
-                  />
-                  <Button onClick={addMarket} size="sm">Add</Button>
+                  <Select value={selectedMarket} onValueChange={setSelectedMarket}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select market" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableMarkets.map((market) => (
+                        <SelectItem key={market} value={market}>
+                          {market}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button onClick={addMarket} size="sm" disabled={!selectedMarket}>Add</Button>
                 </div>
                 <div className="flex flex-wrap gap-1 mt-2">
                   {userPermissions.markets.map((market) => (
@@ -631,15 +688,23 @@ export default function UserHierarchy() {
 
               {/* Stores */}
               <div>
-                <Label className="text-sm font-medium">Store Numbers</Label>
+                <Label className="text-sm font-medium">
+                  Store Numbers {hierarchy.find(h => h.user_id === managingUser)?.role === 'Store Level' ? '(Single Selection)' : '(Multiple Allowed)'}
+                </Label>
                 <div className="flex gap-2 mt-1">
-                  <Input
-                    placeholder="Add store number"
-                    value={storeInput}
-                    onChange={(e) => setStoreInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && addStore()}
-                  />
-                  <Button onClick={addStore} size="sm">Add</Button>
+                  <Select value={selectedStore} onValueChange={setSelectedStore}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select store" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableStores.map((store) => (
+                        <SelectItem key={store} value={store}>
+                          {store}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button onClick={addStore} size="sm" disabled={!selectedStore}>Add</Button>
                 </div>
                 <div className="flex flex-wrap gap-1 mt-2">
                   {userPermissions.stores.map((store) => (
