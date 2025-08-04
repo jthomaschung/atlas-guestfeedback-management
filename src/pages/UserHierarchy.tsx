@@ -17,6 +17,18 @@ const markets = [
   'FL1', 'FL2', 'FL3', 'PA'
 ];
 
+// Define the specific store numbers
+const storeNumbers = [
+  '522', '746', '799', '833', '838', '877', '930', '965', '1002', '1018',
+  '1019', '1061', '1111', '1127', '1206', '1261', '1307', '1337', '1342', '1355',
+  '1440', '1441', '1554', '1556', '1562', '1635', '1694', '1695', '1696', '1762',
+  '1779', '1789', '1955', '1956', '1957', '2006', '2021', '2176', '2178', '2180',
+  '2391', '2500', '2501', '2502', '2503', '2504', '2601', '2682', '2683', '2711',
+  '2712', '2749', '2807', '2808', '2811', '2812', '2821', '2873', '2874', '2876',
+  '2883', '2884', '3029', '3030', '3187', '3260', '3391', '3612', '3613', '3635',
+  '3686', '3972', '4018', '4022', '4024', '4105', '4330', '4358', '4586'
+].map(num => `#${num}`);
+
 interface UserProfile {
   user_id: string;
   email: string;
@@ -66,7 +78,6 @@ export default function UserHierarchy() {
     markets: [],
     stores: []
   });
-  const [availableStores, setAvailableStores] = useState<string[]>([]);
   const [selectedMarket, setSelectedMarket] = useState('');
   const [selectedStore, setSelectedStore] = useState('');
   const [loading, setLoading] = useState(false);
@@ -146,16 +157,6 @@ export default function UserHierarchy() {
         setPermissions(permissionData);
       }
 
-      // Load available stores
-      const { data: storesData } = await supabase
-        .from('work_orders')
-        .select('store_number')
-        .order('store_number');
-
-      if (storesData) {
-        const uniqueStores = [...new Set(storesData.map(item => item.store_number))];
-        setAvailableStores(uniqueStores);
-      }
     } catch (error) {
       console.error('Error loading data:', error);
       toast({
@@ -684,7 +685,7 @@ export default function UserHierarchy() {
               {/* Stores */}
               <div>
                 <Label className="text-sm font-medium">
-                  Store Numbers {hierarchy.find(h => h.user_id === managingUser)?.role === 'Store Level' ? '(Single Selection)' : '(Multiple Allowed)'}
+                  Store Number {hierarchy.find(h => h.user_id === managingUser)?.role === 'Store Level' ? '(Single Selection)' : '(Multiple Allowed)'}
                 </Label>
                 <div className="flex gap-2 mt-1">
                   <Select value={selectedStore} onValueChange={setSelectedStore}>
@@ -692,7 +693,7 @@ export default function UserHierarchy() {
                       <SelectValue placeholder="Select store" />
                     </SelectTrigger>
                     <SelectContent>
-                      {availableStores.map((store) => (
+                      {storeNumbers.map((store) => (
                         <SelectItem key={store} value={store}>
                           {store}
                         </SelectItem>
