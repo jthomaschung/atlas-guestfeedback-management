@@ -68,6 +68,17 @@ const ecoSureOptions = [
   { value: 'Imminent Health', label: 'Imminent Health' },
 ];
 
+const storeNumbers = [
+  '522', '746', '799', '833', '838', '877', '930', '965', '1002', '1018',
+  '1019', '1061', '1111', '1127', '1206', '1261', '1307', '1337', '1342', '1355',
+  '1440', '1441', '1554', '1556', '1562', '1635', '1694', '1695', '1696', '1762',
+  '1779', '1789', '1955', '1956', '1957', '2006', '2021', '2176', '2178', '2180',
+  '2391', '2500', '2501', '2502', '2503', '2504', '2601', '2682', '2683', '2711',
+  '2712', '2749', '2807', '2808', '2811', '2812', '2821', '2873', '2874', '2876',
+  '2883', '2884', '3029', '3030', '3187', '3260', '3391', '3612', '3613', '3635',
+  '3686', '3972', '4018', '4022', '4024', '4105', '4330', '4358', '4586'
+].map(num => ({ value: `#${num}`, label: `#${num}` }));
+
 
 export function WorkOrderForm({ onSubmit, onCancel, initialData }: WorkOrderFormProps) {
   const [formData, setFormData] = useState<WorkOrderFormData>({
@@ -79,35 +90,9 @@ export function WorkOrderForm({ onSubmit, onCancel, initialData }: WorkOrderForm
     ecosure: initialData?.ecosure || 'N/A',
   });
 
-  const [storeNumberError, setStoreNumberError] = useState('');
-
-  const validateStoreNumber = (value: string) => {
-    const pattern = /^#?\d{3,4}$/;
-    if (!value) {
-      setStoreNumberError('Store number is required');
-      return false;
-    }
-    if (!pattern.test(value)) {
-      setStoreNumberError('Store number must be 3-4 digits (e.g., #1234 or 1234)');
-      return false;
-    }
-    setStoreNumberError('');
-    return true;
-  };
-
-  const handleStoreNumberChange = (value: string) => {
-    // Auto-add # prefix if user enters just numbers
-    let formattedValue = value;
-    if (value && !value.startsWith('#') && /^\d/.test(value)) {
-      formattedValue = '#' + value;
-    }
-    setFormData({ ...formData, store_number: formattedValue });
-    validateStoreNumber(formattedValue);
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateStoreNumber(formData.store_number)) {
+    if (!formData.store_number) {
       return;
     }
     onSubmit(formData);
@@ -179,18 +164,24 @@ export function WorkOrderForm({ onSubmit, onCancel, initialData }: WorkOrderForm
             </div>
             
             <div>
-              <Label htmlFor="store_number">Store Number *</Label>
-              <Input
-                id="store_number"
-                value={formData.store_number}
-                onChange={(e) => handleStoreNumberChange(e.target.value)}
-                placeholder="#1234"
-                required
-                className={storeNumberError ? 'border-destructive' : ''}
-              />
-              {storeNumberError && (
-                <p className="text-sm text-destructive mt-1">{storeNumberError}</p>
-              )}
+              <Label>Store Number *</Label>
+              <Select 
+                value={formData.store_number} 
+                onValueChange={(value: string) => 
+                  setFormData({ ...formData, store_number: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select store number" />
+                </SelectTrigger>
+                <SelectContent className="bg-background border border-border">
+                  {storeNumbers.map((store) => (
+                    <SelectItem key={store.value} value={store.value}>
+                      {store.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             
             <div>

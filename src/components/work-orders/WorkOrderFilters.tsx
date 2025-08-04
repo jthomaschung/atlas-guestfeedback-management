@@ -98,7 +98,7 @@ export function WorkOrderFilters({
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background border border-border">
             {statusOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
@@ -111,7 +111,7 @@ export function WorkOrderFilters({
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background border border-border">
             {priorityOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
@@ -124,7 +124,7 @@ export function WorkOrderFilters({
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background border border-border">
             {storeOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
@@ -137,7 +137,7 @@ export function WorkOrderFilters({
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background border border-border">
             {marketOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
@@ -150,7 +150,7 @@ export function WorkOrderFilters({
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background border border-border">
             {assigneeOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
