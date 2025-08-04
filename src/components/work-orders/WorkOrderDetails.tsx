@@ -55,7 +55,7 @@ const assigneeOptions = [
 export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDetailsProps) {
   const [newNote, setNewNote] = useState('');
   const [isAddingNote, setIsAddingNote] = useState(false);
-  const [users, setUsers] = useState<Array<{id: string, email: string, first_name?: string, last_name?: string}>>([]);
+  const [users, setUsers] = useState<Array<{user_id: string, email: string, first_name?: string, last_name?: string, display_name?: string}>>([]);
   const { toast } = useToast();
   const { profile, user } = useAuth();
   const { sendCompletionNotification, sendTaggedNotification } = useNotifications();
@@ -65,14 +65,9 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     const loadUsers = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('user_id, email, first_name, last_name');
+        .select('user_id, email, first_name, last_name, display_name');
       if (data) {
-        setUsers(data.map(profile => ({
-          id: profile.user_id,
-          email: profile.email,
-          first_name: profile.first_name,
-          last_name: profile.last_name
-        })));
+        setUsers(data);
       }
     };
     loadUsers();
@@ -130,17 +125,17 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     const noteWithUserAndTimestamp = `${format(new Date(), 'MMM d, yyyy h:mm a')} - ${userName}: ${newNote.trim()}`;
     const updatedNotes = [...(workOrder.notes || []), noteWithUserAndTimestamp];
     
-    // Check for @mentions in the note
-    const mentions = newNote.match(/@(\w+(?:\.\w+)*@\w+(?:\.\w+)*)/g) || [];
+    // Check for @mentions in the note using display names
+    const mentions = newNote.match(/@(\w+(?:\s+\w+)*)/g) || [];
     
     onUpdate({ notes: updatedNotes });
     
     // Send notifications for tagged users
     for (const mention of mentions) {
-      const email = mention.substring(1); // Remove @ symbol
-      const taggedUser = users.find(u => u.email === email);
+      const displayName = mention.substring(1); // Remove @ symbol
+      const taggedUser = users.find(u => u.display_name === displayName);
       if (taggedUser) {
-        await sendTaggedNotification(workOrder.id, taggedUser.id, newNote.trim());
+        await sendTaggedNotification(workOrder.id, taggedUser.user_id, newNote.trim());
       }
     }
     
@@ -341,14 +336,14 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
             {isAddingNote && (
               <div className="space-y-2 mb-4 p-3 border rounded-md bg-muted/20">
                 <Textarea
-                  placeholder="Add a note or update... Use @email@domain.com to tag users"
+                  placeholder="Add a note or update... Use @DisplayName to tag users"
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
                   className="min-h-[80px]"
                 />
                 <div className="text-xs text-muted-foreground mb-2 flex items-center">
                   <AtSign className="h-3 w-3 mr-1" />
-                  Tip: Type @user@email.com to tag and notify users
+                  Tip: Type @DisplayName to tag and notify users (e.g., @John Smith)
                 </div>
                 <div className="flex gap-2">
                   <Button size="sm" onClick={handleAddNote}>

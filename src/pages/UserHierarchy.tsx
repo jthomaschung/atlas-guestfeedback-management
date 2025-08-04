@@ -34,6 +34,7 @@ interface UserProfile {
   email: string;
   first_name?: string;
   last_name?: string;
+  display_name?: string;
 }
 
 interface UserHierarchyData {
@@ -67,6 +68,7 @@ export default function UserHierarchy() {
   const [selectedManager, setSelectedManager] = useState<string>('');
   const [selectedRole, setSelectedRole] = useState<string>('Store Level');
   const [managingUser, setManagingUser] = useState<string>('');
+  const [editingDisplayName, setEditingDisplayName] = useState<string>('');
   const [userNotifications, setUserNotifications] = useState<NotificationPreferences>({
     user_id: '',
     email_on_completion: true,
@@ -123,7 +125,7 @@ export default function UserHierarchy() {
       // Load all users
       const { data: usersData } = await supabase
         .from('profiles')
-        .select('user_id, email, first_name, last_name')
+        .select('user_id, email, first_name, last_name, display_name')
         .order('first_name');
 
       if (usersData) {
@@ -230,6 +232,7 @@ export default function UserHierarchy() {
   };
 
   const getUserDisplayName = (user: UserProfile) => {
+    if (user.display_name) return user.display_name;
     const name = `${user.first_name || ''} ${user.last_name || ''}`.trim();
     return name || user.email;
   };
@@ -246,6 +249,10 @@ export default function UserHierarchy() {
 
   const handleManageUser = (userId: string) => {
     setManagingUser(userId);
+    
+    // Load user's current display name
+    const user = users.find(u => u.user_id === userId);
+    setEditingDisplayName(user?.display_name || '');
     
     // Load user's current notification preferences
     const userNotif = notifications.find(n => n.user_id === userId);
@@ -275,6 +282,43 @@ export default function UserHierarchy() {
     // Reset dropdown selections
     setSelectedMarket('');
     setSelectedStore('');
+  };
+
+  const handleSaveDisplayName = async () => {
+    if (!managingUser || !editingDisplayName.trim()) {
+      toast({
+        title: "Error",
+        description: "Display name cannot be empty",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ display_name: editingDisplayName.trim() })
+        .eq('user_id', managingUser);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Display name updated successfully"
+      });
+
+      await loadData();
+    } catch (error) {
+      console.error('Error saving display name:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save display name",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSaveNotifications = async () => {
@@ -579,6 +623,43 @@ export default function UserHierarchy() {
 
       {/* User Management Panel */}
       {managingUser && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Display Name Management */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <UserCheck className="h-5 w-5" />
+                Display Name
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Managing: {getUserDisplayName(users.find(u => u.user_id === managingUser)!)}
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="display_name">Display Name</Label>
+                <Input
+                  id="display_name"
+                  value={editingDisplayName}
+                  onChange={(e) => setEditingDisplayName(e.target.value)}
+                  placeholder="Enter display name for tagging"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  This name will be used when tagging users (e.g., @{editingDisplayName || 'Display Name'})
+                </p>
+              </div>
+
+              <Button onClick={handleSaveDisplayName} disabled={loading || !editingDisplayName.trim()} className="w-full">
+                <Save className="h-4 w-4 mr-2" />
+                Save Display Name
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Notification & Permissions Panel */}
+      {managingUser && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Notification Preferences */}
           <Card>
@@ -756,7 +837,7 @@ export default function UserHierarchy() {
           <div className="p-4 bg-yellow-50 dark:bg-yellow-950 rounded-md">
             <h4 className="font-medium mb-2">Tagging Users</h4>
             <p className="text-sm text-muted-foreground">
-              Tag users in notes using @user@email.com format (e.g., @john@company.com).
+              Tag users in notes using @DisplayName format (e.g., @John Smith). Set display names above for easy tagging.
             </p>
           </div>
         </CardContent>
