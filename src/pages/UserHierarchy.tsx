@@ -30,12 +30,42 @@ export default function UserHierarchy() {
   const [selectedManager, setSelectedManager] = useState<string>('');
   const [selectedRole, setSelectedRole] = useState<string>('user');
   const [loading, setLoading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [checkingAdmin, setCheckingAdmin] = useState(true);
   const { toast } = useToast();
   const { user } = useAuth();
 
   useEffect(() => {
-    loadData();
-  }, []);
+    checkAdminStatus();
+  }, [user]);
+
+  useEffect(() => {
+    if (isAdmin) {
+      loadData();
+    }
+  }, [isAdmin]);
+
+  const checkAdminStatus = async () => {
+    if (!user) {
+      setCheckingAdmin(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.rpc('is_admin', { user_id: user.id });
+      if (error) {
+        console.error('Error checking admin status:', error);
+        setIsAdmin(false);
+      } else {
+        setIsAdmin(data || false);
+      }
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      setIsAdmin(false);
+    } finally {
+      setCheckingAdmin(false);
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -143,6 +173,38 @@ export default function UserHierarchy() {
     const manager = users.find(u => u.user_id === managerId);
     return manager ? getUserDisplayName(manager) : 'Unknown Manager';
   };
+
+  if (checkingAdmin) {
+    return (
+      <div className="container mx-auto p-6 flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Checking permissions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="container mx-auto p-6 flex items-center justify-center min-h-[400px]">
+        <Card className="max-w-md">
+          <CardHeader>
+            <CardTitle className="text-center text-red-600">Access Denied</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <Users className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+            <p className="text-muted-foreground mb-4">
+              You need administrator privileges to access this page.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Please contact your system administrator if you believe you should have access.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
