@@ -11,6 +11,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Users, Save, UserCheck, Bell, Map, Store } from 'lucide-react';
 
+const markets = [
+  'AZ1', 'AZ2', 'AZ3', 'AZ4', 'AZ5', 'IE/LA', 'OC', 
+  'MN1', 'MN2', 'NE1', 'NE2', 'NE3', 'NE4', 
+  'FL1', 'FL2', 'FL3', 'PA'
+];
+
 interface UserProfile {
   user_id: string;
   email: string;
@@ -60,7 +66,6 @@ export default function UserHierarchy() {
     markets: [],
     stores: []
   });
-  const [availableMarkets, setAvailableMarkets] = useState<string[]>([]);
   const [availableStores, setAvailableStores] = useState<string[]>([]);
   const [selectedMarket, setSelectedMarket] = useState('');
   const [selectedStore, setSelectedStore] = useState('');
@@ -141,21 +146,11 @@ export default function UserHierarchy() {
         setPermissions(permissionData);
       }
 
-      // Load available markets and stores
-      const { data: marketsData } = await supabase
-        .from('work_orders')
-        .select('market')
-        .order('market');
-
+      // Load available stores
       const { data: storesData } = await supabase
         .from('work_orders')
         .select('store_number')
         .order('store_number');
-
-      if (marketsData) {
-        const uniqueMarkets = [...new Set(marketsData.map(item => item.market))];
-        setAvailableMarkets(uniqueMarkets);
-      }
 
       if (storesData) {
         const uniqueStores = [...new Set(storesData.map(item => item.store_number))];
@@ -662,7 +657,7 @@ export default function UserHierarchy() {
                       <SelectValue placeholder="Select market" />
                     </SelectTrigger>
                     <SelectContent>
-                      {availableMarkets.map((market) => (
+                      {markets.map((market) => (
                         <SelectItem key={market} value={market}>
                           {market}
                         </SelectItem>
