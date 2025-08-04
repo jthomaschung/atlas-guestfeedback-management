@@ -6,9 +6,11 @@ interface WorkOrderTableProps {
   onStatusChange: (id: string, status: WorkOrderStatus) => void;
   onEdit: (workOrder: WorkOrder) => void;
   onViewDetails: (workOrder: WorkOrder) => void;
+  onDelete?: (workOrder: WorkOrder) => void;
+  isAdmin?: boolean;
 }
 
-export function WorkOrderTable({ workOrders, onStatusChange, onEdit, onViewDetails }: WorkOrderTableProps) {
+export function WorkOrderTable({ workOrders, onStatusChange, onEdit, onViewDetails, onDelete, isAdmin }: WorkOrderTableProps) {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -18,6 +20,8 @@ export function WorkOrderTable({ workOrders, onStatusChange, onEdit, onViewDetai
             workOrder={workOrder}
             onEdit={onEdit}
             onViewDetails={onViewDetails}
+            onDelete={onDelete}
+            isAdmin={isAdmin}
           />
         ))}
       </div>

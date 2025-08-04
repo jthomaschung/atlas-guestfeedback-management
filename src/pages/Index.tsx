@@ -7,6 +7,7 @@ import { WorkOrderFilters } from "@/components/work-orders/WorkOrderFilters";
 import { WorkOrderDetails } from "@/components/work-orders/WorkOrderDetails";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Plus, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -24,6 +25,8 @@ const Index = () => {
   const [storeFilter, setStoreFilter] = useState('all');
   const [marketFilter, setMarketFilter] = useState('all');
   const [assigneeFilter, setAssigneeFilter] = useState('all');
+  const [deletingWorkOrder, setDeletingWorkOrder] = useState<WorkOrder | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -58,9 +61,24 @@ const Index = () => {
     }
   };
 
+  // Check admin status
+  const checkAdminStatus = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase.rpc('is_admin', { user_id: user.id });
+      if (!error) {
+        setIsAdmin(data || false);
+      }
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+    }
+  };
+
   useEffect(() => {
     if (user) {
       fetchWorkOrders();
+      checkAdminStatus();
     }
   }, [user]);
   const availableStores = useMemo(() => {
@@ -301,6 +319,40 @@ const Index = () => {
   const handleViewDetails = (workOrder: WorkOrder) => {
     setViewingWorkOrder(workOrder);
   };
+
+  const handleDelete = (workOrder: WorkOrder) => {
+    setDeletingWorkOrder(workOrder);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingWorkOrder) return;
+
+    try {
+      const { error } = await supabase
+        .from('work_orders')
+        .delete()
+        .eq('id', deletingWorkOrder.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Work order deleted",
+        description: `Work order #${deletingWorkOrder.id.slice(0, 8)} has been deleted successfully.`,
+      });
+
+      // Refresh the work orders list
+      await fetchWorkOrders();
+    } catch (error) {
+      console.error('Error deleting work order:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete work order. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setDeletingWorkOrder(null);
+    }
+  };
   const handleUpdateWorkOrder = async (updates: Partial<WorkOrder>) => {
     if (!viewingWorkOrder) return;
 
@@ -420,7 +472,14 @@ const Index = () => {
               <h3 className="text-lg font-medium mb-2">No work orders found</h3>
               <p>Try adjusting your filters or create a new work order.</p>
             </div>
-          </div> : <WorkOrderTable workOrders={filteredWorkOrders} onStatusChange={handleStatusChange} onEdit={handleEdit} onViewDetails={handleViewDetails} />}
+          </div> : <WorkOrderTable 
+            workOrders={filteredWorkOrders} 
+            onStatusChange={handleStatusChange} 
+            onEdit={handleEdit} 
+            onViewDetails={handleViewDetails}
+            onDelete={handleDelete}
+            isAdmin={isAdmin}
+          />}
 
         {editingWorkOrder && <Dialog open={!!editingWorkOrder} onOpenChange={() => setEditingWorkOrder(null)}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -429,6 +488,30 @@ const Index = () => {
           </Dialog>}
 
         {viewingWorkOrder && <WorkOrderDetails workOrder={viewingWorkOrder} onUpdate={handleUpdateWorkOrder} onClose={() => setViewingWorkOrder(null)} />}
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={!!deletingWorkOrder} onOpenChange={() => setDeletingWorkOrder(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Work Order</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this work order? This action cannot be undone.
+                <br />
+                <br />
+                <strong>Work Order:</strong> {deletingWorkOrder?.repair_type} at Store {deletingWorkOrder?.store_number}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={confirmDelete}
+                className="bg-destructive hover:bg-destructive/90"
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>;
 };

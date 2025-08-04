@@ -2,7 +2,7 @@ import { WorkOrder } from "@/types/work-order";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Edit, Calendar, Eye, User, Clock, AlertTriangle } from "lucide-react";
+import { Edit, Calendar, Eye, User, Clock, AlertTriangle, Trash2 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { cn, isWorkOrderOverdue } from "@/lib/utils";
 
@@ -10,6 +10,8 @@ interface WorkOrderCardProps {
   workOrder: WorkOrder;
   onEdit: (workOrder: WorkOrder) => void;
   onViewDetails: (workOrder: WorkOrder) => void;
+  onDelete?: (workOrder: WorkOrder) => void;
+  isAdmin?: boolean;
 }
 
 const statusColors = {
@@ -32,7 +34,7 @@ const priorityIcons = {
   Critical: AlertTriangle,
 };
 
-export function WorkOrderCard({ workOrder, onEdit, onViewDetails }: WorkOrderCardProps) {
+export function WorkOrderCard({ workOrder, onEdit, onViewDetails, onDelete, isAdmin }: WorkOrderCardProps) {
   const PriorityIcon = priorityIcons[workOrder.priority as keyof typeof priorityIcons];
   const isUrgent = workOrder.priority === 'Critical';
   const isOverdue = isWorkOrderOverdue(workOrder.created_at, workOrder.priority);
@@ -94,6 +96,20 @@ export function WorkOrderCard({ workOrder, onEdit, onViewDetails }: WorkOrderCar
             >
               <Eye className="h-3 w-3" />
             </Button>
+            {isAdmin && onDelete && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(workOrder);
+                }}
+                title="Delete Work Order (Admin Only)"
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            )}
           </div>
         </div>
       </CardHeader>

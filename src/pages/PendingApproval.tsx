@@ -4,15 +4,20 @@ import { WorkOrder } from "@/types/work-order";
 import { WorkOrderTable } from "@/components/work-orders/WorkOrderTable";
 import { WorkOrderFilters } from "@/components/work-orders/WorkOrderFilters";
 import { WorkOrderDetails } from "@/components/work-orders/WorkOrderDetails";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
 
 export default function PendingApproval() {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [filteredWorkOrders, setFilteredWorkOrders] = useState<WorkOrder[]>([]);
   const [selectedWorkOrder, setSelectedWorkOrder] = useState<WorkOrder | null>(null);
+  const [deletingWorkOrder, setDeletingWorkOrder] = useState<WorkOrder | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const [filters, setFilters] = useState({
     search: "",
@@ -24,7 +29,22 @@ export default function PendingApproval() {
 
   useEffect(() => {
     fetchWorkOrders();
-  }, []);
+    checkAdminStatus();
+  }, [user]);
+
+  // Check admin status
+  const checkAdminStatus = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase.rpc('is_admin', { user_id: user.id });
+      if (!error) {
+        setIsAdmin(data || false);
+      }
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+    }
+  };
 
   const fetchWorkOrders = async () => {
     try {
@@ -137,6 +157,40 @@ export default function PendingApproval() {
     }
   };
 
+  const handleDelete = (workOrder: WorkOrder) => {
+    setDeletingWorkOrder(workOrder);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingWorkOrder) return;
+
+    try {
+      const { error } = await supabase
+        .from('work_orders')
+        .delete()
+        .eq('id', deletingWorkOrder.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Work order deleted",
+        description: `Work order #${deletingWorkOrder.id.slice(0, 8)} has been deleted successfully.`,
+      });
+
+      // Refresh the work orders list
+      await fetchWorkOrders();
+    } catch (error) {
+      console.error('Error deleting work order:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete work order. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setDeletingWorkOrder(null);
+    }
+  };
+
   const availableRepairTypes = [...new Set(workOrders.map(wo => wo.repair_type))];
   const availableMarkets = [...new Set(workOrders.map(wo => wo.market))];
   const availableAssignees = [...new Set(workOrders.map(wo => wo.assignee).filter(Boolean))];
@@ -187,6 +241,8 @@ export default function PendingApproval() {
           onStatusChange={handleStatusChange}
           onEdit={(workOrder) => setSelectedWorkOrder(workOrder)}
           onViewDetails={(workOrder) => setSelectedWorkOrder(workOrder)}
+          onDelete={handleDelete}
+          isAdmin={isAdmin}
         />
       )}
 
@@ -197,6 +253,30 @@ export default function PendingApproval() {
           onClose={() => setSelectedWorkOrder(null)}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deletingWorkOrder} onOpenChange={() => setDeletingWorkOrder(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Work Order</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this work order? This action cannot be undone.
+              <br />
+              <br />
+              <strong>Work Order:</strong> {deletingWorkOrder?.repair_type} at Store {deletingWorkOrder?.store_number}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
