@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      notification_log: {
+        Row: {
+          id: string
+          notification_type: string
+          recipient_email: string
+          sent_at: string
+          status: string | null
+          work_order_id: string | null
+        }
+        Insert: {
+          id?: string
+          notification_type: string
+          recipient_email: string
+          sent_at?: string
+          status?: string | null
+          work_order_id?: string | null
+        }
+        Update: {
+          id?: string
+          notification_type?: string
+          recipient_email?: string
+          sent_at?: string
+          status?: string | null
+          work_order_id?: string | null
+        }
+        Relationships: []
+      }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          email_on_assignment: boolean | null
+          email_on_completion: boolean | null
+          email_on_tagged: boolean | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_on_assignment?: boolean | null
+          email_on_completion?: boolean | null
+          email_on_tagged?: boolean | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_on_assignment?: boolean | null
+          email_on_completion?: boolean | null
+          email_on_tagged?: boolean | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -39,6 +96,33 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_hierarchy: {
+        Row: {
+          created_at: string
+          id: string
+          manager_id: string | null
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          manager_id?: string | null
+          role?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          manager_id?: string | null
+          role?: string
           updated_at?: string
           user_id?: string
         }
