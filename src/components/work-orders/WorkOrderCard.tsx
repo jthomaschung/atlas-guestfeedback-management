@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Edit, Calendar, Eye, User, Clock, AlertTriangle } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
-import { cn } from "@/lib/utils";
+import { cn, isWorkOrderOverdue } from "@/lib/utils";
 
 interface WorkOrderCardProps {
   workOrder: WorkOrder;
@@ -35,7 +35,7 @@ const priorityIcons = {
 export function WorkOrderCard({ workOrder, onEdit, onViewDetails }: WorkOrderCardProps) {
   const PriorityIcon = priorityIcons[workOrder.priority as keyof typeof priorityIcons];
   const isUrgent = workOrder.priority === 'Critical';
-  const isOverdue = new Date(workOrder.created_at) < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // 7 days
+  const isOverdue = isWorkOrderOverdue(workOrder.created_at, workOrder.priority);
 
   return (
     <Card className={cn(
