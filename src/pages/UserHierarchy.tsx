@@ -4,10 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Users, Save, UserCheck } from 'lucide-react';
+import { Users, Save, UserCheck, Bell, Map, Store } from 'lucide-react';
 
 interface UserProfile {
   user_id: string;
@@ -23,12 +25,43 @@ interface UserHierarchyData {
   role: string;
 }
 
+interface NotificationPreferences {
+  id?: string;
+  user_id: string;
+  email_on_completion: boolean;
+  email_on_tagged: boolean;
+  email_on_assignment: boolean;
+}
+
+interface UserPermissions {
+  id?: string;
+  user_id: string;
+  markets: string[];
+  stores: string[];
+}
+
 export default function UserHierarchy() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [hierarchy, setHierarchy] = useState<UserHierarchyData[]>([]);
+  const [notifications, setNotifications] = useState<NotificationPreferences[]>([]);
+  const [permissions, setPermissions] = useState<UserPermissions[]>([]);
   const [selectedUser, setSelectedUser] = useState<string>('');
   const [selectedManager, setSelectedManager] = useState<string>('');
   const [selectedRole, setSelectedRole] = useState<string>('user');
+  const [managingUser, setManagingUser] = useState<string>('');
+  const [userNotifications, setUserNotifications] = useState<NotificationPreferences>({
+    user_id: '',
+    email_on_completion: true,
+    email_on_tagged: true,
+    email_on_assignment: true
+  });
+  const [userPermissions, setUserPermissions] = useState<UserPermissions>({
+    user_id: '',
+    markets: [],
+    stores: []
+  });
+  const [marketInput, setMarketInput] = useState('');
+  const [storeInput, setStoreInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [checkingAdmin, setCheckingAdmin] = useState(true);
@@ -86,6 +119,24 @@ export default function UserHierarchy() {
 
       if (hierarchyData) {
         setHierarchy(hierarchyData);
+      }
+
+      // Load notification preferences
+      const { data: notificationData } = await supabase
+        .from('notification_preferences')
+        .select('*');
+
+      if (notificationData) {
+        setNotifications(notificationData);
+      }
+
+      // Load user permissions
+      const { data: permissionData } = await supabase
+        .from('user_permissions')
+        .select('*');
+
+      if (permissionData) {
+        setPermissions(permissionData);
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -174,6 +225,152 @@ export default function UserHierarchy() {
     return manager ? getUserDisplayName(manager) : 'Unknown Manager';
   };
 
+  const handleManageUser = (userId: string) => {
+    setManagingUser(userId);
+    
+    // Load user's current notification preferences
+    const userNotif = notifications.find(n => n.user_id === userId);
+    if (userNotif) {
+      setUserNotifications(userNotif);
+    } else {
+      setUserNotifications({
+        user_id: userId,
+        email_on_completion: true,
+        email_on_tagged: true,
+        email_on_assignment: true
+      });
+    }
+
+    // Load user's current permissions
+    const userPerm = permissions.find(p => p.user_id === userId);
+    if (userPerm) {
+      setUserPermissions(userPerm);
+    } else {
+      setUserPermissions({
+        user_id: userId,
+        markets: [],
+        stores: []
+      });
+    }
+  };
+
+  const handleSaveNotifications = async () => {
+    setLoading(true);
+    try {
+      const existingNotification = notifications.find(n => n.user_id === managingUser);
+      
+      if (existingNotification) {
+        const { error } = await supabase
+          .from('notification_preferences')
+          .update({
+            email_on_completion: userNotifications.email_on_completion,
+            email_on_tagged: userNotifications.email_on_tagged,
+            email_on_assignment: userNotifications.email_on_assignment
+          })
+          .eq('user_id', managingUser);
+        
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('notification_preferences')
+          .insert(userNotifications);
+        
+        if (error) throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: "Notification preferences updated successfully"
+      });
+
+      await loadData();
+    } catch (error) {
+      console.error('Error saving notifications:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save notification preferences",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSavePermissions = async () => {
+    setLoading(true);
+    try {
+      const existingPermission = permissions.find(p => p.user_id === managingUser);
+      
+      if (existingPermission) {
+        const { error } = await supabase
+          .from('user_permissions')
+          .update({
+            markets: userPermissions.markets,
+            stores: userPermissions.stores
+          })
+          .eq('user_id', managingUser);
+        
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('user_permissions')
+          .insert(userPermissions);
+        
+        if (error) throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: "User permissions updated successfully"
+      });
+
+      await loadData();
+    } catch (error) {
+      console.error('Error saving permissions:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save user permissions",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addMarket = () => {
+    if (marketInput.trim() && !userPermissions.markets.includes(marketInput.trim())) {
+      setUserPermissions(prev => ({
+        ...prev,
+        markets: [...prev.markets, marketInput.trim()]
+      }));
+      setMarketInput('');
+    }
+  };
+
+  const removeMarket = (market: string) => {
+    setUserPermissions(prev => ({
+      ...prev,
+      markets: prev.markets.filter(m => m !== market)
+    }));
+  };
+
+  const addStore = () => {
+    if (storeInput.trim() && !userPermissions.stores.includes(storeInput.trim())) {
+      setUserPermissions(prev => ({
+        ...prev,
+        stores: [...prev.stores, storeInput.trim()]
+      }));
+      setStoreInput('');
+    }
+  };
+
+  const removeStore = (store: string) => {
+    setUserPermissions(prev => ({
+      ...prev,
+      stores: prev.stores.filter(s => s !== store)
+    }));
+  };
+
   if (checkingAdmin) {
     return (
       <div className="container mx-auto p-6 flex items-center justify-center min-h-[400px]">
@@ -210,7 +407,7 @@ export default function UserHierarchy() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center gap-2 mb-6">
         <Users className="h-6 w-6" />
-        <h1 className="text-2xl font-bold">User Hierarchy Management</h1>
+        <h1 className="text-2xl font-bold">User Management System</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -292,23 +489,40 @@ export default function UserHierarchy() {
           </CardContent>
         </Card>
 
-        {/* Current Hierarchy Display */}
+        {/* User List with Management Actions */}
         <Card>
           <CardHeader>
-            <CardTitle>Current Hierarchy</CardTitle>
+            <CardTitle>User Management</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {users.map((user) => {
                 const userHierarchy = getCurrentHierarchy(user.user_id);
+                const userNotif = notifications.find(n => n.user_id === user.user_id);
+                const userPerm = permissions.find(p => p.user_id === user.user_id);
+                
                 return (
                   <div key={user.user_id} className="p-3 border rounded-md bg-muted/50">
-                    <div className="font-medium">{getUserDisplayName(user)}</div>
-                    <div className="text-sm text-muted-foreground">
-                      Role: {userHierarchy?.role || 'user'}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Manager: {getManagerName(userHierarchy?.manager_id)}
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="font-medium">{getUserDisplayName(user)}</div>
+                        <div className="text-sm text-muted-foreground">
+                          Role: {userHierarchy?.role || 'user'}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Manager: {getManagerName(userHierarchy?.manager_id)}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Markets: {userPerm?.markets?.length || 0} | Stores: {userPerm?.stores?.length || 0}
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleManageUser(user.user_id)}
+                      >
+                        Manage
+                      </Button>
                     </div>
                   </div>
                 );
@@ -318,29 +532,170 @@ export default function UserHierarchy() {
         </Card>
       </div>
 
+      {/* User Management Panel */}
+      {managingUser && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Notification Preferences */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5" />
+                Notification Preferences
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Managing: {getUserDisplayName(users.find(u => u.user_id === managingUser)!)}
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="email_completion"
+                  checked={userNotifications.email_on_completion}
+                  onCheckedChange={(checked) => 
+                    setUserNotifications(prev => ({ ...prev, email_on_completion: checked as boolean }))
+                  }
+                />
+                <Label htmlFor="email_completion" className="text-sm">
+                  Email on work order completion
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="email_tagged"
+                  checked={userNotifications.email_on_tagged}
+                  onCheckedChange={(checked) => 
+                    setUserNotifications(prev => ({ ...prev, email_on_tagged: checked as boolean }))
+                  }
+                />
+                <Label htmlFor="email_tagged" className="text-sm">
+                  Email when tagged in notes
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="email_assignment"
+                  checked={userNotifications.email_on_assignment}
+                  onCheckedChange={(checked) => 
+                    setUserNotifications(prev => ({ ...prev, email_on_assignment: checked as boolean }))
+                  }
+                />
+                <Label htmlFor="email_assignment" className="text-sm">
+                  Email on work order assignment
+                </Label>
+              </div>
+
+              <Button onClick={handleSaveNotifications} disabled={loading} className="w-full">
+                <Save className="h-4 w-4 mr-2" />
+                Save Notifications
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Market & Store Permissions */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Map className="h-5 w-5" />
+                Access Permissions
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Markets */}
+              <div>
+                <Label className="text-sm font-medium">Markets</Label>
+                <div className="flex gap-2 mt-1">
+                  <Input
+                    placeholder="Add market"
+                    value={marketInput}
+                    onChange={(e) => setMarketInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addMarket()}
+                  />
+                  <Button onClick={addMarket} size="sm">Add</Button>
+                </div>
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {userPermissions.markets.map((market) => (
+                    <div key={market} className="bg-secondary text-secondary-foreground px-2 py-1 rounded text-xs flex items-center gap-1">
+                      {market}
+                      <button
+                        onClick={() => removeMarket(market)}
+                        className="text-xs hover:text-destructive"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Stores */}
+              <div>
+                <Label className="text-sm font-medium">Store Numbers</Label>
+                <div className="flex gap-2 mt-1">
+                  <Input
+                    placeholder="Add store number"
+                    value={storeInput}
+                    onChange={(e) => setStoreInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addStore()}
+                  />
+                  <Button onClick={addStore} size="sm">Add</Button>
+                </div>
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {userPermissions.stores.map((store) => (
+                    <div key={store} className="bg-secondary text-secondary-foreground px-2 py-1 rounded text-xs flex items-center gap-1">
+                      {store}
+                      <button
+                        onClick={() => removeStore(store)}
+                        className="text-xs hover:text-destructive"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <Button onClick={handleSavePermissions} disabled={loading} className="w-full">
+                <Save className="h-4 w-4 mr-2" />
+                Save Permissions
+              </Button>
+
+              <Button 
+                variant="outline" 
+                onClick={() => setManagingUser('')} 
+                className="w-full"
+              >
+                Close
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       <Card>
         <CardHeader>
-          <CardTitle>How Email Notifications Work</CardTitle>
+          <CardTitle>System Information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-md">
-            <h4 className="font-medium mb-2">Completion Notifications</h4>
+            <h4 className="font-medium mb-2">Email Notifications</h4>
             <p className="text-sm text-muted-foreground">
-              When a work order is completed, email notifications are sent to:
+              Completion notifications are sent up the management hierarchy. Tagged notifications go directly to mentioned users.
             </p>
-            <ul className="text-sm text-muted-foreground list-disc list-inside mt-2 space-y-1">
-              <li>The original work order creator</li>
-              <li>Their direct manager (if assigned)</li>
-              <li>The manager's manager (if assigned)</li>
-              <li>Up the hierarchy chain until no more managers</li>
-            </ul>
           </div>
           
           <div className="p-4 bg-green-50 dark:bg-green-950 rounded-md">
-            <h4 className="font-medium mb-2">Tag Notifications</h4>
+            <h4 className="font-medium mb-2">Access Permissions</h4>
             <p className="text-sm text-muted-foreground">
-              When adding notes to work orders, you can tag users by typing @user@email.com in your note. 
-              Tagged users will receive an email notification with the note content.
+              Market and store permissions control which work orders users can view. Empty permissions = access to all.
+            </p>
+          </div>
+
+          <div className="p-4 bg-yellow-50 dark:bg-yellow-950 rounded-md">
+            <h4 className="font-medium mb-2">Tagging Users</h4>
+            <p className="text-sm text-muted-foreground">
+              Tag users in notes using @user@email.com format (e.g., @john@company.com).
             </p>
           </div>
         </CardContent>
