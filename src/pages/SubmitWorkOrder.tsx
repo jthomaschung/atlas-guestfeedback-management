@@ -47,7 +47,7 @@ const SubmitWorkOrder = () => {
         }
       }
 
-      const { error } = await supabase
+      const { data: workOrderData, error } = await supabase
         .from('work_orders')
         .insert([{
           user_id: user.id,
@@ -59,7 +59,9 @@ const SubmitWorkOrder = () => {
           ecosure: formData.ecosure,
           status: 'pending',
           image_url: imageUrl
-        }]);
+        }])
+        .select()
+        .single();
 
       if (error) {
         console.error('Error creating work order:', error);
@@ -69,6 +71,24 @@ const SubmitWorkOrder = () => {
           variant: "destructive"
         });
         return;
+      }
+
+      // Check if this is a critical work order in NE markets - send notification to Grant Gelecki
+      const criticalMarkets = ['NE1', 'NE2', 'NE3', 'NE4'];
+      if (formData.priority === 'Critical' && criticalMarkets.includes(formData.market)) {
+        console.log('Critical work order created in NE market, sending notification...');
+        try {
+          await supabase.functions.invoke('send-notifications', {
+            body: {
+              type: 'critical_creation',
+              workOrderId: workOrderData.id
+            }
+          });
+          console.log('Critical notification sent successfully');
+        } catch (notificationError) {
+          console.error('Error sending critical notification:', notificationError);
+          // Don't fail the work order creation if notification fails
+        }
       }
 
       toast({

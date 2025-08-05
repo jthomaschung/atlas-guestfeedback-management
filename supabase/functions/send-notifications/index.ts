@@ -10,7 +10,7 @@ const corsHeaders = {
 };
 
 interface NotificationRequest {
-  type: 'completion' | 'note_tagged';
+  type: 'completion' | 'note_tagged' | 'critical_creation';
   workOrderId: string;
   taggedUserId?: string;
   taggedDisplayName?: string;
@@ -218,6 +218,69 @@ const handler = async (req: Request): Promise<Response> => {
         }
       } else {
         console.log('No tagged profile or email found');
+      }
+    
+    } else if (type === 'critical_creation') {
+      // Check if this is a critical ticket in NE markets for Grant Gelecki
+      const criticalMarkets = ['NE1', 'NE2', 'NE3', 'NE4'];
+      const grantEmail = 'grant.gelecki@atlaswe.com';
+      
+      console.log('Checking critical creation conditions:', {
+        market: workOrder.market,
+        priority: workOrder.priority,
+        isCriticalMarket: criticalMarkets.includes(workOrder.market),
+        isCriticalPriority: workOrder.priority === 'Critical'
+      });
+      
+      if (workOrder.priority === 'Critical' && criticalMarkets.includes(workOrder.market)) {
+        console.log('Sending critical notification to Grant Gelecki:', grantEmail);
+        
+        await resend.emails.send({
+          from: "Critical Work Orders <notifications@resend.dev>",
+          to: [grantEmail],
+          subject: `🚨 CRITICAL WORK ORDER - ${workOrder.market} Store ${workOrder.store_number} - ${workOrder.repair_type}`,
+          html: `
+            <div style="background-color: #fef2f2; border: 2px solid #dc2626; border-radius: 8px; padding: 20px; font-family: Arial, sans-serif;">
+              <h2 style="color: #dc2626; margin-top: 0;">🚨 CRITICAL WORK ORDER ALERT</h2>
+              <p style="color: #dc2626; font-weight: bold; font-size: 16px;">A critical priority work order has been submitted in your NE region and requires immediate attention.</p>
+              
+              <div style="background-color: white; border-radius: 6px; padding: 15px; margin: 15px 0;">
+                <h3 style="margin-top: 0; color: #1f2937;">Work Order Details</h3>
+                <p><strong>Work Order ID:</strong> ${workOrder.id.slice(0, 8)}</p>
+                <p><strong>Store Number:</strong> ${workOrder.store_number}</p>
+                <p><strong>Market:</strong> <span style="background-color: #dc2626; color: white; padding: 2px 8px; border-radius: 4px;">${workOrder.market}</span></p>
+                <p><strong>Repair Type:</strong> ${workOrder.repair_type}</p>
+                <p><strong>Priority:</strong> <span style="background-color: #dc2626; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold;">CRITICAL</span></p>
+                <p><strong>EcoSure Level:</strong> ${workOrder.ecosure}</p>
+                <p><strong>Status:</strong> ${workOrder.status}</p>
+                <p><strong>Description:</strong> ${workOrder.description}</p>
+                <p><strong>Assignee:</strong> ${workOrder.assignee || 'Not assigned'}</p>
+                <p><strong>Created Date:</strong> ${new Date(workOrder.created_at).toLocaleDateString()} at ${new Date(workOrder.created_at).toLocaleTimeString()}</p>
+                <p><strong>Created by:</strong> ${creatorProfile?.first_name} ${creatorProfile?.last_name} (${creatorProfile?.email})</p>
+                ${workOrder.image_url ? `<p><strong>Image:</strong> <a href="${workOrder.image_url}" style="color: #dc2626;">View Image</a></p>` : ''}
+              </div>
+              
+              <div style="background-color: #fef9c3; border: 1px solid #f59e0b; border-radius: 6px; padding: 10px; margin: 15px 0;">
+                <p style="margin: 0; color: #92400e;"><strong>⚠️ Action Required:</strong> This critical work order requires immediate review and assignment.</p>
+              </div>
+              
+              <p style="color: #6b7280; font-size: 14px; margin-bottom: 0;">This is an automated notification for critical work orders in NE1, NE2, NE3, and NE4 markets.</p>
+            </div>
+          `,
+        });
+
+        // Log notification
+        await supabase.from('notification_log').insert({
+          recipient_email: grantEmail,
+          notification_type: 'critical_creation',
+          work_order_id: workOrderId,
+          status: 'sent'
+        });
+        
+        recipients.push(grantEmail);
+        console.log('Critical notification sent successfully to Grant Gelecki');
+      } else {
+        console.log('Work order does not meet critical NE market criteria');
       }
     }
 
