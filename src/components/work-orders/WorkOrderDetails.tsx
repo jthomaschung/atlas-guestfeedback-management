@@ -259,11 +259,16 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     for (const mention of mentions) {
       const displayName = mention.substring(1); // Remove @ symbol
       console.log('Sending notification for tagged user:', displayName);
+      console.log('sendTaggedNotification function type:', typeof sendTaggedNotification);
+      console.log('sendTaggedNotification function:', sendTaggedNotification);
       try {
-        await sendTaggedNotification(workOrder.id, displayName, newNote.trim());
+        console.log('About to call sendTaggedNotification with:', { workOrderId: workOrder.id, displayName, note: newNote.trim() });
+        const result = await sendTaggedNotification(workOrder.id, displayName, newNote.trim());
+        console.log('Notification call completed with result:', result);
         console.log('Notification sent successfully for:', displayName);
       } catch (error) {
         console.error('Error sending notification for:', displayName, error);
+        console.error('Full error details:', error);
       }
     }
     
