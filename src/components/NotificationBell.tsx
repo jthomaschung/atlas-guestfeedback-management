@@ -7,31 +7,52 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { WorkOrderDetails } from '@/components/work-orders/WorkOrderDetails';
 import { useNotificationCount } from '@/hooks/useNotificationCount';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
+import { WorkOrder } from '@/types/work-order';
 
-interface Notification {
+interface NotificationWithWorkOrder {
   id: string;
   work_order_id: string | null;
   sent_at: string;
   notification_type: string;
   status: string;
+  work_order?: {
+    id: string;
+    store_number: string;
+    description: string;
+    status: string;
+    priority: string;
+    repair_type: string;
+    market: string;
+    ecosure: string;
+    assignee: string | null;
+    image_url: string | null;
+    notes: string[] | null;
+    created_at: string;
+    updated_at: string;
+    completed_at: string | null;
+    user_id: string;
+  };
 }
 
 export function NotificationBell() {
   const { count, loading } = useNotificationCount();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<NotificationWithWorkOrder[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedWorkOrder, setSelectedWorkOrder] = useState<WorkOrder | null>(null);
   const { user } = useAuth();
 
   const fetchRecentNotifications = async () => {
     if (!user?.email) return;
 
     try {
-      const { data, error } = await supabase
+      // First get the notifications
+      const { data: notificationData, error: notificationError } = await supabase
         .from('notification_log')
         .select('*')
         .eq('recipient_email', user.email)
@@ -39,12 +60,33 @@ export function NotificationBell() {
         .order('sent_at', { ascending: false })
         .limit(10);
 
-      if (error) {
-        console.error('Error fetching notifications:', error);
+      if (notificationError) {
+        console.error('Error fetching notifications:', notificationError);
         return;
       }
 
-      setNotifications(data || []);
+      // Then get work order details for each notification that has a work_order_id
+      const notificationsWithWorkOrders = await Promise.all(
+        (notificationData || []).map(async (notification) => {
+          if (notification.work_order_id) {
+            const { data: workOrderData, error: workOrderError } = await supabase
+              .from('work_orders')
+              .select('*')
+              .eq('id', notification.work_order_id)
+              .single();
+
+            if (!workOrderError && workOrderData) {
+              return {
+                ...notification,
+                work_order: workOrderData
+              };
+            }
+          }
+          return notification;
+        })
+      );
+
+      setNotifications(notificationsWithWorkOrders);
     } catch (error) {
       console.error('Error in fetchRecentNotifications:', error);
     }
@@ -69,6 +111,41 @@ export function NotificationBell() {
     }
   };
 
+  const handleNotificationClick = (notification: NotificationWithWorkOrder) => {
+    if (notification.work_order) {
+      const workOrder: WorkOrder = {
+        id: notification.work_order.id,
+        user_id: notification.work_order.user_id,
+        description: notification.work_order.description,
+        repair_type: notification.work_order.repair_type as any,
+        store_number: notification.work_order.store_number,
+        market: notification.work_order.market as any,
+        priority: notification.work_order.priority as any,
+        ecosure: notification.work_order.ecosure as any,
+        status: notification.work_order.status as any,
+        assignee: notification.work_order.assignee,
+        image_url: notification.work_order.image_url,
+        notes: notification.work_order.notes,
+        created_at: notification.work_order.created_at,
+        updated_at: notification.work_order.updated_at,
+        completed_at: notification.work_order.completed_at,
+      };
+      setSelectedWorkOrder(workOrder);
+      setIsOpen(false);
+    }
+  };
+
+  const getNotificationDescription = (notification: NotificationWithWorkOrder) => {
+    if (notification.work_order) {
+      const storeNumber = notification.work_order.store_number;
+      const description = notification.work_order.description;
+      const maxLength = 50;
+      const combined = `${storeNumber} - ${description}`;
+      return combined.length > maxLength ? `${combined.substring(0, maxLength)}...` : combined;
+    }
+    return 'Work order not found';
+  };
+
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'tagged':
@@ -83,77 +160,88 @@ export function NotificationBell() {
   };
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="relative text-atlas-dark-foreground hover:text-atlas-red">
-          <Bell className="h-5 w-5" />
-          {count.total > 0 && (
-            <Badge 
-              variant="destructive" 
-              className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
-            >
-              {count.total > 99 ? '99+' : count.total}
-            </Badge>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="end">
-        <Card className="border-0 shadow-lg">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Notifications</CardTitle>
-            <CardDescription>
-              Recent activity and mentions
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            {loading ? (
-              <div className="p-4 text-center text-muted-foreground">
-                Loading notifications...
-              </div>
-            ) : notifications.length === 0 ? (
-              <div className="p-4 text-center text-muted-foreground">
-                No recent notifications
-              </div>
-            ) : (
-              <div className="max-h-80 overflow-y-auto">
-                {notifications.map((notification) => (
-                  <div
-                    key={notification.id}
-                    className="p-3 border-b border-border last:border-b-0 hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex items-start gap-3">
-                      <span className="text-lg mt-0.5">
-                        {getNotificationIcon(notification.notification_type)}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground">
-                          {getNotificationTitle(notification.notification_type)}
-                        </p>
-                        {notification.work_order_id && (
-                          <p className="text-xs text-muted-foreground">
-                            Work Order ID: {notification.work_order_id.slice(0, 8)}...
+    <>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <Button variant="ghost" size="sm" className="relative text-atlas-dark-foreground hover:text-atlas-red">
+            <Bell className="h-5 w-5" />
+            {count.total > 0 && (
+              <Badge 
+                variant="destructive" 
+                className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
+              >
+                {count.total > 99 ? '99+' : count.total}
+              </Badge>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80 p-0" align="end">
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Notifications</CardTitle>
+              <CardDescription>
+                Recent activity and mentions
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              {loading ? (
+                <div className="p-4 text-center text-muted-foreground">
+                  Loading notifications...
+                </div>
+              ) : notifications.length === 0 ? (
+                <div className="p-4 text-center text-muted-foreground">
+                  No recent notifications
+                </div>
+              ) : (
+                <div className="max-h-80 overflow-y-auto">
+                  {notifications.map((notification) => (
+                    <div
+                      key={notification.id}
+                      className="p-3 border-b border-border last:border-b-0 hover:bg-muted/50 transition-colors cursor-pointer"
+                      onClick={() => handleNotificationClick(notification)}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="text-lg mt-0.5">
+                          {getNotificationIcon(notification.notification_type)}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground">
+                            {getNotificationTitle(notification.notification_type)}
                           </p>
-                        )}
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {format(new Date(notification.sent_at), 'MMM d, h:mm a')}
-                        </p>
+                          <p className="text-xs text-muted-foreground">
+                            {getNotificationDescription(notification)}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {format(new Date(notification.sent_at), 'MMM d, h:mm a')}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            
-            {notifications.length > 0 && (
-              <div className="p-3 border-t border-border">
-                <p className="text-xs text-center text-muted-foreground">
-                  Showing recent notifications from the last 7 days
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </PopoverContent>
-    </Popover>
+                  ))}
+                </div>
+              )}
+              
+              {notifications.length > 0 && (
+                <div className="p-3 border-t border-border">
+                  <p className="text-xs text-center text-muted-foreground">
+                    Showing recent notifications from the last 7 days
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </PopoverContent>
+      </Popover>
+
+      {selectedWorkOrder && (
+        <WorkOrderDetails
+          workOrder={selectedWorkOrder}
+          onUpdate={(updates) => {
+            setSelectedWorkOrder(prev => prev ? { ...prev, ...updates } : null);
+          }}
+          onClose={() => setSelectedWorkOrder(null)}
+        />
+      )}
+    </>
   );
 }
