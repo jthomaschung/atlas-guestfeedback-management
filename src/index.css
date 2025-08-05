@@ -8,125 +8,125 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Atlas Branding Color Palette */
-    --background: 0 0% 98%;
-    --foreground: 210 10% 15%;
+    /* Improved Readability Color Palette */
+    --background: 0 0% 100%;
+    --foreground: 210 20% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 10% 15%;
+    --card-foreground: 210 20% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 10% 15%;
+    --popover-foreground: 210 20% 15%;
 
-    /* Atlas Red Primary */
-    --primary: 0 85% 45%;
-    --primary-foreground: 0 0% 98%;
+    /* Atlas Blue Primary for better readability */
+    --primary: 220 100% 40%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Atlas Dark Secondary */
-    --secondary: 210 10% 20%;
-    --secondary-foreground: 0 0% 98%;
+    /* Lighter secondary for better contrast */
+    --secondary: 210 20% 94%;
+    --secondary-foreground: 210 20% 15%;
 
-    --muted: 210 10% 95%;
-    --muted-foreground: 210 10% 45%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 210 20% 40%;
 
-    /* Atlas Red Accent */
-    --accent: 0 85% 45%;
-    --accent-foreground: 0 0% 98%;
+    /* Lighter accent for better readability */
+    --accent: 210 20% 95%;
+    --accent-foreground: 210 20% 15%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 210 10% 88%;
-    --input: 210 10% 88%;
-    --ring: 0 85% 45%;
+    --border: 210 20% 88%;
+    --input: 210 20% 88%;
+    --ring: 220 100% 40%;
 
     --success: 142 76% 36%;
-    --success-foreground: 0 0% 98%;
+    --success-foreground: 0 0% 100%;
 
     --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 98%;
+    --warning-foreground: 0 0% 100%;
 
     --info: 199 89% 48%;
-    --info-foreground: 0 0% 98%;
+    --info-foreground: 0 0% 100%;
 
-    /* Atlas Brand Colors */
-    --atlas-dark: 210 15% 12%;
-    --atlas-dark-foreground: 0 0% 98%;
-    --atlas-red: 0 85% 45%;
-    --atlas-red-foreground: 0 0% 98%;
-    --atlas-light: 0 0% 98%;
-    --atlas-light-foreground: 210 15% 12%;
+    /* Atlas Brand Colors - improved contrast */
+    --atlas-dark: 210 30% 8%;
+    --atlas-dark-foreground: 0 0% 100%;
+    --atlas-red: 0 85% 50%;
+    --atlas-red-foreground: 0 0% 100%;
+    --atlas-light: 0 0% 100%;
+    --atlas-light-foreground: 210 30% 8%;
 
     /* Priority colors */
     --priority-critical: 0 84% 60%;
-    --priority-critical-foreground: 0 0% 98%;
+    --priority-critical-foreground: 0 0% 100%;
     --priority-important: 25 95% 53%;
-    --priority-important-foreground: 0 0% 98%;
+    --priority-important-foreground: 0 0% 100%;
     --priority-low: 210 100% 56%;
-    --priority-low-foreground: 0 0% 98%;
+    --priority-low-foreground: 0 0% 100%;
 
     /* Status colors */
     --status-pending: 38 92% 50%;
-    --status-pending-foreground: 0 0% 98%;
+    --status-pending-foreground: 0 0% 100%;
     --status-in-progress: 199 89% 48%;
-    --status-in-progress-foreground: 0 0% 98%;
+    --status-in-progress-foreground: 0 0% 100%;
     --status-completed: 142 76% 36%;
-    --status-completed-foreground: 0 0% 98%;
-    --status-cancelled: 210 11% 71%;
-    --status-cancelled-foreground: 0 0% 98%;
+    --status-completed-foreground: 0 0% 100%;
+    --status-cancelled: 210 20% 60%;
+    --status-cancelled-foreground: 0 0% 100%;
 
     --radius: 0.5rem;
 
-    /* Atlas Sidebar - Dark Theme */
-    --sidebar-background: 210 15% 12%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 0 85% 45%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 210 15% 18%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 210 15% 18%;
-    --sidebar-ring: 0 85% 45%;
+    /* Atlas Sidebar - improved readability */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 210 30% 8%;
+    --sidebar-primary: 220 100% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 20% 95%;
+    --sidebar-accent-foreground: 210 30% 8%;
+    --sidebar-border: 210 20% 88%;
+    --sidebar-ring: 220 100% 40%;
   }
 
   .dark {
-    /* Atlas Dark Mode */
-    --background: 210 15% 8%;
-    --foreground: 0 0% 95%;
+    /* Improved Dark Mode for readability */
+    --background: 210 30% 6%;
+    --foreground: 0 0% 98%;
 
-    --card: 210 15% 10%;
-    --card-foreground: 0 0% 95%;
+    --card: 210 30% 8%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 210 15% 10%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 210 30% 8%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 0 85% 50%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 220 100% 55%;
+    --primary-foreground: 210 30% 6%;
 
-    --secondary: 210 15% 15%;
-    --secondary-foreground: 0 0% 95%;
+    --secondary: 210 30% 12%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 210 15% 15%;
-    --muted-foreground: 210 10% 65%;
+    --muted: 210 30% 12%;
+    --muted-foreground: 210 15% 70%;
 
-    --accent: 0 85% 50%;
+    --accent: 210 30% 12%;
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 210 15% 18%;
-    --input: 210 15% 18%;
-    --ring: 0 85% 50%;
+    --border: 210 30% 18%;
+    --input: 210 30% 18%;
+    --ring: 220 100% 55%;
 
-    /* Atlas Dark Sidebar */
-    --sidebar-background: 210 15% 5%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 0 85% 50%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 210 15% 12%;
-    --sidebar-accent-foreground: 0 0% 90%;
-    --sidebar-border: 210 15% 12%;
-    --sidebar-ring: 0 85% 50%;
+    /* Improved Dark Sidebar */
+    --sidebar-background: 210 30% 4%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 220 100% 55%;
+    --sidebar-primary-foreground: 210 30% 4%;
+    --sidebar-accent: 210 30% 10%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 210 30% 12%;
+    --sidebar-ring: 220 100% 55%;
   }
 }
 
