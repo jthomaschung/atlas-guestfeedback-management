@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserPermissions } from "@/hooks/useUserPermissions";
 import { supabase } from "@/integrations/supabase/client";
 
 type SortField = 'completed_at' | 'priority' | 'store_number' | 'repair_type';
@@ -33,6 +34,7 @@ const Completed = () => {
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const { toast } = useToast();
   const { user } = useAuth();
+  const { permissions, canAccessWorkOrder } = useUserPermissions();
 
   // Fetch completed work orders from Supabase
   const fetchCompletedWorkOrders = async () => {
@@ -89,6 +91,9 @@ const Completed = () => {
 
   const filteredAndSortedWorkOrders = useMemo(() => {
     let filtered = workOrders.filter(wo => {
+      // Apply permission-based filtering
+      if (!canAccessWorkOrder(wo)) return false;
+      
       const matchesSearch = wo.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           wo.repair_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           wo.store_number.includes(searchTerm) ||
@@ -136,7 +141,7 @@ const Completed = () => {
     });
 
     return filtered;
-  }, [workOrders, searchTerm, priorityFilter, storeFilter, marketFilter, assigneeFilter, sortField, sortDirection]);
+  }, [workOrders, canAccessWorkOrder, searchTerm, priorityFilter, storeFilter, marketFilter, assigneeFilter, sortField, sortDirection]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {

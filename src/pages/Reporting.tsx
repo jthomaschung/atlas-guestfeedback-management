@@ -4,6 +4,7 @@ import { BarChart3, TrendingUp, Clock, CheckCircle, Loader2 } from "lucide-react
 import { WorkOrder, WorkOrderStatus, WorkOrderPriority } from "@/types/work-order";
 import { ReportingFilters } from "@/components/work-orders/ReportingFilters";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserPermissions } from "@/hooks/useUserPermissions";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -33,9 +34,13 @@ const Reporting = () => {
   const [dateCompletedTo, setDateCompletedTo] = useState<Date | undefined>();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { canAccessWorkOrder } = useUserPermissions();
 
   const filteredWorkOrders = useMemo(() => {
     return workOrders.filter(wo => {
+      // Apply permission-based filtering
+      if (!canAccessWorkOrder(wo)) return false;
+      
       const matchesSearch = wo.description.toLowerCase().includes(searchTerm.toLowerCase()) || 
                            wo.repair_type.toLowerCase().includes(searchTerm.toLowerCase()) || 
                            wo.store_number.includes(searchTerm) ||
@@ -64,7 +69,7 @@ const Reporting = () => {
       return matchesSearch && matchesStatus && matchesPriority && matchesStore && matchesMarket && matchesAssignee &&
              matchesCreatedFrom && matchesCreatedTo && matchesCompletedFrom && matchesCompletedTo;
     });
-  }, [workOrders, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter, assigneeFilter, 
+  }, [workOrders, canAccessWorkOrder, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter, assigneeFilter, 
       dateCreatedFrom, dateCreatedTo, dateCompletedFrom, dateCompletedTo]);
 
   const availableStores = useMemo(() => {

@@ -7,6 +7,7 @@ import { WorkOrderDetails } from "@/components/work-orders/WorkOrderDetails";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserPermissions } from "@/hooks/useUserPermissions";
 import { Loader2 } from "lucide-react";
 
 export default function PendingApproval() {
@@ -14,10 +15,10 @@ export default function PendingApproval() {
   const [filteredWorkOrders, setFilteredWorkOrders] = useState<WorkOrder[]>([]);
   const [selectedWorkOrder, setSelectedWorkOrder] = useState<WorkOrder | null>(null);
   const [deletingWorkOrder, setDeletingWorkOrder] = useState<WorkOrder | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { permissions, canAccessWorkOrder } = useUserPermissions();
 
   const [filters, setFilters] = useState({
     search: "",
@@ -28,23 +29,10 @@ export default function PendingApproval() {
   });
 
   useEffect(() => {
-    fetchWorkOrders();
-    checkAdminStatus();
-  }, [user]);
-
-  // Check admin status
-  const checkAdminStatus = async () => {
-    if (!user) return;
-    
-    try {
-      const { data, error } = await supabase.rpc('is_admin', { user_id: user.id });
-      if (!error) {
-        setIsAdmin(data || false);
-      }
-    } catch (error) {
-      console.error('Error checking admin status:', error);
+    if (user) {
+      fetchWorkOrders();
     }
-  };
+  }, [user]);
 
   const fetchWorkOrders = async () => {
     try {
@@ -69,7 +57,10 @@ export default function PendingApproval() {
   };
 
   useEffect(() => {
-    let filtered = workOrders;
+    let filtered = workOrders.filter(wo => {
+      // Apply permission-based filtering
+      return canAccessWorkOrder(wo);
+    });
 
     if (filters.search) {
       filtered = filtered.filter(
@@ -101,7 +92,7 @@ export default function PendingApproval() {
     }
 
     setFilteredWorkOrders(filtered);
-  }, [workOrders, filters]);
+  }, [workOrders, canAccessWorkOrder, filters]);
 
   const handleStatusChange = async (id: string, status: string) => {
     try {
@@ -249,7 +240,7 @@ export default function PendingApproval() {
             onEdit={(workOrder) => setSelectedWorkOrder(workOrder)}
             onViewDetails={(workOrder) => setSelectedWorkOrder(workOrder)}
             onDelete={handleDelete}
-            isAdmin={isAdmin}
+            isAdmin={permissions.isAdmin}
           />
         )}
 

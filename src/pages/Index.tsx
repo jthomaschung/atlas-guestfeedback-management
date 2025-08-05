@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Plus, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserPermissions } from "@/hooks/useUserPermissions";
 import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
@@ -26,9 +27,9 @@ const Index = () => {
   const [marketFilter, setMarketFilter] = useState('all');
   const [assigneeFilter, setAssigneeFilter] = useState('all');
   const [deletingWorkOrder, setDeletingWorkOrder] = useState<WorkOrder | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { permissions, canAccessWorkOrder } = useUserPermissions();
 
   // Fetch work orders from Supabase
   const fetchWorkOrders = async () => {
@@ -61,24 +62,9 @@ const Index = () => {
     }
   };
 
-  // Check admin status
-  const checkAdminStatus = async () => {
-    if (!user) return;
-    
-    try {
-      const { data, error } = await supabase.rpc('is_admin', { user_id: user.id });
-      if (!error) {
-        setIsAdmin(data || false);
-      }
-    } catch (error) {
-      console.error('Error checking admin status:', error);
-    }
-  };
-
   useEffect(() => {
     if (user) {
       fetchWorkOrders();
-      checkAdminStatus();
     }
   }, [user]);
   
@@ -86,6 +72,9 @@ const Index = () => {
     return workOrders.filter(wo => {
       // Exclude completed work orders from dashboard
       if (wo.status === 'completed') return false;
+      
+      // Apply permission-based filtering
+      if (!canAccessWorkOrder(wo)) return false;
       
       const matchesSearch = wo.description.toLowerCase().includes(searchTerm.toLowerCase()) || 
                            wo.repair_type.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -100,7 +89,7 @@ const Index = () => {
                              wo.assignee === assigneeFilter;
       return matchesSearch && matchesStatus && matchesPriority && matchesStore && matchesMarket && matchesAssignee;
     });
-  }, [workOrders, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter, assigneeFilter]);
+  }, [workOrders, canAccessWorkOrder, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter, assigneeFilter]);
 
   const availableStores = useMemo(() => {
     const stores = [...new Set(filteredWorkOrders.map(wo => wo.store_number))];
@@ -481,7 +470,7 @@ const Index = () => {
             onEdit={handleEdit} 
             onViewDetails={handleViewDetails}
             onDelete={handleDelete}
-            isAdmin={isAdmin}
+            isAdmin={permissions.isAdmin}
           />}
 
         {editingWorkOrder && <Dialog open={!!editingWorkOrder} onOpenChange={() => setEditingWorkOrder(null)}>
