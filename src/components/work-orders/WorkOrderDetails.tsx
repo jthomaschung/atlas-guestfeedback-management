@@ -256,6 +256,7 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     onUpdate({ notes: updatedNotes });
     
     // Send notifications for tagged users
+    console.log('DEBUGGING: About to process mentions:', mentions);
     for (const mention of mentions) {
       const displayName = mention.substring(1); // Remove @ symbol
       console.log('Sending notification for tagged user:', displayName);
