@@ -13,6 +13,7 @@ interface NotificationRequest {
   type: 'completion' | 'note_tagged';
   workOrderId: string;
   taggedUserId?: string;
+  taggedDisplayName?: string;
   note?: string;
 }
 
@@ -34,7 +35,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
-    const { type, workOrderId, taggedUserId, note }: NotificationRequest = await req.json();
+    const { type, workOrderId, taggedUserId, taggedDisplayName, note }: NotificationRequest = await req.json();
 
     // Get work order details
     const { data: workOrder, error: woError } = await supabase
@@ -138,48 +139,82 @@ const handler = async (req: Request): Promise<Response> => {
         });
       }
 
-    } else if (type === 'note_tagged' && taggedUserId) {
-      // Get tagged user profile
-      const { data: taggedProfile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', taggedUserId)
-        .single();
+    } else if (type === 'note_tagged') {
+      let taggedProfile = null;
+      
+      // If we have a display name, look up the user by display name
+      if (taggedDisplayName) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('display_name', taggedDisplayName)
+          .single();
+        taggedProfile = data;
+      }
+      // Fallback to taggedUserId if no display name provided
+      else if (taggedUserId) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', taggedUserId)
+          .single();
+        taggedProfile = data;
+      }
+
+      console.log('Tagged profile lookup:', { taggedDisplayName, taggedUserId, found: !!taggedProfile });
 
       if (taggedProfile?.email) {
-        await resend.emails.send({
-          from: "Work Orders <notifications@resend.dev>",
-          to: [taggedProfile.email],
-          subject: `You've Been Tagged - Store ${workOrder.store_number} - ${workOrder.repair_type}`,
-          html: `
-            <h2>You've Been Tagged in a Work Order Note</h2>
-            <p><strong>Work Order ID:</strong> ${workOrder.id.slice(0, 8)}</p>
-            <p><strong>Store Number:</strong> ${workOrder.store_number}</p>
-            <p><strong>Market:</strong> ${workOrder.market}</p>
-            <p><strong>Repair Type:</strong> ${workOrder.repair_type}</p>
-            <p><strong>Priority:</strong> ${workOrder.priority}</p>
-            <p><strong>EcoSure Level:</strong> ${workOrder.ecosure}</p>
-            <p><strong>Status:</strong> ${workOrder.status}</p>
-            <p><strong>Description:</strong> ${workOrder.description}</p>
-            <p><strong>Assignee:</strong> ${workOrder.assignee || 'Not assigned'}</p>
-            <p><strong>Created Date:</strong> ${new Date(workOrder.created_at).toLocaleDateString()}</p>
-            <p><strong>Created by:</strong> ${creatorProfile?.first_name} ${creatorProfile?.last_name} (${creatorProfile?.email})</p>
-            ${workOrder.image_url ? `<p><strong>Image:</strong> <a href="${workOrder.image_url}">View Image</a></p>` : ''}
-            ${workOrder.notes && workOrder.notes.length > 0 ? `<p><strong>Previous Notes:</strong><br>${workOrder.notes.join('<br>')}</p>` : ''}
-            <br>
-            <p><strong>New Note:</strong> ${note}</p>
-            <br>
-            <p>Tagged by: ${creatorProfile?.first_name} ${creatorProfile?.last_name} (${creatorProfile?.email})</p>
-          `,
-        });
+        // Check if user wants to receive tagged notifications
+        const { data: notificationPrefs } = await supabase
+          .from('notification_preferences')
+          .select('email_on_tagged')
+          .eq('user_id', taggedProfile.user_id)
+          .single();
 
-        // Log notification
-        await supabase.from('notification_log').insert({
-          recipient_email: taggedProfile.email,
-          notification_type: 'note_tagged',
-          work_order_id: workOrderId,
-          status: 'sent'
-        });
+        // Send notification if user has no preferences (default) or has opted in
+        if (!notificationPrefs || notificationPrefs.email_on_tagged) {
+          console.log('Sending tagged notification to:', taggedProfile.email);
+          
+          await resend.emails.send({
+            from: "Work Orders <notifications@resend.dev>",
+            to: [taggedProfile.email],
+            subject: `You've Been Tagged - Store ${workOrder.store_number} - ${workOrder.repair_type}`,
+            html: `
+              <h2>You've Been Tagged in a Work Order Note</h2>
+              <p><strong>Work Order ID:</strong> ${workOrder.id.slice(0, 8)}</p>
+              <p><strong>Store Number:</strong> ${workOrder.store_number}</p>
+              <p><strong>Market:</strong> ${workOrder.market}</p>
+              <p><strong>Repair Type:</strong> ${workOrder.repair_type}</p>
+              <p><strong>Priority:</strong> ${workOrder.priority}</p>
+              <p><strong>EcoSure Level:</strong> ${workOrder.ecosure}</p>
+              <p><strong>Status:</strong> ${workOrder.status}</p>
+              <p><strong>Description:</strong> ${workOrder.description}</p>
+              <p><strong>Assignee:</strong> ${workOrder.assignee || 'Not assigned'}</p>
+              <p><strong>Created Date:</strong> ${new Date(workOrder.created_at).toLocaleDateString()}</p>
+              <p><strong>Created by:</strong> ${creatorProfile?.first_name} ${creatorProfile?.last_name} (${creatorProfile?.email})</p>
+              ${workOrder.image_url ? `<p><strong>Image:</strong> <a href="${workOrder.image_url}">View Image</a></p>` : ''}
+              ${workOrder.notes && workOrder.notes.length > 0 ? `<p><strong>Previous Notes:</strong><br>${workOrder.notes.join('<br>')}</p>` : ''}
+              <br>
+              <p><strong>New Note:</strong> ${note}</p>
+              <br>
+              <p>Tagged by: ${creatorProfile?.first_name} ${creatorProfile?.last_name} (${creatorProfile?.email})</p>
+            `,
+          });
+
+          // Log notification
+          await supabase.from('notification_log').insert({
+            recipient_email: taggedProfile.email,
+            notification_type: 'note_tagged',
+            work_order_id: workOrderId,
+            status: 'sent'
+          });
+          
+          console.log('Tagged notification sent successfully');
+        } else {
+          console.log('User has opted out of tagged notifications');
+        }
+      } else {
+        console.log('No tagged profile or email found');
       }
     }
 

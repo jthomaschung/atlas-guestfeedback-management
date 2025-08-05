@@ -39,28 +39,11 @@ export const useNotifications = () => {
 
   const sendTaggedNotification = async (workOrderId: string, taggedDisplayName: string, note: string) => {
     try {
-      // First, find the user by display name to get their user_id
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('user_id')
-        .eq('display_name', taggedDisplayName)
-        .single();
-
-      if (profileError || !profileData) {
-        console.error('Error finding user by display name:', profileError);
-        toast({
-          title: "Notification Error",
-          description: "Could not find user to notify",
-          variant: "destructive"
-        });
-        return;
-      }
-
       const { data, error } = await supabase.functions.invoke('send-notifications', {
         body: {
           type: 'note_tagged',
           workOrderId,
-          taggedUserId: profileData.user_id,
+          taggedDisplayName,
           note
         }
       });
