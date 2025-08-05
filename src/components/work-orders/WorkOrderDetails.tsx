@@ -216,6 +216,8 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     
     // Check for @mentions in the note using display names
     const mentions = newNote.match(/@(\w+(?:\s+\w+)*)/g) || [];
+    console.log('Found mentions in note:', mentions);
+    console.log('New note content:', newNote);
     
     onUpdate({ notes: updatedNotes });
     
@@ -223,7 +225,12 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     for (const mention of mentions) {
       const displayName = mention.substring(1); // Remove @ symbol
       console.log('Sending notification for tagged user:', displayName);
-      await sendTaggedNotification(workOrder.id, displayName, newNote.trim());
+      try {
+        await sendTaggedNotification(workOrder.id, displayName, newNote.trim());
+        console.log('Notification sent successfully for:', displayName);
+      } catch (error) {
+        console.error('Error sending notification for:', displayName, error);
+      }
     }
     
     setNewNote('');
