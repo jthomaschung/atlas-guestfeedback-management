@@ -197,86 +197,94 @@ export default function PendingApproval() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto p-6">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Pending Approval</h1>
-        <p className="text-muted-foreground">
-          Work orders awaiting approval ({filteredWorkOrders.length} of {workOrders.length})
-        </p>
-      </div>
-
-      <WorkOrderFilters
-        searchTerm={filters.search}
-        onSearchChange={(value) => setFilters(prev => ({ ...prev, search: value }))}
-        statusFilter="all"
-        onStatusFilterChange={() => {}}
-        priorityFilter={filters.priority as any}
-        onPriorityFilterChange={(value) => setFilters(prev => ({ ...prev, priority: value as string }))}
-        storeFilter="all"
-        onStoreFilterChange={() => {}}
-        marketFilter={filters.market}
-        onMarketFilterChange={(value) => setFilters(prev => ({ ...prev, market: value }))}
-        assigneeFilter={filters.assignee}
-        onAssigneeFilterChange={(value) => setFilters(prev => ({ ...prev, assignee: value }))}
-        onClearFilters={() => setFilters({ search: "", repairType: "all", market: "all", priority: "all", assignee: "all" })}
-        availableStores={[...new Set(workOrders.map(wo => wo.store_number))]}
-        availableMarkets={availableMarkets}
-        availableAssignees={availableAssignees}
-      />
-
-      {filteredWorkOrders.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-lg text-muted-foreground">No work orders pending approval</p>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Pending Approval</h1>
+            <p className="text-muted-foreground mt-1">
+              Work orders awaiting approval ({filteredWorkOrders.length} of {workOrders.length})
+            </p>
+          </div>
         </div>
-      ) : (
-        <WorkOrderTable
-          workOrders={filteredWorkOrders}
-          onStatusChange={handleStatusChange}
-          onEdit={(workOrder) => setSelectedWorkOrder(workOrder)}
-          onViewDetails={(workOrder) => setSelectedWorkOrder(workOrder)}
-          onDelete={handleDelete}
-          isAdmin={isAdmin}
-        />
-      )}
 
-      {selectedWorkOrder && (
-        <WorkOrderDetails
-          workOrder={selectedWorkOrder}
-          onUpdate={(updates) => handleWorkOrderUpdate(selectedWorkOrder.id, updates)}
-          onClose={() => setSelectedWorkOrder(null)}
+        <WorkOrderFilters
+          searchTerm={filters.search}
+          onSearchChange={(value) => setFilters(prev => ({ ...prev, search: value }))}
+          statusFilter="all"
+          onStatusFilterChange={() => {}}
+          priorityFilter={filters.priority as any}
+          onPriorityFilterChange={(value) => setFilters(prev => ({ ...prev, priority: value as string }))}
+          storeFilter="all"
+          onStoreFilterChange={() => {}}
+          marketFilter={filters.market}
+          onMarketFilterChange={(value) => setFilters(prev => ({ ...prev, market: value }))}
+          assigneeFilter={filters.assignee}
+          onAssigneeFilterChange={(value) => setFilters(prev => ({ ...prev, assignee: value }))}
+          onClearFilters={() => setFilters({ search: "", repairType: "all", market: "all", priority: "all", assignee: "all" })}
+          availableStores={[...new Set(workOrders.map(wo => wo.store_number))]}
+          availableMarkets={availableMarkets}
+          availableAssignees={availableAssignees}
         />
-      )}
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deletingWorkOrder} onOpenChange={() => setDeletingWorkOrder(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Work Order</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this work order? This action cannot be undone.
-              <br />
-              <br />
-              <strong>Work Order:</strong> {deletingWorkOrder?.repair_type} at Store {deletingWorkOrder?.store_number}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={confirmDelete}
-              className="bg-destructive hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        {filteredWorkOrders.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-lg text-muted-foreground">No work orders pending approval</p>
+          </div>
+        ) : (
+          <WorkOrderTable
+            workOrders={filteredWorkOrders}
+            onStatusChange={handleStatusChange}
+            onEdit={(workOrder) => setSelectedWorkOrder(workOrder)}
+            onViewDetails={(workOrder) => setSelectedWorkOrder(workOrder)}
+            onDelete={handleDelete}
+            isAdmin={isAdmin}
+          />
+        )}
+
+        {selectedWorkOrder && (
+          <WorkOrderDetails
+            workOrder={selectedWorkOrder}
+            onUpdate={(updates) => handleWorkOrderUpdate(selectedWorkOrder.id, updates)}
+            onClose={() => setSelectedWorkOrder(null)}
+          />
+        )}
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={!!deletingWorkOrder} onOpenChange={() => setDeletingWorkOrder(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Work Order</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this work order? This action cannot be undone.
+                <br />
+                <br />
+                <strong>Work Order:</strong> {deletingWorkOrder?.repair_type} at Store {deletingWorkOrder?.store_number}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={confirmDelete}
+                className="bg-destructive hover:bg-destructive/90"
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </div>
   );
 }
