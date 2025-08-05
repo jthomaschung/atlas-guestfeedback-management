@@ -216,17 +216,19 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     
     // Check for @mentions in the note - extract display names from known users
     const mentions = [];
-    const mentionRegex = /@([A-Za-z]+(?:\s+[A-Za-z]+)*)/g;
+    const mentionRegex = /@([A-Za-z][A-Za-z\s]*?)(?=\s|$|[^A-Za-z\s])/g;
     let match;
     console.log('All users available for tagging:', users.map(u => getUserDisplayName(u)));
+    console.log('Note text being analyzed:', newNote);
+    
     while ((match = mentionRegex.exec(newNote)) !== null) {
-      const potentialName = match[1];
+      const potentialName = match[1].trim();
       console.log('Found potential mention:', potentialName);
       // Check if this matches any known user display name
       const matchingUser = users.find(user => {
         const displayName = getUserDisplayName(user);
-        const matches = displayName.toLowerCase().startsWith(potentialName.toLowerCase());
-        console.log(`Checking ${displayName} against ${potentialName}:`, matches);
+        const matches = displayName.toLowerCase() === potentialName.toLowerCase();
+        console.log(`Checking "${displayName}" against "${potentialName}":`, matches);
         return matches;
       });
       if (matchingUser) {
