@@ -216,27 +216,38 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     
     // Check for @mentions in the note - extract display names from known users
     const mentions = [];
-    const mentionRegex = /@([A-Za-z][A-Za-z\s]*?)(?=\s|$|[^A-Za-z\s])/g;
-    let match;
     console.log('All users available for tagging:', users.map(u => getUserDisplayName(u)));
     console.log('Note text being analyzed:', newNote);
     
-    while ((match = mentionRegex.exec(newNote)) !== null) {
-      const potentialName = match[1].trim();
-      console.log('Found potential mention:', potentialName);
-      // Check if this matches any known user display name
-      const matchingUser = users.find(user => {
+    // Find all @ symbols and check what follows
+    const atPositions = [];
+    for (let i = 0; i < newNote.length; i++) {
+      if (newNote[i] === '@') {
+        atPositions.push(i);
+      }
+    }
+    
+    for (const pos of atPositions) {
+      const textAfterAt = newNote.substring(pos + 1);
+      console.log('Text after @:', textAfterAt);
+      
+      // Check which user display name matches the beginning of this text
+      let longestMatch = null;
+      let longestMatchLength = 0;
+      
+      for (const user of users) {
         const displayName = getUserDisplayName(user);
-        const matches = displayName.toLowerCase() === potentialName.toLowerCase();
-        console.log(`Checking "${displayName}" against "${potentialName}":`, matches);
-        return matches;
-      });
-      if (matchingUser) {
-        const fullDisplayName = getUserDisplayName(matchingUser);
-        console.log('Found matching user:', fullDisplayName);
-        mentions.push('@' + fullDisplayName);
-      } else {
-        console.log('No matching user found for:', potentialName);
+        if (textAfterAt.toLowerCase().startsWith(displayName.toLowerCase())) {
+          if (displayName.length > longestMatchLength) {
+            longestMatch = displayName;
+            longestMatchLength = displayName.length;
+          }
+        }
+      }
+      
+      if (longestMatch) {
+        console.log('Found matching user:', longestMatch);
+        mentions.push('@' + longestMatch);
       }
     }
     console.log('Found mentions in note:', mentions);
