@@ -197,22 +197,30 @@ const handler = async (req: Request): Promise<Response> => {
         taggedProfile = data;
       }
 
-      console.log('Tagged profile lookup:', { taggedDisplayName, taggedUserId, found: !!taggedProfile });
+      console.log('Tagged profile lookup completed:', { taggedDisplayName, taggedUserId, found: !!taggedProfile });
 
       if (taggedProfile?.email) {
+        console.log('Tagged profile found with email:', taggedProfile.email);
+        
         // Check if user wants to receive tagged notifications
-        const { data: notificationPrefs } = await supabase
+        const { data: notificationPrefs, error: prefsError } = await supabase
           .from('notification_preferences')
           .select('email_on_tagged')
           .eq('user_id', taggedProfile.user_id)
           .single();
 
+        console.log('Notification preferences lookup:', { notificationPrefs, prefsError });
+
         // Send notification if user has no preferences (default) or has opted in
-        if (!notificationPrefs || notificationPrefs.email_on_tagged) {
+        const shouldSendEmail = !notificationPrefs || notificationPrefs.email_on_tagged;
+        console.log('Should send email decision:', { shouldSendEmail, hasPrefs: !!notificationPrefs, emailOnTagged: notificationPrefs?.email_on_tagged });
+        
+        if (shouldSendEmail) {
           console.log('Sending tagged notification to:', taggedProfile.email);
           recipients.push(taggedProfile.email);
           
           try {
+            console.log('About to send email via Resend...');
             const emailResult = await resend.emails.send({
               from: "Work Orders <workorders@atlaswe.com>",
               to: [taggedProfile.email],
@@ -239,6 +247,13 @@ const handler = async (req: Request): Promise<Response> => {
             `,
             });
 
+            console.log('Resend API response:', emailResult);
+
+            if (emailResult.error) {
+              console.error('Resend API returned error:', emailResult.error);
+              throw emailResult.error;
+            }
+
             console.log('Tagged email sent successfully:', { email: taggedProfile.email, emailResult });
 
             // Log notification
@@ -249,9 +264,9 @@ const handler = async (req: Request): Promise<Response> => {
               status: 'sent'
             });
             
-            console.log('Tagged notification sent successfully');
+            console.log('Tagged notification logged successfully');
           } catch (emailError) {
-            console.error('Failed to send tagged email:', { email: taggedProfile.email, error: emailError });
+            console.error('Failed to send tagged email:', { email: taggedProfile.email, error: emailError, errorMessage: emailError?.message, errorStack: emailError?.stack });
             
             // Log failed notification
             await supabase.from('notification_log').insert({
@@ -265,7 +280,7 @@ const handler = async (req: Request): Promise<Response> => {
           console.log('User has opted out of tagged notifications');
         }
       } else {
-        console.log('No tagged profile or email found');
+        console.log('No tagged profile or email found:', { taggedProfile });
       }
     
     } else if (type === 'critical_creation') {
