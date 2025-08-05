@@ -20,7 +20,7 @@ const items = [
   { title: "Pending Approval", url: "/pending-approval", icon: ClipboardList },
   { title: "Completed", url: "/completed", icon: ClipboardList },
   { title: "Reporting", url: "/reporting", icon: BarChart3 },
-  { title: "User Hierarchy", url: "/user-hierarchy", icon: Users },
+  { title: "User Management", url: "/user-hierarchy", icon: Users },
 ];
 
 export function AppSidebar() {
