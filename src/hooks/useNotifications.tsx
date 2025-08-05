@@ -38,6 +38,7 @@ export const useNotifications = () => {
   };
 
   const sendTaggedNotification = async (workOrderId: string, taggedDisplayName: string, note: string) => {
+    console.log('useNotifications: Sending tagged notification for:', { workOrderId, taggedDisplayName, note });
     try {
       const { data, error } = await supabase.functions.invoke('send-notifications', {
         body: {
@@ -47,6 +48,8 @@ export const useNotifications = () => {
           note
         }
       });
+      
+      console.log('useNotifications: Edge function response:', { data, error });
 
       if (error) {
         console.error('Error sending tagged notification:', error);
