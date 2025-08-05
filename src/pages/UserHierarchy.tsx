@@ -69,6 +69,7 @@ export default function UserHierarchy() {
   const [selectedRole, setSelectedRole] = useState<string>('Store Level');
   const [managingUser, setManagingUser] = useState<string>('');
   const [editingDisplayName, setEditingDisplayName] = useState<string>('');
+  const [editingEmail, setEditingEmail] = useState<string>('');
   const [userNotifications, setUserNotifications] = useState<NotificationPreferences>({
     user_id: '',
     email_on_completion: true,
@@ -250,9 +251,10 @@ export default function UserHierarchy() {
   const handleManageUser = (userId: string) => {
     setManagingUser(userId);
     
-    // Load user's current display name
+    // Load user's current display name and email
     const user = users.find(u => u.user_id === userId);
     setEditingDisplayName(user?.display_name || '');
+    setEditingEmail(user?.email || '');
     
     // Load user's current notification preferences
     const userNotif = notifications.find(n => n.user_id === userId);
@@ -285,10 +287,10 @@ export default function UserHierarchy() {
   };
 
   const handleSaveDisplayName = async () => {
-    if (!managingUser || !editingDisplayName.trim()) {
+    if (!managingUser || !editingDisplayName.trim() || !editingEmail.trim()) {
       toast({
         title: "Error",
-        description: "Display name cannot be empty",
+        description: "Display name and email cannot be empty",
         variant: "destructive"
       });
       return;
@@ -298,22 +300,25 @@ export default function UserHierarchy() {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ display_name: editingDisplayName.trim() })
+        .update({ 
+          display_name: editingDisplayName.trim(),
+          email: editingEmail.trim()
+        })
         .eq('user_id', managingUser);
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Display name updated successfully"
+        description: "User information updated successfully"
       });
 
       await loadData();
     } catch (error) {
-      console.error('Error saving display name:', error);
+      console.error('Error saving user information:', error);
       toast({
         title: "Error",
-        description: "Failed to save display name",
+        description: "Failed to save user information",
         variant: "destructive"
       });
     } finally {
@@ -624,12 +629,12 @@ export default function UserHierarchy() {
       {/* User Management Panel */}
       {managingUser && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Display Name Management */}
+          {/* User Information Management */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <UserCheck className="h-5 w-5" />
-                Display Name
+                User Information
               </CardTitle>
               <p className="text-sm text-muted-foreground">
                 Managing: {getUserDisplayName(users.find(u => u.user_id === managingUser)!)}
@@ -649,9 +654,23 @@ export default function UserHierarchy() {
                 </p>
               </div>
 
-              <Button onClick={handleSaveDisplayName} disabled={loading || !editingDisplayName.trim()} className="w-full">
+              <div>
+                <Label htmlFor="user_email">Email Address</Label>
+                <Input
+                  id="user_email"
+                  type="email"
+                  value={editingEmail}
+                  onChange={(e) => setEditingEmail(e.target.value)}
+                  placeholder="Enter email address for notifications"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  This email will be used for sending notifications
+                </p>
+              </div>
+
+              <Button onClick={handleSaveDisplayName} disabled={loading || !editingDisplayName.trim() || !editingEmail.trim()} className="w-full">
                 <Save className="h-4 w-4 mr-2" />
-                Save Display Name
+                Save User Information
               </Button>
             </CardContent>
           </Card>
