@@ -20,6 +20,17 @@ interface NotificationRequest {
 const handler = async (req: Request): Promise<Response> => {
   console.log('Send notifications function called with method:', req.method);
   
+  // Check if Resend API key is configured
+  const resendApiKey = Deno.env.get("RESEND_API_KEY");
+  console.log('Resend API key configured:', !!resendApiKey);
+  if (!resendApiKey) {
+    console.error('RESEND_API_KEY not configured');
+    return new Response(
+      JSON.stringify({ error: 'Email service not configured' }),
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+  
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -199,6 +210,7 @@ const handler = async (req: Request): Promise<Response> => {
         // Send notification if user has no preferences (default) or has opted in
         if (!notificationPrefs || notificationPrefs.email_on_tagged) {
           console.log('Sending tagged notification to:', taggedProfile.email);
+          recipients.push(taggedProfile.email);
           
           try {
             const emailResult = await resend.emails.send({
