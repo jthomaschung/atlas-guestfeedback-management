@@ -107,6 +107,7 @@ export type Database = {
       user_hierarchy: {
         Row: {
           created_at: string
+          director_id: string | null
           id: string
           manager_id: string | null
           role: string
@@ -115,6 +116,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          director_id?: string | null
           id?: string
           manager_id?: string | null
           role?: string
@@ -123,6 +125,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          director_id?: string | null
           id?: string
           manager_id?: string | null
           role?: string

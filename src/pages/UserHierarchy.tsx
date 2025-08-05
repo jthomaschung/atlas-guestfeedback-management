@@ -44,6 +44,7 @@ interface UserHierarchyData {
   id?: string;
   user_id: string;
   manager_id?: string;
+  director_id?: string;
   role: string;
 }
 
@@ -84,6 +85,7 @@ export default function UserHierarchy() {
     email: '',
     role: 'Store Level',
     manager_id: '',
+    director_id: '',
     email_on_completion: true,
     email_on_tagged: true,
     email_on_assignment: true,
@@ -190,6 +192,7 @@ export default function UserHierarchy() {
       email: userData.profile.email || '',
       role: userData.hierarchy?.role || 'Store Level',
       manager_id: userData.hierarchy?.manager_id || '',
+      director_id: userData.hierarchy?.director_id || '',
       email_on_completion: userData.notifications?.email_on_completion ?? true,
       email_on_tagged: userData.notifications?.email_on_tagged ?? true,
       email_on_assignment: userData.notifications?.email_on_assignment ?? true,
@@ -223,7 +226,8 @@ export default function UserHierarchy() {
           .from('user_hierarchy')
           .update({
             role: formData.role,
-            manager_id: formData.manager_id || null
+            manager_id: formData.manager_id || null,
+            director_id: formData.director_id || null
           })
           .eq('user_id', userId);
       } else {
@@ -232,7 +236,8 @@ export default function UserHierarchy() {
           .insert({
             user_id: userId,
             role: formData.role,
-            manager_id: formData.manager_id || null
+            manager_id: formData.manager_id || null,
+            director_id: formData.director_id || null
           });
       }
 
@@ -514,26 +519,81 @@ export default function UserHierarchy() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <Label htmlFor="manager">Manager (Optional)</Label>
-                  <Select 
-                    value={formData.manager_id} 
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, manager_id: value === 'none' ? '' : value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select manager" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background border border-border">
-                      <SelectItem value="none">No Manager</SelectItem>
-                      {users
-                        .filter(u => u.profile.user_id !== selectedUser?.profile.user_id)
-                        .map((userData) => (
-                          <SelectItem key={userData.profile.user_id} value={userData.profile.user_id}>
-                            {getUserDisplayName(userData.profile)}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                <div className="space-y-4">
+                  {/* DM Selection for Store Level Users */}
+                  {formData.role === 'Store Level' && (
+                    <div>
+                      <Label>District Manager (DM)</Label>
+                      <Select 
+                        value={formData.manager_id} 
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, manager_id: value === 'none' ? '' : value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select DM" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border border-border">
+                          <SelectItem value="none">No DM</SelectItem>
+                          {users
+                            .filter(u => u.profile.user_id !== selectedUser?.profile.user_id && u.hierarchy?.role === 'DM')
+                            .map((userData) => (
+                              <SelectItem key={userData.profile.user_id} value={userData.profile.user_id}>
+                                {getUserDisplayName(userData.profile)}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {/* Director Selection for Store Level and DM Level Users */}
+                  {(formData.role === 'Store Level' || formData.role === 'DM') && (
+                    <div>
+                      <Label>Director</Label>
+                      <Select 
+                        value={formData.director_id} 
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, director_id: value === 'none' ? '' : value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Director" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border border-border">
+                          <SelectItem value="none">No Director</SelectItem>
+                          {users
+                            .filter(u => u.profile.user_id !== selectedUser?.profile.user_id && u.hierarchy?.role === 'Director')
+                            .map((userData) => (
+                              <SelectItem key={userData.profile.user_id} value={userData.profile.user_id}>
+                                {getUserDisplayName(userData.profile)}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {/* General Manager Selection for other roles */}
+                  {formData.role !== 'Store Level' && formData.role !== 'DM' && formData.role !== 'Admin' && (
+                    <div>
+                      <Label>Manager</Label>
+                      <Select 
+                        value={formData.manager_id} 
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, manager_id: value === 'none' ? '' : value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Manager" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border border-border">
+                          <SelectItem value="none">No Manager</SelectItem>
+                          {users
+                            .filter(u => u.profile.user_id !== selectedUser?.profile.user_id)
+                            .map((userData) => (
+                              <SelectItem key={userData.profile.user_id} value={userData.profile.user_id}>
+                                {getUserDisplayName(userData.profile)}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                 </div>
               </div>
             </TabsContent>
