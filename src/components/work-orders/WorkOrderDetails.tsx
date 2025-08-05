@@ -222,10 +222,8 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     // Send notifications for tagged users
     for (const mention of mentions) {
       const displayName = mention.substring(1); // Remove @ symbol
-      const taggedUser = users.find(u => u.display_name === displayName);
-      if (taggedUser) {
-        await sendTaggedNotification(workOrder.id, taggedUser.user_id, newNote.trim());
-      }
+      console.log('Sending notification for tagged user:', displayName);
+      await sendTaggedNotification(workOrder.id, displayName, newNote.trim());
     }
     
     setNewNote('');
