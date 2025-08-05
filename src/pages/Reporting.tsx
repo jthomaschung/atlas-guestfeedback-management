@@ -2,10 +2,12 @@ import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, TrendingUp, Clock, CheckCircle, Loader2 } from "lucide-react";
 import { WorkOrder, WorkOrderStatus, WorkOrderPriority } from "@/types/work-order";
-import { WorkOrderFilters } from "@/components/work-orders/WorkOrderFilters";
+import { ReportingFilters } from "@/components/work-orders/ReportingFilters";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
 
 interface ReportingStats {
   averageCompletionTime: number;
@@ -20,11 +22,15 @@ const Reporting = () => {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<WorkOrderStatus | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'completed'>('all');
   const [priorityFilter, setPriorityFilter] = useState<WorkOrderPriority | 'all'>('all');
   const [storeFilter, setStoreFilter] = useState('all');
   const [marketFilter, setMarketFilter] = useState('all');
   const [assigneeFilter, setAssigneeFilter] = useState('all');
+  const [dateCreatedFrom, setDateCreatedFrom] = useState<Date | undefined>();
+  const [dateCreatedTo, setDateCreatedTo] = useState<Date | undefined>();
+  const [dateCompletedFrom, setDateCompletedFrom] = useState<Date | undefined>();
+  const [dateCompletedTo, setDateCompletedTo] = useState<Date | undefined>();
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -34,16 +40,32 @@ const Reporting = () => {
                            wo.repair_type.toLowerCase().includes(searchTerm.toLowerCase()) || 
                            wo.store_number.includes(searchTerm) ||
                            (wo.assignee?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
-      const matchesStatus = statusFilter === 'all' || wo.status === statusFilter;
+      
+      const matchesStatus = statusFilter === 'all' || 
+                           (statusFilter === 'open' && ['pending', 'in-progress', 'pending-approval'].includes(wo.status)) ||
+                           (statusFilter === 'completed' && wo.status === 'completed');
+      
       const matchesPriority = priorityFilter === 'all' || wo.priority === priorityFilter;
       const matchesStore = storeFilter === 'all' || wo.store_number === storeFilter;
       const matchesMarket = marketFilter === 'all' || wo.market === marketFilter;
       const matchesAssignee = assigneeFilter === 'all' || 
                              (assigneeFilter === 'unassigned' && !wo.assignee) ||
                              wo.assignee === assigneeFilter;
-      return matchesSearch && matchesStatus && matchesPriority && matchesStore && matchesMarket && matchesAssignee;
+
+      // Date filters
+      const createdAt = new Date(wo.created_at);
+      const completedAt = wo.completed_at ? new Date(wo.completed_at) : null;
+      
+      const matchesCreatedFrom = !dateCreatedFrom || createdAt >= dateCreatedFrom;
+      const matchesCreatedTo = !dateCreatedTo || createdAt <= dateCreatedTo;
+      const matchesCompletedFrom = !dateCompletedFrom || (completedAt && completedAt >= dateCompletedFrom);
+      const matchesCompletedTo = !dateCompletedTo || (completedAt && completedAt <= dateCompletedTo);
+
+      return matchesSearch && matchesStatus && matchesPriority && matchesStore && matchesMarket && matchesAssignee &&
+             matchesCreatedFrom && matchesCreatedTo && matchesCompletedFrom && matchesCompletedTo;
     });
-  }, [workOrders, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter, assigneeFilter]);
+  }, [workOrders, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter, assigneeFilter, 
+      dateCreatedFrom, dateCreatedTo, dateCompletedFrom, dateCompletedTo]);
 
   const availableStores = useMemo(() => {
     const stores = [...new Set(workOrders.map(wo => wo.store_number))];
@@ -67,6 +89,10 @@ const Reporting = () => {
     setStoreFilter('all');
     setMarketFilter('all');
     setAssigneeFilter('all');
+    setDateCreatedFrom(undefined);
+    setDateCreatedTo(undefined);
+    setDateCompletedFrom(undefined);
+    setDateCompletedTo(undefined);
   };
 
   const calculateStats = (workOrdersToCalculate: WorkOrder[]): ReportingStats => {
@@ -181,7 +207,7 @@ const Reporting = () => {
         </p>
       </div>
 
-      <WorkOrderFilters 
+      <ReportingFilters 
         searchTerm={searchTerm} 
         onSearchChange={setSearchTerm} 
         statusFilter={statusFilter} 
@@ -194,6 +220,14 @@ const Reporting = () => {
         onMarketFilterChange={setMarketFilter} 
         assigneeFilter={assigneeFilter}
         onAssigneeFilterChange={setAssigneeFilter}
+        dateCreatedFrom={dateCreatedFrom}
+        onDateCreatedFromChange={setDateCreatedFrom}
+        dateCreatedTo={dateCreatedTo}
+        onDateCreatedToChange={setDateCreatedTo}
+        dateCompletedFrom={dateCompletedFrom}
+        onDateCompletedFromChange={setDateCompletedFrom}
+        dateCompletedTo={dateCompletedTo}
+        onDateCompletedToChange={setDateCompletedTo}
         onClearFilters={clearFilters} 
         availableStores={availableStores} 
         availableMarkets={availableMarkets} 
@@ -265,74 +299,57 @@ const Reporting = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Pending</span>
-                <div className="flex items-center space-x-2">
-                  <div className="w-24 h-2 bg-muted rounded-full">
-                    <div 
-                      className="h-2 bg-yellow-500 rounded-full transition-all duration-300"
-                      style={{ 
-                        width: `${Object.values(stats.statusDistribution).reduce((a, b) => a + b, 0) > 0 
-                          ? (stats.statusDistribution.pending / Object.values(stats.statusDistribution).reduce((a, b) => a + b, 0)) * 100 
-                          : 0}%` 
-                      }}
-                    ></div>
-                  </div>
-                  <span className="text-sm text-muted-foreground">{stats.statusDistribution.pending}</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">In Progress</span>
-                <div className="flex items-center space-x-2">
-                  <div className="w-24 h-2 bg-muted rounded-full">
-                    <div 
-                      className="h-2 bg-blue-500 rounded-full transition-all duration-300"
-                      style={{ 
-                        width: `${Object.values(stats.statusDistribution).reduce((a, b) => a + b, 0) > 0 
-                          ? (stats.statusDistribution['in-progress'] / Object.values(stats.statusDistribution).reduce((a, b) => a + b, 0)) * 100 
-                          : 0}%` 
-                      }}
-                    ></div>
-                  </div>
-                  <span className="text-sm text-muted-foreground">{stats.statusDistribution['in-progress']}</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Completed</span>
-                <div className="flex items-center space-x-2">
-                  <div className="w-24 h-2 bg-muted rounded-full">
-                    <div 
-                      className="h-2 bg-green-500 rounded-full transition-all duration-300"
-                      style={{ 
-                        width: `${Object.values(stats.statusDistribution).reduce((a, b) => a + b, 0) > 0 
-                          ? (stats.statusDistribution.completed / Object.values(stats.statusDistribution).reduce((a, b) => a + b, 0)) * 100 
-                          : 0}%` 
-                      }}
-                    ></div>
-                  </div>
-                  <span className="text-sm text-muted-foreground">{stats.statusDistribution.completed}</span>
-                </div>
-              </div>
-              {stats.statusDistribution.cancelled > 0 && (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Cancelled</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-24 h-2 bg-muted rounded-full">
-                      <div 
-                        className="h-2 bg-red-500 rounded-full transition-all duration-300"
-                        style={{ 
-                          width: `${Object.values(stats.statusDistribution).reduce((a, b) => a + b, 0) > 0 
-                            ? (stats.statusDistribution.cancelled / Object.values(stats.statusDistribution).reduce((a, b) => a + b, 0)) * 100 
-                            : 0}%` 
-                        }}
-                      ></div>
-                    </div>
-                    <span className="text-sm text-muted-foreground">{stats.statusDistribution.cancelled}</span>
-                  </div>
-                </div>
-              )}
-            </div>
+            <ChartContainer
+              config={{
+                pending: {
+                  label: "Pending",
+                  color: "hsl(var(--chart-1))",
+                },
+                "pending-approval": {
+                  label: "Pending Approval",
+                  color: "hsl(var(--chart-2))",
+                },
+                "in-progress": {
+                  label: "In Progress",
+                  color: "hsl(var(--chart-3))",
+                },
+                completed: {
+                  label: "Completed",
+                  color: "hsl(var(--chart-4))",
+                },
+                cancelled: {
+                  label: "Cancelled",
+                  color: "hsl(var(--chart-5))",
+                },
+              }}
+              className="h-[300px]"
+            >
+              <PieChart>
+                <Pie
+                  data={Object.entries(stats.statusDistribution)
+                    .filter(([, count]) => count > 0)
+                    .map(([status, count]) => ({
+                      name: status === 'pending-approval' ? 'Pending Approval' : 
+                            status === 'in-progress' ? 'In Progress' : 
+                            status.charAt(0).toUpperCase() + status.slice(1),
+                      value: count,
+                      fill: status === 'pending' ? 'hsl(var(--chart-1))' :
+                            status === 'pending-approval' ? 'hsl(var(--chart-2))' :
+                            status === 'in-progress' ? 'hsl(var(--chart-3))' :
+                            status === 'completed' ? 'hsl(var(--chart-4))' :
+                            'hsl(var(--chart-5))'
+                    }))}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  labelLine={false}
+                  label={({ name, value }) => `${name}: ${value}`}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+              </PieChart>
+            </ChartContainer>
           </CardContent>
         </Card>
 
@@ -344,20 +361,56 @@ const Reporting = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {Object.entries(stats.repairTypeDistribution)
-                .sort(([,a], [,b]) => b - a)
-                .slice(0, 5)
-                .map(([repairType, count]) => (
-                  <div key={repairType} className="flex items-center justify-between">
-                    <span className="text-sm">{repairType}</span>
-                    <span className="text-sm text-muted-foreground">{count} requests</span>
-                  </div>
-                ))}
-              {Object.keys(stats.repairTypeDistribution).length === 0 && (
-                <p className="text-sm text-muted-foreground">No repair types available</p>
-              )}
-            </div>
+            <ChartContainer
+              config={{
+                count: {
+                  label: "Count",
+                  color: "hsl(var(--chart-1))",
+                },
+              }}
+              className="h-[300px]"
+            >
+              <BarChart
+                data={Object.entries(stats.repairTypeDistribution)
+                  .sort(([,a], [,b]) => b - a)
+                  .slice(0, 8)
+                  .map(([repairType, count]) => ({
+                    name: repairType.length > 15 ? repairType.substring(0, 15) + '...' : repairType,
+                    fullName: repairType,
+                    count
+                  }))}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 60,
+                }}
+              >
+                <XAxis 
+                  dataKey="name" 
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                  fontSize={12}
+                />
+                <YAxis />
+                <ChartTooltip 
+                  content={({ active, payload, label }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload;
+                      return (
+                        <div className="bg-background border border-border p-2 rounded shadow">
+                          <p className="font-medium">{data.fullName}</p>
+                          <p className="text-sm text-muted-foreground">Count: {data.count}</p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Bar dataKey="count" fill="hsl(var(--chart-1))" />
+              </BarChart>
+            </ChartContainer>
           </CardContent>
         </Card>
       </div>
