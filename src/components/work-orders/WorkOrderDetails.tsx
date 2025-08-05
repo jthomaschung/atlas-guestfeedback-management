@@ -206,6 +206,7 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
   };
 
   const handleAddNote = async () => {
+    console.log('🚨 HANDLEADDNOTE FUNCTION CALLED - NEW VERSION 🚨');
     if (!newNote.trim()) return;
     
     const timestamp = new Date().toISOString();
