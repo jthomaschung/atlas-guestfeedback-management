@@ -101,6 +101,18 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				'atlas-dark': {
+					DEFAULT: 'hsl(var(--atlas-dark))',
+					foreground: 'hsl(var(--atlas-dark-foreground))'
+				},
+				'atlas-red': {
+					DEFAULT: 'hsl(var(--atlas-red))',
+					foreground: 'hsl(var(--atlas-red-foreground))'
+				},
+				'atlas-light': {
+					DEFAULT: 'hsl(var(--atlas-light))',
+					foreground: 'hsl(var(--atlas-light-foreground))'
 				}
 			},
 			borderRadius: {
