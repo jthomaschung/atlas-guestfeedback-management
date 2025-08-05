@@ -6,6 +6,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppSidebar } from '@/components/AppSidebar';
+import { NotificationBell } from '@/components/NotificationBell';
 import Welcome from '@/pages/Welcome';
 import Index from '@/pages/Index';
 import SubmitWorkOrder from '@/pages/SubmitWorkOrder';
@@ -37,7 +38,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col">
-          <header className="h-16 flex items-center bg-atlas-dark border-b border-atlas-dark px-6">
+          <header className="h-16 flex items-center justify-between bg-atlas-dark border-b border-atlas-dark px-6">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="text-atlas-dark-foreground hover:text-atlas-red" />
               <div className="text-atlas-dark-foreground">
@@ -45,6 +46,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
                 <span className="ml-2 text-sm text-atlas-dark-foreground/80">Facilities Management Portal</span>
               </div>
             </div>
+            <NotificationBell />
           </header>
           <main className="flex-1 overflow-auto bg-background">
             {children}
