@@ -159,22 +159,30 @@ const handler = async (req: Request): Promise<Response> => {
     } else if (type === 'note_tagged') {
       let taggedProfile = null;
       
+      console.log('Looking up tagged user:', { taggedDisplayName, taggedUserId });
+      
       // If we have a display name, look up the user by display name
       if (taggedDisplayName) {
-        const { data } = await supabase
+        console.log('Searching by display name:', taggedDisplayName);
+        const { data, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('display_name', taggedDisplayName)
           .single();
+        
+        console.log('Display name lookup result:', { data, error });
         taggedProfile = data;
       }
       // Fallback to taggedUserId if no display name provided
       else if (taggedUserId) {
-        const { data } = await supabase
+        console.log('Searching by user ID:', taggedUserId);
+        const { data, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('user_id', taggedUserId)
           .single();
+        
+        console.log('User ID lookup result:', { data, error });
         taggedProfile = data;
       }
 
