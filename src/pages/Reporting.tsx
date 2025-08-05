@@ -303,23 +303,23 @@ const Reporting = () => {
               config={{
                 pending: {
                   label: "Pending",
-                  color: "hsl(var(--chart-1))",
+                  color: "hsl(45, 93%, 47%)", // Orange/yellow for pending
                 },
                 "pending-approval": {
                   label: "Pending Approval",
-                  color: "hsl(var(--chart-2))",
+                  color: "hsl(262, 83%, 58%)", // Purple for pending approval
                 },
                 "in-progress": {
                   label: "In Progress",
-                  color: "hsl(var(--chart-3))",
+                  color: "hsl(213, 94%, 68%)", // Blue for in progress
                 },
                 completed: {
                   label: "Completed",
-                  color: "hsl(var(--chart-4))",
+                  color: "hsl(142, 69%, 58%)", // Green for completed
                 },
                 cancelled: {
                   label: "Cancelled",
-                  color: "hsl(var(--chart-5))",
+                  color: "hsl(0, 84%, 60%)", // Red for cancelled
                 },
               }}
               className="h-[300px]"
@@ -333,11 +333,11 @@ const Reporting = () => {
                             status === 'in-progress' ? 'In Progress' : 
                             status.charAt(0).toUpperCase() + status.slice(1),
                       value: count,
-                      fill: status === 'pending' ? 'hsl(var(--chart-1))' :
-                            status === 'pending-approval' ? 'hsl(var(--chart-2))' :
-                            status === 'in-progress' ? 'hsl(var(--chart-3))' :
-                            status === 'completed' ? 'hsl(var(--chart-4))' :
-                            'hsl(var(--chart-5))'
+                      fill: status === 'pending' ? 'hsl(45, 93%, 47%)' :
+                            status === 'pending-approval' ? 'hsl(262, 83%, 58%)' :
+                            status === 'in-progress' ? 'hsl(213, 94%, 68%)' :
+                            status === 'completed' ? 'hsl(142, 69%, 58%)' :
+                            'hsl(0, 84%, 60%)'
                     }))}
                   dataKey="value"
                   nameKey="name"
@@ -345,7 +345,7 @@ const Reporting = () => {
                   cy="50%"
                   outerRadius={80}
                   labelLine={false}
-                  label={({ name, value }) => `${name}: ${value}`}
+                  label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
               </PieChart>
@@ -374,11 +374,26 @@ const Reporting = () => {
                 data={Object.entries(stats.repairTypeDistribution)
                   .sort(([,a], [,b]) => b - a)
                   .slice(0, 8)
-                  .map(([repairType, count]) => ({
-                    name: repairType.length > 15 ? repairType.substring(0, 15) + '...' : repairType,
-                    fullName: repairType,
-                    count
-                  }))}
+                  .map(([repairType, count], index) => {
+                    // Color palette for different repair types
+                    const colors = [
+                      'hsl(213, 94%, 68%)', // Blue
+                      'hsl(142, 69%, 58%)', // Green  
+                      'hsl(45, 93%, 47%)',  // Orange
+                      'hsl(262, 83%, 58%)', // Purple
+                      'hsl(0, 84%, 60%)',   // Red
+                      'hsl(173, 58%, 39%)', // Teal
+                      'hsl(48, 96%, 53%)',  // Yellow
+                      'hsl(280, 100%, 70%)', // Pink
+                    ];
+                    
+                    return {
+                      name: repairType.length > 15 ? repairType.substring(0, 15) + '...' : repairType,
+                      fullName: repairType,
+                      count,
+                      fill: colors[index % colors.length]
+                    };
+                  })}
                 margin={{
                   top: 20,
                   right: 30,
@@ -399,8 +414,8 @@ const Reporting = () => {
                     if (active && payload && payload.length) {
                       const data = payload[0].payload;
                       return (
-                        <div className="bg-background border border-border p-2 rounded shadow">
-                          <p className="font-medium">{data.fullName}</p>
+                        <div className="bg-background border border-border p-3 rounded-lg shadow-lg">
+                          <p className="font-medium text-foreground">{data.fullName}</p>
                           <p className="text-sm text-muted-foreground">Count: {data.count}</p>
                         </div>
                       );
@@ -408,7 +423,7 @@ const Reporting = () => {
                     return null;
                   }}
                 />
-                <Bar dataKey="count" fill="hsl(var(--chart-1))" />
+                <Bar dataKey="count" />
               </BarChart>
             </ChartContainer>
           </CardContent>
