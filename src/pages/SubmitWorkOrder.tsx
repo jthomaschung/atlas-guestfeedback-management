@@ -107,8 +107,8 @@ const SubmitWorkOrder = () => {
         />
       </div>
 
-      <div className="mt-6 bg-accent border rounded-lg p-6">
-        <h2 className="text-xl font-semibold text-foreground mb-4">
+      <div className="mt-6 bg-warning/10 border-2 border-warning/20 rounded-lg p-6">
+        <h2 className="text-xl font-bold text-warning mb-4">
           After-Hours Emergency Instructions
         </h2>
         <p className="text-sm text-muted-foreground mb-4">
