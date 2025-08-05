@@ -218,15 +218,23 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     const mentions = [];
     const mentionRegex = /@([A-Za-z]+(?:\s+[A-Za-z]+)*)/g;
     let match;
+    console.log('All users available for tagging:', users.map(u => getUserDisplayName(u)));
     while ((match = mentionRegex.exec(newNote)) !== null) {
       const potentialName = match[1];
+      console.log('Found potential mention:', potentialName);
       // Check if this matches any known user display name
       const matchingUser = users.find(user => {
         const displayName = getUserDisplayName(user);
-        return displayName.toLowerCase().startsWith(potentialName.toLowerCase());
+        const matches = displayName.toLowerCase().startsWith(potentialName.toLowerCase());
+        console.log(`Checking ${displayName} against ${potentialName}:`, matches);
+        return matches;
       });
       if (matchingUser) {
-        mentions.push('@' + getUserDisplayName(matchingUser));
+        const fullDisplayName = getUserDisplayName(matchingUser);
+        console.log('Found matching user:', fullDisplayName);
+        mentions.push('@' + fullDisplayName);
+      } else {
+        console.log('No matching user found for:', potentialName);
       }
     }
     console.log('Found mentions in note:', mentions);
