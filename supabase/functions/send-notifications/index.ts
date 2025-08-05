@@ -108,11 +108,12 @@ const handler = async (req: Request): Promise<Response> => {
 
       // Send completion notification emails
       for (const email of recipients) {
-        await resend.emails.send({
-          from: "Work Orders <notifications@resend.dev>",
-          to: [email],
-          subject: `Work Order Completed - Store ${workOrder.store_number} - ${workOrder.description}`,
-          html: `
+        try {
+          const emailResult = await resend.emails.send({
+            from: "Work Orders <notifications@resend.dev>",
+            to: [email],
+            subject: `Work Order Completed - Store ${workOrder.store_number} - ${workOrder.description}`,
+            html: `
             <h2>Work Order Completed</h2>
             <p><strong>Work Order ID:</strong> ${workOrder.id.slice(0, 8)}</p>
             <p><strong>Store Number:</strong> ${workOrder.store_number}</p>
@@ -130,16 +131,29 @@ const handler = async (req: Request): Promise<Response> => {
             ${workOrder.notes && workOrder.notes.length > 0 ? `<p><strong>Notes:</strong><br>${workOrder.notes.join('<br>')}</p>` : ''}
             <br>
             <p>This work order has been marked as completed.</p>
-          `,
-        });
+            `,
+          });
 
-        // Log notification
-        await supabase.from('notification_log').insert({
-          recipient_email: email,
-          notification_type: 'completion',
-          work_order_id: workOrderId,
-          status: 'sent'
-        });
+          console.log('Completion email sent successfully:', { email, emailResult });
+
+          // Log notification
+          await supabase.from('notification_log').insert({
+            recipient_email: email,
+            notification_type: 'completion',
+            work_order_id: workOrderId,
+            status: 'sent'
+          });
+        } catch (emailError) {
+          console.error('Failed to send completion email:', { email, error: emailError });
+          
+          // Log failed notification
+          await supabase.from('notification_log').insert({
+            recipient_email: email,
+            notification_type: 'completion',
+            work_order_id: workOrderId,
+            status: 'failed'
+          });
+        }
       }
 
     } else if (type === 'note_tagged') {
@@ -178,11 +192,12 @@ const handler = async (req: Request): Promise<Response> => {
         if (!notificationPrefs || notificationPrefs.email_on_tagged) {
           console.log('Sending tagged notification to:', taggedProfile.email);
           
-          await resend.emails.send({
-            from: "Work Orders <notifications@resend.dev>",
-            to: [taggedProfile.email],
-            subject: `You've Been Tagged - Store ${workOrder.store_number} - ${workOrder.repair_type}`,
-            html: `
+          try {
+            const emailResult = await resend.emails.send({
+              from: "Work Orders <notifications@resend.dev>",
+              to: [taggedProfile.email],
+              subject: `You've Been Tagged - Store ${workOrder.store_number} - ${workOrder.repair_type}`,
+              html: `
               <h2>You've Been Tagged in a Work Order Note</h2>
               <p><strong>Work Order ID:</strong> ${workOrder.id.slice(0, 8)}</p>
               <p><strong>Store Number:</strong> ${workOrder.store_number}</p>
@@ -202,17 +217,30 @@ const handler = async (req: Request): Promise<Response> => {
               <br>
               <p>Tagged by: ${creatorProfile?.first_name} ${creatorProfile?.last_name} (${creatorProfile?.email})</p>
             `,
-          });
+            });
 
-          // Log notification
-          await supabase.from('notification_log').insert({
-            recipient_email: taggedProfile.email,
-            notification_type: 'note_tagged',
-            work_order_id: workOrderId,
-            status: 'sent'
-          });
-          
-          console.log('Tagged notification sent successfully');
+            console.log('Tagged email sent successfully:', { email: taggedProfile.email, emailResult });
+
+            // Log notification
+            await supabase.from('notification_log').insert({
+              recipient_email: taggedProfile.email,
+              notification_type: 'note_tagged',
+              work_order_id: workOrderId,
+              status: 'sent'
+            });
+            
+            console.log('Tagged notification sent successfully');
+          } catch (emailError) {
+            console.error('Failed to send tagged email:', { email: taggedProfile.email, error: emailError });
+            
+            // Log failed notification
+            await supabase.from('notification_log').insert({
+              recipient_email: taggedProfile.email,
+              notification_type: 'note_tagged',
+              work_order_id: workOrderId,
+              status: 'failed'
+            });
+          }
         } else {
           console.log('User has opted out of tagged notifications');
         }
@@ -235,11 +263,12 @@ const handler = async (req: Request): Promise<Response> => {
       if (workOrder.priority === 'Critical' && criticalMarkets.includes(workOrder.market)) {
         console.log('Sending critical notification to Grant Gelecki:', grantEmail);
         
-        await resend.emails.send({
-          from: "Critical Work Orders <notifications@resend.dev>",
-          to: [grantEmail],
-          subject: `🚨 CRITICAL WORK ORDER - ${workOrder.market} Store ${workOrder.store_number} - ${workOrder.repair_type}`,
-          html: `
+        try {
+          const emailResult = await resend.emails.send({
+            from: "Critical Work Orders <notifications@resend.dev>",
+            to: [grantEmail],
+            subject: `🚨 CRITICAL WORK ORDER - ${workOrder.market} Store ${workOrder.store_number} - ${workOrder.repair_type}`,
+            html: `
             <div style="background-color: #fef2f2; border: 2px solid #dc2626; border-radius: 8px; padding: 20px; font-family: Arial, sans-serif;">
               <h2 style="color: #dc2626; margin-top: 0;">🚨 CRITICAL WORK ORDER ALERT</h2>
               <p style="color: #dc2626; font-weight: bold; font-size: 16px;">A critical priority work order has been submitted in your NE region and requires immediate attention.</p>
@@ -267,18 +296,31 @@ const handler = async (req: Request): Promise<Response> => {
               <p style="color: #6b7280; font-size: 14px; margin-bottom: 0;">This is an automated notification for critical work orders in NE1, NE2, NE3, and NE4 markets.</p>
             </div>
           `,
-        });
+          });
 
-        // Log notification
-        await supabase.from('notification_log').insert({
-          recipient_email: grantEmail,
-          notification_type: 'critical_creation',
-          work_order_id: workOrderId,
-          status: 'sent'
-        });
-        
-        recipients.push(grantEmail);
-        console.log('Critical notification sent successfully to Grant Gelecki');
+          console.log('Critical email sent successfully:', { email: grantEmail, emailResult });
+
+          // Log notification
+          await supabase.from('notification_log').insert({
+            recipient_email: grantEmail,
+            notification_type: 'critical_creation',
+            work_order_id: workOrderId,
+            status: 'sent'
+          });
+          
+          recipients.push(grantEmail);
+          console.log('Critical notification sent successfully to Grant Gelecki');
+        } catch (emailError) {
+          console.error('Failed to send critical email:', { email: grantEmail, error: emailError });
+          
+          // Log failed notification
+          await supabase.from('notification_log').insert({
+            recipient_email: grantEmail,
+            notification_type: 'critical_creation',
+            work_order_id: workOrderId,
+            status: 'failed'
+          });
+        }
       } else {
         console.log('Work order does not meet critical NE market criteria');
       }
