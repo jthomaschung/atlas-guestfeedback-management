@@ -37,7 +37,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col">
-          <header className="h-16 flex items-center justify-between bg-atlas-dark border-b border-atlas-dark px-6">
+          <header className="h-16 flex items-center bg-atlas-dark border-b border-atlas-dark px-6">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="text-atlas-dark-foreground hover:text-atlas-red" />
               <div className="text-atlas-dark-foreground">
@@ -45,17 +45,6 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
                 <span className="ml-2 text-sm text-atlas-dark-foreground/80">Facilities Management Portal</span>
               </div>
             </div>
-            <nav className="flex items-center gap-6 text-sm">
-              <span className="text-atlas-dark-foreground/80 hover:text-atlas-red cursor-pointer transition-colors">
-                Atlas Management Portal
-              </span>
-              <span className="text-atlas-dark-foreground/80 hover:text-atlas-red cursor-pointer transition-colors">
-                Atlas Team Members
-              </span>
-              <span className="text-atlas-dark-foreground/80 hover:text-atlas-red cursor-pointer transition-colors">
-                Account
-              </span>
-            </nav>
           </header>
           <main className="flex-1 overflow-auto bg-background">
             {children}
