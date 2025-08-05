@@ -17,7 +17,6 @@ import {
 const items = [
   { title: "Submit New Work Order", url: "/submit", icon: PlusCircle },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Work Order Tracking", url: "/tracking", icon: ClipboardList },
   { title: "Pending Approval", url: "/pending-approval", icon: ClipboardList },
   { title: "Completed", url: "/completed", icon: ClipboardList },
   { title: "Reporting", url: "/reporting", icon: BarChart3 },

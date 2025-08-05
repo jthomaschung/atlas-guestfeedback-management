@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, TrendingUp, Clock, CheckCircle, Loader2 } from "lucide-react";
 import { WorkOrder, WorkOrderStatus, WorkOrderPriority } from "@/types/work-order";
+import { WorkOrderFilters } from "@/components/work-orders/WorkOrderFilters";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -16,16 +17,63 @@ interface ReportingStats {
 }
 
 const Reporting = () => {
-  const [stats, setStats] = useState<ReportingStats | null>(null);
+  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<WorkOrderStatus | 'all'>('all');
+  const [priorityFilter, setPriorityFilter] = useState<WorkOrderPriority | 'all'>('all');
+  const [storeFilter, setStoreFilter] = useState('all');
+  const [marketFilter, setMarketFilter] = useState('all');
+  const [assigneeFilter, setAssigneeFilter] = useState('all');
   const { user } = useAuth();
   const { toast } = useToast();
 
-  const calculateStats = (workOrders: WorkOrder[]): ReportingStats => {
-    const total = workOrders.length;
-    const completed = workOrders.filter(wo => wo.status === 'completed');
-    const active = workOrders.filter(wo => wo.status === 'pending' || wo.status === 'in-progress');
-    const critical = workOrders.filter(wo => wo.priority === 'Critical');
+  const filteredWorkOrders = useMemo(() => {
+    return workOrders.filter(wo => {
+      const matchesSearch = wo.description.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           wo.repair_type.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           wo.store_number.includes(searchTerm) ||
+                           (wo.assignee?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
+      const matchesStatus = statusFilter === 'all' || wo.status === statusFilter;
+      const matchesPriority = priorityFilter === 'all' || wo.priority === priorityFilter;
+      const matchesStore = storeFilter === 'all' || wo.store_number === storeFilter;
+      const matchesMarket = marketFilter === 'all' || wo.market === marketFilter;
+      const matchesAssignee = assigneeFilter === 'all' || 
+                             (assigneeFilter === 'unassigned' && !wo.assignee) ||
+                             wo.assignee === assigneeFilter;
+      return matchesSearch && matchesStatus && matchesPriority && matchesStore && matchesMarket && matchesAssignee;
+    });
+  }, [workOrders, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter, assigneeFilter]);
+
+  const availableStores = useMemo(() => {
+    const stores = [...new Set(workOrders.map(wo => wo.store_number))];
+    return stores.sort();
+  }, [workOrders]);
+
+  const availableMarkets = useMemo(() => {
+    const markets = [...new Set(workOrders.map(wo => wo.market))];
+    return markets.sort();
+  }, [workOrders]);
+
+  const availableAssignees = useMemo(() => {
+    const assignees = [...new Set(workOrders.map(wo => wo.assignee).filter(Boolean))];
+    return assignees.sort();
+  }, [workOrders]);
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setStatusFilter('all');
+    setPriorityFilter('all');
+    setStoreFilter('all');
+    setMarketFilter('all');
+    setAssigneeFilter('all');
+  };
+
+  const calculateStats = (workOrdersToCalculate: WorkOrder[]): ReportingStats => {
+    const total = workOrdersToCalculate.length;
+    const completed = workOrdersToCalculate.filter(wo => wo.status === 'completed');
+    const active = workOrdersToCalculate.filter(wo => wo.status === 'pending' || wo.status === 'in-progress');
+    const critical = workOrdersToCalculate.filter(wo => wo.priority === 'Critical');
 
     // Calculate average completion time
     const completionTimes = completed
@@ -51,13 +99,13 @@ const Reporting = () => {
       'completed': 0,
       'cancelled': 0
     };
-    workOrders.forEach(wo => {
+    workOrdersToCalculate.forEach(wo => {
       statusDistribution[wo.status]++;
     });
 
     // Repair type distribution
     const repairTypeDistribution: Record<string, number> = {};
-    workOrders.forEach(wo => {
+    workOrdersToCalculate.forEach(wo => {
       repairTypeDistribution[wo.repair_type] = (repairTypeDistribution[wo.repair_type] || 0) + 1;
     });
 
@@ -70,6 +118,10 @@ const Reporting = () => {
       repairTypeDistribution
     };
   };
+
+  const stats = useMemo(() => {
+    return calculateStats(filteredWorkOrders);
+  }, [filteredWorkOrders]);
 
   const fetchReportingData = async () => {
     try {
@@ -87,9 +139,8 @@ const Reporting = () => {
         return;
       }
 
-      const workOrders = (data || []) as WorkOrder[];
-      const calculatedStats = calculateStats(workOrders);
-      setStats(calculatedStats);
+      const workOrdersData = (data || []) as WorkOrder[];
+      setWorkOrders(workOrdersData);
     } catch (error) {
       console.error('Unexpected error:', error);
       toast({
@@ -121,15 +172,6 @@ const Reporting = () => {
     );
   }
 
-  if (!stats) {
-    return (
-      <div className="container mx-auto p-6">
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Failed to load reporting data. Please try refreshing the page.</p>
-        </div>
-      </div>
-    );
-  }
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="mb-6">
@@ -138,6 +180,25 @@ const Reporting = () => {
           View insights and analytics for work order performance
         </p>
       </div>
+
+      <WorkOrderFilters 
+        searchTerm={searchTerm} 
+        onSearchChange={setSearchTerm} 
+        statusFilter={statusFilter} 
+        onStatusFilterChange={setStatusFilter} 
+        priorityFilter={priorityFilter} 
+        onPriorityFilterChange={setPriorityFilter} 
+        storeFilter={storeFilter} 
+        onStoreFilterChange={setStoreFilter} 
+        marketFilter={marketFilter} 
+        onMarketFilterChange={setMarketFilter} 
+        assigneeFilter={assigneeFilter}
+        onAssigneeFilterChange={setAssigneeFilter}
+        onClearFilters={clearFilters} 
+        availableStores={availableStores} 
+        availableMarkets={availableMarkets} 
+        availableAssignees={availableAssignees}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>

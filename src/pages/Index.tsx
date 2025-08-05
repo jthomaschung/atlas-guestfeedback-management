@@ -81,19 +81,7 @@ const Index = () => {
       checkAdminStatus();
     }
   }, [user]);
-  const availableStores = useMemo(() => {
-    const stores = [...new Set(workOrders.map(wo => wo.store_number))];
-    return stores.sort();
-  }, [workOrders]);
-  const availableMarkets = useMemo(() => {
-    const markets = [...new Set(workOrders.map(wo => wo.market))];
-    return markets.sort();
-  }, [workOrders]);
-
-  const availableAssignees = useMemo(() => {
-    const assignees = [...new Set(workOrders.map(wo => wo.assignee).filter(Boolean))];
-    return assignees.sort();
-  }, [workOrders]);
+  
   const filteredWorkOrders = useMemo(() => {
     return workOrders.filter(wo => {
       // Exclude completed work orders from dashboard
@@ -113,6 +101,21 @@ const Index = () => {
       return matchesSearch && matchesStatus && matchesPriority && matchesStore && matchesMarket && matchesAssignee;
     });
   }, [workOrders, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter, assigneeFilter]);
+
+  const availableStores = useMemo(() => {
+    const stores = [...new Set(filteredWorkOrders.map(wo => wo.store_number))];
+    return stores.sort();
+  }, [filteredWorkOrders]);
+  
+  const availableMarkets = useMemo(() => {
+    const markets = [...new Set(filteredWorkOrders.map(wo => wo.market))];
+    return markets.sort();
+  }, [filteredWorkOrders]);
+
+  const availableAssignees = useMemo(() => {
+    const assignees = [...new Set(filteredWorkOrders.map(wo => wo.assignee).filter(Boolean))];
+    return assignees.sort();
+  }, [filteredWorkOrders]);
   const handleCreateWorkOrder = async (formData: WorkOrderFormData) => {
     if (!user) {
       toast({
@@ -437,7 +440,7 @@ const Index = () => {
           </Dialog>
         </div>
 
-        <WorkOrderStats workOrders={workOrders} onFilterChange={handleStatsFilterChange} />
+        <WorkOrderStats workOrders={filteredWorkOrders} onFilterChange={handleStatsFilterChange} />
 
         <WorkOrderFilters 
           searchTerm={searchTerm} 
