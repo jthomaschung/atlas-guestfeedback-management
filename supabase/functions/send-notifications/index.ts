@@ -110,7 +110,7 @@ const handler = async (req: Request): Promise<Response> => {
       for (const email of recipients) {
         try {
           const emailResult = await resend.emails.send({
-            from: "Work Orders <notifications@resend.dev>",
+            from: "Work Orders <workorders@atlaswe.com>",
             to: [email],
             subject: `Work Order Completed - Store ${workOrder.store_number} - ${workOrder.description}`,
             html: `
@@ -194,7 +194,7 @@ const handler = async (req: Request): Promise<Response> => {
           
           try {
             const emailResult = await resend.emails.send({
-              from: "Work Orders <notifications@resend.dev>",
+              from: "Work Orders <workorders@atlaswe.com>",
               to: [taggedProfile.email],
               subject: `You've Been Tagged - Store ${workOrder.store_number} - ${workOrder.repair_type}`,
               html: `
@@ -265,7 +265,7 @@ const handler = async (req: Request): Promise<Response> => {
         
         try {
           const emailResult = await resend.emails.send({
-            from: "Critical Work Orders <notifications@resend.dev>",
+            from: "Critical Work Orders <workorders@atlaswe.com>",
             to: [grantEmail],
             subject: `🚨 CRITICAL WORK ORDER - ${workOrder.market} Store ${workOrder.store_number} - ${workOrder.repair_type}`,
             html: `
