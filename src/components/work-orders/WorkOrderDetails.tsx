@@ -214,8 +214,21 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     const noteWithUserAndTimestamp = `${format(new Date(), 'MMM d, yyyy h:mm a')} - ${userName}: ${newNote.trim()}`;
     const updatedNotes = [...(workOrder.notes || []), noteWithUserAndTimestamp];
     
-    // Check for @mentions in the note using display names (improved regex to stop at word boundaries)
-    const mentions = newNote.match(/@([A-Za-z]+(?:\s+[A-Za-z]+)*?)(?=\s|$|[^A-Za-z\s])/g) || [];
+    // Check for @mentions in the note - extract display names from known users
+    const mentions = [];
+    const mentionRegex = /@([A-Za-z]+(?:\s+[A-Za-z]+)*)/g;
+    let match;
+    while ((match = mentionRegex.exec(newNote)) !== null) {
+      const potentialName = match[1];
+      // Check if this matches any known user display name
+      const matchingUser = users.find(user => {
+        const displayName = getUserDisplayName(user);
+        return displayName.toLowerCase().startsWith(potentialName.toLowerCase());
+      });
+      if (matchingUser) {
+        mentions.push('@' + getUserDisplayName(matchingUser));
+      }
+    }
     console.log('Found mentions in note:', mentions);
     console.log('New note content:', newNote);
     
