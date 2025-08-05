@@ -39,7 +39,19 @@ export const useNotifications = () => {
 
   const sendTaggedNotification = async (workOrderId: string, taggedDisplayName: string, note: string) => {
     console.log('useNotifications: Sending tagged notification for:', { workOrderId, taggedDisplayName, note });
+    
+    if (!workOrderId || !taggedDisplayName) {
+      console.error('useNotifications: Missing required parameters:', { workOrderId, taggedDisplayName });
+      toast({
+        title: "Notification Error",
+        description: "Missing required parameters for notification",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     try {
+      console.log('useNotifications: About to call edge function...');
       const { data, error } = await supabase.functions.invoke('send-notifications', {
         body: {
           type: 'note_tagged',
