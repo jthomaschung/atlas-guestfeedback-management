@@ -18,6 +18,8 @@ interface NotificationRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  console.log('Send notifications function called with method:', req.method);
+  
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -36,6 +38,7 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     const { type, workOrderId, taggedUserId, taggedDisplayName, note }: NotificationRequest = await req.json();
+    console.log('Notification request:', { type, workOrderId, taggedUserId, taggedDisplayName });
 
     // Get work order details
     const { data: workOrder, error: woError } = await supabase
