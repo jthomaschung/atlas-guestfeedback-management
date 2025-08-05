@@ -5,11 +5,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Users, Save, UserCheck, Bell, Map, Store } from 'lucide-react';
+import { Users, Save, Settings, Bell, Map, Store, UserCheck, Shield, Network, X } from 'lucide-react';
 
 const markets = [
   'AZ1', 'AZ2', 'AZ3', 'AZ4', 'AZ5', 'IE/LA', 'OC', 
@@ -17,7 +19,6 @@ const markets = [
   'FL1', 'FL2', 'FL3', 'PA'
 ];
 
-// Define the specific store numbers
 const storeNumbers = [
   '522', '746', '799', '833', '838', '877', '930', '965', '1002', '1018',
   '1019', '1061', '1111', '1127', '1206', '1261', '1307', '1337', '1342', '1355',
@@ -28,6 +29,8 @@ const storeNumbers = [
   '2883', '2884', '3029', '3030', '3187', '3260', '3391', '3612', '3613', '3635',
   '3686', '3972', '4018', '4022', '4024', '4105', '4330', '4358', '4586'
 ].map(num => `#${num}`);
+
+const roles = ['Store Level', 'DM', 'GM/DM', 'Director', 'Admin'];
 
 interface UserProfile {
   user_id: string;
@@ -59,33 +62,38 @@ interface UserPermissions {
   stores: string[];
 }
 
+interface CombinedUserData {
+  profile: UserProfile;
+  hierarchy?: UserHierarchyData;
+  notifications?: NotificationPreferences;
+  permissions?: UserPermissions;
+}
+
 export default function UserHierarchy() {
-  const [users, setUsers] = useState<UserProfile[]>([]);
-  const [hierarchy, setHierarchy] = useState<UserHierarchyData[]>([]);
-  const [notifications, setNotifications] = useState<NotificationPreferences[]>([]);
-  const [permissions, setPermissions] = useState<UserPermissions[]>([]);
-  const [selectedUser, setSelectedUser] = useState<string>('');
-  const [selectedManager, setSelectedManager] = useState<string>('');
-  const [selectedRole, setSelectedRole] = useState<string>('Store Level');
-  const [managingUser, setManagingUser] = useState<string>('');
-  const [editingDisplayName, setEditingDisplayName] = useState<string>('');
-  const [editingEmail, setEditingEmail] = useState<string>('');
-  const [userNotifications, setUserNotifications] = useState<NotificationPreferences>({
-    user_id: '',
-    email_on_completion: true,
-    email_on_tagged: true,
-    email_on_assignment: true
-  });
-  const [userPermissions, setUserPermissions] = useState<UserPermissions>({
-    user_id: '',
-    markets: [],
-    stores: []
-  });
-  const [selectedMarket, setSelectedMarket] = useState('');
-  const [selectedStore, setSelectedStore] = useState('');
+  const [users, setUsers] = useState<CombinedUserData[]>([]);
+  const [selectedUser, setSelectedUser] = useState<CombinedUserData | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [checkingAdmin, setCheckingAdmin] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Form states for the selected user
+  const [formData, setFormData] = useState({
+    display_name: '',
+    email: '',
+    role: 'Store Level',
+    manager_id: '',
+    email_on_completion: true,
+    email_on_tagged: true,
+    email_on_assignment: true,
+    markets: [] as string[],
+    stores: [] as string[]
+  });
+  
+  const [selectedMarket, setSelectedMarket] = useState('');
+  const [selectedStore, setSelectedStore] = useState('');
+  
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -95,7 +103,7 @@ export default function UserHierarchy() {
 
   useEffect(() => {
     if (isAdmin) {
-      loadData();
+      loadAllUsers();
     }
   }, [isAdmin]);
 
@@ -121,287 +129,165 @@ export default function UserHierarchy() {
     }
   };
 
-  const loadData = async () => {
+  const loadAllUsers = async () => {
+    setLoading(true);
     try {
-      // Load all users
-      const { data: usersData } = await supabase
+      // Load all users with their related data
+      const { data: profiles } = await supabase
         .from('profiles')
-        .select('user_id, email, first_name, last_name, display_name')
+        .select('*')
         .order('first_name');
 
-      if (usersData) {
-        setUsers(usersData);
-      }
-
-      // Load hierarchy data
       const { data: hierarchyData } = await supabase
         .from('user_hierarchy')
         .select('*');
 
-      if (hierarchyData) {
-        setHierarchy(hierarchyData);
-      }
-
-      // Load notification preferences
       const { data: notificationData } = await supabase
         .from('notification_preferences')
         .select('*');
 
-      if (notificationData) {
-        setNotifications(notificationData);
-      }
-
-      // Load user permissions
       const { data: permissionData } = await supabase
         .from('user_permissions')
         .select('*');
 
-      if (permissionData) {
-        setPermissions(permissionData);
-      }
+      // Combine all user data
+      const combinedUsers: CombinedUserData[] = (profiles || []).map(profile => ({
+        profile,
+        hierarchy: hierarchyData?.find(h => h.user_id === profile.user_id),
+        notifications: notificationData?.find(n => n.user_id === profile.user_id),
+        permissions: permissionData?.find(p => p.user_id === profile.user_id)
+      }));
 
+      setUsers(combinedUsers);
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error('Error loading users:', error);
       toast({
         title: "Error",
         description: "Failed to load user data",
         variant: "destructive"
       });
-    }
-  };
-
-  const handleSaveHierarchy = async () => {
-    if (!selectedUser) {
-      toast({
-        title: "Error",
-        description: "Please select a user",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const hierarchyData = {
-        user_id: selectedUser,
-        manager_id: selectedManager === 'none' ? null : selectedManager || null,
-        role: selectedRole
-      };
-
-      const existingHierarchy = hierarchy.find(h => h.user_id === selectedUser);
-
-      if (existingHierarchy) {
-        // Update existing
-        const { error } = await supabase
-          .from('user_hierarchy')
-          .update(hierarchyData)
-          .eq('user_id', selectedUser);
-
-        if (error) throw error;
-      } else {
-        // Create new
-        const { error } = await supabase
-          .from('user_hierarchy')
-          .insert(hierarchyData);
-
-        if (error) throw error;
-      }
-
-      toast({
-        title: "Success",
-        description: "User hierarchy updated successfully",
-      });
-
-      // Reload data
-      await loadData();
-      
-      // Reset form
-      setSelectedUser('');
-      setSelectedManager('');
-      setSelectedRole('Store Level');
-
-    } catch (error) {
-      console.error('Error saving hierarchy:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save hierarchy",
-        variant: "destructive"
-      });
     } finally {
       setLoading(false);
     }
   };
 
-  const getUserDisplayName = (user: UserProfile) => {
-    if (user.display_name) return user.display_name;
-    const name = `${user.first_name || ''} ${user.last_name || ''}`.trim();
-    return name || user.email;
-  };
-
-  const getCurrentHierarchy = (userId: string) => {
-    return hierarchy.find(h => h.user_id === userId);
+  const getUserDisplayName = (profile: UserProfile) => {
+    if (profile.display_name) return profile.display_name;
+    const name = `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
+    return name || profile.email;
   };
 
   const getManagerName = (managerId?: string) => {
     if (!managerId) return 'No Manager';
-    const manager = users.find(u => u.user_id === managerId);
-    return manager ? getUserDisplayName(manager) : 'Unknown Manager';
+    const manager = users.find(u => u.profile.user_id === managerId);
+    return manager ? getUserDisplayName(manager.profile) : 'Unknown Manager';
   };
 
-  const handleManageUser = (userId: string) => {
-    setManagingUser(userId);
-    
-    // Load user's current display name and email
-    const user = users.find(u => u.user_id === userId);
-    setEditingDisplayName(user?.display_name || '');
-    setEditingEmail(user?.email || '');
-    
-    // Load user's current notification preferences
-    const userNotif = notifications.find(n => n.user_id === userId);
-    if (userNotif) {
-      setUserNotifications(userNotif);
-    } else {
-      setUserNotifications({
-        user_id: userId,
-        email_on_completion: true,
-        email_on_tagged: true,
-        email_on_assignment: true
-      });
-    }
-
-    // Load user's current permissions
-    const userPerm = permissions.find(p => p.user_id === userId);
-    if (userPerm) {
-      setUserPermissions(userPerm);
-    } else {
-      setUserPermissions({
-        user_id: userId,
-        markets: [],
-        stores: []
-      });
-    }
-
-    // Reset dropdown selections
+  const openUserDialog = (userData: CombinedUserData) => {
+    setSelectedUser(userData);
+    setFormData({
+      display_name: userData.profile.display_name || '',
+      email: userData.profile.email || '',
+      role: userData.hierarchy?.role || 'Store Level',
+      manager_id: userData.hierarchy?.manager_id || '',
+      email_on_completion: userData.notifications?.email_on_completion ?? true,
+      email_on_tagged: userData.notifications?.email_on_tagged ?? true,
+      email_on_assignment: userData.notifications?.email_on_assignment ?? true,
+      markets: userData.permissions?.markets || [],
+      stores: userData.permissions?.stores || []
+    });
     setSelectedMarket('');
     setSelectedStore('');
+    setIsDialogOpen(true);
   };
 
-  const handleSaveDisplayName = async () => {
-    if (!managingUser || !editingDisplayName.trim() || !editingEmail.trim()) {
-      toast({
-        title: "Error",
-        description: "Display name and email cannot be empty",
-        variant: "destructive"
-      });
-      return;
-    }
-
+  const handleSaveUser = async () => {
+    if (!selectedUser) return;
+    
     setLoading(true);
     try {
-      const { error } = await supabase
+      const userId = selectedUser.profile.user_id;
+
+      // Update profile
+      await supabase
         .from('profiles')
-        .update({ 
-          display_name: editingDisplayName.trim(),
-          email: editingEmail.trim()
+        .update({
+          display_name: formData.display_name.trim(),
+          email: formData.email.trim()
         })
-        .eq('user_id', managingUser);
+        .eq('user_id', userId);
 
-      if (error) throw error;
+      // Update or insert hierarchy
+      if (selectedUser.hierarchy) {
+        await supabase
+          .from('user_hierarchy')
+          .update({
+            role: formData.role,
+            manager_id: formData.manager_id || null
+          })
+          .eq('user_id', userId);
+      } else {
+        await supabase
+          .from('user_hierarchy')
+          .insert({
+            user_id: userId,
+            role: formData.role,
+            manager_id: formData.manager_id || null
+          });
+      }
 
-      toast({
-        title: "Success",
-        description: "User information updated successfully"
-      });
-
-      await loadData();
-    } catch (error) {
-      console.error('Error saving user information:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save user information",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSaveNotifications = async () => {
-    setLoading(true);
-    try {
-      const existingNotification = notifications.find(n => n.user_id === managingUser);
-      
-      if (existingNotification) {
-        const { error } = await supabase
+      // Update or insert notifications
+      if (selectedUser.notifications) {
+        await supabase
           .from('notification_preferences')
           .update({
-            email_on_completion: userNotifications.email_on_completion,
-            email_on_tagged: userNotifications.email_on_tagged,
-            email_on_assignment: userNotifications.email_on_assignment
+            email_on_completion: formData.email_on_completion,
+            email_on_tagged: formData.email_on_tagged,
+            email_on_assignment: formData.email_on_assignment
           })
-          .eq('user_id', managingUser);
-        
-        if (error) throw error;
+          .eq('user_id', userId);
       } else {
-        const { error } = await supabase
+        await supabase
           .from('notification_preferences')
-          .insert(userNotifications);
-        
-        if (error) throw error;
+          .insert({
+            user_id: userId,
+            email_on_completion: formData.email_on_completion,
+            email_on_tagged: formData.email_on_tagged,
+            email_on_assignment: formData.email_on_assignment
+          });
+      }
+
+      // Update or insert permissions
+      if (selectedUser.permissions) {
+        await supabase
+          .from('user_permissions')
+          .update({
+            markets: formData.markets,
+            stores: formData.stores
+          })
+          .eq('user_id', userId);
+      } else {
+        await supabase
+          .from('user_permissions')
+          .insert({
+            user_id: userId,
+            markets: formData.markets,
+            stores: formData.stores
+          });
       }
 
       toast({
         title: "Success",
-        description: "Notification preferences updated successfully"
+        description: "User updated successfully"
       });
 
-      await loadData();
+      setIsDialogOpen(false);
+      await loadAllUsers();
     } catch (error) {
-      console.error('Error saving notifications:', error);
+      console.error('Error saving user:', error);
       toast({
         title: "Error",
-        description: "Failed to save notification preferences",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSavePermissions = async () => {
-    setLoading(true);
-    try {
-      const existingPermission = permissions.find(p => p.user_id === managingUser);
-      
-      if (existingPermission) {
-        const { error } = await supabase
-          .from('user_permissions')
-          .update({
-            markets: userPermissions.markets,
-            stores: userPermissions.stores
-          })
-          .eq('user_id', managingUser);
-        
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('user_permissions')
-          .insert(userPermissions);
-        
-        if (error) throw error;
-      }
-
-      toast({
-        title: "Success",
-        description: "User permissions updated successfully"
-      });
-
-      await loadData();
-    } catch (error) {
-      console.error('Error saving permissions:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save user permissions",
+        description: "Failed to save user",
         variant: "destructive"
       });
     } finally {
@@ -410,60 +296,49 @@ export default function UserHierarchy() {
   };
 
   const addMarket = () => {
-    if (selectedMarket && !userPermissions.markets.includes(selectedMarket)) {
-      const managingUserRole = hierarchy.find(h => h.user_id === managingUser)?.role || 'Store Level';
-      
-      if (managingUserRole === 'Store Level') {
-        // Store Level users can only have one market
-        setUserPermissions(prev => ({
-          ...prev,
-          markets: [selectedMarket]
-        }));
+    if (selectedMarket && !formData.markets.includes(selectedMarket)) {
+      if (formData.role === 'Store Level') {
+        setFormData(prev => ({ ...prev, markets: [selectedMarket] }));
       } else {
-        // Directors and DMs can have multiple markets
-        setUserPermissions(prev => ({
-          ...prev,
-          markets: [...prev.markets, selectedMarket]
-        }));
+        setFormData(prev => ({ ...prev, markets: [...prev.markets, selectedMarket] }));
       }
       setSelectedMarket('');
     }
   };
 
   const removeMarket = (market: string) => {
-    setUserPermissions(prev => ({
+    setFormData(prev => ({
       ...prev,
       markets: prev.markets.filter(m => m !== market)
     }));
   };
 
   const addStore = () => {
-    if (selectedStore && !userPermissions.stores.includes(selectedStore)) {
-      const managingUserRole = hierarchy.find(h => h.user_id === managingUser)?.role || 'Store Level';
-      
-      if (managingUserRole === 'Store Level') {
-        // Store Level users can only have one store
-        setUserPermissions(prev => ({
-          ...prev,
-          stores: [selectedStore]
-        }));
+    if (selectedStore && !formData.stores.includes(selectedStore)) {
+      if (formData.role === 'Store Level') {
+        setFormData(prev => ({ ...prev, stores: [selectedStore] }));
       } else {
-        // Directors and DMs can have multiple stores
-        setUserPermissions(prev => ({
-          ...prev,
-          stores: [...prev.stores, selectedStore]
-        }));
+        setFormData(prev => ({ ...prev, stores: [...prev.stores, selectedStore] }));
       }
       setSelectedStore('');
     }
   };
 
   const removeStore = (store: string) => {
-    setUserPermissions(prev => ({
+    setFormData(prev => ({
       ...prev,
       stores: prev.stores.filter(s => s !== store)
     }));
   };
+
+  const filteredUsers = users.filter(userData => {
+    const displayName = getUserDisplayName(userData.profile).toLowerCase();
+    const email = userData.profile.email.toLowerCase();
+    const role = userData.hierarchy?.role || '';
+    const search = searchTerm.toLowerCase();
+    
+    return displayName.includes(search) || email.includes(search) || role.toLowerCase().includes(search);
+  });
 
   if (checkingAdmin) {
     return (
@@ -481,12 +356,15 @@ export default function UserHierarchy() {
       <div className="container mx-auto p-6 flex items-center justify-center min-h-[400px]">
         <Card className="max-w-md">
           <CardHeader>
-            <CardTitle className="text-center text-red-600">Access Denied</CardTitle>
+            <CardTitle className="text-center text-red-600 flex items-center justify-center gap-2">
+              <Shield className="h-5 w-5" />
+              Access Denied
+            </CardTitle>
           </CardHeader>
           <CardContent className="text-center">
             <Users className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
             <p className="text-muted-foreground mb-4">
-              You need administrator privileges to access this page.
+              You need administrator privileges to access the User Management System.
             </p>
             <p className="text-sm text-muted-foreground">
               Please contact your system administrator if you believe you should have access.
@@ -499,368 +377,297 @@ export default function UserHierarchy() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center gap-2 mb-6">
-        <Users className="h-6 w-6" />
-        <h1 className="text-2xl font-bold">User Management System</h1>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Add/Edit Hierarchy */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <UserCheck className="h-5 w-5" />
-              Set User Hierarchy
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>User</Label>
-              <Select value={selectedUser} onValueChange={(value) => {
-                setSelectedUser(value);
-                const currentHierarchy = getCurrentHierarchy(value);
-                if (currentHierarchy) {
-                  setSelectedManager(currentHierarchy.manager_id || 'none');
-                  setSelectedRole(currentHierarchy.role);
-                } else {
-                  setSelectedManager('none');
-                  setSelectedRole('Store Level');
-                }
-              }}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select user" />
-                </SelectTrigger>
-                <SelectContent>
-                  {users.map((user) => (
-                    <SelectItem key={user.user_id} value={user.user_id}>
-                      {getUserDisplayName(user)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label>Manager (Optional)</Label>
-              <Select value={selectedManager} onValueChange={setSelectedManager}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select manager (optional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">No Manager</SelectItem>
-                  {users.filter(u => u.user_id !== selectedUser).map((user) => (
-                    <SelectItem key={user.user_id} value={user.user_id}>
-                      {getUserDisplayName(user)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label>Role</Label>
-              <Select value={selectedRole} onValueChange={setSelectedRole}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Store Level">Store Level</SelectItem>
-                  <SelectItem value="DM">DM</SelectItem>
-                  <SelectItem value="Director">Director</SelectItem>
-                  <SelectItem value="Admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Button 
-              onClick={handleSaveHierarchy} 
-              disabled={loading || !selectedUser}
-              className="w-full"
-            >
-              <Save className="h-4 w-4 mr-2" />
-              {loading ? 'Saving...' : 'Save Hierarchy'}
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* User List with Management Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>User Management</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3 max-h-96 overflow-y-auto">
-              {users.map((user) => {
-                const userHierarchy = getCurrentHierarchy(user.user_id);
-                const userNotif = notifications.find(n => n.user_id === user.user_id);
-                const userPerm = permissions.find(p => p.user_id === user.user_id);
-                
-                return (
-                  <div key={user.user_id} className="p-3 border rounded-md bg-muted/50">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="font-medium">{getUserDisplayName(user)}</div>
-                        <div className="text-sm text-muted-foreground">
-                          Role: {userHierarchy?.role || 'Store Level'}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          Manager: {getManagerName(userHierarchy?.manager_id)}
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          Markets: {userPerm?.markets?.length || 0} | Stores: {userPerm?.stores?.length || 0}
-                        </div>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleManageUser(user.user_id)}
-                      >
-                        Manage
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* User Management Panel */}
-      {managingUser && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* User Information Management */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <UserCheck className="h-5 w-5" />
-                User Information
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Managing: {getUserDisplayName(users.find(u => u.user_id === managingUser)!)}
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="display_name">Display Name</Label>
-                <Input
-                  id="display_name"
-                  value={editingDisplayName}
-                  onChange={(e) => setEditingDisplayName(e.target.value)}
-                  placeholder="Enter display name for tagging"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  This name will be used when tagging users (e.g., @{editingDisplayName || 'Display Name'})
-                </p>
-              </div>
-
-              <div>
-                <Label htmlFor="user_email">Email Address</Label>
-                <Input
-                  id="user_email"
-                  type="email"
-                  value={editingEmail}
-                  onChange={(e) => setEditingEmail(e.target.value)}
-                  placeholder="Enter email address for notifications"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  This email will be used for sending notifications
-                </p>
-              </div>
-
-              <Button onClick={handleSaveDisplayName} disabled={loading || !editingDisplayName.trim() || !editingEmail.trim()} className="w-full">
-                <Save className="h-4 w-4 mr-2" />
-                Save User Information
-              </Button>
-            </CardContent>
-          </Card>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Users className="h-6 w-6" />
+          <h1 className="text-3xl font-bold">User Management System</h1>
+          <Badge variant="secondary" className="ml-2">Admin Only</Badge>
         </div>
-      )}
-
-      {/* Notification & Permissions Panel */}
-      {managingUser && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Notification Preferences */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                Notification Preferences
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Managing: {getUserDisplayName(users.find(u => u.user_id === managingUser)!)}
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="email_completion"
-                  checked={userNotifications.email_on_completion}
-                  onCheckedChange={(checked) => 
-                    setUserNotifications(prev => ({ ...prev, email_on_completion: checked as boolean }))
-                  }
-                />
-                <Label htmlFor="email_completion" className="text-sm">
-                  Email on work order completion
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="email_tagged"
-                  checked={userNotifications.email_on_tagged}
-                  onCheckedChange={(checked) => 
-                    setUserNotifications(prev => ({ ...prev, email_on_tagged: checked as boolean }))
-                  }
-                />
-                <Label htmlFor="email_tagged" className="text-sm">
-                  Email when tagged in notes
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="email_assignment"
-                  checked={userNotifications.email_on_assignment}
-                  onCheckedChange={(checked) => 
-                    setUserNotifications(prev => ({ ...prev, email_on_assignment: checked as boolean }))
-                  }
-                />
-                <Label htmlFor="email_assignment" className="text-sm">
-                  Email on work order assignment
-                </Label>
-              </div>
-
-              <Button onClick={handleSaveNotifications} disabled={loading} className="w-full">
-                <Save className="h-4 w-4 mr-2" />
-                Save Notifications
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Market & Store Permissions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Map className="h-5 w-5" />
-                Access Permissions
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Markets */}
-              <div>
-                <Label className="text-sm font-medium">
-                  Markets {hierarchy.find(h => h.user_id === managingUser)?.role === 'Store Level' ? '(Single Selection)' : '(Multiple Allowed)'}
-                </Label>
-                <div className="flex gap-2 mt-1">
-                  <Select value={selectedMarket} onValueChange={setSelectedMarket}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select market" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {markets.map((market) => (
-                        <SelectItem key={market} value={market}>
-                          {market}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button onClick={addMarket} size="sm" disabled={!selectedMarket}>Add</Button>
-                </div>
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {userPermissions.markets.map((market) => (
-                    <div key={market} className="bg-secondary text-secondary-foreground px-2 py-1 rounded text-xs flex items-center gap-1">
-                      {market}
-                      <button
-                        onClick={() => removeMarket(market)}
-                        className="text-xs hover:text-destructive"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Stores */}
-              <div>
-                <Label className="text-sm font-medium">
-                  Store Number {hierarchy.find(h => h.user_id === managingUser)?.role === 'Store Level' ? '(Single Selection)' : '(Multiple Allowed)'}
-                </Label>
-                <div className="flex gap-2 mt-1">
-                  <Select value={selectedStore} onValueChange={setSelectedStore}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select store" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {storeNumbers.map((store) => (
-                        <SelectItem key={store} value={store}>
-                          {store}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button onClick={addStore} size="sm" disabled={!selectedStore}>Add</Button>
-                </div>
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {userPermissions.stores.map((store) => (
-                    <div key={store} className="bg-secondary text-secondary-foreground px-2 py-1 rounded text-xs flex items-center gap-1">
-                      {store}
-                      <button
-                        onClick={() => removeStore(store)}
-                        className="text-xs hover:text-destructive"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <Button onClick={handleSavePermissions} disabled={loading} className="w-full">
-                <Save className="h-4 w-4 mr-2" />
-                Save Permissions
-              </Button>
-
-              <Button 
-                variant="outline" 
-                onClick={() => setManagingUser('')} 
-                className="w-full"
-              >
-                Close
-              </Button>
-            </CardContent>
-          </Card>
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder="Search users..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-64"
+          />
+          <Button onClick={loadAllUsers} disabled={loading}>
+            {loading ? 'Refreshing...' : 'Refresh'}
+          </Button>
         </div>
-      )}
+      </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>System Information</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            All Users ({filteredUsers.length})
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-md">
-            <h4 className="font-medium mb-2">Email Notifications</h4>
-            <p className="text-sm text-muted-foreground">
-              Completion notifications are sent up the management hierarchy. Tagged notifications go directly to mentioned users.
-            </p>
-          </div>
-          
-          <div className="p-4 bg-green-50 dark:bg-green-950 rounded-md">
-            <h4 className="font-medium mb-2">Access Permissions</h4>
-            <p className="text-sm text-muted-foreground">
-              Market and store permissions control which work orders users can view. Empty permissions = access to all.
-            </p>
-          </div>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredUsers.map((userData) => (
+              <Card key={userData.profile.user_id} className="cursor-pointer hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1">
+                      <div className="font-semibold text-base">
+                        {getUserDisplayName(userData.profile)}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {userData.profile.email}
+                      </div>
+                    </div>
+                    <Badge variant={userData.hierarchy?.role === 'Admin' ? 'destructive' : 'secondary'}>
+                      {userData.hierarchy?.role || 'Store Level'}
+                    </Badge>
+                  </div>
+                  
+                  <div className="space-y-2 text-xs text-muted-foreground mb-3">
+                    <div className="flex items-center gap-1">
+                      <Network className="h-3 w-3" />
+                      Manager: {getManagerName(userData.hierarchy?.manager_id)}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Map className="h-3 w-3" />
+                      Markets: {userData.permissions?.markets?.length || 0}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Store className="h-3 w-3" />
+                      Stores: {userData.permissions?.stores?.length || 0}
+                    </div>
+                  </div>
 
-          <div className="p-4 bg-yellow-50 dark:bg-yellow-950 rounded-md">
-            <h4 className="font-medium mb-2">Tagging Users</h4>
-            <p className="text-sm text-muted-foreground">
-              Tag users in notes using @DisplayName format (e.g., @John Smith). Set display names above for easy tagging.
-            </p>
+                  <Button 
+                    onClick={() => openUserDialog(userData)}
+                    className="w-full"
+                    size="sm"
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Manage User
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </CardContent>
       </Card>
+
+      {/* User Management Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5" />
+              Manage User: {selectedUser ? getUserDisplayName(selectedUser.profile) : ''}
+            </DialogTitle>
+          </DialogHeader>
+
+          <Tabs defaultValue="basic" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="basic">Basic Info</TabsTrigger>
+              <TabsTrigger value="hierarchy">Role & Manager</TabsTrigger>
+              <TabsTrigger value="notifications">Notifications</TabsTrigger>
+              <TabsTrigger value="permissions">Permissions</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="basic" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="display_name">Display Name</Label>
+                  <Input
+                    id="display_name"
+                    value={formData.display_name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, display_name: e.target.value }))}
+                    placeholder="Name for tagging (@mentions)"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="Email for notifications"
+                  />
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="hierarchy" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="role">Role</Label>
+                  <Select 
+                    value={formData.role} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border border-border">
+                      {roles.map((role) => (
+                        <SelectItem key={role} value={role}>
+                          {role}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="manager">Manager (Optional)</Label>
+                  <Select 
+                    value={formData.manager_id} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, manager_id: value === 'none' ? '' : value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select manager" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border border-border">
+                      <SelectItem value="none">No Manager</SelectItem>
+                      {users
+                        .filter(u => u.profile.user_id !== selectedUser?.profile.user_id)
+                        .map((userData) => (
+                          <SelectItem key={userData.profile.user_id} value={userData.profile.user_id}>
+                            {getUserDisplayName(userData.profile)}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="notifications" className="space-y-4">
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="email_completion"
+                    checked={formData.email_on_completion}
+                    onCheckedChange={(checked) => 
+                      setFormData(prev => ({ ...prev, email_on_completion: checked as boolean }))
+                    }
+                  />
+                  <Label htmlFor="email_completion">Email on work order completion</Label>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="email_tagged"
+                    checked={formData.email_on_tagged}
+                    onCheckedChange={(checked) => 
+                      setFormData(prev => ({ ...prev, email_on_tagged: checked as boolean }))
+                    }
+                  />
+                  <Label htmlFor="email_tagged">Email when tagged in notes</Label>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="email_assignment"
+                    checked={formData.email_on_assignment}
+                    onCheckedChange={(checked) => 
+                      setFormData(prev => ({ ...prev, email_on_assignment: checked as boolean }))
+                    }
+                  />
+                  <Label htmlFor="email_assignment">Email on work order assignment</Label>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="permissions" className="space-y-4">
+              <div className="space-y-6">
+                {/* Markets */}
+                <div>
+                  <Label className="text-sm font-medium">
+                    Markets {formData.role === 'Store Level' ? '(Single Selection)' : '(Multiple Allowed)'}
+                  </Label>
+                  <div className="flex gap-2 mt-2">
+                    <Select value={selectedMarket} onValueChange={setSelectedMarket}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select market" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background border border-border">
+                        {markets.map((market) => (
+                          <SelectItem key={market} value={market}>
+                            {market}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button onClick={addMarket} size="sm" disabled={!selectedMarket}>
+                      Add
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {formData.markets.map((market) => (
+                      <Badge key={market} variant="secondary" className="flex items-center gap-1">
+                        {market}
+                        <X 
+                          className="h-3 w-3 cursor-pointer hover:text-destructive" 
+                          onClick={() => removeMarket(market)}
+                        />
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Stores */}
+                <div>
+                  <Label className="text-sm font-medium">
+                    Stores {formData.role === 'Store Level' ? '(Single Selection)' : '(Multiple Allowed)'}
+                  </Label>
+                  <div className="flex gap-2 mt-2">
+                    <Select value={selectedStore} onValueChange={setSelectedStore}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select store" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background border border-border">
+                        {storeNumbers.map((store) => (
+                          <SelectItem key={store} value={store}>
+                            {store}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button onClick={addStore} size="sm" disabled={!selectedStore}>
+                      Add
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {formData.stores.map((store) => (
+                      <Badge key={store} variant="secondary" className="flex items-center gap-1">
+                        {store}
+                        <X 
+                          className="h-3 w-3 cursor-pointer hover:text-destructive" 
+                          onClick={() => removeStore(store)}
+                        />
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-muted/50 p-4 rounded-lg">
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Note:</strong> Admin role users have access to all stores and markets regardless of permissions set here. 
+                    Empty permissions for other roles means access to all locations.
+                  </p>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveUser} disabled={loading}>
+              <Save className="h-4 w-4 mr-2" />
+              {loading ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
