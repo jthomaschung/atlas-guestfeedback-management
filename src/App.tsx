@@ -7,6 +7,8 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppSidebar } from '@/components/AppSidebar';
 import { NotificationBell } from '@/components/NotificationBell';
+import { Button } from '@/components/ui/button';
+import { LogOut } from 'lucide-react';
 import Welcome from '@/pages/Welcome';
 import Index from '@/pages/Index';
 import SubmitWorkOrder from '@/pages/SubmitWorkOrder';
@@ -19,7 +21,7 @@ import UserHierarchy from '@/pages/UserHierarchy';
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   
   if (loading) {
     return (
@@ -46,7 +48,18 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
                 <span className="ml-2 text-sm text-atlas-dark-foreground/80">Facilities Management Portal</span>
               </div>
             </div>
-            <NotificationBell />
+            <div className="flex items-center gap-4">
+              <NotificationBell />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={signOut}
+                className="text-atlas-dark-foreground hover:text-atlas-red hover:bg-atlas-red/10"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </header>
           <main className="flex-1 overflow-auto bg-background">
             {children}
