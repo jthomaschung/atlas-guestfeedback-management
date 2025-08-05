@@ -212,7 +212,8 @@ export default function UserHierarchy() {
       const userId = selectedUser.profile.user_id;
 
       // Update profile
-      await supabase
+      console.log('Updating profile for user:', userId, formData.display_name);
+      const { error: profileError } = await supabase
         .from('profiles')
         .update({
           display_name: formData.display_name.trim(),
@@ -220,9 +221,14 @@ export default function UserHierarchy() {
         })
         .eq('user_id', userId);
 
+      if (profileError) {
+        console.error('Profile update error:', profileError);
+        throw profileError;
+      }
+
       // Update or insert hierarchy
       if (selectedUser.hierarchy) {
-        await supabase
+        const { error: hierarchyError } = await supabase
           .from('user_hierarchy')
           .update({
             role: formData.role,
@@ -230,8 +236,13 @@ export default function UserHierarchy() {
             director_id: formData.director_id || null
           })
           .eq('user_id', userId);
+
+        if (hierarchyError) {
+          console.error('Hierarchy update error:', hierarchyError);
+          throw hierarchyError;
+        }
       } else {
-        await supabase
+        const { error: hierarchyError } = await supabase
           .from('user_hierarchy')
           .insert({
             user_id: userId,
@@ -239,11 +250,16 @@ export default function UserHierarchy() {
             manager_id: formData.manager_id || null,
             director_id: formData.director_id || null
           });
+
+        if (hierarchyError) {
+          console.error('Hierarchy insert error:', hierarchyError);
+          throw hierarchyError;
+        }
       }
 
       // Update or insert notifications
       if (selectedUser.notifications) {
-        await supabase
+        const { error: notificationError } = await supabase
           .from('notification_preferences')
           .update({
             email_on_completion: formData.email_on_completion,
@@ -251,8 +267,13 @@ export default function UserHierarchy() {
             email_on_assignment: formData.email_on_assignment
           })
           .eq('user_id', userId);
+
+        if (notificationError) {
+          console.error('Notification update error:', notificationError);
+          throw notificationError;
+        }
       } else {
-        await supabase
+        const { error: notificationError } = await supabase
           .from('notification_preferences')
           .insert({
             user_id: userId,
@@ -260,25 +281,40 @@ export default function UserHierarchy() {
             email_on_tagged: formData.email_on_tagged,
             email_on_assignment: formData.email_on_assignment
           });
+
+        if (notificationError) {
+          console.error('Notification insert error:', notificationError);
+          throw notificationError;
+        }
       }
 
       // Update or insert permissions
       if (selectedUser.permissions) {
-        await supabase
+        const { error: permissionError } = await supabase
           .from('user_permissions')
           .update({
             markets: formData.markets,
             stores: formData.stores
           })
           .eq('user_id', userId);
+
+        if (permissionError) {
+          console.error('Permission update error:', permissionError);
+          throw permissionError;
+        }
       } else {
-        await supabase
+        const { error: permissionError } = await supabase
           .from('user_permissions')
           .insert({
             user_id: userId,
             markets: formData.markets,
             stores: formData.stores
           });
+
+        if (permissionError) {
+          console.error('Permission insert error:', permissionError);
+          throw permissionError;
+        }
       }
 
       toast({
@@ -288,11 +324,12 @@ export default function UserHierarchy() {
 
       setIsDialogOpen(false);
       await loadAllUsers();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving user:', error);
+      const errorMessage = error?.message || 'Failed to save user';
       toast({
         title: "Error",
-        description: "Failed to save user",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
