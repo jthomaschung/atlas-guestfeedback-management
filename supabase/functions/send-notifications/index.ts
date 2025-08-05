@@ -207,7 +207,7 @@ const handler = async (req: Request): Promise<Response> => {
           .from('notification_preferences')
           .select('email_on_tagged')
           .eq('user_id', taggedProfile.user_id)
-          .single();
+          .maybeSingle();
 
         console.log('Notification preferences lookup:', { notificationPrefs, prefsError });
 
