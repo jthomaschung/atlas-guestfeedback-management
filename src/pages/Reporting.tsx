@@ -331,6 +331,7 @@ const Reporting = () => {
                     .map(([status, count]) => ({
                       name: status === 'pending-approval' ? 'Pending Approval' : 
                             status === 'in-progress' ? 'In Progress' : 
+                            status === 'pending' ? 'Pending' :
                             status.charAt(0).toUpperCase() + status.slice(1),
                       value: count,
                       fill: status === 'pending' ? 'hsl(45, 93%, 47%)' :
