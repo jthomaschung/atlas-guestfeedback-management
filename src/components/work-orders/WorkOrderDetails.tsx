@@ -214,8 +214,8 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     const noteWithUserAndTimestamp = `${format(new Date(), 'MMM d, yyyy h:mm a')} - ${userName}: ${newNote.trim()}`;
     const updatedNotes = [...(workOrder.notes || []), noteWithUserAndTimestamp];
     
-    // Check for @mentions in the note using display names
-    const mentions = newNote.match(/@(\w+(?:\s+\w+)*)/g) || [];
+    // Check for @mentions in the note using display names (improved regex to stop at word boundaries)
+    const mentions = newNote.match(/@([A-Za-z]+(?:\s+[A-Za-z]+)*?)(?=\s|$|[^A-Za-z\s])/g) || [];
     console.log('Found mentions in note:', mentions);
     console.log('New note content:', newNote);
     
