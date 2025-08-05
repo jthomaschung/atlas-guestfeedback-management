@@ -106,6 +106,35 @@ const SubmitWorkOrder = () => {
           onCancel={handleCancel}
         />
       </div>
+
+      <div className="mt-6 bg-accent border rounded-lg p-6">
+        <h2 className="text-xl font-semibold text-foreground mb-4">
+          After-Hours Emergency Instructions
+        </h2>
+        <p className="text-sm text-muted-foreground mb-4">
+          (Office Hours M-F 8am - 5pm PST)
+        </p>
+        <div className="space-y-3 text-foreground">
+          <div className="flex items-start gap-2">
+            <span>📞</span>
+            <div>
+              <strong>Call:</strong> 800-626-0563 for immediate assistance.
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <span>📧</span>
+            <div>
+              <strong>Email:</strong> facilities@atlaswe.com to document the issue.
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <span>🚨</span>
+            <div>
+              <strong>For Life-Safety Issues:</strong> Contact local emergency services first, then report to the maintenance team or manager.
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
