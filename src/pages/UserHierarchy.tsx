@@ -212,15 +212,17 @@ export default function UserHierarchy() {
       const userId = selectedUser.profile.user_id;
 
       // Update profile
-      console.log('Updating profile for user:', userId, formData.display_name);
-      const { error: profileError } = await supabase
+      console.log('Updating profile for user:', userId, 'Display Name:', formData.display_name);
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .update({
           display_name: formData.display_name.trim(),
           email: formData.email.trim()
         })
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .select();
 
+      console.log('Profile update result:', { profileData, profileError });
       if (profileError) {
         console.error('Profile update error:', profileError);
         throw profileError;
