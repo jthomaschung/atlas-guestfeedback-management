@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart3, TrendingUp, Clock, CheckCircle, Loader2 } from "lucide-react";
+import { BarChart3, TrendingUp, Clock, CheckCircle, Loader2, AlertTriangle } from "lucide-react";
 import { WorkOrder, WorkOrderStatus, WorkOrderPriority } from "@/types/work-order";
 import { ReportingFilters } from "@/components/work-orders/ReportingFilters";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,14 +9,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import { isWorkOrderOverdue } from "@/lib/utils";
 
 interface ReportingStats {
   averageCompletionTime: number;
-  completionRate: number;
+  overdueTickets: number;
   criticalIssues: number;
   activeWorkOrders: number;
   statusDistribution: Record<WorkOrderStatus, number>;
   repairTypeDistribution: Record<string, number>;
+  marketDistribution: Record<string, number>;
 }
 
 const Reporting = () => {
@@ -103,8 +105,14 @@ const Reporting = () => {
   const calculateStats = (workOrdersToCalculate: WorkOrder[]): ReportingStats => {
     const total = workOrdersToCalculate.length;
     const completed = workOrdersToCalculate.filter(wo => wo.status === 'completed');
-    const active = workOrdersToCalculate.filter(wo => wo.status === 'pending' || wo.status === 'in-progress');
+    // Active work orders should include all statuses except completed
+    const active = workOrdersToCalculate.filter(wo => wo.status !== 'completed');
     const critical = workOrdersToCalculate.filter(wo => wo.priority === 'Critical');
+    
+    // Calculate overdue tickets
+    const overdue = workOrdersToCalculate.filter(wo => 
+      wo.status !== 'completed' && isWorkOrderOverdue(wo.created_at, wo.priority)
+    );
 
     // Calculate average completion time
     const completionTimes = completed
@@ -118,9 +126,6 @@ const Reporting = () => {
     const averageCompletionTime = completionTimes.length > 0 
       ? completionTimes.reduce((sum, time) => sum + time, 0) / completionTimes.length 
       : 0;
-
-    // Calculate completion rate
-    const completionRate = total > 0 ? (completed.length / total) * 100 : 0;
 
     // Status distribution
     const statusDistribution: Record<WorkOrderStatus, number> = {
@@ -140,13 +145,21 @@ const Reporting = () => {
       repairTypeDistribution[wo.repair_type] = (repairTypeDistribution[wo.repair_type] || 0) + 1;
     });
 
+    // Market distribution for open tickets
+    const marketDistribution: Record<string, number> = {};
+    const openTickets = workOrdersToCalculate.filter(wo => wo.status !== 'completed');
+    openTickets.forEach(wo => {
+      marketDistribution[wo.market] = (marketDistribution[wo.market] || 0) + 1;
+    });
+
     return {
       averageCompletionTime,
-      completionRate,
+      overdueTickets: overdue.length,
       criticalIssues: critical.length,
       activeWorkOrders: active.length,
       statusDistribution,
-      repairTypeDistribution
+      repairTypeDistribution,
+      marketDistribution
     };
   };
 
@@ -257,13 +270,13 @@ const Reporting = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Overdue Tickets</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.completionRate.toFixed(0)}%</div>
+            <div className="text-2xl font-bold">{stats.overdueTickets}</div>
             <p className="text-xs text-muted-foreground">
-              {stats.statusDistribution.completed} of {Object.values(stats.statusDistribution).reduce((a, b) => a + b, 0)} orders completed
+              Past due date work orders
             </p>
           </CardContent>
         </Card>
@@ -289,13 +302,13 @@ const Reporting = () => {
           <CardContent>
             <div className="text-2xl font-bold">{stats.activeWorkOrders}</div>
             <p className="text-xs text-muted-foreground">
-              Pending + In Progress
+              All work orders except completed
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Work Orders by Status</CardTitle>
@@ -355,6 +368,76 @@ const Reporting = () => {
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
               </PieChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Open Tickets by Market</CardTitle>
+            <CardDescription>
+              Distribution of open work orders across markets
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer
+              config={{
+                count: {
+                  label: "Open Tickets",
+                  color: "hsl(var(--chart-2))",
+                },
+              }}
+              className="h-[300px]"
+            >
+              <BarChart
+                data={Object.entries(stats.marketDistribution)
+                  .sort(([,a], [,b]) => b - a)
+                  .map(([market, count], index) => {
+                    const colors = [
+                      'hsl(213, 94%, 68%)', // Blue
+                      'hsl(142, 69%, 58%)', // Green  
+                      'hsl(45, 93%, 47%)',  // Orange
+                      'hsl(262, 83%, 58%)', // Purple
+                      'hsl(0, 84%, 60%)',   // Red
+                      'hsl(173, 58%, 39%)', // Teal
+                      'hsl(48, 96%, 53%)',  // Yellow
+                      'hsl(280, 100%, 70%)', // Pink
+                    ];
+                    
+                    return {
+                      name: market,
+                      count,
+                      fill: colors[index % colors.length]
+                    };
+                  })}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 40,
+                }}
+              >
+                <XAxis 
+                  dataKey="name" 
+                  fontSize={12}
+                />
+                <YAxis />
+                <ChartTooltip 
+                  content={({ active, payload, label }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload;
+                      return (
+                        <div className="bg-background border border-border p-3 rounded-lg shadow-lg">
+                          <p className="font-medium text-foreground">{data.name}</p>
+                          <p className="text-sm text-muted-foreground">Open Tickets: {data.count}</p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Bar dataKey="count" />
+              </BarChart>
             </ChartContainer>
           </CardContent>
         </Card>
