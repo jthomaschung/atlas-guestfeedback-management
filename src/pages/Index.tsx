@@ -182,6 +182,26 @@ const Index = () => {
         return;
       }
 
+      // Send critical notifications for all critical work orders
+      console.log('Dashboard: Checking if critical notification needed:', { priority: formData.priority, workOrderId: data.id });
+      if (formData.priority === 'Critical') {
+        console.log('Dashboard: Critical work order created, sending notification...');
+        try {
+          const result = await supabase.functions.invoke('send-notifications', {
+            body: {
+              type: 'critical_creation',
+              workOrderId: data.id
+            }
+          });
+          console.log('Dashboard: Critical notification result:', result);
+        } catch (notificationError) {
+          console.error('Dashboard: Error sending critical notification:', notificationError);
+          // Don't fail the work order creation if notification fails
+        }
+      } else {
+        console.log('Dashboard: Not a critical work order, skipping notification');
+      }
+
       // Add the new work order to the local state
       setWorkOrders(prev => [data as WorkOrder, ...prev]);
       setIsFormOpen(false);
