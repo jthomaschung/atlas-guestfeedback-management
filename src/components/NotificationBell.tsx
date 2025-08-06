@@ -143,6 +143,7 @@ export function NotificationBell() {
 
   const markNotificationAsRead = async (notificationId: string) => {
     try {
+      console.log('Marking notification as read:', notificationId);
       const { error } = await supabase
         .from('notification_log')
         .update({ read_at: new Date().toISOString() })
@@ -150,14 +151,25 @@ export function NotificationBell() {
 
       if (error) {
         console.error('Error marking notification as read:', error);
+        toast({
+          title: "Error",
+          description: "Failed to mark notification as read",
+          variant: "destructive"
+        });
         return;
       }
 
+      console.log('Successfully marked notification as read');
       // Refresh notifications and count
       await fetchRecentNotifications();
       refresh();
     } catch (error) {
       console.error('Error in markNotificationAsRead:', error);
+      toast({
+        title: "Error", 
+        description: "Failed to mark notification as read",
+        variant: "destructive"
+      });
     }
   };
 
@@ -165,6 +177,7 @@ export function NotificationBell() {
     if (!user?.email) return;
 
     try {
+      console.log('Clearing all notifications for:', user.email);
       const { error } = await supabase
         .from('notification_log')
         .update({ read_at: new Date().toISOString() })
@@ -181,6 +194,7 @@ export function NotificationBell() {
         return;
       }
 
+      console.log('Successfully cleared all notifications');
       // Refresh notifications and count
       await fetchRecentNotifications();
       refresh();
