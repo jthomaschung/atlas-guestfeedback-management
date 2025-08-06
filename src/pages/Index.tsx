@@ -67,6 +67,21 @@ const Index = () => {
       fetchWorkOrders();
     }
   }, [user]);
+
+  // Handle workOrderId query parameter from email links
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const workOrderId = urlParams.get('workOrderId');
+    
+    if (workOrderId && workOrders.length > 0) {
+      const workOrder = workOrders.find(wo => wo.id === workOrderId);
+      if (workOrder) {
+        setViewingWorkOrder(workOrder);
+        // Clean up the URL parameter
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  }, [workOrders]);
   
   const filteredWorkOrders = useMemo(() => {
     return workOrders.filter(wo => {
