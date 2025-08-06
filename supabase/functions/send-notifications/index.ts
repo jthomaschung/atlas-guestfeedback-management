@@ -226,24 +226,49 @@ const handler = async (req: Request): Promise<Response> => {
               to: [taggedProfile.email],
               subject: `You've Been Tagged - Store ${workOrder.store_number} - ${workOrder.repair_type}`,
               html: `
-              <h2>You've Been Tagged in a Work Order Note</h2>
-              <p><strong>Work Order ID:</strong> ${workOrder.id.slice(0, 8)}</p>
-              <p><strong>Store Number:</strong> ${workOrder.store_number}</p>
-              <p><strong>Market:</strong> ${workOrder.market}</p>
-              <p><strong>Repair Type:</strong> ${workOrder.repair_type}</p>
-              <p><strong>Priority:</strong> ${workOrder.priority}</p>
-              <p><strong>EcoSure Level:</strong> ${workOrder.ecosure}</p>
-              <p><strong>Status:</strong> ${workOrder.status}</p>
-              <p><strong>Description:</strong> ${workOrder.description}</p>
-              <p><strong>Assignee:</strong> ${workOrder.assignee || 'Not assigned'}</p>
-              <p><strong>Created Date:</strong> ${new Date(workOrder.created_at).toLocaleDateString()}</p>
-              <p><strong>Created by:</strong> ${creatorProfile?.first_name} ${creatorProfile?.last_name} (${creatorProfile?.email})</p>
-              ${workOrder.image_url ? `<p><strong>Image:</strong> <a href="${workOrder.image_url}">View Image</a></p>` : ''}
-              ${workOrder.notes && workOrder.notes.length > 0 ? `<p><strong>Previous Notes:</strong><br>${workOrder.notes.join('<br>')}</p>` : ''}
-              <br>
-              <p><strong>New Note:</strong> ${note}</p>
-              <br>
-              <p>Tagged by: ${creatorProfile?.first_name} ${creatorProfile?.last_name} (${creatorProfile?.email})</p>
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8fafc; padding: 20px;">
+                <div style="background-color: #ffffff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                  <div style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; text-align: center;">
+                    <h2 style="margin: 0; font-size: 24px; font-weight: bold;">🏷️ You've Been Tagged</h2>
+                    <p style="margin: 8px 0 0 0; opacity: 0.9;">in a Work Order Note</p>
+                  </div>
+                  
+                  <div style="background-color: #f1f5f9; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 15px 0; color: #1e293b; font-size: 18px;">Work Order Details</h3>
+                    <div style="display: grid; gap: 8px;">
+                      <div><strong style="color: #475569;">Store Number:</strong> <span style="color: #1e293b;">${workOrder.store_number}</span></div>
+                      <div><strong style="color: #475569;">Market:</strong> <span style="color: #1e293b;">${workOrder.market}</span></div>
+                      <div><strong style="color: #475569;">Repair Type:</strong> <span style="color: #1e293b;">${workOrder.repair_type}</span></div>
+                      <div><strong style="color: #475569;">Priority:</strong> <span style="background-color: ${workOrder.priority === 'Critical' ? '#dc2626' : workOrder.priority === 'High' ? '#ea580c' : workOrder.priority === 'Medium' ? '#d97706' : '#65a30d'}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">${workOrder.priority}</span></div>
+                      <div><strong style="color: #475569;">Status:</strong> <span style="color: #1e293b;">${workOrder.status}</span></div>
+                      <div><strong style="color: #475569;">Description:</strong> <span style="color: #1e293b;">${workOrder.description}</span></div>
+                      <div><strong style="color: #475569;">Assignee:</strong> <span style="color: #1e293b;">${workOrder.assignee || 'Not assigned'}</span></div>
+                      <div><strong style="color: #475569;">Created Date:</strong> <span style="color: #1e293b;">${new Date(workOrder.created_at).toLocaleDateString()}</span></div>
+                      ${workOrder.image_url ? `<div><strong style="color: #475569;">Image:</strong> <a href="${workOrder.image_url}" style="color: #3b82f6; text-decoration: underline;">View Image</a></div>` : ''}
+                    </div>
+                  </div>
+                  
+                  ${workOrder.notes && workOrder.notes.length > 0 ? `
+                  <div style="background-color: #f8fafc; border-left: 4px solid #94a3b8; padding: 15px; margin-bottom: 20px; border-radius: 0 8px 8px 0;">
+                    <strong style="color: #475569;">Previous Notes:</strong>
+                    <div style="margin-top: 8px; color: #64748b; font-style: italic;">${workOrder.notes.join('<br>')}</div>
+                  </div>
+                  ` : ''}
+                  
+                  <div style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+                    <strong style="font-size: 16px;">📝 New Note:</strong>
+                    <div style="margin-top: 8px; background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 6px; font-size: 15px;">${note}</div>
+                  </div>
+                  
+                  <div style="border-top: 2px solid #e2e8f0; padding-top: 20px; text-align: center;">
+                    <div style="background-color: #fef3c7; border: 1px solid #f59e0b; color: #92400e; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
+                      <strong>⚠️ Please don't reply to this email</strong><br>
+                      <span style="font-size: 14px;">Respond back on the Facilities Management Portal</span>
+                    </div>
+                    <p style="color: #64748b; font-size: 12px; margin: 0;">This is an automated notification from the Facilities Management System</p>
+                  </div>
+                </div>
+              </div>
             `,
             });
 
