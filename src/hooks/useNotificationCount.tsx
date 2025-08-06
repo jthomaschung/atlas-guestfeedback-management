@@ -25,6 +25,7 @@ export function useNotificationCount() {
         .select('notification_type')
         .eq('recipient_email', user.email)
         .eq('status', 'sent')
+        .is('read_at', null)
         .gte('sent_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()); // Last 7 days
 
       if (error) {

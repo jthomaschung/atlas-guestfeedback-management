@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           id: string
           notification_type: string
+          read_at: string | null
           recipient_email: string
           sent_at: string
           status: string | null
@@ -26,6 +27,7 @@ export type Database = {
         Insert: {
           id?: string
           notification_type: string
+          read_at?: string | null
           recipient_email: string
           sent_at?: string
           status?: string | null
@@ -34,6 +36,7 @@ export type Database = {
         Update: {
           id?: string
           notification_type?: string
+          read_at?: string | null
           recipient_email?: string
           sent_at?: string
           status?: string | null

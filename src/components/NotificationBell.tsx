@@ -1,4 +1,4 @@
-import { Bell } from 'lucide-react';
+import { Bell, X, CheckCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { WorkOrder } from '@/types/work-order';
+import { useToast } from '@/hooks/use-toast';
 
 interface NotificationWithWorkOrder {
   id: string;
@@ -41,11 +42,12 @@ interface NotificationWithWorkOrder {
 }
 
 export function NotificationBell() {
-  const { count, loading } = useNotificationCount();
+  const { count, loading, refresh } = useNotificationCount();
   const [notifications, setNotifications] = useState<NotificationWithWorkOrder[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedWorkOrder, setSelectedWorkOrder] = useState<WorkOrder | null>(null);
   const { user } = useAuth();
+  const { toast } = useToast();
 
   const fetchRecentNotifications = async () => {
     if (!user?.email) return;
@@ -57,6 +59,7 @@ export function NotificationBell() {
         .select('*')
         .eq('recipient_email', user.email)
         .eq('status', 'sent')
+        .is('read_at', null)
         .order('sent_at', { ascending: false })
         .limit(10);
 
@@ -111,7 +114,10 @@ export function NotificationBell() {
     }
   };
 
-  const handleNotificationClick = (notification: NotificationWithWorkOrder) => {
+  const handleNotificationClick = async (notification: NotificationWithWorkOrder) => {
+    // Mark notification as read
+    await markNotificationAsRead(notification.id);
+    
     if (notification.work_order) {
       const workOrder: WorkOrder = {
         id: notification.work_order.id,
@@ -132,6 +138,64 @@ export function NotificationBell() {
       };
       setSelectedWorkOrder(workOrder);
       setIsOpen(false);
+    }
+  };
+
+  const markNotificationAsRead = async (notificationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('notification_log')
+        .update({ read_at: new Date().toISOString() })
+        .eq('id', notificationId);
+
+      if (error) {
+        console.error('Error marking notification as read:', error);
+        return;
+      }
+
+      // Refresh notifications and count
+      await fetchRecentNotifications();
+      refresh();
+    } catch (error) {
+      console.error('Error in markNotificationAsRead:', error);
+    }
+  };
+
+  const clearAllNotifications = async () => {
+    if (!user?.email) return;
+
+    try {
+      const { error } = await supabase
+        .from('notification_log')
+        .update({ read_at: new Date().toISOString() })
+        .eq('recipient_email', user.email)
+        .is('read_at', null);
+
+      if (error) {
+        console.error('Error clearing all notifications:', error);
+        toast({
+          title: "Error",
+          description: "Failed to clear notifications",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Refresh notifications and count
+      await fetchRecentNotifications();
+      refresh();
+      
+      toast({
+        title: "Notifications Cleared",
+        description: "All notifications have been marked as read",
+      });
+    } catch (error) {
+      console.error('Error in clearAllNotifications:', error);
+      toast({
+        title: "Error",
+        description: "Failed to clear notifications",
+        variant: "destructive"
+      });
     }
   };
 
@@ -178,10 +242,25 @@ export function NotificationBell() {
         <PopoverContent className="w-80 p-0" align="end">
           <Card className="border-0 shadow-lg">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Notifications</CardTitle>
-              <CardDescription>
-                Recent activity and mentions
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg">Notifications</CardTitle>
+                  <CardDescription>
+                    Recent activity and mentions
+                  </CardDescription>
+                </div>
+                {notifications.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearAllNotifications}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <CheckCheck className="h-4 w-4 mr-1" />
+                    Clear All
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="p-0">
               {loading ? (
@@ -197,25 +276,40 @@ export function NotificationBell() {
                   {notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      className="p-3 border-b border-border last:border-b-0 hover:bg-muted/50 transition-colors cursor-pointer"
-                      onClick={() => handleNotificationClick(notification)}
+                      className="group relative p-3 border-b border-border last:border-b-0 hover:bg-muted/50 transition-colors"
                     >
-                      <div className="flex items-start gap-3">
-                        <span className="text-lg mt-0.5">
-                          {getNotificationIcon(notification.notification_type)}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground">
-                            {getNotificationTitle(notification.notification_type)}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {getNotificationDescription(notification)}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {format(new Date(notification.sent_at), 'MMM d, h:mm a')}
-                          </p>
+                      <div 
+                        className="cursor-pointer"
+                        onClick={() => handleNotificationClick(notification)}
+                      >
+                        <div className="flex items-start gap-3">
+                          <span className="text-lg mt-0.5">
+                            {getNotificationIcon(notification.notification_type)}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-foreground">
+                              {getNotificationTitle(notification.notification_type)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {getNotificationDescription(notification)}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {format(new Date(notification.sent_at), 'MMM d, h:mm a')}
+                            </p>
+                          </div>
                         </div>
                       </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          markNotificationAsRead(notification.id);
+                        }}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
                     </div>
                   ))}
                 </div>
