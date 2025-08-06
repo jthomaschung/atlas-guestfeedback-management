@@ -73,10 +73,9 @@ const SubmitWorkOrder = () => {
         return;
       }
 
-      // Check if this is a critical work order in NE markets - send notification to Grant Gelecki
-      const criticalMarkets = ['NE1', 'NE2', 'NE3', 'NE4'];
-      if (formData.priority === 'Critical' && criticalMarkets.includes(formData.market)) {
-        console.log('Critical work order created in NE market, sending notification...');
+      // Send critical notifications for all critical work orders
+      if (formData.priority === 'Critical') {
+        console.log('Critical work order created, sending notification...');
         try {
           await supabase.functions.invoke('send-notifications', {
             body: {
