@@ -1,1 +1,4 @@
 project_id = "frmjdxziwwlfpgevszga"
+
+[functions.redirect-to-work-order]
+verify_jwt = false

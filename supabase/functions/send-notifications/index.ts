@@ -261,7 +261,7 @@ const handler = async (req: Request): Promise<Response> => {
                   ` : ''}
                   
                   <div style="text-align: center; margin-bottom: 25px;">
-                    <a href="https://59a1a4a4-5107-4cbe-87fb-e1dcf4b1823a.lovableproject.com/dashboard?workOrderId=${workOrderId}" style="background: linear-gradient(135deg, hsl(0, 85%, 45%), hsl(210, 15%, 20%)); color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">View Work Order Details</a>
+                    <a href="https://frmjdxziwwlfpgevszga.supabase.co/functions/v1/redirect-to-work-order?id=${workOrderId}" style="background: linear-gradient(135deg, hsl(0, 85%, 45%), hsl(210, 15%, 20%)); color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">View Work Order Details</a>
                   </div>
                   
                   <div style="border-top: 2px solid hsl(210, 10%, 88%); padding-top: 20px; text-align: center;">
