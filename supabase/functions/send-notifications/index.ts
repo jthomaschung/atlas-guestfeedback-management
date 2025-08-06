@@ -134,10 +134,9 @@ const handler = async (req: Request): Promise<Response> => {
                   
                   <div style="background-color: hsl(210, 10%, 95%); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
                     <h3 style="margin: 0 0 15px 0; color: hsl(210, 15%, 12%); font-size: 18px;">Work Order Details</h3>
-                    <div style="display: grid; gap: 8px;">
-                      <div><strong style="color: hsl(210, 10%, 45%);">Work Order ID:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.id.slice(0, 8)}</span></div>
-                      <div><strong style="color: hsl(210, 10%, 45%);">Store Number:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.store_number}</span></div>
-                      <div><strong style="color: hsl(210, 10%, 45%);">Market:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.market}</span></div>
+                     <div style="display: grid; gap: 8px;">
+                       <div><strong style="color: hsl(210, 10%, 45%);">Store Number:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.store_number}</span></div>
+                       <div><strong style="color: hsl(210, 10%, 45%);">Market:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.market}</span></div>
                       <div><strong style="color: hsl(210, 10%, 45%);">Repair Type:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.repair_type}</span></div>
                       <div><strong style="color: hsl(210, 10%, 45%);">Priority:</strong> <span style="background-color: ${workOrder.priority === 'Critical' ? 'hsl(0, 84%, 60%)' : workOrder.priority === 'High' ? 'hsl(25, 95%, 53%)' : workOrder.priority === 'Medium' ? 'hsl(38, 92%, 50%)' : 'hsl(210, 100%, 56%)'}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">${workOrder.priority}</span></div>
                       <div><strong style="color: hsl(210, 10%, 45%);">EcoSure Level:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.ecosure}</span></div>
@@ -394,10 +393,9 @@ const handler = async (req: Request): Promise<Response> => {
                     
                     <div style="background-color: hsl(210, 10%, 95%); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
                       <h3 style="margin: 0 0 15px 0; color: hsl(210, 15%, 12%); font-size: 18px;">Work Order Details</h3>
-                      <div style="display: grid; gap: 8px;">
-                        <div><strong style="color: hsl(210, 10%, 45%);">Work Order ID:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.id.slice(0, 8)}</span></div>
-                        <div><strong style="color: hsl(210, 10%, 45%);">Store Number:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.store_number}</span></div>
-                        <div><strong style="color: hsl(210, 10%, 45%);">Market:</strong> <span style="background-color: hsl(0, 84%, 60%); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">${workOrder.market}</span></div>
+                       <div style="display: grid; gap: 8px;">
+                         <div><strong style="color: hsl(210, 10%, 45%);">Store Number:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.store_number}</span></div>
+                         <div><strong style="color: hsl(210, 10%, 45%);">Market:</strong> <span style="background-color: hsl(0, 84%, 60%); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">${workOrder.market}</span></div>
                         <div><strong style="color: hsl(210, 10%, 45%);">Repair Type:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.repair_type}</span></div>
                         <div><strong style="color: hsl(210, 10%, 45%);">Priority:</strong> <span style="background-color: hsl(0, 84%, 60%); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">CRITICAL</span></div>
                         <div><strong style="color: hsl(210, 10%, 45%);">EcoSure Level:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.ecosure}</span></div>
