@@ -248,6 +248,11 @@ const handler = async (req: Request): Promise<Response> => {
                     </div>
                   </div>
                   
+                  <div style="background: linear-gradient(135deg, hsl(0, 85%, 45%), hsl(210, 15%, 20%)); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <strong style="font-size: 16px;">📝 New Note:</strong>
+                    <div style="margin-top: 8px; background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 6px; font-size: 15px;">${note}</div>
+                  </div>
+                  
                   ${workOrder.notes && workOrder.notes.length > 0 ? `
                   <div style="background-color: hsl(0, 0%, 98%); border-left: 4px solid hsl(0, 85%, 45%); padding: 15px; margin-bottom: 20px; border-radius: 0 8px 8px 0;">
                     <strong style="color: hsl(210, 10%, 45%);">Previous Notes:</strong>
@@ -255,9 +260,8 @@ const handler = async (req: Request): Promise<Response> => {
                   </div>
                   ` : ''}
                   
-                  <div style="background: linear-gradient(135deg, hsl(0, 85%, 45%), hsl(210, 15%, 20%)); color: white; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
-                    <strong style="font-size: 16px;">📝 New Note:</strong>
-                    <div style="margin-top: 8px; background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 6px; font-size: 15px;">${note}</div>
+                  <div style="text-align: center; margin-bottom: 25px;">
+                    <a href="https://frmjdxziwwlfpgevszga.supabase.co/functions/v1/redirect-to-work-order?id=${workOrderId}" style="background: linear-gradient(135deg, hsl(0, 85%, 45%), hsl(210, 15%, 20%)); color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">View Work Order Details</a>
                   </div>
                   
                   <div style="border-top: 2px solid hsl(210, 10%, 88%); padding-top: 20px; text-align: center;">
