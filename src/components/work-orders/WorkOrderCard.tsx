@@ -41,7 +41,7 @@ export function WorkOrderCard({ workOrder, onEdit, onViewDetails, onDelete, isAd
 
   return (
     <Card className={cn(
-      "group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer",
+      "group hover:shadow-[0_10px_25px_-5px_hsl(48_100%_80%_/_0.4),_0_4px_6px_-2px_hsl(48_100%_80%_/_0.2)] transition-all duration-200 hover:scale-[1.02] cursor-pointer",
       isUrgent && "ring-2 ring-red-200 dark:ring-red-800/50",
       workOrder.status === 'completed' && "opacity-75",
       !workOrder.viewed && "bg-accent/50 border-accent"

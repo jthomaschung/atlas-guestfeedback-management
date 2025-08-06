@@ -76,6 +76,9 @@ All colors MUST be HSL.
     --status-cancelled-foreground: 0 0% 98%;
 
     --radius: 0.5rem;
+    
+    /* Custom shadows */
+    --shadow-yellow: 0 10px 25px -5px hsl(48 100% 80% / 0.4), 0 4px 6px -2px hsl(48 100% 80% / 0.2);
 
     /* Atlas Sidebar - Dark Theme */
     --sidebar-background: 210 15% 12%;
