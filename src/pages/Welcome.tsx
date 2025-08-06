@@ -118,16 +118,23 @@ export default function Welcome() {
           <div className="text-center max-w-4xl mx-auto">
             {/* Main Branding */}
             <div className="mb-12">
-              <h1 className="text-6xl md:text-8xl font-black text-white mb-2 tracking-tight">
+              {/* Atlas Logo */}
+              <div className="mb-8 animate-fade-in">
+                <img 
+                  src="/lovable-uploads/9faa62d6-a114-492a-88df-c8401b255bd5.png" 
+                  alt="Atlas Team Logo" 
+                  className="w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 hover-scale"
+                />
+              </div>
+              
+              <h1 className="text-6xl md:text-8xl font-black text-white mb-2 tracking-tight animate-fade-in">
                 FACILITIES
               </h1>
-              <h2 className="text-2xl md:text-4xl font-bold text-atlas-red mb-8 tracking-wide">
+              <h2 className="text-2xl md:text-4xl font-bold text-atlas-red mb-8 tracking-wide animate-fade-in">
                 MANAGEMENT PORTAL
               </h2>
-              <div className="w-16 h-16 mx-auto mb-8 bg-gradient-to-br from-atlas-red to-red-700 rounded-full flex items-center justify-center border-2 border-white/20">
-                <span className="text-white font-bold text-xl">A</span>
-              </div>
-              <p className="text-4xl md:text-6xl font-bold text-white mb-4 tracking-wide">
+              
+              <p className="text-4xl md:text-6xl font-bold text-white mb-4 tracking-wide animate-fade-in">
                 NO EXCUSES.
               </p>
               <p className="text-4xl md:text-6xl font-bold text-white tracking-wide">
