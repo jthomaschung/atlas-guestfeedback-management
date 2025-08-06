@@ -252,6 +252,7 @@ const Reporting = () => {
         availableAssignees={availableAssignees}
       />
 
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -308,7 +309,9 @@ const Reporting = () => {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      {/* Charts - Stacked Vertically */}
+      <div className="space-y-8">
+        {/* Work Orders by Status */}
         <Card>
           <CardHeader>
             <CardTitle>Work Orders by Status</CardTitle>
@@ -340,7 +343,7 @@ const Reporting = () => {
                   color: "hsl(0, 84%, 60%)",
                 },
               }}
-              className="h-[350px]"
+              className="h-[400px]"
             >
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -423,193 +426,198 @@ const Reporting = () => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Open Tickets by Market</CardTitle>
-            <CardDescription>
-              Distribution of open work orders across markets
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                count: {
-                  label: "Open Tickets",
-                  color: "hsl(213, 94%, 68%)",
-                },
-              }}
-              className="h-[400px]"
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={Object.entries(stats.marketDistribution)
-                    .sort(([,a], [,b]) => b - a)
-                    .map(([market, count], index) => {
-                      const colors = [
-                        'hsl(213, 94%, 68%)', // Blue
-                        'hsl(142, 69%, 58%)', // Green  
-                        'hsl(45, 93%, 47%)',  // Orange
-                        'hsl(262, 83%, 58%)', // Purple
-                        'hsl(0, 84%, 60%)',   // Red
-                        'hsl(173, 58%, 39%)', // Teal
-                        'hsl(48, 96%, 53%)',  // Yellow
-                        'hsl(280, 100%, 70%)', // Pink
-                      ];
-                      
-                      return {
-                        name: market,
-                        count,
-                        fill: colors[index % colors.length]
-                      };
-                    })}
-                  margin={{
-                    top: 20,
-                    right: 30,
-                    left: 20,
-                    bottom: 50,
-                  }}
-                >
-                  <XAxis 
-                    dataKey="name" 
-                    fontSize={14}
-                    fontWeight={500}
-                    tick={{ fill: 'hsl(var(--foreground))' }}
-                  />
-                  <YAxis 
-                    fontSize={12}
-                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <ChartTooltip 
-                    content={({ active, payload, label }) => {
-                      if (active && payload && payload.length) {
-                        const data = payload[0].payload;
-                        return (
-                          <div className="bg-background border border-border p-3 rounded-lg shadow-lg">
-                            <p className="font-medium text-foreground">Market: {data.name}</p>
-                            <p className="text-sm text-muted-foreground">Open Tickets: {data.count}</p>
-                          </div>
-                        );
-                      }
-                      return null;
+        {/* Side by side charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Open Tickets by Market */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Open Tickets by Market</CardTitle>
+              <CardDescription>
+                Distribution of open work orders across markets
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer
+                config={{
+                  count: {
+                    label: "Open Tickets",
+                    color: "hsl(213, 94%, 68%)",
+                  },
+                }}
+                className="h-[400px]"
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={Object.entries(stats.marketDistribution)
+                      .sort(([,a], [,b]) => b - a)
+                      .map(([market, count], index) => {
+                        const colors = [
+                          'hsl(213, 94%, 68%)', // Blue
+                          'hsl(142, 69%, 58%)', // Green  
+                          'hsl(45, 93%, 47%)',  // Orange
+                          'hsl(262, 83%, 58%)', // Purple
+                          'hsl(0, 84%, 60%)',   // Red
+                          'hsl(173, 58%, 39%)', // Teal
+                          'hsl(48, 96%, 53%)',  // Yellow
+                          'hsl(280, 100%, 70%)', // Pink
+                        ];
+                        
+                        return {
+                          name: market,
+                          count,
+                          fill: colors[index % colors.length]
+                        };
+                      })}
+                    margin={{
+                      top: 20,
+                      right: 30,
+                      left: 20,
+                      bottom: 50,
                     }}
-                  />
-                  <Bar 
-                    dataKey="count" 
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+                  >
+                    <XAxis 
+                      dataKey="name" 
+                      fontSize={14}
+                      fontWeight={500}
+                      tick={{ fill: 'hsl(var(--foreground))' }}
+                    />
+                    <YAxis 
+                      fontSize={12}
+                      tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <ChartTooltip 
+                      content={({ active, payload, label }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          return (
+                            <div className="bg-background border border-border p-3 rounded-lg shadow-lg">
+                              <p className="font-medium text-foreground">Market: {data.name}</p>
+                              <p className="text-sm text-muted-foreground">Open Tickets: {data.count}</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Bar 
+                      dataKey="count" 
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Repair Types</CardTitle>
-            <CardDescription>
-              Most common types of maintenance requests
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer
-              config={{
-                count: {
-                  label: "Count",
-                  color: "hsl(var(--chart-1))",
-                },
-              }}
-              className="h-[400px]"
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={Object.entries(stats.repairTypeDistribution)
-                    .sort(([,a], [,b]) => b - a)
-                    .slice(0, 6)
-                    .map(([repairType, count], index) => {
-                      const colors = [
-                        'hsl(213, 94%, 68%)', // Blue
-                        'hsl(142, 69%, 58%)', // Green  
-                        'hsl(45, 93%, 47%)',  // Orange
-                        'hsl(262, 83%, 58%)', // Purple
-                        'hsl(0, 84%, 60%)',   // Red
-                        'hsl(173, 58%, 39%)', // Teal
-                      ];
-                      
-                      // Create abbreviated names for display
-                      const abbreviations: Record<string, string> = {
-                        'AC / Heating': 'AC/Heat',
-                        'Walk In Cooler / Freezer': 'Cooler/Freezer',
-                        'Ice Machine': 'Ice Machine',
-                        'Cold Tables': 'Cold Tables',
-                        'Oven / Proofer': 'Oven/Proofer',
-                        'Plumbing': 'Plumbing',
-                        'Electrical': 'Electrical',
-                        'General Maintenance': 'Gen. Maint.',
-                        'Exterior Signage': 'Ext. Signage',
-                        'Retarder': 'Retarder',
-                        'Toasted Sandwich Oven': 'Sandwich Oven',
-                        'POS / Network': 'POS/Network',
-                        'Doors / Windows': 'Doors/Windows'
-                      };
-                      
-                      const shortName = abbreviations[repairType] || 
-                        (repairType.length > 10 ? repairType.substring(0, 10) + '...' : repairType);
-                      
-                      return {
-                        name: shortName,
-                        fullName: repairType,
-                        count,
-                        fill: colors[index % colors.length]
-                      };
-                    })}
-                  margin={{
-                    top: 20,
-                    right: 30,
-                    left: 20,
-                    bottom: 80,
-                  }}
-                >
-                  <XAxis 
-                    dataKey="name" 
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
-                    fontSize={12}
-                    fontWeight={500}
-                    tick={{ fill: 'hsl(var(--foreground))' }}
-                    interval={0}
-                  />
-                  <YAxis 
-                    fontSize={12}
-                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <ChartTooltip 
-                    content={({ active, payload, label }) => {
-                      if (active && payload && payload.length) {
-                        const data = payload[0].payload;
-                        return (
-                          <div className="bg-background border border-border p-3 rounded-lg shadow-lg">
-                            <p className="font-medium text-foreground">{data.fullName}</p>
-                            <p className="text-sm text-muted-foreground">Count: {data.count}</p>
-                          </div>
-                        );
-                      }
-                      return null;
+          {/* Top Repair Types */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Top Repair Types</CardTitle>
+              <CardDescription>
+                Most common types of maintenance requests
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer
+                config={{
+                  count: {
+                    label: "Count",
+                    color: "hsl(var(--chart-1))",
+                  },
+                }}
+                className="h-[400px]"
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={Object.entries(stats.repairTypeDistribution)
+                      .sort(([,a], [,b]) => b - a)
+                      .slice(0, 6)
+                      .map(([repairType, count], index) => {
+                        const colors = [
+                          'hsl(213, 94%, 68%)', // Blue
+                          'hsl(142, 69%, 58%)', // Green  
+                          'hsl(45, 93%, 47%)',  // Orange
+                          'hsl(262, 83%, 58%)', // Purple
+                          'hsl(0, 84%, 60%)',   // Red
+                          'hsl(173, 58%, 39%)', // Teal
+                        ];
+                        
+                        // Create abbreviated names for display
+                        const abbreviations: Record<string, string> = {
+                          'AC / Heating': 'AC/Heat',
+                          'Walk In Cooler / Freezer': 'Cooler/Freezer',
+                          'Ice Machine': 'Ice Machine',
+                          'Cold Tables': 'Cold Tables',
+                          'Oven / Proofer': 'Oven/Proofer',
+                          'Plumbing': 'Plumbing',
+                          'Electrical': 'Electrical',
+                          'General Maintenance': 'Gen. Maint.',
+                          'Exterior Signage': 'Ext. Signage',
+                          'Retarder': 'Retarder',
+                          'Toasted Sandwich Oven': 'Sandwich Oven',
+                          'POS / Network': 'POS/Network',
+                          'Doors / Windows': 'Doors/Windows'
+                        };
+                        
+                        const shortName = abbreviations[repairType] || 
+                          (repairType.length > 10 ? repairType.substring(0, 10) + '...' : repairType);
+                        
+                        return {
+                          name: shortName,
+                          fullName: repairType,
+                          count,
+                          fill: colors[index % colors.length]
+                        };
+                      })}
+                    margin={{
+                      top: 20,
+                      right: 30,
+                      left: 20,
+                      bottom: 80,
                     }}
-                  />
-                  <Bar 
-                    dataKey="count" 
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+                  >
+                    <XAxis 
+                      dataKey="name" 
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                      fontSize={12}
+                      fontWeight={500}
+                      tick={{ fill: 'hsl(var(--foreground))' }}
+                      interval={0}
+                    />
+                    <YAxis 
+                      fontSize={12}
+                      tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <ChartTooltip 
+                      content={({ active, payload, label }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          return (
+                            <div className="bg-background border border-border p-3 rounded-lg shadow-lg">
+                              <p className="font-medium text-foreground">{data.fullName}</p>
+                              <p className="text-sm text-muted-foreground">Count: {data.count}</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Bar 
+                      dataKey="count" 
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
