@@ -227,6 +227,10 @@ export type Database = {
         Args: { first_name: string; last_name: string; email: string }
         Returns: string
       }
+      get_current_user_email: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       is_admin: {
         Args: { user_id: string }
         Returns: boolean
