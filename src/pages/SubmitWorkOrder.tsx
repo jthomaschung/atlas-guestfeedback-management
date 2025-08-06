@@ -74,20 +74,23 @@ const SubmitWorkOrder = () => {
       }
 
       // Send critical notifications for all critical work orders
+      console.log('Checking if critical notification needed:', { priority: formData.priority, workOrderId: workOrderData.id });
       if (formData.priority === 'Critical') {
         console.log('Critical work order created, sending notification...');
         try {
-          await supabase.functions.invoke('send-notifications', {
+          const result = await supabase.functions.invoke('send-notifications', {
             body: {
               type: 'critical_creation',
               workOrderId: workOrderData.id
             }
           });
-          console.log('Critical notification sent successfully');
+          console.log('Critical notification result:', result);
         } catch (notificationError) {
           console.error('Error sending critical notification:', notificationError);
           // Don't fail the work order creation if notification fails
         }
+      } else {
+        console.log('Not a critical work order, skipping notification');
       }
 
       toast({
