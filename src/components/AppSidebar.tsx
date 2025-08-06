@@ -1,4 +1,4 @@
-import { PlusCircle, LayoutDashboard, BarChart3, ClipboardList, Users } from "lucide-react";
+import { PlusCircle, LayoutDashboard, BarChart3, ClipboardList, Users, Settings } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
 import {
@@ -21,6 +21,7 @@ const items = [
   { title: "Completed", url: "/completed", icon: ClipboardList },
   { title: "Reporting", url: "/reporting", icon: BarChart3 },
   { title: "User Management", url: "/user-hierarchy", icon: Users },
+  { title: "Settings", url: "/settings", icon: Settings },
 ];
 
 export function AppSidebar() {
