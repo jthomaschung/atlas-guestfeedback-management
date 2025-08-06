@@ -110,195 +110,216 @@ export default function Welcome() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
-      <div className="w-full max-w-md">
-        {/* Atlas Logo and Branding */}
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-red-600 to-red-700 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-2xl">A</span>
+    <div className="min-h-screen relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Hero Section with Branding */}
+      <div className="relative min-h-screen flex flex-col">
+        {/* Header Branding */}
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="text-center max-w-4xl mx-auto">
+            {/* Main Branding */}
+            <div className="mb-12">
+              <h1 className="text-6xl md:text-8xl font-black text-white mb-2 tracking-tight">
+                FACILITIES
+              </h1>
+              <h2 className="text-2xl md:text-4xl font-bold text-atlas-red mb-8 tracking-wide">
+                MANAGEMENT PORTAL
+              </h2>
+              <div className="w-16 h-16 mx-auto mb-8 bg-gradient-to-br from-atlas-red to-red-700 rounded-full flex items-center justify-center border-2 border-white/20">
+                <span className="text-white font-bold text-xl">A</span>
+              </div>
+              <p className="text-4xl md:text-6xl font-bold text-white mb-4 tracking-wide">
+                NO EXCUSES.
+              </p>
+              <p className="text-4xl md:text-6xl font-bold text-white tracking-wide">
+                JUST SOLUTIONS.
+              </p>
+            </div>
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">ATLAS</h1>
-          <p className="text-slate-300">Work Order Management System</p>
         </div>
 
-        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-2xl">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl text-slate-900">Welcome</CardTitle>
-            <CardDescription className="text-slate-600">
-              Sign in or create an account to manage work orders
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent>
-            {!showResetPassword ? (
-              <Tabs defaultValue="signin" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="signin">Sign In</TabsTrigger>
-                  <TabsTrigger value="signup">Sign Up</TabsTrigger>
-                </TabsList>
+        {/* Login Card */}
+        <div className="flex justify-center pb-12 px-4">
+          <div className="w-full max-w-md">
+            <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-2xl">
+              <CardHeader className="text-center">
+                <CardTitle className="text-2xl text-slate-900">Welcome</CardTitle>
+                <CardDescription className="text-slate-600">
+                  Sign in or create an account to manage work orders
+                </CardDescription>
+              </CardHeader>
+              
+              <CardContent>
+                {!showResetPassword ? (
+                  <Tabs defaultValue="signin" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="signin">Sign In</TabsTrigger>
+                      <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                    </TabsList>
 
-                <TabsContent value="signin" className="space-y-4">
-                  <form onSubmit={handleSignIn} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="signin-email">Email</Label>
-                      <Input
-                        id="signin-email"
-                        name="email"
-                        type="email"
-                        placeholder="your.name@atlaswe.com"
-                        required
-                        className="bg-white"
-                      />
+                    <TabsContent value="signin" className="space-y-4">
+                      <form onSubmit={handleSignIn} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="signin-email">Email</Label>
+                          <Input
+                            id="signin-email"
+                            name="email"
+                            type="email"
+                            placeholder="your.name@atlaswe.com"
+                            required
+                            className="bg-white"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="signin-password">Password</Label>
+                          <Input
+                            id="signin-password"
+                            name="password"
+                            type="password"
+                            required
+                            className="bg-white"
+                          />
+                        </div>
+                        {error && (
+                          <Alert variant="destructive">
+                            <AlertDescription>{error}</AlertDescription>
+                          </Alert>
+                        )}
+                        <Button
+                          type="submit"
+                          className="w-full bg-red-600 hover:bg-red-700 text-white"
+                          disabled={isSubmitting}
+                        >
+                          {isSubmitting ? 'Signing in...' : 'Sign In'}
+                        </Button>
+                        
+                        <div className="text-center">
+                          <button
+                            type="button"
+                            onClick={() => setShowResetPassword(true)}
+                            className="text-sm text-red-600 hover:text-red-700 underline"
+                          >
+                            Forgot your password?
+                          </button>
+                        </div>
+                      </form>
+                    </TabsContent>
+
+                    <TabsContent value="signup" className="space-y-4">
+                      <form onSubmit={handleSignUp} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="firstName">First Name</Label>
+                            <Input
+                              id="firstName"
+                              name="firstName"
+                              type="text"
+                              required
+                              className="bg-white"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="lastName">Last Name</Label>
+                            <Input
+                              id="lastName"
+                              name="lastName"
+                              type="text"
+                              required
+                              className="bg-white"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="signup-email">Email</Label>
+                          <Input
+                            id="signup-email"
+                            name="email"
+                            type="email"
+                            placeholder="your.name@atlaswe.com"
+                            required
+                            className="bg-white"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="signup-password">Password</Label>
+                          <Input
+                            id="signup-password"
+                            name="password"
+                            type="password"
+                            required
+                            className="bg-white"
+                          />
+                        </div>
+                        {error && (
+                          <Alert variant="destructive">
+                            <AlertDescription>{error}</AlertDescription>
+                          </Alert>
+                        )}
+                        <Button
+                          type="submit"
+                          className="w-full bg-red-600 hover:bg-red-700 text-white"
+                          disabled={isSubmitting}
+                        >
+                          {isSubmitting ? 'Creating Account...' : 'Create Account'}
+                        </Button>
+                      </form>
+                    </TabsContent>
+                  </Tabs>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="text-center mb-4">
+                      <h3 className="text-lg font-semibold text-slate-900">Reset Password</h3>
+                      <p className="text-sm text-slate-600">Enter your email to receive password reset instructions</p>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="signin-password">Password</Label>
-                      <Input
-                        id="signin-password"
-                        name="password"
-                        type="password"
-                        required
-                        className="bg-white"
-                      />
-                    </div>
-                    {error && (
-                      <Alert variant="destructive">
-                        <AlertDescription>{error}</AlertDescription>
-                      </Alert>
-                    )}
-                    <Button
-                      type="submit"
-                      className="w-full bg-red-600 hover:bg-red-700 text-white"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? 'Signing in...' : 'Sign In'}
-                    </Button>
                     
-                    <div className="text-center">
-                      <button
-                        type="button"
-                        onClick={() => setShowResetPassword(true)}
-                        className="text-sm text-red-600 hover:text-red-700 underline"
+                    <form onSubmit={handleResetPassword} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="reset-email">Email</Label>
+                        <Input
+                          id="reset-email"
+                          name="email"
+                          type="email"
+                          placeholder="your.name@atlaswe.com"
+                          required
+                          className="bg-white"
+                        />
+                      </div>
+                      {error && (
+                        <Alert variant="destructive">
+                          <AlertDescription>{error}</AlertDescription>
+                        </Alert>
+                      )}
+                      <Button
+                        type="submit"
+                        className="w-full bg-red-600 hover:bg-red-700 text-white"
+                        disabled={isSubmitting}
                       >
-                        Forgot your password?
-                      </button>
-                    </div>
-                  </form>
-                </TabsContent>
-
-                <TabsContent value="signup" className="space-y-4">
-                  <form onSubmit={handleSignUp} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="firstName">First Name</Label>
-                        <Input
-                          id="firstName"
-                          name="firstName"
-                          type="text"
-                          required
-                          className="bg-white"
-                        />
+                        {isSubmitting ? 'Sending Reset Email...' : 'Send Reset Email'}
+                      </Button>
+                      
+                      <div className="text-center">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowResetPassword(false);
+                            setError(null);
+                          }}
+                          className="text-sm text-slate-600 hover:text-slate-700 underline"
+                        >
+                          Back to Sign In
+                        </button>
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="lastName">Last Name</Label>
-                        <Input
-                          id="lastName"
-                          name="lastName"
-                          type="text"
-                          required
-                          className="bg-white"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-email">Email</Label>
-                      <Input
-                        id="signup-email"
-                        name="email"
-                        type="email"
-                        placeholder="your.name@atlaswe.com"
-                        required
-                        className="bg-white"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-password">Password</Label>
-                      <Input
-                        id="signup-password"
-                        name="password"
-                        type="password"
-                        required
-                        className="bg-white"
-                      />
-                    </div>
-                    {error && (
-                      <Alert variant="destructive">
-                        <AlertDescription>{error}</AlertDescription>
-                      </Alert>
-                    )}
-                    <Button
-                      type="submit"
-                      className="w-full bg-red-600 hover:bg-red-700 text-white"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? 'Creating Account...' : 'Create Account'}
-                    </Button>
-                  </form>
-                </TabsContent>
-              </Tabs>
-            ) : (
-              <div className="space-y-4">
-                <div className="text-center mb-4">
-                  <h3 className="text-lg font-semibold text-slate-900">Reset Password</h3>
-                  <p className="text-sm text-slate-600">Enter your email to receive password reset instructions</p>
-                </div>
-                
-                <form onSubmit={handleResetPassword} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="reset-email">Email</Label>
-                    <Input
-                      id="reset-email"
-                      name="email"
-                      type="email"
-                      placeholder="your.name@atlaswe.com"
-                      required
-                      className="bg-white"
-                    />
+                    </form>
                   </div>
-                  {error && (
-                    <Alert variant="destructive">
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  )}
-                  <Button
-                    type="submit"
-                    className="w-full bg-red-600 hover:bg-red-700 text-white"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? 'Sending Reset Email...' : 'Send Reset Email'}
-                  </Button>
-                  
-                  <div className="text-center">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowResetPassword(false);
-                        setError(null);
-                      }}
-                      className="text-sm text-slate-600 hover:text-slate-700 underline"
-                    >
-                      Back to Sign In
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                )}
+              </CardContent>
+            </Card>
 
-        <div className="text-center mt-6">
-          <p className="text-slate-400 text-sm">
-            © 2024 Atlas Work Order Management System
-          </p>
+            <div className="text-center mt-6">
+              <p className="text-slate-400 text-sm">
+                © 2024 Atlas Facilities Management Portal
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
