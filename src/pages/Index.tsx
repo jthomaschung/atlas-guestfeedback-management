@@ -423,8 +423,8 @@ const Index = () => {
       }
 
       const updatedWorkOrder = { ...viewingWorkOrder, ...updates, updated_at: new Date().toISOString() };
-      setWorkOrders(workOrders.map(wo => wo.id === updatedWorkOrder.id ? updatedWorkOrder : wo));
-      setViewingWorkOrder(updatedWorkOrder);
+      setWorkOrders(workOrders.map(wo => wo.id === updatedWorkOrder.id ? updatedWorkOrder as WorkOrder : wo));
+      setViewingWorkOrder(updatedWorkOrder as WorkOrder);
       toast({
         title: "Work Order Updated",
         description: "Changes have been saved successfully."

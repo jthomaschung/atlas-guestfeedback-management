@@ -181,6 +181,7 @@ export type Database = {
           store_number: string
           updated_at: string
           user_id: string
+          viewed: boolean | null
         }
         Insert: {
           assignee?: string | null
@@ -198,6 +199,7 @@ export type Database = {
           store_number: string
           updated_at?: string
           user_id: string
+          viewed?: boolean | null
         }
         Update: {
           assignee?: string | null
@@ -215,6 +217,7 @@ export type Database = {
           store_number?: string
           updated_at?: string
           user_id?: string
+          viewed?: boolean | null
         }
         Relationships: []
       }
