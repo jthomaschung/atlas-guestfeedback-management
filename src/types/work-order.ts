@@ -54,6 +54,7 @@ export interface WorkOrder {
   created_at: string;
   updated_at: string;
   completed_at?: string;
+  viewed?: boolean;
 }
 
 export interface Profile {

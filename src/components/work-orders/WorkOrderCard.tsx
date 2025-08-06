@@ -43,7 +43,8 @@ export function WorkOrderCard({ workOrder, onEdit, onViewDetails, onDelete, isAd
     <Card className={cn(
       "group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer",
       isUrgent && "ring-2 ring-red-200 dark:ring-red-800/50",
-      workOrder.status === 'completed' && "opacity-75"
+      workOrder.status === 'completed' && "opacity-75",
+      !workOrder.viewed && "bg-accent/50 border-accent"
     )} onClick={() => onViewDetails(workOrder)}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">

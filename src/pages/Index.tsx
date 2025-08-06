@@ -343,8 +343,28 @@ const Index = () => {
   const handleEdit = (workOrder: WorkOrder) => {
     setEditingWorkOrder(workOrder);
   };
-  const handleViewDetails = (workOrder: WorkOrder) => {
+  const handleViewDetails = async (workOrder: WorkOrder) => {
     setViewingWorkOrder(workOrder);
+    
+    // Mark work order as viewed if it hasn't been viewed yet
+    if (!workOrder.viewed) {
+      try {
+        const { error } = await supabase
+          .from('work_orders')
+          .update({ viewed: true })
+          .eq('id', workOrder.id);
+
+        if (!error) {
+          // Update local state
+          setWorkOrders(prev => prev.map(wo => 
+            wo.id === workOrder.id ? { ...wo, viewed: true } : wo
+          ));
+        }
+      } catch (error) {
+        console.error('Error marking work order as viewed:', error);
+        // Don't show error to user as this is not critical
+      }
+    }
   };
 
   const handleDelete = (workOrder: WorkOrder) => {
