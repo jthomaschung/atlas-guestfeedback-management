@@ -226,46 +226,46 @@ const handler = async (req: Request): Promise<Response> => {
               to: [taggedProfile.email],
               subject: `You've Been Tagged - Store ${workOrder.store_number} - ${workOrder.repair_type}`,
               html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8fafc; padding: 20px;">
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: hsl(0, 0%, 98%); padding: 20px;">
                 <div style="background-color: #ffffff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                  <div style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; text-align: center;">
+                  <div style="background: linear-gradient(135deg, hsl(0, 85%, 45%), hsl(210, 15%, 12%)); color: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; text-align: center;">
                     <h2 style="margin: 0; font-size: 24px; font-weight: bold;">🏷️ You've Been Tagged</h2>
                     <p style="margin: 8px 0 0 0; opacity: 0.9;">in a Work Order Note</p>
                   </div>
                   
-                  <div style="background-color: #f1f5f9; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-                    <h3 style="margin: 0 0 15px 0; color: #1e293b; font-size: 18px;">Work Order Details</h3>
+                  <div style="background-color: hsl(210, 10%, 95%); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 15px 0; color: hsl(210, 15%, 12%); font-size: 18px;">Work Order Details</h3>
                     <div style="display: grid; gap: 8px;">
-                      <div><strong style="color: #475569;">Store Number:</strong> <span style="color: #1e293b;">${workOrder.store_number}</span></div>
-                      <div><strong style="color: #475569;">Market:</strong> <span style="color: #1e293b;">${workOrder.market}</span></div>
-                      <div><strong style="color: #475569;">Repair Type:</strong> <span style="color: #1e293b;">${workOrder.repair_type}</span></div>
-                      <div><strong style="color: #475569;">Priority:</strong> <span style="background-color: ${workOrder.priority === 'Critical' ? '#dc2626' : workOrder.priority === 'High' ? '#ea580c' : workOrder.priority === 'Medium' ? '#d97706' : '#65a30d'}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">${workOrder.priority}</span></div>
-                      <div><strong style="color: #475569;">Status:</strong> <span style="color: #1e293b;">${workOrder.status}</span></div>
-                      <div><strong style="color: #475569;">Description:</strong> <span style="color: #1e293b;">${workOrder.description}</span></div>
-                      <div><strong style="color: #475569;">Assignee:</strong> <span style="color: #1e293b;">${workOrder.assignee || 'Not assigned'}</span></div>
-                      <div><strong style="color: #475569;">Created Date:</strong> <span style="color: #1e293b;">${new Date(workOrder.created_at).toLocaleDateString()}</span></div>
-                      ${workOrder.image_url ? `<div><strong style="color: #475569;">Image:</strong> <a href="${workOrder.image_url}" style="color: #3b82f6; text-decoration: underline;">View Image</a></div>` : ''}
+                      <div><strong style="color: hsl(210, 10%, 45%);">Store Number:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.store_number}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">Market:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.market}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">Repair Type:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.repair_type}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">Priority:</strong> <span style="background-color: ${workOrder.priority === 'Critical' ? 'hsl(0, 84%, 60%)' : workOrder.priority === 'High' ? 'hsl(25, 95%, 53%)' : workOrder.priority === 'Medium' ? 'hsl(38, 92%, 50%)' : 'hsl(210, 100%, 56%)'}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">${workOrder.priority}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">Status:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.status}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">Description:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.description}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">Assignee:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.assignee || 'Not assigned'}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">Created Date:</strong> <span style="color: hsl(210, 15%, 12%);">${new Date(workOrder.created_at).toLocaleDateString()}</span></div>
+                      ${workOrder.image_url ? `<div><strong style="color: hsl(210, 10%, 45%);">Image:</strong> <a href="${workOrder.image_url}" style="color: hsl(0, 85%, 45%); text-decoration: underline;">View Image</a></div>` : ''}
                     </div>
                   </div>
                   
                   ${workOrder.notes && workOrder.notes.length > 0 ? `
-                  <div style="background-color: #f8fafc; border-left: 4px solid #94a3b8; padding: 15px; margin-bottom: 20px; border-radius: 0 8px 8px 0;">
-                    <strong style="color: #475569;">Previous Notes:</strong>
-                    <div style="margin-top: 8px; color: #64748b; font-style: italic;">${workOrder.notes.join('<br>')}</div>
+                  <div style="background-color: hsl(0, 0%, 98%); border-left: 4px solid hsl(0, 85%, 45%); padding: 15px; margin-bottom: 20px; border-radius: 0 8px 8px 0;">
+                    <strong style="color: hsl(210, 10%, 45%);">Previous Notes:</strong>
+                    <div style="margin-top: 8px; color: hsl(210, 10%, 45%); font-style: italic;">${workOrder.notes.join('<br>')}</div>
                   </div>
                   ` : ''}
                   
-                  <div style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+                  <div style="background: linear-gradient(135deg, hsl(0, 85%, 45%), hsl(210, 15%, 20%)); color: white; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
                     <strong style="font-size: 16px;">📝 New Note:</strong>
                     <div style="margin-top: 8px; background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 6px; font-size: 15px;">${note}</div>
                   </div>
                   
-                  <div style="border-top: 2px solid #e2e8f0; padding-top: 20px; text-align: center;">
-                    <div style="background-color: #fef3c7; border: 1px solid #f59e0b; color: #92400e; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
+                  <div style="border-top: 2px solid hsl(210, 10%, 88%); padding-top: 20px; text-align: center;">
+                    <div style="background-color: hsl(38, 92%, 50%); border: 1px solid hsl(38, 92%, 50%); color: white; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
                       <strong>⚠️ Please don't reply to this email</strong><br>
                       <span style="font-size: 14px;">Respond back on the Facilities Management Portal</span>
                     </div>
-                    <p style="color: #64748b; font-size: 12px; margin: 0;">This is an automated notification from the Facilities Management System</p>
+                    <p style="color: hsl(210, 10%, 45%); font-size: 12px; margin: 0;">This is an automated notification from the Facilities Management System</p>
                   </div>
                 </div>
               </div>
