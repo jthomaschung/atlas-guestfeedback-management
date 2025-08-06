@@ -363,9 +363,10 @@ const Reporting = () => {
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    innerRadius={40}
-                    outerRadius={100}
-                    paddingAngle={2}
+                    innerRadius={50}
+                    outerRadius={110}
+                    paddingAngle={3}
+                    startAngle={90}
                   >
                     {Object.entries(stats.statusDistribution)
                       .filter(([, count]) => count > 0)
@@ -393,6 +394,32 @@ const Reporting = () => {
                 </PieChart>
               </ResponsiveContainer>
             </ChartContainer>
+            <div className="mt-4 flex flex-wrap gap-3 justify-center">
+              {Object.entries(stats.statusDistribution)
+                .filter(([, count]) => count > 0)
+                .map(([status, count]) => {
+                  const color = status === 'pending' ? 'hsl(45, 93%, 47%)' :
+                                status === 'pending-approval' ? 'hsl(262, 83%, 58%)' :
+                                status === 'in-progress' ? 'hsl(213, 94%, 68%)' :
+                                status === 'completed' ? 'hsl(142, 69%, 58%)' :
+                                'hsl(0, 84%, 60%)';
+                  const name = status === 'pending-approval' ? 'Pending Approval' : 
+                               status === 'in-progress' ? 'In Progress' : 
+                               status === 'pending' ? 'Pending' :
+                               status.charAt(0).toUpperCase() + status.slice(1);
+                  return (
+                    <div key={status} className="flex items-center gap-2">
+                      <div 
+                        className="w-3 h-3 rounded-full" 
+                        style={{ backgroundColor: color }}
+                      />
+                      <span className="text-sm text-muted-foreground">
+                        {name}: {count}
+                      </span>
+                    </div>
+                  );
+                })}
+            </div>
           </CardContent>
         </Card>
 
@@ -411,7 +438,7 @@ const Reporting = () => {
                   color: "hsl(213, 94%, 68%)",
                 },
               }}
-              className="h-[350px]"
+              className="h-[400px]"
             >
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
@@ -444,7 +471,7 @@ const Reporting = () => {
                 >
                   <XAxis 
                     dataKey="name" 
-                    fontSize={13}
+                    fontSize={14}
                     fontWeight={500}
                     tick={{ fill: 'hsl(var(--foreground))' }}
                   />
@@ -493,7 +520,7 @@ const Reporting = () => {
                   color: "hsl(var(--chart-1))",
                 },
               }}
-              className="h-[350px]"
+              className="h-[400px]"
             >
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
@@ -510,10 +537,25 @@ const Reporting = () => {
                         'hsl(173, 58%, 39%)', // Teal
                       ];
                       
-                      // Shorten long repair type names for better display
-                      const shortName = repairType.length > 12 ? 
-                        repairType.split(' ').map(word => word.length > 6 ? word.substring(0, 6) : word).join(' ') : 
-                        repairType;
+                      // Create abbreviated names for display
+                      const abbreviations: Record<string, string> = {
+                        'AC / Heating': 'AC/Heat',
+                        'Walk In Cooler / Freezer': 'Cooler/Freezer',
+                        'Ice Machine': 'Ice Machine',
+                        'Cold Tables': 'Cold Tables',
+                        'Oven / Proofer': 'Oven/Proofer',
+                        'Plumbing': 'Plumbing',
+                        'Electrical': 'Electrical',
+                        'General Maintenance': 'Gen. Maint.',
+                        'Exterior Signage': 'Ext. Signage',
+                        'Retarder': 'Retarder',
+                        'Toasted Sandwich Oven': 'Sandwich Oven',
+                        'POS / Network': 'POS/Network',
+                        'Doors / Windows': 'Doors/Windows'
+                      };
+                      
+                      const shortName = abbreviations[repairType] || 
+                        (repairType.length > 10 ? repairType.substring(0, 10) + '...' : repairType);
                       
                       return {
                         name: shortName,
@@ -522,30 +564,28 @@ const Reporting = () => {
                         fill: colors[index % colors.length]
                       };
                     })}
-                  layout="horizontal"
                   margin={{
                     top: 20,
                     right: 30,
-                    left: 80,
-                    bottom: 20,
+                    left: 20,
+                    bottom: 80,
                   }}
                 >
                   <XAxis 
-                    type="number"
+                    dataKey="name" 
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                    fontSize={12}
+                    fontWeight={500}
+                    tick={{ fill: 'hsl(var(--foreground))' }}
+                    interval={0}
+                  />
+                  <YAxis 
                     fontSize={12}
                     tick={{ fill: 'hsl(var(--muted-foreground))' }}
                     axisLine={false}
                     tickLine={false}
-                  />
-                  <YAxis 
-                    type="category"
-                    dataKey="name" 
-                    fontSize={12}
-                    fontWeight={500}
-                    tick={{ fill: 'hsl(var(--foreground))' }}
-                    axisLine={false}
-                    tickLine={false}
-                    width={75}
                   />
                   <ChartTooltip 
                     content={({ active, payload, label }) => {
@@ -563,7 +603,7 @@ const Reporting = () => {
                   />
                   <Bar 
                     dataKey="count" 
-                    radius={[0, 4, 4, 0]}
+                    radius={[4, 4, 0, 0]}
                   />
                 </BarChart>
               </ResponsiveContainer>
