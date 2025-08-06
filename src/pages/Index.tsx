@@ -6,7 +6,7 @@ import { WorkOrderStats } from "@/components/work-orders/WorkOrderStats";
 import { WorkOrderFilters } from "@/components/work-orders/WorkOrderFilters";
 import { WorkOrderDetails } from "@/components/work-orders/WorkOrderDetails";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Plus, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -439,6 +439,10 @@ const Index = () => {
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Create New Work Order</DialogTitle>
+                <DialogDescription>Submit a new maintenance request for your store</DialogDescription>
+              </DialogHeader>
               <WorkOrderForm onSubmit={handleCreateWorkOrder} onCancel={() => setIsFormOpen(false)} />
             </DialogContent>
           </Dialog>
@@ -490,6 +494,10 @@ const Index = () => {
 
         {editingWorkOrder && <Dialog open={!!editingWorkOrder} onOpenChange={() => setEditingWorkOrder(null)}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Edit Work Order</DialogTitle>
+                <DialogDescription>Update the work order details</DialogDescription>
+              </DialogHeader>
               <WorkOrderForm onSubmit={handleEditWorkOrder} onCancel={() => setEditingWorkOrder(null)} initialData={editingWorkOrder} />
             </DialogContent>
           </Dialog>}
