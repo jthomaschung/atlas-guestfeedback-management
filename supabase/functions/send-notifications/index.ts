@@ -123,25 +123,54 @@ const handler = async (req: Request): Promise<Response> => {
           const emailResult = await resend.emails.send({
             from: "Work Orders <workorders@atlasfacilities.co>",
             to: [email],
-            subject: `Work Order Completed - Store ${workOrder.store_number} - ${workOrder.description}`,
+            subject: `Work Order Completed - Store ${workOrder.store_number} - ${workOrder.repair_type}`,
             html: `
-            <h2>Work Order Completed</h2>
-            <p><strong>Work Order ID:</strong> ${workOrder.id.slice(0, 8)}</p>
-            <p><strong>Store Number:</strong> ${workOrder.store_number}</p>
-            <p><strong>Market:</strong> ${workOrder.market}</p>
-            <p><strong>Repair Type:</strong> ${workOrder.repair_type}</p>
-            <p><strong>Priority:</strong> ${workOrder.priority}</p>
-            <p><strong>EcoSure Level:</strong> ${workOrder.ecosure}</p>
-            <p><strong>Status:</strong> ${workOrder.status}</p>
-            <p><strong>Description:</strong> ${workOrder.description}</p>
-            <p><strong>Assignee:</strong> ${workOrder.assignee || 'Not assigned'}</p>
-            <p><strong>Created Date:</strong> ${new Date(workOrder.created_at).toLocaleDateString()}</p>
-            <p><strong>Completed Date:</strong> ${workOrder.completed_at ? new Date(workOrder.completed_at).toLocaleDateString() : 'N/A'}</p>
-            <p><strong>Created by:</strong> ${creatorProfile?.first_name} ${creatorProfile?.last_name} (${creatorProfile?.email})</p>
-            ${workOrder.image_url ? `<p><strong>Image:</strong> <a href="${workOrder.image_url}">View Image</a></p>` : ''}
-            ${workOrder.notes && workOrder.notes.length > 0 ? `<p><strong>Notes:</strong><br>${workOrder.notes.join('<br>')}</p>` : ''}
-            <br>
-            <p>This work order has been marked as completed.</p>
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: hsl(0, 0%, 98%); padding: 20px;">
+                <div style="background-color: #ffffff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                  <div style="background: linear-gradient(135deg, hsl(120, 60%, 35%), hsl(210, 15%, 12%)); color: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; text-align: center;">
+                    <h2 style="margin: 0; font-size: 24px; font-weight: bold;">✅ Work Order Completed</h2>
+                    <p style="margin: 8px 0 0 0; opacity: 0.9;">Task Successfully Finished</p>
+                  </div>
+                  
+                  <div style="background-color: hsl(210, 10%, 95%); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 15px 0; color: hsl(210, 15%, 12%); font-size: 18px;">Work Order Details</h3>
+                    <div style="display: grid; gap: 8px;">
+                      <div><strong style="color: hsl(210, 10%, 45%);">Work Order ID:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.id.slice(0, 8)}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">Store Number:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.store_number}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">Market:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.market}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">Repair Type:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.repair_type}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">Priority:</strong> <span style="background-color: ${workOrder.priority === 'Critical' ? 'hsl(0, 84%, 60%)' : workOrder.priority === 'High' ? 'hsl(25, 95%, 53%)' : workOrder.priority === 'Medium' ? 'hsl(38, 92%, 50%)' : 'hsl(210, 100%, 56%)'}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">${workOrder.priority}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">EcoSure Level:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.ecosure}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">Status:</strong> <span style="background-color: hsl(120, 60%, 35%); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">${workOrder.status}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">Description:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.description}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">Assignee:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.assignee || 'Not assigned'}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">Created Date:</strong> <span style="color: hsl(210, 15%, 12%);">${new Date(workOrder.created_at).toLocaleDateString()}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">Completed Date:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.completed_at ? new Date(workOrder.completed_at).toLocaleDateString() : 'N/A'}</span></div>
+                      <div><strong style="color: hsl(210, 10%, 45%);">Created by:</strong> <span style="color: hsl(210, 15%, 12%);">${creatorProfile?.first_name} ${creatorProfile?.last_name} (${creatorProfile?.email})</span></div>
+                      ${workOrder.image_url ? `<div><strong style="color: hsl(210, 10%, 45%);">Image:</strong> <a href="${workOrder.image_url}" style="color: hsl(0, 85%, 45%); text-decoration: underline;">View Image</a></div>` : ''}
+                    </div>
+                  </div>
+                  
+                  ${workOrder.notes && workOrder.notes.length > 0 ? `
+                  <div style="background-color: hsl(0, 0%, 98%); border-left: 4px solid hsl(120, 60%, 35%); padding: 15px; margin-bottom: 20px; border-radius: 0 8px 8px 0;">
+                    <strong style="color: hsl(210, 10%, 45%);">Notes:</strong>
+                    <div style="margin-top: 8px; color: hsl(210, 10%, 45%); font-style: italic;">${workOrder.notes.join('<br>')}</div>
+                  </div>
+                  ` : ''}
+                  
+                  <div style="text-align: center; margin-bottom: 25px;">
+                    <a href="https://frmjdxziwwlfpgevszga.supabase.co/functions/v1/redirect-to-work-order?id=${workOrderId}" style="background: linear-gradient(135deg, hsl(120, 60%, 35%), hsl(210, 15%, 20%)); color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">View Work Order Details</a>
+                  </div>
+                  
+                  <div style="border-top: 2px solid hsl(210, 10%, 88%); padding-top: 20px; text-align: center;">
+                    <div style="background-color: hsl(38, 92%, 50%); border: 1px solid hsl(38, 92%, 50%); color: white; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
+                      <strong>⚠️ Please don't reply to this email</strong><br>
+                      <span style="font-size: 14px;">Respond back on the Facilities Management Portal</span>
+                    </div>
+                    <p style="color: hsl(210, 10%, 45%); font-size: 12px; margin: 0;">This is an automated notification from the Facilities Management System</p>
+                  </div>
+                </div>
+              </div>
             `,
           });
 
@@ -313,80 +342,126 @@ const handler = async (req: Request): Promise<Response> => {
       }
     
     } else if (type === 'critical_creation') {
-      // Check if this is a critical ticket in NE markets for Grant Gelecki
-      const criticalMarkets = ['NE1', 'NE2', 'NE3', 'NE4'];
-      const grantEmail = 'grant.gelecki@atlaswe.com';
-      
-      console.log('Checking critical creation conditions:', {
-        market: workOrder.market,
-        priority: workOrder.priority,
-        isCriticalMarket: criticalMarkets.includes(workOrder.market),
-        isCriticalPriority: workOrder.priority === 'Critical'
-      });
-      
-      if (workOrder.priority === 'Critical' && criticalMarkets.includes(workOrder.market)) {
-        console.log('Sending critical notification to Grant Gelecki:', grantEmail);
+      if (workOrder.priority === 'Critical') {
+        const criticalMarkets = ['NE1', 'NE2', 'NE3', 'NE4'];
+        const grantEmail = 'grant.gelecki@atlaswe.com';
+        const facilitiesEmail = 'facilities@atlaswe.com';
         
-        try {
-          const emailResult = await resend.emails.send({
-            from: "Critical Work Orders <workorders@atlasfacilities.co>",
-            to: [grantEmail],
-            subject: `🚨 CRITICAL WORK ORDER - ${workOrder.market} Store ${workOrder.store_number} - ${workOrder.repair_type}`,
-            html: `
-            <div style="background-color: #fef2f2; border: 2px solid #dc2626; border-radius: 8px; padding: 20px; font-family: Arial, sans-serif;">
-              <h2 style="color: #dc2626; margin-top: 0;">🚨 CRITICAL WORK ORDER ALERT</h2>
-              <p style="color: #dc2626; font-weight: bold; font-size: 16px;">A critical priority work order has been submitted in your NE region and requires immediate attention.</p>
-              
-              <div style="background-color: white; border-radius: 6px; padding: 15px; margin: 15px 0;">
-                <h3 style="margin-top: 0; color: #1f2937;">Work Order Details</h3>
-                <p><strong>Work Order ID:</strong> ${workOrder.id.slice(0, 8)}</p>
-                <p><strong>Store Number:</strong> ${workOrder.store_number}</p>
-                <p><strong>Market:</strong> <span style="background-color: #dc2626; color: white; padding: 2px 8px; border-radius: 4px;">${workOrder.market}</span></p>
-                <p><strong>Repair Type:</strong> ${workOrder.repair_type}</p>
-                <p><strong>Priority:</strong> <span style="background-color: #dc2626; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold;">CRITICAL</span></p>
-                <p><strong>EcoSure Level:</strong> ${workOrder.ecosure}</p>
-                <p><strong>Status:</strong> ${workOrder.status}</p>
-                <p><strong>Description:</strong> ${workOrder.description}</p>
-                <p><strong>Assignee:</strong> ${workOrder.assignee || 'Not assigned'}</p>
-                <p><strong>Created Date:</strong> ${new Date(workOrder.created_at).toLocaleDateString()} at ${new Date(workOrder.created_at).toLocaleTimeString()}</p>
-                <p><strong>Created by:</strong> ${creatorProfile?.first_name} ${creatorProfile?.last_name} (${creatorProfile?.email})</p>
-                ${workOrder.image_url ? `<p><strong>Image:</strong> <a href="${workOrder.image_url}" style="color: #dc2626;">View Image</a></p>` : ''}
-              </div>
-              
-              <div style="background-color: #fef9c3; border: 1px solid #f59e0b; border-radius: 6px; padding: 10px; margin: 15px 0;">
-                <p style="margin: 0; color: #92400e;"><strong>⚠️ Action Required:</strong> This critical work order requires immediate review and assignment.</p>
-              </div>
-              
-              <p style="color: #6b7280; font-size: 14px; margin-bottom: 0;">This is an automated notification for critical work orders in NE1, NE2, NE3, and NE4 markets.</p>
-            </div>
-          `,
-          });
+        console.log('Checking critical creation conditions:', {
+          market: workOrder.market,
+          priority: workOrder.priority,
+          isCriticalMarket: criticalMarkets.includes(workOrder.market),
+          isCriticalPriority: workOrder.priority === 'Critical'
+        });
+        
+        // Determine recipients based on market
+        const criticalRecipients = [];
+        
+        if (criticalMarkets.includes(workOrder.market)) {
+          // NE markets - send to Grant Gelecki
+          criticalRecipients.push(grantEmail);
+          console.log('Adding Grant Gelecki for NE market:', workOrder.market);
+        } else {
+          // All other markets - send to facilities@atlaswe.com
+          criticalRecipients.push(facilitiesEmail);
+          console.log('Adding facilities email for non-NE market:', workOrder.market);
+        }
+        
+        // Send to all critical recipients
+        for (const email of criticalRecipients) {
+          try {
+            const isNEMarket = criticalMarkets.includes(workOrder.market);
+            const emailResult = await resend.emails.send({
+              from: "Critical Work Orders <workorders@atlasfacilities.co>",
+              to: [email],
+              subject: `🚨 CRITICAL WORK ORDER - ${workOrder.market} Store ${workOrder.store_number} - ${workOrder.repair_type}`,
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: hsl(0, 0%, 98%); padding: 20px;">
+                  <div style="background-color: #ffffff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border: 3px solid hsl(0, 84%, 60%);">
+                    <div style="background: linear-gradient(135deg, hsl(0, 84%, 60%), hsl(210, 15%, 12%)); color: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; text-align: center;">
+                      <h2 style="margin: 0; font-size: 24px; font-weight: bold;">🚨 CRITICAL WORK ORDER</h2>
+                      <p style="margin: 8px 0 0 0; opacity: 0.9;">Immediate Attention Required</p>
+                    </div>
+                    
+                    <div style="background-color: hsl(0, 84%, 95%); border: 2px solid hsl(0, 84%, 60%); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                      <p style="margin: 0 0 10px 0; color: hsl(0, 84%, 40%); font-weight: bold; font-size: 16px;">
+                        ${isNEMarket ? 
+                          '⚠️ A critical priority work order has been submitted in your NE region and requires immediate attention.' :
+                          '⚠️ A critical priority work order has been submitted and requires immediate attention.'
+                        }
+                      </p>
+                    </div>
+                    
+                    <div style="background-color: hsl(210, 10%, 95%); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                      <h3 style="margin: 0 0 15px 0; color: hsl(210, 15%, 12%); font-size: 18px;">Work Order Details</h3>
+                      <div style="display: grid; gap: 8px;">
+                        <div><strong style="color: hsl(210, 10%, 45%);">Work Order ID:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.id.slice(0, 8)}</span></div>
+                        <div><strong style="color: hsl(210, 10%, 45%);">Store Number:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.store_number}</span></div>
+                        <div><strong style="color: hsl(210, 10%, 45%);">Market:</strong> <span style="background-color: hsl(0, 84%, 60%); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">${workOrder.market}</span></div>
+                        <div><strong style="color: hsl(210, 10%, 45%);">Repair Type:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.repair_type}</span></div>
+                        <div><strong style="color: hsl(210, 10%, 45%);">Priority:</strong> <span style="background-color: hsl(0, 84%, 60%); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">CRITICAL</span></div>
+                        <div><strong style="color: hsl(210, 10%, 45%);">EcoSure Level:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.ecosure}</span></div>
+                        <div><strong style="color: hsl(210, 10%, 45%);">Status:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.status}</span></div>
+                        <div><strong style="color: hsl(210, 10%, 45%);">Description:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.description}</span></div>
+                        <div><strong style="color: hsl(210, 10%, 45%);">Assignee:</strong> <span style="color: hsl(210, 15%, 12%);">${workOrder.assignee || 'Not assigned'}</span></div>
+                        <div><strong style="color: hsl(210, 10%, 45%);">Created Date:</strong> <span style="color: hsl(210, 15%, 12%);">${new Date(workOrder.created_at).toLocaleDateString()} at ${new Date(workOrder.created_at).toLocaleTimeString()}</span></div>
+                        <div><strong style="color: hsl(210, 10%, 45%);">Created by:</strong> <span style="color: hsl(210, 15%, 12%);">${creatorProfile?.first_name} ${creatorProfile?.last_name} (${creatorProfile?.email})</span></div>
+                        ${workOrder.image_url ? `<div><strong style="color: hsl(210, 10%, 45%);">Image:</strong> <a href="${workOrder.image_url}" style="color: hsl(0, 85%, 45%); text-decoration: underline;">View Image</a></div>` : ''}
+                      </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, hsl(38, 92%, 50%), hsl(25, 95%, 53%)); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                      <strong style="font-size: 16px;">⚠️ Action Required:</strong>
+                      <div style="margin-top: 8px; background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 6px; font-size: 15px;">This critical work order requires immediate review and assignment.</div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-bottom: 25px;">
+                      <a href="https://frmjdxziwwlfpgevszga.supabase.co/functions/v1/redirect-to-work-order?id=${workOrderId}" style="background: linear-gradient(135deg, hsl(0, 84%, 60%), hsl(210, 15%, 20%)); color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">View Work Order Details</a>
+                    </div>
+                    
+                    <div style="border-top: 2px solid hsl(210, 10%, 88%); padding-top: 20px; text-align: center;">
+                      <div style="background-color: hsl(38, 92%, 50%); border: 1px solid hsl(38, 92%, 50%); color: white; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
+                        <strong>⚠️ Please don't reply to this email</strong><br>
+                        <span style="font-size: 14px;">Respond back on the Facilities Management Portal</span>
+                      </div>
+                      <p style="color: hsl(210, 10%, 45%); font-size: 12px; margin: 0;">
+                        ${isNEMarket ? 
+                          'This is an automated notification for critical work orders in NE1, NE2, NE3, and NE4 markets.' :
+                          'This is an automated notification for critical work orders.'
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              `,
+            });
 
-          console.log('Critical email sent successfully:', { email: grantEmail, emailResult });
+            console.log('Critical email sent successfully:', { email, emailResult });
 
-          // Log notification
-          await supabase.from('notification_log').insert({
-            recipient_email: grantEmail,
-            notification_type: 'critical_creation',
-            work_order_id: workOrderId,
-            status: 'sent'
-          });
-          
-          recipients.push(grantEmail);
-          console.log('Critical notification sent successfully to Grant Gelecki');
-        } catch (emailError) {
-          console.error('Failed to send critical email:', { email: grantEmail, error: emailError });
-          
-          // Log failed notification
-          await supabase.from('notification_log').insert({
-            recipient_email: grantEmail,
-            notification_type: 'critical_creation',
-            work_order_id: workOrderId,
-            status: 'failed'
-          });
+            // Log notification
+            await supabase.from('notification_log').insert({
+              recipient_email: email,
+              notification_type: 'critical_creation',
+              work_order_id: workOrderId,
+              status: 'sent'
+            });
+            
+            recipients.push(email);
+            console.log('Critical notification sent successfully to:', email);
+          } catch (emailError) {
+            console.error('Failed to send critical email:', { email, error: emailError });
+            
+            // Log failed notification
+            await supabase.from('notification_log').insert({
+              recipient_email: email,
+              notification_type: 'critical_creation',
+              work_order_id: workOrderId,
+              status: 'failed'
+            });
+          }
         }
       } else {
-        console.log('Work order does not meet critical NE market criteria');
+        console.log('Work order is not critical priority');
       }
     }
 
