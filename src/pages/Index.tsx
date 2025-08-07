@@ -421,7 +421,7 @@ const Index = () => {
         return;
       }
 
-      const updatedWorkOrder = { ...viewingWorkOrder, ...updates, updated_at: new Date().toISOString() };
+      const updatedWorkOrder = { ...viewingWorkOrder, ...updates, viewed: true, updated_at: new Date().toISOString() };
       setWorkOrders(workOrders.map(wo => wo.id === updatedWorkOrder.id ? updatedWorkOrder as WorkOrder : wo));
       setViewingWorkOrder(updatedWorkOrder as WorkOrder);
       toast({

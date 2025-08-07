@@ -4,6 +4,7 @@ export type RepairType =
   | 'Ice Machine'
   | 'Cold Tables'
   | 'Oven / Proofer'
+  | 'Slicer'
   | 'Plumbing'
   | 'Electrical'
   | 'General Maintenance'

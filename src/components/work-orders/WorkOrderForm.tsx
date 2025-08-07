@@ -24,6 +24,7 @@ const repairTypes: { value: RepairType; label: string }[] = [
   { value: 'Ice Machine', label: 'Ice Machine' },
   { value: 'Cold Tables', label: 'Cold Tables' },
   { value: 'Oven / Proofer', label: 'Oven / Proofer' },
+  { value: 'Slicer', label: 'Slicer' },
   { value: 'Plumbing', label: 'Plumbing' },
   { value: 'Electrical', label: 'Electrical' },
   { value: 'General Maintenance', label: 'General Maintenance' },
