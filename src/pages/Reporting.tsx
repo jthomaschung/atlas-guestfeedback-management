@@ -330,7 +330,7 @@ const Reporting = () => {
                     color: "hsl(213, 94%, 68%)",
                   },
                 }}
-                className="h-[500px]"
+                className="h-[600px] w-full"
               >
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -359,7 +359,7 @@ const Reporting = () => {
                       cy="50%"
                       labelLine={false}
                       label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                      outerRadius={120}
+                      outerRadius={150}
                       dataKey="value"
                     >
                       {Object.entries(stats.marketDistribution).map((entry, index) => (
@@ -402,7 +402,7 @@ const Reporting = () => {
                     color: "hsl(var(--chart-1))",
                   },
                 }}
-                className="h-[500px]"
+                className="h-[600px] w-full"
               >
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -451,7 +451,7 @@ const Reporting = () => {
                       cy="50%"
                       labelLine={false}
                       label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                      outerRadius={120}
+                      outerRadius={150}
                       dataKey="value"
                     >
                       {Object.entries(stats.repairTypeDistribution).slice(0, 6).map((entry, index) => (
