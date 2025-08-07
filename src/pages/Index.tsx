@@ -408,6 +408,7 @@ const Index = () => {
         .from('work_orders')
         .update({
           ...updates,
+          viewed: true,
           updated_at: new Date().toISOString()
         })
         .eq('id', viewingWorkOrder.id);
