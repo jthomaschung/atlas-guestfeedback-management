@@ -26,7 +26,7 @@ export type WorkOrderPriority = 'Critical' | 'Important' | 'Low';
 
 export type EcoSure = 'Imminent Health' | 'Critical' | 'Major' | 'Minor' | 'N/A';
 
-export type WorkOrderStatus = 'pending' | 'pending-approval' | 'in-progress' | 'completed' | 'cancelled';
+export type WorkOrderStatus = 'pending' | 'pending-approval' | 'in-progress' | 'on-hold' | 'completed' | 'cancelled';
 
 export interface WorkOrderFormData {
   description: string;

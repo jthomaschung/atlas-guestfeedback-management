@@ -28,6 +28,7 @@ const statusOptions = [
   { value: 'pending', label: 'Pending' },
   { value: 'pending-approval', label: 'Pending Approval' },
   { value: 'in-progress', label: 'In Progress' },
+  { value: 'on-hold', label: 'On Hold' },
   { value: 'completed', label: 'Completed' },
 ];
 

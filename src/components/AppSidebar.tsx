@@ -18,6 +18,7 @@ const items = [
   { title: "Submit New Work Order", url: "/submit", icon: PlusCircle },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Pending Approval", url: "/pending-approval", icon: ClipboardList },
+  { title: "On Hold", url: "/on-hold", icon: ClipboardList },
   { title: "Completed", url: "/completed", icon: ClipboardList },
   { title: "Reporting", url: "/reporting", icon: BarChart3 },
   { title: "User Management", url: "/user-hierarchy", icon: Users },

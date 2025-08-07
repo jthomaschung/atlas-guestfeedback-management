@@ -14,6 +14,7 @@ import Index from '@/pages/Index';
 import SubmitWorkOrder from '@/pages/SubmitWorkOrder';
 
 import PendingApproval from '@/pages/PendingApproval';
+import OnHold from '@/pages/OnHold';
 import Completed from '@/pages/Completed';
 import Reporting from '@/pages/Reporting';
 import UserHierarchy from '@/pages/UserHierarchy';
@@ -125,6 +126,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <PendingApproval />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/on-hold" 
+                element={
+                  <ProtectedRoute>
+                    <OnHold />
                   </ProtectedRoute>
                 } 
               />
