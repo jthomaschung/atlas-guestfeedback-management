@@ -21,11 +21,11 @@ const Index = () => {
   const [editingWorkOrder, setEditingWorkOrder] = useState<WorkOrder | null>(null);
   const [viewingWorkOrder, setViewingWorkOrder] = useState<WorkOrder | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string[]>([]);
-  const [priorityFilter, setPriorityFilter] = useState<string[]>([]);
-  const [storeFilter, setStoreFilter] = useState<string[]>([]);
-  const [marketFilter, setMarketFilter] = useState<string[]>([]);
-  const [assigneeFilter, setAssigneeFilter] = useState<string[]>([]);
+  const [statusFilter, setStatusFilter] = useState<WorkOrderStatus | 'all'>('all');
+  const [priorityFilter, setPriorityFilter] = useState<WorkOrderPriority | 'all'>('all');
+  const [storeFilter, setStoreFilter] = useState('all');
+  const [marketFilter, setMarketFilter] = useState('all');
+  const [assigneeFilter, setAssigneeFilter] = useState('all');
   const [deletingWorkOrder, setDeletingWorkOrder] = useState<WorkOrder | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
@@ -95,13 +95,13 @@ const Index = () => {
                            wo.repair_type.toLowerCase().includes(searchTerm.toLowerCase()) || 
                            wo.store_number.includes(searchTerm) ||
                            (wo.assignee?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
-      const matchesStatus = statusFilter.length === 0 || statusFilter.includes(wo.status);
-      const matchesPriority = priorityFilter.length === 0 || priorityFilter.includes(wo.priority);
-      const matchesStore = storeFilter.length === 0 || storeFilter.includes(wo.store_number);
-      const matchesMarket = marketFilter.length === 0 || marketFilter.includes(wo.market);
-      const matchesAssignee = assigneeFilter.length === 0 || 
-                             (assigneeFilter.includes('unassigned') && !wo.assignee) ||
-                             (wo.assignee && assigneeFilter.includes(wo.assignee));
+      const matchesStatus = statusFilter === 'all' || wo.status === statusFilter;
+      const matchesPriority = priorityFilter === 'all' || wo.priority === priorityFilter;
+      const matchesStore = storeFilter === 'all' || wo.store_number === storeFilter;
+      const matchesMarket = marketFilter === 'all' || wo.market === marketFilter;
+      const matchesAssignee = assigneeFilter === 'all' || 
+                             (assigneeFilter === 'unassigned' && !wo.assignee) ||
+                             wo.assignee === assigneeFilter;
       return matchesSearch && matchesStatus && matchesPriority && matchesStore && matchesMarket && matchesAssignee;
     });
   }, [workOrders, canAccessWorkOrder, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter, assigneeFilter]);
@@ -439,26 +439,26 @@ const Index = () => {
   };
   const clearFilters = () => {
     setSearchTerm('');
-    setStatusFilter([]);
-    setPriorityFilter([]);
-    setStoreFilter([]);
-    setMarketFilter([]);
-    setAssigneeFilter([]);
+    setStatusFilter('all');
+    setPriorityFilter('all');
+    setStoreFilter('all');
+    setMarketFilter('all');
+    setAssigneeFilter('all');
   };
   const handleStatsFilterChange = (type: 'status' | 'priority', value: string) => {
     if (type === 'status') {
-      setStatusFilter([value]);
+      setStatusFilter(value as WorkOrderStatus | 'all');
       // Reset other filters when clicking stats
-      setPriorityFilter([]);
+      setPriorityFilter('all');
     } else if (type === 'priority') {
-      setPriorityFilter([value]);
+      setPriorityFilter(value as WorkOrderPriority | 'all');
       // Reset other filters when clicking stats
-      setStatusFilter([]);
+      setStatusFilter('all');
     }
     setSearchTerm('');
-    setStoreFilter([]);
-    setMarketFilter([]);
-    setAssigneeFilter([]);
+    setStoreFilter('all');
+    setMarketFilter('all');
+    setAssigneeFilter('all');
   };
   return <div className="min-h-screen bg-background">
       <div className="container mx-auto p-6 space-y-6">

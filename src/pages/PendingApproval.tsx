@@ -23,9 +23,9 @@ export default function PendingApproval() {
   const [filters, setFilters] = useState({
     search: "",
     repairType: "all",
-    market: [] as string[],
-    priority: [] as string[],
-    assignee: [] as string[],
+    market: "all",
+    priority: "all",
+    assignee: "all",
   });
 
   useEffect(() => {
@@ -75,19 +75,19 @@ export default function PendingApproval() {
       filtered = filtered.filter((wo) => wo.repair_type === filters.repairType);
     }
 
-    if (filters.market.length > 0) {
-      filtered = filtered.filter((wo) => filters.market.includes(wo.market));
+    if (filters.market !== "all") {
+      filtered = filtered.filter((wo) => wo.market === filters.market);
     }
 
-    if (filters.priority.length > 0) {
-      filtered = filtered.filter((wo) => filters.priority.includes(wo.priority));
+    if (filters.priority !== "all") {
+      filtered = filtered.filter((wo) => wo.priority === filters.priority);
     }
 
-    if (filters.assignee.length > 0) {
-      if (filters.assignee.includes("unassigned")) {
-        filtered = filtered.filter((wo) => !wo.assignee || filters.assignee.includes(wo.assignee || ""));
+    if (filters.assignee !== "all") {
+      if (filters.assignee === "unassigned") {
+        filtered = filtered.filter((wo) => !wo.assignee);
       } else {
-        filtered = filtered.filter((wo) => wo.assignee && filters.assignee.includes(wo.assignee));
+        filtered = filtered.filter((wo) => wo.assignee === filters.assignee);
       }
     }
 
@@ -213,17 +213,17 @@ export default function PendingApproval() {
         <WorkOrderFilters
           searchTerm={filters.search}
           onSearchChange={(value) => setFilters(prev => ({ ...prev, search: value }))}
-          statusFilter={["pending-approval"]}
+          statusFilter="all"
           onStatusFilterChange={() => {}}
-          priorityFilter={filters.priority}
-          onPriorityFilterChange={(value) => setFilters(prev => ({ ...prev, priority: value }))}
-          storeFilter={[]}
+          priorityFilter={filters.priority as any}
+          onPriorityFilterChange={(value) => setFilters(prev => ({ ...prev, priority: value as string }))}
+          storeFilter="all"
           onStoreFilterChange={() => {}}
           marketFilter={filters.market}
           onMarketFilterChange={(value) => setFilters(prev => ({ ...prev, market: value }))}
           assigneeFilter={filters.assignee}
           onAssigneeFilterChange={(value) => setFilters(prev => ({ ...prev, assignee: value }))}
-          onClearFilters={() => setFilters({ search: "", repairType: "all", market: [], priority: [], assignee: [] })}
+          onClearFilters={() => setFilters({ search: "", repairType: "all", market: "all", priority: "all", assignee: "all" })}
           availableStores={[...new Set(workOrders.map(wo => wo.store_number))]}
           availableMarkets={availableMarkets}
           availableAssignees={availableAssignees}

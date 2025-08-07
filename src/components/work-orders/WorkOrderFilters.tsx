@@ -1,38 +1,40 @@
 import { WorkOrderStatus, WorkOrderPriority, RepairType } from "@/types/work-order";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MultiSelect, Option } from "@/components/ui/multi-select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, X } from "lucide-react";
 
 interface WorkOrderFiltersProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
-  statusFilter: string[];
-  onStatusFilterChange: (value: string[]) => void;
-  priorityFilter: string[];
-  onPriorityFilterChange: (value: string[]) => void;
-  storeFilter: string[];
-  onStoreFilterChange: (value: string[]) => void;
-  marketFilter: string[];
-  onMarketFilterChange: (value: string[]) => void;
-  assigneeFilter: string[];
-  onAssigneeFilterChange: (value: string[]) => void;
+  statusFilter: WorkOrderStatus | 'all';
+  onStatusFilterChange: (value: WorkOrderStatus | 'all') => void;
+  priorityFilter: WorkOrderPriority | 'all';
+  onPriorityFilterChange: (value: WorkOrderPriority | 'all') => void;
+  storeFilter: string;
+  onStoreFilterChange: (value: string) => void;
+  marketFilter: string;
+  onMarketFilterChange: (value: string) => void;
+  assigneeFilter: string;
+  onAssigneeFilterChange: (value: string) => void;
   onClearFilters: () => void;
   availableStores: string[];
   availableMarkets: string[];
   availableAssignees: string[];
 }
 
-const statusOptions: Option[] = [
+const statusOptions = [
+  { value: 'all', label: 'All Status' },
   { value: 'pending', label: 'Pending' },
   { value: 'pending-approval', label: 'Pending Approval' },
   { value: 'in-progress', label: 'In Progress' },
   { value: 'on-hold', label: 'On Hold' },
   { value: 'completed', label: 'Completed' },
-  { value: 'cancelled', label: 'Cancelled' },
 ];
 
-const priorityOptions: Option[] = [
+
+const priorityOptions = [
+  { value: 'all', label: 'All Priorities' },
   { value: 'Low', label: 'Low' },
   { value: 'Important', label: 'Important' },
   { value: 'Critical', label: 'Critical' },
@@ -56,31 +58,29 @@ export function WorkOrderFilters({
   availableMarkets,
   availableAssignees,
 }: WorkOrderFiltersProps) {
-  const storeOptions: Option[] = (availableStores || []).map(store => ({ 
-    value: store, 
-    label: `Store ${store}` 
-  }));
+  const storeOptions = [
+    { value: 'all', label: 'All Stores' },
+    ...(availableStores || []).map(store => ({ value: store, label: `Store ${store}` }))
+  ];
 
-  const marketOptions: Option[] = (availableMarkets || []).map(market => ({ 
-    value: market, 
-    label: market 
-  }));
+  const marketOptions = [
+    { value: 'all', label: 'All Markets' },
+    ...(availableMarkets || []).map(market => ({ value: market, label: market }))
+  ];
 
-  const assigneeOptions: Option[] = [
+  const assigneeOptions = [
+    { value: 'all', label: 'All Assignees' },
     { value: 'unassigned', label: 'Unassigned' },
-    ...(availableAssignees || []).map(assignee => ({ 
-      value: assignee, 
-      label: assignee 
-    }))
+    ...(availableAssignees || []).map(assignee => ({ value: assignee, label: assignee }))
   ];
 
   const hasActiveFilters = 
     searchTerm !== '' ||
-    statusFilter.length > 0 ||
-    priorityFilter.length > 0 ||
-    storeFilter.length > 0 ||
-    marketFilter.length > 0 ||
-    assigneeFilter.length > 0;
+    statusFilter !== 'all' ||
+    priorityFilter !== 'all' ||
+    storeFilter !== 'all' ||
+    marketFilter !== 'all' ||
+    assigneeFilter !== 'all';
 
   return (
     <div className="space-y-4">
@@ -95,40 +95,70 @@ export function WorkOrderFilters({
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        <MultiSelect
-          options={statusOptions}
-          selected={statusFilter}
-          onChange={onStatusFilterChange}
-          placeholder="All Status"
-        />
+        <Select value={statusFilter} onValueChange={onStatusFilterChange}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="bg-background border border-border">
+            {statusOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         
-        <MultiSelect
-          options={priorityOptions}
-          selected={priorityFilter}
-          onChange={onPriorityFilterChange}
-          placeholder="All Priorities"
-        />
+        <Select value={priorityFilter} onValueChange={onPriorityFilterChange}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="bg-background border border-border">
+            {priorityOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         
-        <MultiSelect
-          options={storeOptions}
-          selected={storeFilter}
-          onChange={onStoreFilterChange}
-          placeholder="All Stores"
-        />
+        <Select value={storeFilter} onValueChange={onStoreFilterChange}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="bg-background border border-border">
+            {storeOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         
-        <MultiSelect
-          options={marketOptions}
-          selected={marketFilter}
-          onChange={onMarketFilterChange}
-          placeholder="All Markets"
-        />
+        <Select value={marketFilter} onValueChange={onMarketFilterChange}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="bg-background border border-border">
+            {marketOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         
-        <MultiSelect
-          options={assigneeOptions}
-          selected={assigneeFilter}
-          onChange={onAssigneeFilterChange}
-          placeholder="All Assignees"
-        />
+        <Select value={assigneeFilter} onValueChange={onAssigneeFilterChange}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="bg-background border border-border">
+            {assigneeOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       
       {hasActiveFilters && (
