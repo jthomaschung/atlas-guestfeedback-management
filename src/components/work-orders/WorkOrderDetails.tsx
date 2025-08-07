@@ -23,6 +23,7 @@ const statusColors = {
   pending: 'bg-yellow-500 text-white border-yellow-600 hover:bg-yellow-600',
   'pending-approval': 'bg-purple-500 text-white border-purple-600 hover:bg-purple-600',
   'in-progress': 'bg-blue-500 text-white border-blue-600 hover:bg-blue-600',
+  'on-hold': 'bg-orange-500 text-white border-orange-600 hover:bg-orange-600',
   completed: 'bg-green-500 text-white border-green-600 hover:bg-green-600',
   cancelled: 'bg-gray-500 text-white border-gray-600 hover:bg-gray-600',
 };
@@ -374,7 +375,7 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
                      </Badge>
                    </SelectValue>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background border border-border z-50">
                   <SelectItem value="pending">
                      <Badge className={statusColors.pending}>Pending</Badge>
                    </SelectItem>
@@ -383,6 +384,9 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
                    </SelectItem>
                    <SelectItem value="in-progress">
                      <Badge className={statusColors['in-progress']}>In Progress</Badge>
+                   </SelectItem>
+                   <SelectItem value="on-hold">
+                     <Badge className={statusColors['on-hold']}>On Hold</Badge>
                    </SelectItem>
                    <SelectItem value="completed">
                      <Badge className={statusColors.completed}>Completed</Badge>
