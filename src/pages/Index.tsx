@@ -346,20 +346,18 @@ const Index = () => {
   const handleViewDetails = async (workOrder: WorkOrder) => {
     setViewingWorkOrder(workOrder);
     
-    // Mark work order as viewed if it hasn't been viewed yet
+    // Immediately update local state to remove gray styling
     if (!workOrder.viewed) {
+      setWorkOrders(prev => prev.map(wo => 
+        wo.id === workOrder.id ? { ...wo, viewed: true } : wo
+      ));
+      
+      // Update database in background
       try {
-        const { error } = await supabase
+        await supabase
           .from('work_orders')
           .update({ viewed: true })
           .eq('id', workOrder.id);
-
-        if (!error) {
-          // Update local state
-          setWorkOrders(prev => prev.map(wo => 
-            wo.id === workOrder.id ? { ...wo, viewed: true } : wo
-          ));
-        }
       } catch (error) {
         console.error('Error marking work order as viewed:', error);
         // Don't show error to user as this is not critical
