@@ -58,6 +58,7 @@ export function MultiSelect({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          type="button"
           variant="outline"
           role="combobox"
           aria-expanded={open}
@@ -65,6 +66,10 @@ export function MultiSelect({
             "w-full justify-between min-h-10 h-auto",
             className
           )}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
         >
           <div className="flex gap-1 flex-wrap">
             {selected.length === 0 && (
@@ -78,6 +83,7 @@ export function MultiSelect({
               >
                 {option.label}
                 <Button
+                  type="button"
                   className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   size="sm"
                   variant="ghost"
@@ -95,7 +101,7 @@ export function MultiSelect({
           <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0" align="start">
+      <PopoverContent className="w-full p-0 z-50" align="start">
         <Command>
           <CommandInput placeholder="Search..." />
           <CommandEmpty>No item found.</CommandEmpty>
