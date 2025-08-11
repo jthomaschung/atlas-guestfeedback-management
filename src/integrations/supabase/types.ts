@@ -223,36 +223,7 @@ export type Database = {
       }
     }
     Views: {
-      public_profiles: {
-        Row: {
-          created_at: string | null
-          display_name: string | null
-          first_name: string | null
-          id: string | null
-          last_name: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          display_name?: string | null
-          first_name?: string | null
-          id?: string | null
-          last_name?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          display_name?: string | null
-          first_name?: string | null
-          id?: string | null
-          last_name?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       generate_display_name: {
@@ -262,6 +233,15 @@ export type Database = {
       get_current_user_email: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_user_display_info: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          user_id: string
+          display_name: string
+          first_name: string
+          last_name: string
+        }[]
       }
       is_admin: {
         Args: { user_id: string }

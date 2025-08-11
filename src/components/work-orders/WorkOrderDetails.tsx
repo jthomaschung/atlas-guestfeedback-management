@@ -73,11 +73,22 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
   // Load users for tagging and additional images
   useEffect(() => {
     const loadUsers = async () => {
-      const { data } = await supabase
-        .from('profiles')
-        .select('user_id, email, first_name, last_name, display_name');
+      // Use the secure function that only exposes necessary user information (no emails)
+      const { data, error } = await supabase.rpc('get_user_display_info');
+      if (error) {
+        console.error('Error loading users for tagging:', error);
+        return;
+      }
       if (data) {
-        setUsers(data);
+        // Transform the data to match expected format
+        const transformedData = data.map(user => ({
+          user_id: user.user_id,
+          email: '', // No longer exposed for security
+          first_name: user.first_name,
+          last_name: user.last_name,
+          display_name: user.display_name
+        }));
+        setUsers(transformedData);
       }
     };
     loadUsers();
@@ -93,11 +104,11 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     setAdditionalImages(imageUrls);
   }, [workOrder.notes]);
 
-  // Helper function to get display name for a user
+  // Helper function to get display name for a user (updated to not rely on email)
   const getUserDisplayName = (user: typeof users[0]) => {
     if (user.display_name) return user.display_name;
     const name = `${user.first_name || ''} ${user.last_name || ''}`.trim();
-    return name || user.email.split('@')[0];
+    return name || 'Unknown User'; // Fallback since email is no longer available
   };
 
   // Handle textarea changes and detect @ mentions
