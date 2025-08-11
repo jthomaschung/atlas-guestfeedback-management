@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Calendar, MessageSquare, Plus, X, User, AtSign } from 'lucide-react';
+import { Calendar, MessageSquare, Plus, X, User, AtSign, Upload, Paperclip } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -62,12 +62,15 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
   const [mentionQuery, setMentionQuery] = useState('');
   const [mentionStartPos, setMentionStartPos] = useState(0);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const [additionalImages, setAdditionalImages] = useState<string[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { profile, user } = useAuth();
   const { sendCompletionNotification, sendTaggedNotification } = useNotifications();
 
-  // Load users for tagging
+  // Load users for tagging and additional images
   useEffect(() => {
     const loadUsers = async () => {
       const { data } = await supabase
@@ -78,7 +81,17 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
       }
     };
     loadUsers();
-  }, []);
+
+    // Load additional images from work order notes (if they contain image URLs)
+    const imageUrls = (workOrder.notes || [])
+      .filter(note => note.includes('http') && (note.includes('.jpg') || note.includes('.jpeg') || note.includes('.png') || note.includes('.webp') || note.includes('.gif')))
+      .map(note => {
+        const urlMatch = note.match(/https?:\/\/[^\s]+\.(jpg|jpeg|png|webp|gif)/i);
+        return urlMatch ? urlMatch[0] : null;
+      })
+      .filter(Boolean) as string[];
+    setAdditionalImages(imageUrls);
+  }, [workOrder.notes]);
 
   // Helper function to get display name for a user
   const getUserDisplayName = (user: typeof users[0]) => {
@@ -283,6 +296,76 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     });
   };
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Check file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/mov', 'video/avi'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: "Invalid File Type",
+        description: "Please upload an image (JPG, PNG, GIF, WebP) or video (MP4, MOV, AVI)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Please upload a file smaller than 10MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadingFile(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${workOrder.id}/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('work-orders')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('work-orders')
+        .getPublicUrl(filePath);
+
+      // Add the file URL as a note
+      const timestamp = new Date().toISOString();
+      const userName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 
+                       user?.email || 'Unknown User';
+      const fileNote = `${format(new Date(), 'MMM d, yyyy h:mm a')} - ${userName}: Attached ${file.type.startsWith('image/') ? 'image' : 'video'}: ${publicUrl}`;
+      const updatedNotes = [...(workOrder.notes || []), fileNote];
+
+      onUpdate({ notes: updatedNotes });
+      setAdditionalImages(prev => [...prev, publicUrl]);
+
+      toast({
+        title: "File Uploaded",
+        description: `${file.type.startsWith('image/') ? 'Image' : 'Video'} has been attached to the work order`,
+      });
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast({
+        title: "Upload Failed",
+        description: "Failed to upload file. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingFile(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -335,7 +418,7 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
           {/* Image */}
           {workOrder.image_url && (
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Attached Image</Label>
+              <Label className="text-sm font-medium text-muted-foreground">Original Attachment</Label>
               <div className="mt-1">
                 <img 
                   src={workOrder.image_url} 
@@ -345,6 +428,67 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
               </div>
             </div>
           )}
+
+          {/* Additional Attachments */}
+          {additionalImages.length > 0 && (
+            <div>
+              <Label className="text-sm font-medium text-muted-foreground">Additional Attachments</Label>
+              <div className="mt-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {additionalImages.map((imageUrl, index) => (
+                  <div key={index} className="border rounded-md overflow-hidden">
+                    {imageUrl.includes('.mp4') || imageUrl.includes('.mov') || imageUrl.includes('.avi') ? (
+                      <video 
+                        src={imageUrl} 
+                        controls 
+                        className="w-full h-auto max-h-64"
+                      />
+                    ) : (
+                      <img 
+                        src={imageUrl} 
+                        alt={`Additional attachment ${index + 1}`} 
+                        className="w-full h-auto max-h-64 object-cover"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Add Attachment Section */}
+          <div>
+            <Label className="text-sm font-medium text-muted-foreground mb-2 block">Add Photo/Video</Label>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingFile}
+                className="flex items-center gap-2"
+              >
+                {uploadingFile ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Paperclip className="h-4 w-4" />
+                    Attach File
+                  </>
+                )}
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                Images (JPG, PNG, GIF, WebP) or Videos (MP4, MOV, AVI) • Max 10MB
+              </span>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,video/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </div>
+          </div>
 
           {/* Assignee Section */}
           <div>
