@@ -74,6 +74,7 @@ export default function UserHierarchy() {
   const [users, setUsers] = useState<CombinedUserData[]>([]);
   const [selectedUser, setSelectedUser] = useState<CombinedUserData | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCreateMode, setIsCreateMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [checkingAdmin, setCheckingAdmin] = useState(true);
@@ -83,6 +84,9 @@ export default function UserHierarchy() {
   const [formData, setFormData] = useState({
     display_name: '',
     email: '',
+    password: '',
+    first_name: '',
+    last_name: '',
     role: 'Store Level',
     manager_id: '',
     director_id: '',
@@ -187,9 +191,13 @@ export default function UserHierarchy() {
 
   const openUserDialog = (userData: CombinedUserData) => {
     setSelectedUser(userData);
+    setIsCreateMode(false);
     setFormData({
       display_name: userData.profile.display_name || '',
       email: userData.profile.email || '',
+      password: '',
+      first_name: userData.profile.first_name || '',
+      last_name: userData.profile.last_name || '',
       role: userData.hierarchy?.role || 'Store Level',
       manager_id: userData.hierarchy?.manager_id || '',
       director_id: userData.hierarchy?.director_id || '',
@@ -204,32 +212,100 @@ export default function UserHierarchy() {
     setIsDialogOpen(true);
   };
 
+  const openCreateUserDialog = () => {
+    setSelectedUser(null);
+    setIsCreateMode(true);
+    setFormData({
+      display_name: '',
+      email: '',
+      password: '',
+      first_name: '',
+      last_name: '',
+      role: 'Store Level',
+      manager_id: '',
+      director_id: '',
+      email_on_completion: true,
+      email_on_tagged: true,
+      email_on_assignment: true,
+      markets: [],
+      stores: []
+    });
+    setSelectedMarket('');
+    setSelectedStore('');
+    setIsDialogOpen(true);
+  };
+
   const handleSaveUser = async () => {
-    if (!selectedUser) return;
-    
     setLoading(true);
     try {
-      const userId = selectedUser.profile.user_id;
+      let userId: string;
 
-      // Update profile
-      console.log('Updating profile for user:', userId, 'Display Name:', formData.display_name);
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          display_name: formData.display_name.trim(),
-          email: formData.email.trim()
-        })
-        .eq('user_id', userId)
-        .select();
+      if (isCreateMode) {
+        // Create new user
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: formData.email.trim(),
+          password: formData.password,
+          options: {
+            data: {
+              first_name: formData.first_name.trim(),
+              last_name: formData.last_name.trim(),
+              display_name: formData.display_name.trim()
+            }
+          }
+        });
 
-      console.log('Profile update result:', { profileData, profileError });
-      if (profileError) {
-        console.error('Profile update error:', profileError);
-        throw profileError;
+        if (authError) {
+          throw authError;
+        }
+
+        if (!authData.user) {
+          throw new Error('Failed to create user');
+        }
+
+        userId = authData.user.id;
+
+        // The trigger will automatically create the profile, but we should update it with our data
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for trigger to complete
+
+        // Update the profile with our form data
+        const { error: profileUpdateError } = await supabase
+          .from('profiles')
+          .update({
+            first_name: formData.first_name.trim(),
+            last_name: formData.last_name.trim(),
+            display_name: formData.display_name.trim()
+          })
+          .eq('user_id', userId);
+
+        if (profileUpdateError) {
+          console.error('Profile update error:', profileUpdateError);
+        }
+      } else {
+        if (!selectedUser) return;
+        userId = selectedUser.profile.user_id;
+
+        // Update profile for existing user
+        console.log('Updating profile for user:', userId, 'Display Name:', formData.display_name);
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            display_name: formData.display_name.trim(),
+            email: formData.email.trim(),
+            first_name: formData.first_name.trim(),
+            last_name: formData.last_name.trim()
+          })
+          .eq('user_id', userId)
+          .select();
+
+        console.log('Profile update result:', { profileData, profileError });
+        if (profileError) {
+          console.error('Profile update error:', profileError);
+          throw profileError;
+        }
       }
 
       // Update or insert hierarchy
-      if (selectedUser.hierarchy) {
+      if (!isCreateMode && selectedUser?.hierarchy) {
         const { error: hierarchyError } = await supabase
           .from('user_hierarchy')
           .update({
@@ -260,7 +336,7 @@ export default function UserHierarchy() {
       }
 
       // Update or insert notifications
-      if (selectedUser.notifications) {
+      if (!isCreateMode && selectedUser?.notifications) {
         const { error: notificationError } = await supabase
           .from('notification_preferences')
           .update({
@@ -291,7 +367,7 @@ export default function UserHierarchy() {
       }
 
       // Update or insert permissions
-      if (selectedUser.permissions) {
+      if (!isCreateMode && selectedUser?.permissions) {
         const { error: permissionError } = await supabase
           .from('user_permissions')
           .update({
@@ -321,7 +397,7 @@ export default function UserHierarchy() {
 
       toast({
         title: "Success",
-        description: "User updated successfully"
+        description: isCreateMode ? "User created successfully" : "User updated successfully"
       });
 
       setIsDialogOpen(false);
@@ -437,6 +513,10 @@ export default function UserHierarchy() {
           <Button onClick={loadAllUsers} disabled={loading}>
             {loading ? 'Refreshing...' : 'Refresh'}
           </Button>
+          <Button onClick={openCreateUserDialog} variant="outline">
+            <Users className="h-4 w-4 mr-2" />
+            Create User
+          </Button>
         </div>
       </div>
 
@@ -502,7 +582,7 @@ export default function UserHierarchy() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Settings className="h-5 w-5" />
-              Manage User: {selectedUser ? getUserDisplayName(selectedUser.profile) : ''}
+              {isCreateMode ? 'Create New User' : `Manage User: ${selectedUser ? getUserDisplayName(selectedUser.profile) : ''}`}
             </DialogTitle>
           </DialogHeader>
 
@@ -516,6 +596,24 @@ export default function UserHierarchy() {
 
             <TabsContent value="basic" className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="first_name">First Name</Label>
+                  <Input
+                    id="first_name"
+                    value={formData.first_name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
+                    placeholder="User's first name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="last_name">Last Name</Label>
+                  <Input
+                    id="last_name"
+                    value={formData.last_name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
+                    placeholder="User's last name"
+                  />
+                </div>
                 <div>
                   <Label htmlFor="display_name">Display Name</Label>
                   <Input
@@ -533,8 +631,22 @@ export default function UserHierarchy() {
                     value={formData.email}
                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                     placeholder="Email for notifications"
+                    disabled={!isCreateMode}
                   />
                 </div>
+                {isCreateMode && (
+                  <div className="col-span-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                      placeholder="Initial password for the user"
+                      required={isCreateMode}
+                    />
+                  </div>
+                )}
               </div>
             </TabsContent>
 

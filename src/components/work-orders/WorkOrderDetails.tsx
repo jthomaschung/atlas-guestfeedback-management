@@ -64,14 +64,24 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
   const [mentionStartPos, setMentionStartPos] = useState(0);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [additionalImages, setAdditionalImages] = useState<string[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isEditingCreatedBy, setIsEditingCreatedBy] = useState(false);
+  const [selectedCreatorId, setSelectedCreatorId] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { profile, user } = useAuth();
   const { sendCompletionNotification, sendTaggedNotification } = useNotifications();
 
-  // Load users for tagging and additional images
+  // Check admin status and load users for tagging and additional images
   useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (user) {
+        const { data } = await supabase.rpc('is_admin', { user_id: user.id });
+        setIsAdmin(data || false);
+      }
+    };
+
     const loadUsers = async () => {
       // Use the secure function that only exposes necessary user information (no emails)
       const { data, error } = await supabase.rpc('get_user_display_info');
@@ -91,6 +101,8 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
         setUsers(transformedData);
       }
     };
+    
+    checkAdminStatus();
     loadUsers();
 
     // Load additional images from work order notes (if they contain image URLs)
@@ -102,7 +114,7 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
       })
       .filter(Boolean) as string[];
     setAdditionalImages(imageUrls);
-  }, [workOrder.notes]);
+  }, [workOrder.notes, user]);
 
   // Helper function to get display name for a user (updated to not rely on email)
   const getUserDisplayName = (user: typeof users[0]) => {
@@ -377,6 +389,40 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     }
   };
 
+  const handleChangeCreatedBy = async () => {
+    if (!selectedCreatorId || !isAdmin) return;
+
+    try {
+      const { error } = await supabase
+        .from('work_orders')
+        .update({ user_id: selectedCreatorId })
+        .eq('id', workOrder.id);
+
+      if (error) throw error;
+
+      // Update the work order in parent component
+      onUpdate({ user_id: selectedCreatorId });
+      setIsEditingCreatedBy(false);
+      
+      toast({
+        title: "Created By Updated",
+        description: "Work order creator has been changed successfully",
+      });
+    } catch (error) {
+      console.error('Error updating created by:', error);
+      toast({
+        title: "Update Failed",
+        description: "Failed to update work order creator",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getCreatorDisplayName = () => {
+    const creator = users.find(u => u.user_id === workOrder.user_id);
+    return creator ? getUserDisplayName(creator) : 'Unknown User';
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -408,6 +454,51 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
                 <Calendar className="h-3 w-3 mr-1" />
                 {format(new Date(workOrder.created_at), 'MMM d, yyyy h:mm a')}
               </div>
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-muted-foreground">Created By</Label>
+              {isAdmin && isEditingCreatedBy ? (
+                <div className="flex items-center gap-2 mt-1">
+                  <Select value={selectedCreatorId} onValueChange={setSelectedCreatorId}>
+                    <SelectTrigger className="h-8">
+                      <SelectValue placeholder="Select user" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {users.map(user => (
+                        <SelectItem key={user.user_id} value={user.user_id}>
+                          {getUserDisplayName(user)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button size="sm" onClick={handleChangeCreatedBy} disabled={!selectedCreatorId}>
+                    Save
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => setIsEditingCreatedBy(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <User className="h-3 w-3 mr-1" />
+                    {getCreatorDisplayName()}
+                  </div>
+                  {isAdmin && (
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      onClick={() => {
+                        setSelectedCreatorId(workOrder.user_id);
+                        setIsEditingCreatedBy(true);
+                      }}
+                      className="h-6 px-2 text-xs"
+                    >
+                      Change
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
             {workOrder.completed_at && (
               <div>
