@@ -26,10 +26,10 @@ const Completed = () => {
   const [loading, setLoading] = useState(true);
   const [viewingWorkOrder, setViewingWorkOrder] = useState<WorkOrder | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [priorityFilter, setPriorityFilter] = useState<WorkOrderPriority | 'all'>('all');
-  const [storeFilter, setStoreFilter] = useState('all');
-  const [marketFilter, setMarketFilter] = useState('all');
-  const [assigneeFilter, setAssigneeFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState<string[]>([]);
+  const [storeFilter, setStoreFilter] = useState<string[]>([]);
+  const [marketFilter, setMarketFilter] = useState<string[]>([]);
+  const [assigneeFilter, setAssigneeFilter] = useState<string[]>([]);
   const [sortField, setSortField] = useState<SortField>('completed_at');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const { toast } = useToast();
@@ -98,12 +98,12 @@ const Completed = () => {
                           wo.repair_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           wo.store_number.includes(searchTerm) ||
                           (wo.assignee?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
-      const matchesPriority = priorityFilter === 'all' || wo.priority === priorityFilter;
-      const matchesStore = storeFilter === 'all' || wo.store_number === storeFilter;
-      const matchesMarket = marketFilter === 'all' || wo.market === marketFilter;
-      const matchesAssignee = assigneeFilter === 'all' || 
-                             (assigneeFilter === 'unassigned' && !wo.assignee) ||
-                             wo.assignee === assigneeFilter;
+      const matchesPriority = priorityFilter.length === 0 || priorityFilter.includes(wo.priority);
+      const matchesStore = storeFilter.length === 0 || storeFilter.includes(wo.store_number);
+      const matchesMarket = marketFilter.length === 0 || marketFilter.includes(wo.market);
+      const matchesAssignee = assigneeFilter.length === 0 || 
+                             (assigneeFilter.includes('unassigned') && !wo.assignee) ||
+                             (wo.assignee && assigneeFilter.includes(wo.assignee));
 
       return matchesSearch && matchesPriority && matchesStore && matchesMarket && matchesAssignee;
     });
@@ -154,10 +154,10 @@ const Completed = () => {
 
   const clearFilters = () => {
     setSearchTerm('');
-    setPriorityFilter('all');
-    setStoreFilter('all');
-    setMarketFilter('all');
-    setAssigneeFilter('all');
+    setPriorityFilter([]);
+    setStoreFilter([]);
+    setMarketFilter([]);
+    setAssigneeFilter([]);
   };
 
   const handleViewDetails = (workOrder: WorkOrder) => {
@@ -235,7 +235,7 @@ const Completed = () => {
         <WorkOrderFilters 
           searchTerm={searchTerm} 
           onSearchChange={setSearchTerm} 
-          statusFilter="completed" 
+          statusFilter={["completed"]} 
           onStatusFilterChange={() => {}} 
           priorityFilter={priorityFilter} 
           onPriorityFilterChange={setPriorityFilter} 

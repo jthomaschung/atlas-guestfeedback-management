@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { WorkOrder } from "@/types/work-order";
+import { WorkOrder, WorkOrderStatus, WorkOrderPriority } from "@/types/work-order";
 import { WorkOrderTable } from "@/components/work-orders/WorkOrderTable";
 import { WorkOrderFilters } from "@/components/work-orders/WorkOrderFilters";
 import { WorkOrderDetails } from "@/components/work-orders/WorkOrderDetails";
@@ -21,11 +21,13 @@ export default function OnHold() {
   const { permissions, canAccessWorkOrder } = useUserPermissions();
 
   const [filters, setFilters] = useState({
-    search: "",
-    repairType: "all",
-    market: "all",
-    priority: "all",
-    assignee: "all",
+    searchTerm: '',
+    statusFilter: [] as string[],
+    priorityFilter: [] as string[],
+    storeFilter: [] as string[],
+    marketFilter: [] as string[],
+    assigneeFilter: [] as string[],
+    sortOrder: 'newest' as 'newest' | 'oldest'
   });
 
   useEffect(() => {
@@ -57,39 +59,64 @@ export default function OnHold() {
   };
 
   useEffect(() => {
-    let filtered = workOrders.filter(wo => {
+    let filtered = workOrders.filter(workOrder => {
       // Apply permission-based filtering
-      return canAccessWorkOrder(wo);
-    });
-
-    if (filters.search) {
-      filtered = filtered.filter(
-        (wo) =>
-          wo.description.toLowerCase().includes(filters.search.toLowerCase()) ||
-          wo.store_number.includes(filters.search) ||
-          wo.repair_type.toLowerCase().includes(filters.search.toLowerCase())
-      );
-    }
-
-    if (filters.repairType !== "all") {
-      filtered = filtered.filter((wo) => wo.repair_type === filters.repairType);
-    }
-
-    if (filters.market !== "all") {
-      filtered = filtered.filter((wo) => wo.market === filters.market);
-    }
-
-    if (filters.priority !== "all") {
-      filtered = filtered.filter((wo) => wo.priority === filters.priority);
-    }
-
-    if (filters.assignee !== "all") {
-      if (filters.assignee === "unassigned") {
-        filtered = filtered.filter((wo) => !wo.assignee);
-      } else {
-        filtered = filtered.filter((wo) => wo.assignee === filters.assignee);
+      if (!canAccessWorkOrder(workOrder)) {
+        return false;
       }
-    }
+
+      // Search filter
+      if (filters.searchTerm) {
+        const searchLower = filters.searchTerm.toLowerCase();
+        const matchesSearch = 
+          workOrder.repair_type?.toLowerCase().includes(searchLower) ||
+          workOrder.description?.toLowerCase().includes(searchLower) ||
+          workOrder.store_number?.toLowerCase().includes(searchLower) ||
+          workOrder.assignee?.toLowerCase().includes(searchLower) ||
+          workOrder.market?.toLowerCase().includes(searchLower);
+        
+        if (!matchesSearch) return false;
+      }
+
+      // Status filter
+      if (filters.statusFilter.length > 0 && !filters.statusFilter.includes(workOrder.status)) {
+        return false;
+      }
+
+      // Priority filter
+      if (filters.priorityFilter.length > 0 && !filters.priorityFilter.includes(workOrder.priority)) {
+        return false;
+      }
+
+      // Store filter
+      if (filters.storeFilter.length > 0 && !filters.storeFilter.includes(workOrder.store_number || '')) {
+        return false;
+      }
+
+      // Market filter
+      if (filters.marketFilter.length > 0 && !filters.marketFilter.includes(workOrder.market || '')) {
+        return false;
+      }
+
+      // Assignee filter
+      if (filters.assigneeFilter.length > 0) {
+        if (filters.assigneeFilter.includes('unassigned') && workOrder.assignee) {
+          if (!filters.assigneeFilter.includes(workOrder.assignee)) {
+            return false;
+          }
+        } else if (!filters.assigneeFilter.includes('unassigned') && !workOrder.assignee) {
+          return false;
+        } else if (workOrder.assignee && !filters.assigneeFilter.includes(workOrder.assignee) && !filters.assigneeFilter.includes('unassigned')) {
+          return false;
+        }
+      }
+
+      return true;
+    }).sort((a, b) => {
+      const aDate = new Date(a.created_at).getTime();
+      const bDate = new Date(b.created_at).getTime();
+      return filters.sortOrder === 'newest' ? bDate - aDate : aDate - bDate;
+    });
 
     setFilteredWorkOrders(filtered);
   }, [workOrders, canAccessWorkOrder, filters]);
@@ -182,7 +209,7 @@ export default function OnHold() {
     }
   };
 
-  const availableRepairTypes = [...new Set(workOrders.map(wo => wo.repair_type))];
+  const availableStores = [...new Set(workOrders.map(wo => wo.store_number))];
   const availableMarkets = [...new Set(workOrders.map(wo => wo.market))];
   const availableAssignees = [...new Set(workOrders.map(wo => wo.assignee).filter(Boolean))];
 
@@ -210,6 +237,34 @@ export default function OnHold() {
           </div>
         </div>
 
+        <WorkOrderFilters 
+          searchTerm={filters.searchTerm} 
+          onSearchChange={(value) => setFilters(prev => ({ ...prev, searchTerm: value }))}
+          statusFilter={filters.statusFilter}
+          onStatusFilterChange={(values) => setFilters(prev => ({ ...prev, statusFilter: values }))}
+          priorityFilter={filters.priorityFilter}
+          onPriorityFilterChange={(values) => setFilters(prev => ({ ...prev, priorityFilter: values }))}
+          storeFilter={filters.storeFilter}
+          onStoreFilterChange={(values) => setFilters(prev => ({ ...prev, storeFilter: values }))}
+          marketFilter={filters.marketFilter}
+          onMarketFilterChange={(values) => setFilters(prev => ({ ...prev, marketFilter: values }))}
+          assigneeFilter={filters.assigneeFilter}
+          onAssigneeFilterChange={(values) => setFilters(prev => ({ ...prev, assigneeFilter: values }))}
+          sortOrder={filters.sortOrder}
+          onSortOrderChange={(value) => setFilters(prev => ({ ...prev, sortOrder: value }))}
+          onClearFilters={() => setFilters({
+            searchTerm: '',
+            statusFilter: [],
+            priorityFilter: [],
+            storeFilter: [],
+            marketFilter: [],
+            assigneeFilter: [],
+            sortOrder: 'newest'
+          })}
+          availableStores={availableStores} 
+          availableMarkets={availableMarkets} 
+          availableAssignees={availableAssignees}
+        />
 
         {filteredWorkOrders.length === 0 ? (
           <div className="text-center py-12">
