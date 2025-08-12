@@ -2,7 +2,7 @@ import { WorkOrderStatus, WorkOrderPriority, RepairType } from "@/types/work-ord
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, X } from "lucide-react";
+import { Search, X, ArrowUpDown, CalendarArrowUp, CalendarArrowDown } from "lucide-react";
 
 interface WorkOrderFiltersProps {
   searchTerm: string;
@@ -17,6 +17,8 @@ interface WorkOrderFiltersProps {
   onMarketFilterChange: (value: string) => void;
   assigneeFilter: string;
   onAssigneeFilterChange: (value: string) => void;
+  sortOrder: 'newest' | 'oldest';
+  onSortOrderChange: (value: 'newest' | 'oldest') => void;
   onClearFilters: () => void;
   availableStores: string[];
   availableMarkets: string[];
@@ -53,6 +55,8 @@ export function WorkOrderFilters({
   onMarketFilterChange,
   assigneeFilter,
   onAssigneeFilterChange,
+  sortOrder,
+  onSortOrderChange,
   onClearFilters,
   availableStores,
   availableMarkets,
@@ -94,71 +98,94 @@ export function WorkOrderFilters({
         />
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="bg-background border border-border">
-            {statusOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        
-        <Select value={priorityFilter} onValueChange={onPriorityFilterChange}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="bg-background border border-border">
-            {priorityOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        
-        <Select value={storeFilter} onValueChange={onStoreFilterChange}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="bg-background border border-border">
-            {storeOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        
-        <Select value={marketFilter} onValueChange={onMarketFilterChange}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="bg-background border border-border">
-            {marketOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        
-        <Select value={assigneeFilter} onValueChange={onAssigneeFilterChange}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="bg-background border border-border">
-            {assigneeOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="flex items-center justify-between">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 flex-1">
+          <Select value={statusFilter} onValueChange={onStatusFilterChange}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-background border border-border">
+              {statusOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <Select value={priorityFilter} onValueChange={onPriorityFilterChange}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-background border border-border">
+              {priorityOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <Select value={storeFilter} onValueChange={onStoreFilterChange}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-background border border-border">
+              {storeOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <Select value={marketFilter} onValueChange={onMarketFilterChange}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-background border border-border">
+              {marketOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <Select value={assigneeFilter} onValueChange={onAssigneeFilterChange}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-background border border-border">
+              {assigneeOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center gap-2 ml-4">
+          <Button
+            variant={sortOrder === 'newest' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => onSortOrderChange('newest')}
+            className="flex items-center gap-2"
+          >
+            <CalendarArrowDown className="h-4 w-4" />
+            Newest First
+          </Button>
+          <Button
+            variant={sortOrder === 'oldest' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => onSortOrderChange('oldest')}
+            className="flex items-center gap-2"
+          >
+            <CalendarArrowUp className="h-4 w-4" />
+            Oldest First
+          </Button>
+        </div>
       </div>
       
       {hasActiveFilters && (

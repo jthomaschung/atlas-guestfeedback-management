@@ -210,24 +210,6 @@ export default function OnHold() {
           </div>
         </div>
 
-        <WorkOrderFilters
-          searchTerm={filters.search}
-          onSearchChange={(value) => setFilters(prev => ({ ...prev, search: value }))}
-          statusFilter="all"
-          onStatusFilterChange={() => {}}
-          priorityFilter={filters.priority as any}
-          onPriorityFilterChange={(value) => setFilters(prev => ({ ...prev, priority: value as string }))}
-          storeFilter="all"
-          onStoreFilterChange={() => {}}
-          marketFilter={filters.market}
-          onMarketFilterChange={(value) => setFilters(prev => ({ ...prev, market: value }))}
-          assigneeFilter={filters.assignee}
-          onAssigneeFilterChange={(value) => setFilters(prev => ({ ...prev, assignee: value }))}
-          onClearFilters={() => setFilters({ search: "", repairType: "all", market: "all", priority: "all", assignee: "all" })}
-          availableStores={[...new Set(workOrders.map(wo => wo.store_number))]}
-          availableMarkets={availableMarkets}
-          availableAssignees={availableAssignees}
-        />
 
         {filteredWorkOrders.length === 0 ? (
           <div className="text-center py-12">

@@ -232,22 +232,24 @@ const Completed = () => {
           </div>
         </div>
 
-        <WorkOrderFilters
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          statusFilter="completed"
-          onStatusFilterChange={() => {}} // No-op since we're always filtering by completed
-          priorityFilter={priorityFilter}
-          onPriorityFilterChange={setPriorityFilter}
-          storeFilter={storeFilter}
-          onStoreFilterChange={setStoreFilter}
-          marketFilter={marketFilter}
-          onMarketFilterChange={setMarketFilter}
+        <WorkOrderFilters 
+          searchTerm={searchTerm} 
+          onSearchChange={setSearchTerm} 
+          statusFilter="completed" 
+          onStatusFilterChange={() => {}} 
+          priorityFilter={priorityFilter} 
+          onPriorityFilterChange={setPriorityFilter} 
+          storeFilter={storeFilter} 
+          onStoreFilterChange={setStoreFilter} 
+          marketFilter={marketFilter} 
+          onMarketFilterChange={setMarketFilter} 
           assigneeFilter={assigneeFilter}
           onAssigneeFilterChange={setAssigneeFilter}
-          onClearFilters={clearFilters}
-          availableStores={availableStores}
-          availableMarkets={availableMarkets}
+          sortOrder="newest"
+          onSortOrderChange={() => {}}
+          onClearFilters={clearFilters} 
+          availableStores={availableStores} 
+          availableMarkets={availableMarkets} 
           availableAssignees={availableAssignees}
         />
 

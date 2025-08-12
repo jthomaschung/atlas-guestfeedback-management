@@ -26,6 +26,7 @@ const Index = () => {
   const [storeFilter, setStoreFilter] = useState('all');
   const [marketFilter, setMarketFilter] = useState('all');
   const [assigneeFilter, setAssigneeFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [deletingWorkOrder, setDeletingWorkOrder] = useState<WorkOrder | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
@@ -132,10 +133,17 @@ const Index = () => {
       return allFiltersMatch;
     });
 
-    console.log('Filtered work orders count:', filtered.length);
-    console.log('Final filtered work orders:', filtered.map(wo => ({ id: wo.id, market: wo.market, store: wo.store_number, status: wo.status })));
-    return filtered;
-  }, [workOrders, canAccessWorkOrder, permissions, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter, assigneeFilter]);
+    // Apply sorting by created date
+    const sorted = [...filtered].sort((a, b) => {
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+      return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+    });
+
+    console.log('Filtered work orders count:', sorted.length);
+    console.log('Final filtered work orders:', sorted.map(wo => ({ id: wo.id, market: wo.market, store: wo.store_number, status: wo.status })));
+    return sorted;
+  }, [workOrders, canAccessWorkOrder, permissions, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter, assigneeFilter, sortOrder]);
 
   const availableStores = useMemo(() => {
     const stores = [...new Set(filteredWorkOrders.map(wo => wo.store_number))];
@@ -533,6 +541,8 @@ const Index = () => {
           onMarketFilterChange={setMarketFilter} 
           assigneeFilter={assigneeFilter}
           onAssigneeFilterChange={setAssigneeFilter}
+          sortOrder={sortOrder}
+          onSortOrderChange={setSortOrder}
           onClearFilters={clearFilters} 
           availableStores={availableStores} 
           availableMarkets={availableMarkets} 
