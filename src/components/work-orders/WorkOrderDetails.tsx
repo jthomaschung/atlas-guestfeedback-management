@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { WorkOrder, WorkOrderStatus, WorkOrderPriority, EcoSure } from '@/types/work-order';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -66,7 +67,9 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
   const [additionalImages, setAdditionalImages] = useState<string[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isEditingCreatedBy, setIsEditingCreatedBy] = useState(false);
+  const [isEditingCreatedDate, setIsEditingCreatedDate] = useState(false);
   const [selectedCreatorId, setSelectedCreatorId] = useState('');
+  const [editedCreatedDate, setEditedCreatedDate] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -418,6 +421,35 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
     }
   };
 
+  const handleChangeCreatedDate = async () => {
+    if (!editedCreatedDate || !isAdmin) return;
+
+    try {
+      const { error } = await supabase
+        .from('work_orders')
+        .update({ created_at: editedCreatedDate })
+        .eq('id', workOrder.id);
+
+      if (error) throw error;
+
+      // Update the work order in parent component
+      onUpdate({ created_at: editedCreatedDate });
+      setIsEditingCreatedDate(false);
+      
+      toast({
+        title: "Created Date Updated",
+        description: "Work order creation date has been changed successfully",
+      });
+    } catch (error) {
+      console.error('Error updating created date:', error);
+      toast({
+        title: "Update Failed",
+        description: "Failed to update work order creation date",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getCreatorDisplayName = () => {
     const creator = users.find(u => u.user_id === workOrder.user_id);
     return creator ? getUserDisplayName(creator) : 'Unknown User';
@@ -450,10 +482,47 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
             </div>
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Created</Label>
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Calendar className="h-3 w-3 mr-1" />
-                {format(new Date(workOrder.created_at), 'MMM d, yyyy h:mm a')}
-              </div>
+              {isAdmin && isEditingCreatedDate ? (
+                <div className="flex items-center gap-2 mt-1">
+                  <Input
+                    type="datetime-local"
+                    value={editedCreatedDate}
+                    onChange={(e) => setEditedCreatedDate(e.target.value)}
+                    className="h-8"
+                  />
+                  <Button size="sm" onClick={handleChangeCreatedDate} disabled={!editedCreatedDate}>
+                    Save
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => setIsEditingCreatedDate(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Calendar className="h-3 w-3 mr-1" />
+                    {format(new Date(workOrder.created_at), 'MMM d, yyyy h:mm a')}
+                  </div>
+                  {isAdmin && (
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      onClick={() => {
+                        // Convert the ISO string to datetime-local format
+                        const date = new Date(workOrder.created_at);
+                        const localDateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+                          .toISOString()
+                          .slice(0, 16);
+                        setEditedCreatedDate(localDateTime);
+                        setIsEditingCreatedDate(true);
+                      }}
+                      className="h-6 px-2 text-xs"
+                    >
+                      Change
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Created By</Label>
