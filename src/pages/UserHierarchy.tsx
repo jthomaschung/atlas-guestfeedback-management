@@ -241,31 +241,33 @@ export default function UserHierarchy() {
       let userId: string;
 
       if (isCreateMode) {
-        // Create new user
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-          email: formData.email.trim(),
-          password: formData.password,
-          options: {
-            data: {
-              first_name: formData.first_name.trim(),
-              last_name: formData.last_name.trim(),
-              display_name: formData.display_name.trim()
-            }
+        // Create new user using edge function (admin API)
+        console.log('Creating user via edge function...');
+        const { data: createUserData, error: createUserError } = await supabase.functions.invoke('create-user', {
+          body: {
+            email: formData.email.trim(),
+            password: formData.password,
+            firstName: formData.first_name.trim(),
+            lastName: formData.last_name.trim(),
+            displayName: formData.display_name.trim()
           }
         });
 
-        if (authError) {
-          throw authError;
+        if (createUserError) {
+          console.error('Create user error:', createUserError);
+          throw createUserError;
         }
 
-        if (!authData.user) {
+        if (!createUserData?.user) {
+          console.error('No user data returned from edge function');
           throw new Error('Failed to create user');
         }
 
-        userId = authData.user.id;
+        userId = createUserData.user.id;
+        console.log('User created successfully with ID:', userId);
 
-        // The trigger will automatically create the profile, but we should update it with our data
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for trigger to complete
+        // Wait for trigger to complete profile creation
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
         // Update the profile with our form data
         const { error: profileUpdateError } = await supabase
