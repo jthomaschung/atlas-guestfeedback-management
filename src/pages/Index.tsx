@@ -75,14 +75,35 @@ const Index = () => {
     const workOrderId = urlParams.get('workOrderId');
     
     if (workOrderId && workOrders.length > 0) {
+      // Find work order in all work orders, not just filtered ones
       const workOrder = workOrders.find(wo => wo.id === workOrderId);
       if (workOrder) {
-        setViewingWorkOrder(workOrder);
+        // Check if user has permission to access this work order
+        if (canAccessWorkOrder(workOrder)) {
+          setViewingWorkOrder(workOrder);
+          // Clean up the URL parameter
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } else {
+          toast({
+            title: "Access Denied",
+            description: "You don't have permission to view this work order.",
+            variant: "destructive"
+          });
+          // Clean up the URL parameter
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      } else {
+        // Work order not found, show error
+        toast({
+          title: "Work Order Not Found",
+          description: "The requested work order could not be found.",
+          variant: "destructive"
+        });
         // Clean up the URL parameter
         window.history.replaceState({}, document.title, window.location.pathname);
       }
     }
-  }, [workOrders]);
+  }, [workOrders, canAccessWorkOrder, toast]);
   
   const filteredWorkOrders = useMemo(() => {
     console.log('Filtering work orders:', {
