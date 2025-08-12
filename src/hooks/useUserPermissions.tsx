@@ -42,7 +42,7 @@ export function useUserPermissions() {
           .from('user_permissions')
           .select('markets, stores')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (permissions) {
           userPermissions.markets = permissions.markets || [];
