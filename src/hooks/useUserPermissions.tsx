@@ -60,21 +60,37 @@ export function useUserPermissions() {
   };
 
   const canAccessWorkOrder = (workOrder: { market: string; store_number: string }) => {
+    console.log('canAccessWorkOrder check:', {
+      workOrder: { market: workOrder.market, store_number: workOrder.store_number },
+      permissions,
+      isAdmin: permissions.isAdmin,
+      hasMarkets: permissions.markets.length > 0,
+      hasStores: permissions.stores.length > 0
+    });
+
     // Admin can access everything
-    if (permissions.isAdmin) return true;
+    if (permissions.isAdmin) {
+      console.log('User is admin, access granted');
+      return true;
+    }
 
     // If user has market permissions, they can see work orders in those markets
     if (permissions.markets.length > 0) {
-      return permissions.markets.includes(workOrder.market);
+      const hasMarketAccess = permissions.markets.includes(workOrder.market);
+      console.log('Market check:', { userMarkets: permissions.markets, workOrderMarket: workOrder.market, hasAccess: hasMarketAccess });
+      return hasMarketAccess;
     }
 
     // If user has no market permissions but has store permissions, 
     // they can only see work orders for their specific stores
     if (permissions.stores.length > 0) {
-      return permissions.stores.includes(workOrder.store_number);
+      const hasStoreAccess = permissions.stores.includes(workOrder.store_number);
+      console.log('Store check:', { userStores: permissions.stores, workOrderStore: workOrder.store_number, hasAccess: hasStoreAccess });
+      return hasStoreAccess;
     }
 
     // No permissions = no access
+    console.log('No permissions found, access denied');
     return false;
   };
 

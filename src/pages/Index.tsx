@@ -84,12 +84,30 @@ const Index = () => {
   }, [workOrders]);
   
   const filteredWorkOrders = useMemo(() => {
-    return workOrders.filter(wo => {
+    console.log('Filtering work orders:', {
+      totalWorkOrders: workOrders.length,
+      permissions,
+      searchTerm,
+      statusFilter,
+      priorityFilter,
+      storeFilter,
+      marketFilter,
+      assigneeFilter
+    });
+
+    const filtered = workOrders.filter(wo => {
       // Exclude completed work orders from dashboard
-      if (wo.status === 'completed') return false;
+      if (wo.status === 'completed') {
+        console.log('Excluding completed work order:', wo.id);
+        return false;
+      }
       
       // Apply permission-based filtering
-      if (!canAccessWorkOrder(wo)) return false;
+      const hasPermission = canAccessWorkOrder(wo);
+      if (!hasPermission) {
+        console.log('Access denied for work order:', wo.id, wo.market, wo.store_number);
+        return false;
+      }
       
       const matchesSearch = wo.description.toLowerCase().includes(searchTerm.toLowerCase()) || 
                            wo.repair_type.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -102,9 +120,21 @@ const Index = () => {
       const matchesAssignee = assigneeFilter === 'all' || 
                              (assigneeFilter === 'unassigned' && !wo.assignee) ||
                              wo.assignee === assigneeFilter;
-      return matchesSearch && matchesStatus && matchesPriority && matchesStore && matchesMarket && matchesAssignee;
+      
+      const allFiltersMatch = matchesSearch && matchesStatus && matchesPriority && matchesStore && matchesMarket && matchesAssignee;
+      
+      if (hasPermission && !allFiltersMatch) {
+        console.log('Work order has permission but filtered out:', wo.id, {
+          matchesSearch, matchesStatus, matchesPriority, matchesStore, matchesMarket, matchesAssignee
+        });
+      }
+      
+      return allFiltersMatch;
     });
-  }, [workOrders, canAccessWorkOrder, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter, assigneeFilter]);
+
+    console.log('Filtered work orders count:', filtered.length);
+    return filtered;
+  }, [workOrders, canAccessWorkOrder, permissions, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter, assigneeFilter]);
 
   const availableStores = useMemo(() => {
     const stores = [...new Set(filteredWorkOrders.map(wo => wo.store_number))];
