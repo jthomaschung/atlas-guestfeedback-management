@@ -133,6 +133,7 @@ const Index = () => {
     });
 
     console.log('Filtered work orders count:', filtered.length);
+    console.log('Final filtered work orders:', filtered.map(wo => ({ id: wo.id, market: wo.market, store: wo.store_number, status: wo.status })));
     return filtered;
   }, [workOrders, canAccessWorkOrder, permissions, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter, assigneeFilter]);
 
