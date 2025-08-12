@@ -117,6 +117,47 @@ const handler = async (req: Request): Promise<Response> => {
         }
       }
 
+      // Add DMs and Directors who have access to this store/market
+      console.log('Looking for DMs and Directors with access to store:', workOrder.store_number, 'market:', workOrder.market);
+      
+      const { data: dmsAndDirectors } = await supabase
+        .from('user_hierarchy')
+        .select(`
+          user_id,
+          role,
+          profiles!inner(email, first_name, last_name),
+          user_permissions(markets, stores)
+        `)
+        .in('role', ['DM', 'Director']);
+
+      console.log('Found DMs and Directors:', dmsAndDirectors);
+
+      if (dmsAndDirectors) {
+        for (const person of dmsAndDirectors) {
+          const permissions = person.user_permissions[0];
+          let hasAccess = false;
+
+          if (permissions) {
+            // Check if they have market access
+            if (permissions.markets && permissions.markets.includes(workOrder.market)) {
+              hasAccess = true;
+              console.log(`${person.role} ${person.profiles.email} has market access to ${workOrder.market}`);
+            }
+            
+            // Check if they have specific store access
+            if (permissions.stores && permissions.stores.includes(workOrder.store_number)) {
+              hasAccess = true;
+              console.log(`${person.role} ${person.profiles.email} has store access to ${workOrder.store_number}`);
+            }
+          }
+
+          if (hasAccess && person.profiles.email && !recipients.includes(person.profiles.email)) {
+            recipients.push(person.profiles.email);
+            console.log(`Added ${person.role} ${person.profiles.email} to completion notification recipients`);
+          }
+        }
+      }
+
       // Send completion notification emails
       for (const email of recipients) {
         try {
