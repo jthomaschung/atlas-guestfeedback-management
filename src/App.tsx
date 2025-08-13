@@ -44,7 +44,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
         <div className="flex-1 flex flex-col">
           <header className="h-16 flex items-center justify-between bg-atlas-dark border-b border-atlas-dark px-6">
             <div className="flex items-center gap-4">
-              <SidebarTrigger className="text-atlas-dark-foreground hover:text-atlas-red" />
+              <SidebarTrigger className="text-atlas-dark-foreground hover:bg-atlas-red/10 hover:text-atlas-red transition-colors" />
               <div className="text-atlas-dark-foreground">
                 <span className="text-2xl font-bold tracking-wide">ATLAS</span>
                 <span className="ml-2 text-sm text-atlas-dark-foreground/80">Facilities Management Portal</span>
