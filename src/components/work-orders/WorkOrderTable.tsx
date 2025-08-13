@@ -13,7 +13,7 @@ interface WorkOrderTableProps {
 export function WorkOrderTable({ workOrders, onStatusChange, onEdit, onViewDetails, onDelete, isAdmin }: WorkOrderTableProps) {
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {workOrders.map((workOrder) => (
           <WorkOrderCard
             key={workOrder.id}

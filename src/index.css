@@ -142,3 +142,30 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* Mobile-optimized dropdown styling */
+  .mobile-dropdown {
+    @apply z-50 bg-background border border-border;
+  }
+  
+  /* Better mobile touch targets */
+  .mobile-touch-target {
+    @apply min-h-[44px];
+  }
+  
+  /* Mobile-specific responsive classes */
+  @media (max-width: 768px) {
+    .mobile-stack {
+      @apply flex-col gap-3;
+    }
+    
+    .mobile-full-width {
+      @apply w-full;
+    }
+    
+    .mobile-compact-text {
+      @apply text-sm;
+    }
+  }
+}

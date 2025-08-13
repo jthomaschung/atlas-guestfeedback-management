@@ -456,8 +456,8 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-2 sm:p-4 z-50">
+      <Card className="w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-2xl">Work Order Details</CardTitle>
           <Button variant="ghost" size="sm" onClick={onClose}>
@@ -467,7 +467,7 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
         
         <CardContent className="space-y-6">
           {/* Basic Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Store #</Label>
               <p className="text-lg font-semibold">{workOrder.store_number}</p>
@@ -664,22 +664,22 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
           {/* Assignee Section */}
           <div>
             <Label className="text-sm font-medium text-muted-foreground mb-2 block">Assignee</Label>
-            <Select value={workOrder.assignee || 'unassigned'} onValueChange={handleAssigneeChange}>
-              <SelectTrigger className="w-full max-w-md">
-                <SelectValue placeholder="Select assignee" />
-              </SelectTrigger>
-              <SelectContent>
-                {assigneeOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <Select value={workOrder.assignee || 'unassigned'} onValueChange={handleAssigneeChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select assignee" />
+                </SelectTrigger>
+                <SelectContent className="bg-background border border-border z-50">
+                  {assigneeOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
           </div>
 
           {/* Interactive Badges */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div>
               <Label className="text-sm font-medium text-muted-foreground mb-2 block">Status</Label>
               <Select value={workOrder.status} onValueChange={handleStatusChange}>
@@ -690,7 +690,7 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
                      </Badge>
                    </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="bg-background border border-border z-50">
+                <SelectContent className="bg-background border border-border z-50 max-h-48 overflow-y-auto">
                   <SelectItem value="pending">
                      <Badge className={statusColors.pending}>Pending</Badge>
                    </SelectItem>
@@ -723,17 +723,17 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
                     </Badge>
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Low">
-                    <Badge className={priorityColors.Low}>Low</Badge>
-                  </SelectItem>
-                  <SelectItem value="Important">
-                    <Badge className={priorityColors.Important}>Important</Badge>
-                  </SelectItem>
-                  <SelectItem value="Critical">
-                    <Badge className={priorityColors.Critical}>Critical</Badge>
-                  </SelectItem>
-                </SelectContent>
+                 <SelectContent className="bg-background border border-border z-50">
+                   <SelectItem value="Low">
+                     <Badge className={priorityColors.Low}>Low</Badge>
+                   </SelectItem>
+                   <SelectItem value="Important">
+                     <Badge className={priorityColors.Important}>Important</Badge>
+                   </SelectItem>
+                   <SelectItem value="Critical">
+                     <Badge className={priorityColors.Critical}>Critical</Badge>
+                   </SelectItem>
+                 </SelectContent>
               </Select>
             </div>
 
@@ -747,23 +747,23 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
                     </Badge>
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="N/A">
-                    <Badge className={ecoSureColors['N/A']}>N/A</Badge>
-                  </SelectItem>
-                  <SelectItem value="Minor">
-                    <Badge className={ecoSureColors.Minor}>Minor</Badge>
-                  </SelectItem>
-                  <SelectItem value="Major">
-                    <Badge className={ecoSureColors.Major}>Major</Badge>
-                  </SelectItem>
-                  <SelectItem value="Critical">
-                    <Badge className={ecoSureColors.Critical}>Critical</Badge>
-                  </SelectItem>
-                  <SelectItem value="Imminent Health">
-                    <Badge className={ecoSureColors['Imminent Health']}>Imminent Health</Badge>
-                  </SelectItem>
-                </SelectContent>
+                 <SelectContent className="bg-background border border-border z-50">
+                   <SelectItem value="N/A">
+                     <Badge className={ecoSureColors['N/A']}>N/A</Badge>
+                   </SelectItem>
+                   <SelectItem value="Minor">
+                     <Badge className={ecoSureColors.Minor}>Minor</Badge>
+                   </SelectItem>
+                   <SelectItem value="Major">
+                     <Badge className={ecoSureColors.Major}>Major</Badge>
+                   </SelectItem>
+                   <SelectItem value="Critical">
+                     <Badge className={ecoSureColors.Critical}>Critical</Badge>
+                   </SelectItem>
+                   <SelectItem value="Imminent Health">
+                     <Badge className={ecoSureColors['Imminent Health']}>Imminent Health</Badge>
+                   </SelectItem>
+                 </SelectContent>
               </Select>
             </div>
           </div>

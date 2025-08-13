@@ -108,8 +108,8 @@ export function WorkOrderForm({ onSubmit, onCancel, initialData }: WorkOrderForm
       
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
+          <div className="grid grid-cols-1 gap-4">
+            <div>
               <Label htmlFor="description">Description *</Label>
               <Textarea
                 id="description"
@@ -118,131 +118,138 @@ export function WorkOrderForm({ onSubmit, onCancel, initialData }: WorkOrderForm
                 placeholder="Detailed description of the work order"
                 rows={3}
                 required
+                className="w-full"
               />
             </div>
             
-            <div>
-              <Label>Repair Type *</Label>
-              <Select 
-                value={formData.repair_type} 
-                onValueChange={(value: RepairType) => 
-                  setFormData({ ...formData, repair_type: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {repairTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label>Repair Type *</Label>
+                <Select 
+                  value={formData.repair_type} 
+                  onValueChange={(value: RepairType) => 
+                    setFormData({ ...formData, repair_type: value })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border border-border z-50">
+                    {repairTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label>Priority *</Label>
+                <Select 
+                  value={formData.priority} 
+                  onValueChange={(value: WorkOrderPriority) => 
+                    setFormData({ ...formData, priority: value })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border border-border z-50">
+                    {priorities.map((priority) => (
+                      <SelectItem key={priority.value} value={priority.value}>
+                        {priority.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             
-            <div>
-              <Label>Priority *</Label>
-              <Select 
-                value={formData.priority} 
-                onValueChange={(value: WorkOrderPriority) => 
-                  setFormData({ ...formData, priority: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {priorities.map((priority) => (
-                    <SelectItem key={priority.value} value={priority.value}>
-                      {priority.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label>Store Number *</Label>
+                <Select 
+                  value={formData.store_number} 
+                  onValueChange={(value: string) => 
+                    setFormData({ ...formData, store_number: value })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select store number" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border border-border z-50">
+                    {storeNumbers.map((store) => (
+                      <SelectItem key={store.value} value={store.value}>
+                        {store.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label>Market *</Label>
+                <Select 
+                  value={formData.market} 
+                  onValueChange={(value: Market) => 
+                    setFormData({ ...formData, market: value })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border border-border z-50">
+                    {markets.map((market) => (
+                      <SelectItem key={market.value} value={market.value}>
+                        {market.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             
-            <div>
-              <Label>Store Number *</Label>
-              <Select 
-                value={formData.store_number} 
-                onValueChange={(value: string) => 
-                  setFormData({ ...formData, store_number: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select store number" />
-                </SelectTrigger>
-                <SelectContent className="bg-background border border-border">
-                  {storeNumbers.map((store) => (
-                    <SelectItem key={store.value} value={store.value}>
-                      {store.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label>Market *</Label>
-              <Select 
-                value={formData.market} 
-                onValueChange={(value: Market) => 
-                  setFormData({ ...formData, market: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {markets.map((market) => (
-                    <SelectItem key={market.value} value={market.value}>
-                      {market.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label>EcoSure *</Label>
-              <Select 
-                value={formData.ecosure} 
-                onValueChange={(value) => 
-                  setFormData({ ...formData, ecosure: value as any })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {ecoSureOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            
-            <div>
-              <Label htmlFor="image">Image (Optional)</Label>
-              <Input
-                id="image"
-                type="file"
-                accept="image/*"
-                onChange={(e) => setFormData({ ...formData, image: e.target.files?.[0] })}
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label>EcoSure *</Label>
+                <Select 
+                  value={formData.ecosure} 
+                  onValueChange={(value) => 
+                    setFormData({ ...formData, ecosure: value as any })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border border-border z-50">
+                    {ecoSureOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="image">Image (Optional)</Label>
+                <Input
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setFormData({ ...formData, image: e.target.files?.[0] })}
+                  className="w-full"
+                />
+              </div>
             </div>
           </div>
           
-          <div className="flex gap-3 justify-end">
-            <Button type="button" variant="outline" onClick={onCancel}>
+          <div className="flex flex-col sm:flex-row gap-3 justify-end">
+            <Button type="button" variant="outline" onClick={onCancel} className="w-full sm:w-auto">
               Cancel
             </Button>
-            <Button type="submit">
+            <Button type="submit" className="w-full sm:w-auto">
               {initialData ? 'Update Work Order' : 'Create Work Order'}
             </Button>
           </div>

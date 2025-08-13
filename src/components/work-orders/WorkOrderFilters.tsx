@@ -94,8 +94,8 @@ export function WorkOrderFilters({
         />
       </div>
       
-      <div className="flex items-center justify-between">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 flex-1">
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
           <MultiSelect
             options={statusOptions}
             selected={statusFilter}
@@ -132,24 +132,26 @@ export function WorkOrderFilters({
           />
         </div>
 
-        <div className="flex items-center gap-2 ml-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <Button
             variant={sortOrder === 'newest' ? 'default' : 'outline'}
             size="sm"
             onClick={() => onSortOrderChange('newest')}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 justify-center"
           >
             <CalendarArrowDown className="h-4 w-4" />
-            Newest First
+            <span className="hidden sm:inline">Newest First</span>
+            <span className="sm:hidden">Newest</span>
           </Button>
           <Button
             variant={sortOrder === 'oldest' ? 'default' : 'outline'}
             size="sm"
             onClick={() => onSortOrderChange('oldest')}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 justify-center"
           >
             <CalendarArrowUp className="h-4 w-4" />
-            Oldest First
+            <span className="hidden sm:inline">Oldest First</span>
+            <span className="sm:hidden">Oldest</span>
           </Button>
         </div>
       </div>

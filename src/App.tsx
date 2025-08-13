@@ -42,28 +42,28 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col">
-          <header className="h-16 flex items-center justify-between bg-atlas-dark border-b border-atlas-dark px-6">
-            <div className="flex items-center gap-4">
+          <header className="h-16 flex items-center justify-between bg-atlas-dark border-b border-atlas-dark px-3 sm:px-6">
+            <div className="flex items-center gap-2 sm:gap-4">
               <SidebarTrigger className="text-atlas-dark-foreground hover:bg-atlas-red/10 hover:text-atlas-red transition-colors" />
               <div className="text-atlas-dark-foreground">
-                <span className="text-2xl font-bold tracking-wide">ATLAS</span>
-                <span className="ml-2 text-sm text-atlas-dark-foreground/80">Facilities Management Portal</span>
+                <span className="text-xl sm:text-2xl font-bold tracking-wide">ATLAS</span>
+                <span className="hidden sm:inline ml-2 text-sm text-atlas-dark-foreground/80">Facilities Management Portal</span>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <NotificationBell />
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={signOut}
-                className="text-atlas-dark-foreground hover:text-atlas-red hover:bg-atlas-red/10"
+                className="text-atlas-dark-foreground hover:text-atlas-red hover:bg-atlas-red/10 p-2"
               >
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
+                <LogOut className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Logout</span>
               </Button>
             </div>
           </header>
-          <main className="flex-1 overflow-auto bg-background">
+          <main className="flex-1 overflow-auto bg-background p-2 sm:p-4 md:p-6">
             {children}
           </main>
         </div>

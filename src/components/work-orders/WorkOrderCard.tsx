@@ -72,11 +72,11 @@ export function WorkOrderCard({ workOrder, onEdit, onViewDetails, onDelete, isAd
             </p>
           </div>
           
-          <div className="flex items-center gap-1 ml-4">
+          <div className="flex items-center gap-1 ml-2 sm:ml-4">
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="h-8 w-8 p-0 opacity-60 sm:opacity-0 group-hover:opacity-100 transition-opacity"
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit(workOrder);
@@ -88,7 +88,7 @@ export function WorkOrderCard({ workOrder, onEdit, onViewDetails, onDelete, isAd
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="h-8 w-8 p-0 opacity-60 sm:opacity-0 group-hover:opacity-100 transition-opacity"
               onClick={(e) => {
                 e.stopPropagation();
                 onViewDetails(workOrder);
@@ -101,7 +101,7 @@ export function WorkOrderCard({ workOrder, onEdit, onViewDetails, onDelete, isAd
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive"
+                className="h-8 w-8 p-0 opacity-60 sm:opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive"
                 onClick={(e) => {
                   e.stopPropagation();
                   onDelete(workOrder);
@@ -146,8 +146,8 @@ export function WorkOrderCard({ workOrder, onEdit, onViewDetails, onDelete, isAd
           </div>
           
           {/* Meta Information */}
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
               <div className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
                 <span>{format(new Date(workOrder.created_at), 'MMM d, yyyy')}</span>
@@ -155,13 +155,13 @@ export function WorkOrderCard({ workOrder, onEdit, onViewDetails, onDelete, isAd
               
               <div className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
-                <span>{formatDistanceToNow(new Date(workOrder.created_at), { addSuffix: true })}</span>
+                <span className="truncate">{formatDistanceToNow(new Date(workOrder.created_at), { addSuffix: true })}</span>
               </div>
             </div>
             
             <div className="flex items-center gap-1">
               <User className="h-3 w-3" />
-              <span className="truncate max-w-20">
+              <span className="truncate max-w-32">
                 {workOrder.assignee && workOrder.assignee !== 'unassigned' 
                   ? workOrder.assignee 
                   : 'Unassigned'
