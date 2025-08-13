@@ -24,8 +24,8 @@ type WorkOrderRow = Database['public']['Tables']['work_orders']['Row'];
 interface DailySummaryData {
   newTickets: WorkOrderRow[];
   completedTickets: WorkOrderRow[];
-  statusChanges: any[];
-  notesComments: any[];
+  statusChanges: WorkOrderRow[];
+  notesComments: WorkOrderRow[];
 }
 
 export default function DailySummary() {
@@ -77,11 +77,33 @@ export default function DailySummary() {
 
       if (completedError) throw completedError;
 
+      // Fetch status changes (work orders updated on selected date)
+      const { data: statusChanges, error: statusError } = await supabase
+        .from('work_orders')
+        .select('*')
+        .gte('updated_at', startOfDay.toISOString())
+        .lte('updated_at', endOfDay.toISOString())
+        .neq('created_at', 'updated_at')
+        .order('updated_at', { ascending: false });
+
+      if (statusError) throw statusError;
+
+      // Fetch work orders with notes (as proxy for notes/comments activity)
+      const { data: notesComments, error: notesError } = await supabase
+        .from('work_orders')
+        .select('*')
+        .not('notes', 'is', null)
+        .gte('updated_at', startOfDay.toISOString())
+        .lte('updated_at', endOfDay.toISOString())
+        .order('updated_at', { ascending: false });
+
+      if (notesError) throw notesError;
+
       setSummaryData({
         newTickets: workOrders || [],
         completedTickets: completedOrders || [],
-        statusChanges: [], // TODO: Implement status change tracking
-        notesComments: [] // TODO: Implement notes/comments tracking
+        statusChanges: statusChanges || [],
+        notesComments: notesComments || []
       });
     } catch (error) {
       console.error('Error fetching daily summary:', error);
@@ -320,9 +342,43 @@ export default function DailySummary() {
           </CollapsibleTrigger>
           <CollapsibleContent>
             <CardContent>
-              <div className="text-center text-muted-foreground py-8">
-                Status change tracking coming soon
-              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Ticket</TableHead>
+                    <TableHead>Store</TableHead>
+                    <TableHead>Current Status</TableHead>
+                    <TableHead>Priority</TableHead>
+                    <TableHead>Updated</TableHead>
+                    <TableHead>Title</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {summaryData.statusChanges.map((ticket) => (
+                    <TableRow key={ticket.id}>
+                      <TableCell className="font-medium">#{ticket.id.slice(-4)}</TableCell>
+                      <TableCell>{ticket.store_number}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="capitalize">{ticket.status}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getPriorityBadgeVariant(ticket.priority)}>
+                          {ticket.priority}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{format(new Date(ticket.updated_at), "h:mm a")}</TableCell>
+                      <TableCell className="max-w-xs truncate">{ticket.description}</TableCell>
+                    </TableRow>
+                  ))}
+                  {summaryData.statusChanges.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                        No status changes for {format(selectedDate, "MMMM dd, yyyy")}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
             </CardContent>
           </CollapsibleContent>
         </Card>
@@ -341,9 +397,43 @@ export default function DailySummary() {
           </CollapsibleTrigger>
           <CollapsibleContent>
             <CardContent>
-              <div className="text-center text-muted-foreground py-8">
-                Notes & comments tracking coming soon
-              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Ticket</TableHead>
+                    <TableHead>Store</TableHead>
+                    <TableHead>Priority</TableHead>
+                    <TableHead>Notes Count</TableHead>
+                    <TableHead>Updated</TableHead>
+                    <TableHead>Title</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {summaryData.notesComments.map((ticket) => (
+                    <TableRow key={ticket.id}>
+                      <TableCell className="font-medium">#{ticket.id.slice(-4)}</TableCell>
+                      <TableCell>{ticket.store_number}</TableCell>
+                      <TableCell>
+                        <Badge variant={getPriorityBadgeVariant(ticket.priority)}>
+                          {ticket.priority}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{ticket.notes?.length || 0} notes</Badge>
+                      </TableCell>
+                      <TableCell>{format(new Date(ticket.updated_at), "h:mm a")}</TableCell>
+                      <TableCell className="max-w-xs truncate">{ticket.description}</TableCell>
+                    </TableRow>
+                  ))}
+                  {summaryData.notesComments.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                        No notes or comments for {format(selectedDate, "MMMM dd, yyyy")}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
             </CardContent>
           </CollapsibleContent>
         </Card>
