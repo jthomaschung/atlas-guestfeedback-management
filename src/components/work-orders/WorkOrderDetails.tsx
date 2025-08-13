@@ -456,16 +456,19 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-2 sm:p-4 z-50">
-      <Card className="w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle className="text-2xl">Work Order Details</CardTitle>
+    <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
+      <Card className="w-full max-w-4xl min-h-0 max-h-none sm:max-h-[90vh] my-4 sm:my-0 flex flex-col">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-bold">Work Order Details</h2>
+            <Badge variant="outline" className="text-xs">#{workOrder.id.slice(-8)}</Badge>
+          </div>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="h-4 w-4" />
           </Button>
         </CardHeader>
         
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 sm:space-y-6 flex-1 overflow-y-auto min-h-0">
           {/* Basic Info */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
