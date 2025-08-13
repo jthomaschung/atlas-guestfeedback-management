@@ -457,7 +457,7 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-start sm:items-center justify-center p-0 sm:p-4">
-      <div className="w-full sm:max-w-4xl h-full sm:h-auto sm:max-h-[95vh] bg-background sm:rounded-lg shadow-lg overflow-hidden flex flex-col">
+      <div className="w-full sm:max-w-4xl h-full sm:h-auto sm:max-h-[90vh] bg-background sm:rounded-lg shadow-lg flex flex-col">
         <Card className="h-full flex flex-col border-0 shadow-none bg-transparent">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 flex-shrink-0 px-4 pt-4">
           <div className="flex items-center gap-2">
@@ -469,7 +469,7 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
           </Button>
         </CardHeader>
         
-        <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6 overflow-y-auto flex-1 touch-pan-y">
+        <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6 overflow-y-auto flex-1 min-h-0">
           {/* Basic Info */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
