@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { CalendarDays, Download, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -44,6 +45,7 @@ export default function DailySummary() {
     notesComments: false
   });
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const fetchDailySummary = async (date: Date) => {
     if (!user) return;
@@ -184,6 +186,10 @@ export default function DailySummary() {
     }
   };
 
+  const handleRowClick = (ticketId: string) => {
+    navigate(`/work-order/${ticketId}`);
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto p-6 space-y-6">
@@ -260,7 +266,6 @@ export default function DailySummary() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Ticket</TableHead>
                     <TableHead>Store</TableHead>
                     <TableHead>Market</TableHead>
                     <TableHead>Priority</TableHead>
@@ -270,8 +275,11 @@ export default function DailySummary() {
                 </TableHeader>
                 <TableBody>
                   {summaryData.newTickets.map((ticket) => (
-                    <TableRow key={ticket.id}>
-                      <TableCell className="font-medium">#{ticket.id.slice(-4)}</TableCell>
+                    <TableRow 
+                      key={ticket.id}
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleRowClick(ticket.id)}
+                    >
                       <TableCell>{ticket.store_number}</TableCell>
                       <TableCell>{ticket.market}</TableCell>
                       <TableCell>
@@ -285,7 +293,7 @@ export default function DailySummary() {
                   ))}
                   {summaryData.newTickets.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                      <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                         No new tickets for {format(selectedDate, "MMMM dd, yyyy")}
                       </TableCell>
                     </TableRow>
@@ -313,7 +321,6 @@ export default function DailySummary() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Ticket</TableHead>
                     <TableHead>Store</TableHead>
                     <TableHead>Priority</TableHead>
                     <TableHead>Completed</TableHead>
@@ -323,8 +330,11 @@ export default function DailySummary() {
                 </TableHeader>
                 <TableBody>
                   {summaryData.completedTickets.map((ticket) => (
-                    <TableRow key={ticket.id}>
-                      <TableCell className="font-medium">#{ticket.id.slice(-4)}</TableCell>
+                    <TableRow 
+                      key={ticket.id}
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleRowClick(ticket.id)}
+                    >
                       <TableCell>{ticket.store_number}</TableCell>
                       <TableCell>
                         <Badge variant={getPriorityBadgeVariant(ticket.priority)}>
@@ -342,7 +352,7 @@ export default function DailySummary() {
                   ))}
                   {summaryData.completedTickets.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                      <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                         No completed tickets for {format(selectedDate, "MMMM dd, yyyy")}
                       </TableCell>
                     </TableRow>
@@ -370,7 +380,6 @@ export default function DailySummary() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Ticket</TableHead>
                     <TableHead>Store</TableHead>
                     <TableHead>Current Status</TableHead>
                     <TableHead>Priority</TableHead>
@@ -380,8 +389,11 @@ export default function DailySummary() {
                 </TableHeader>
                 <TableBody>
                   {summaryData.statusChanges.map((ticket) => (
-                    <TableRow key={ticket.id}>
-                      <TableCell className="font-medium">#{ticket.id.slice(-4)}</TableCell>
+                    <TableRow 
+                      key={ticket.id}
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleRowClick(ticket.id)}
+                    >
                       <TableCell>{ticket.store_number}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className="capitalize">{ticket.status}</Badge>
@@ -397,7 +409,7 @@ export default function DailySummary() {
                   ))}
                   {summaryData.statusChanges.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                      <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                         No status changes for {format(selectedDate, "MMMM dd, yyyy")}
                       </TableCell>
                     </TableRow>
@@ -425,26 +437,30 @@ export default function DailySummary() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Ticket</TableHead>
                     <TableHead>Store</TableHead>
                     <TableHead>Priority</TableHead>
-                    <TableHead>Notes Count</TableHead>
+                    <TableHead>Latest Note</TableHead>
                     <TableHead>Updated</TableHead>
                     <TableHead>Title</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {summaryData.notesComments.map((ticket) => (
-                    <TableRow key={ticket.id}>
-                      <TableCell className="font-medium">#{ticket.id.slice(-4)}</TableCell>
+                    <TableRow 
+                      key={ticket.id}
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleRowClick(ticket.id)}
+                    >
                       <TableCell>{ticket.store_number}</TableCell>
                       <TableCell>
                         <Badge variant={getPriorityBadgeVariant(ticket.priority)}>
                           {ticket.priority}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{ticket.notes?.length || 0} notes</Badge>
+                      <TableCell className="max-w-xs truncate">
+                        {ticket.notes && ticket.notes.length > 0 
+                          ? ticket.notes[ticket.notes.length - 1] 
+                          : "No notes available"}
                       </TableCell>
                       <TableCell>{format(new Date(ticket.updated_at), "h:mm a")}</TableCell>
                       <TableCell className="max-w-xs truncate">{ticket.description}</TableCell>
@@ -452,7 +468,7 @@ export default function DailySummary() {
                   ))}
                   {summaryData.notesComments.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                      <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                         No notes or comments for {format(selectedDate, "MMMM dd, yyyy")}
                       </TableCell>
                     </TableRow>
