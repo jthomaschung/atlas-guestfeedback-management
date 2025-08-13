@@ -57,7 +57,6 @@ const markets: { value: Market; label: string }[] = [
   { value: 'NE4', label: 'NE4' },
   { value: 'FL1', label: 'FL1' },
   { value: 'FL2', label: 'FL2' },
-  { value: 'FL3', label: 'FL3' },
   { value: 'PA', label: 'PA' },
 ];
 

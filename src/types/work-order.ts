@@ -19,7 +19,7 @@ export type Market =
   | 'IE/LA' | 'OC'
   | 'MN1' | 'MN2'
   | 'NE1' | 'NE2' | 'NE3' | 'NE4'
-  | 'FL1' | 'FL2' | 'FL3'
+  | 'FL1' | 'FL2'
   | 'PA';
 
 export type WorkOrderPriority = 'Critical' | 'Important' | 'Low';
