@@ -56,7 +56,7 @@ export default function DailySummary() {
       const endOfDay = new Date(date);
       endOfDay.setHours(23, 59, 59, 999);
 
-      // Fetch work orders for the selected date
+      // Fetch work orders created on the selected date
       const { data: workOrders, error } = await supabase
         .from('work_orders')
         .select('*')
@@ -64,31 +64,46 @@ export default function DailySummary() {
         .lte('created_at', endOfDay.toISOString())
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching new tickets:', error);
+        throw error;
+      }
 
-      // Fetch completed orders for the selected date
+      // Fetch completed orders for the selected date (by completed_at)
       const { data: completedOrders, error: completedError } = await supabase
         .from('work_orders')
         .select('*')
+        .not('completed_at', 'is', null)
         .gte('completed_at', startOfDay.toISOString())
         .lte('completed_at', endOfDay.toISOString())
-        .eq('status', 'completed')
         .order('completed_at', { ascending: false });
 
-      if (completedError) throw completedError;
+      if (completedError) {
+        console.error('Error fetching completed tickets:', completedError);
+        throw completedError;
+      }
 
-      // Fetch status changes (work orders updated on selected date)
-      const { data: statusChanges, error: statusError } = await supabase
+      // Fetch all work orders updated on the selected date (excluding those created on the same date)
+      const { data: allUpdated, error: statusError } = await supabase
         .from('work_orders')
         .select('*')
         .gte('updated_at', startOfDay.toISOString())
         .lte('updated_at', endOfDay.toISOString())
-        .neq('created_at', 'updated_at')
         .order('updated_at', { ascending: false });
 
-      if (statusError) throw statusError;
+      if (statusError) {
+        console.error('Error fetching status changes:', statusError);
+        throw statusError;
+      }
 
-      // Fetch work orders with notes (as proxy for notes/comments activity)
+      // Filter out work orders that were created on the same date (true status changes only)
+      const statusChanges = allUpdated?.filter(order => {
+        const createdDate = new Date(order.created_at).toDateString();
+        const updatedDate = new Date(order.updated_at).toDateString();
+        return createdDate !== updatedDate;
+      }) || [];
+
+      // Fetch work orders with notes updated on the selected date
       const { data: notesComments, error: notesError } = await supabase
         .from('work_orders')
         .select('*')
@@ -97,7 +112,17 @@ export default function DailySummary() {
         .lte('updated_at', endOfDay.toISOString())
         .order('updated_at', { ascending: false });
 
-      if (notesError) throw notesError;
+      if (notesError) {
+        console.error('Error fetching notes/comments:', notesError);
+        throw notesError;
+      }
+
+      console.log('Daily Summary Data:', {
+        newTickets: workOrders?.length || 0,
+        completedTickets: completedOrders?.length || 0,
+        statusChanges: statusChanges?.length || 0,
+        notesComments: notesComments?.length || 0
+      });
 
       setSummaryData({
         newTickets: workOrders || [],
