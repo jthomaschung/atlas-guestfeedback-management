@@ -12,7 +12,7 @@ import { LogOut } from 'lucide-react';
 import Welcome from '@/pages/Welcome';
 import Index from '@/pages/Index';
 import SubmitWorkOrder from '@/pages/SubmitWorkOrder';
-
+import DailySummary from '@/pages/DailySummary';
 import PendingApproval from '@/pages/PendingApproval';
 import OnHold from '@/pages/OnHold';
 import Completed from '@/pages/Completed';
@@ -118,6 +118,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <SubmitWorkOrder />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/daily-summary" 
+                element={
+                  <ProtectedRoute>
+                    <DailySummary />
                   </ProtectedRoute>
                 } 
               />
