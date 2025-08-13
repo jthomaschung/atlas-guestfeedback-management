@@ -187,7 +187,7 @@ export default function DailySummary() {
   };
 
   const handleRowClick = (ticketId: string) => {
-    navigate(`/work-order/${ticketId}`);
+    navigate(`/dashboard?workOrderId=${ticketId}`);
   };
 
   if (loading) {
@@ -227,10 +227,6 @@ export default function DailySummary() {
               />
             </PopoverContent>
           </Popover>
-          <Button variant="outline" size="sm">
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
         </div>
       </div>
 
