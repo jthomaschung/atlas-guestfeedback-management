@@ -167,5 +167,16 @@ All colors MUST be HSL.
     .mobile-compact-text {
       @apply text-sm;
     }
+    
+    /* Ensure proper spacing for mobile modals */
+    .mobile-modal-padding {
+      @apply p-3;
+    }
+    
+    /* Safe area adjustments for mobile devices */
+    .mobile-safe-area {
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-top: env(safe-area-inset-top);
+    }
   }
 }

@@ -456,8 +456,10 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-start sm:items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
-      <Card className="w-full max-w-4xl min-h-0 max-h-none sm:max-h-[90vh] my-4 sm:my-0 flex flex-col">
+    <div className="fixed inset-0 bg-black/50 z-50 p-0 sm:p-4">
+      <div className="h-full w-full overflow-y-auto">
+        <div className="min-h-full flex items-stretch sm:items-center justify-center p-4 sm:p-0">
+          <Card className="w-full max-w-4xl max-h-none sm:max-h-[90vh] sm:overflow-y-auto my-auto">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 flex-shrink-0">
           <div className="flex items-center gap-2">
             <h2 className="text-lg sm:text-xl font-bold">Work Order Details</h2>
@@ -468,7 +470,7 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
           </Button>
         </CardHeader>
         
-        <CardContent className="space-y-4 sm:space-y-6 flex-1 overflow-y-auto min-h-0">
+        <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
           {/* Basic Info */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -682,7 +684,7 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
           </div>
 
           {/* Interactive Badges */}
-          <div className="grid grid-cols-1 gap-4">
+          <div className="space-y-4">
             <div>
               <Label className="text-sm font-medium text-muted-foreground mb-2 block">Status</Label>
               <Select value={workOrder.status} onValueChange={handleStatusChange}>
@@ -716,8 +718,8 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
               </Select>
             </div>
 
-            <div>
-              <Label className="text-sm font-medium text-muted-foreground mb-2 block">Priority</Label>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Priority</Label>
               <Select value={workOrder.priority} onValueChange={handlePriorityChange}>
                 <SelectTrigger className="w-full">
                   <SelectValue>
@@ -726,22 +728,22 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
                     </Badge>
                   </SelectValue>
                 </SelectTrigger>
-                 <SelectContent className="bg-background border border-border z-50">
-                   <SelectItem value="Low">
-                     <Badge className={priorityColors.Low}>Low</Badge>
-                   </SelectItem>
-                   <SelectItem value="Important">
-                     <Badge className={priorityColors.Important}>Important</Badge>
-                   </SelectItem>
-                   <SelectItem value="Critical">
-                     <Badge className={priorityColors.Critical}>Critical</Badge>
-                   </SelectItem>
-                 </SelectContent>
+                <SelectContent className="bg-background border border-border z-50">
+                  <SelectItem value="Low">
+                    <Badge className={priorityColors.Low}>Low</Badge>
+                  </SelectItem>
+                  <SelectItem value="Important">
+                    <Badge className={priorityColors.Important}>Important</Badge>
+                  </SelectItem>
+                  <SelectItem value="Critical">
+                    <Badge className={priorityColors.Critical}>Critical</Badge>
+                  </SelectItem>
+                </SelectContent>
               </Select>
             </div>
 
-            <div>
-              <Label className="text-sm font-medium text-muted-foreground mb-2 block">EcoSure</Label>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">EcoSure</Label>
               <Select value={workOrder.ecosure} onValueChange={handleEcoSureChange}>
                 <SelectTrigger className="w-full">
                   <SelectValue>
@@ -750,23 +752,23 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
                     </Badge>
                   </SelectValue>
                 </SelectTrigger>
-                 <SelectContent className="bg-background border border-border z-50">
-                   <SelectItem value="N/A">
-                     <Badge className={ecoSureColors['N/A']}>N/A</Badge>
-                   </SelectItem>
-                   <SelectItem value="Minor">
-                     <Badge className={ecoSureColors.Minor}>Minor</Badge>
-                   </SelectItem>
-                   <SelectItem value="Major">
-                     <Badge className={ecoSureColors.Major}>Major</Badge>
-                   </SelectItem>
-                   <SelectItem value="Critical">
-                     <Badge className={ecoSureColors.Critical}>Critical</Badge>
-                   </SelectItem>
-                   <SelectItem value="Imminent Health">
-                     <Badge className={ecoSureColors['Imminent Health']}>Imminent Health</Badge>
-                   </SelectItem>
-                 </SelectContent>
+                <SelectContent className="bg-background border border-border z-50">
+                  <SelectItem value="N/A">
+                    <Badge className={ecoSureColors['N/A']}>N/A</Badge>
+                  </SelectItem>
+                  <SelectItem value="Minor">
+                    <Badge className={ecoSureColors.Minor}>Minor</Badge>
+                  </SelectItem>
+                  <SelectItem value="Major">
+                    <Badge className={ecoSureColors.Major}>Major</Badge>
+                  </SelectItem>
+                  <SelectItem value="Critical">
+                    <Badge className={ecoSureColors.Critical}>Critical</Badge>
+                  </SelectItem>
+                  <SelectItem value="Imminent Health">
+                    <Badge className={ecoSureColors['Imminent Health']}>Imminent Health</Badge>
+                  </SelectItem>
+                </SelectContent>
               </Select>
             </div>
           </div>
@@ -859,7 +861,9 @@ export function WorkOrderDetails({ workOrder, onUpdate, onClose }: WorkOrderDeta
             </div>
           </div>
         </CardContent>
-      </Card>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
