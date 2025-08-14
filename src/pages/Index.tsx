@@ -167,19 +167,19 @@ const Index = () => {
   }, [workOrders, canAccessWorkOrder, permissions, searchTerm, statusFilter, priorityFilter, storeFilter, marketFilter, assigneeFilter, sortOrder]);
 
   const availableStores = useMemo(() => {
-    const stores = [...new Set(filteredWorkOrders.map(wo => wo.store_number))];
+    const stores = [...new Set(workOrders.map(wo => wo.store_number))];
     return stores.sort();
-  }, [filteredWorkOrders]);
+  }, [workOrders]);
   
   const availableMarkets = useMemo(() => {
-    const markets = [...new Set(filteredWorkOrders.map(wo => wo.market))];
+    const markets = [...new Set(workOrders.map(wo => wo.market))];
     return markets.sort();
-  }, [filteredWorkOrders]);
+  }, [workOrders]);
 
   const availableAssignees = useMemo(() => {
-    const assignees = [...new Set(filteredWorkOrders.map(wo => wo.assignee).filter(Boolean))];
+    const assignees = [...new Set(workOrders.map(wo => wo.assignee).filter(Boolean))];
     return assignees.sort();
-  }, [filteredWorkOrders]);
+  }, [workOrders]);
   const handleCreateWorkOrder = async (formData: WorkOrderFormData) => {
     if (!user) {
       toast({
