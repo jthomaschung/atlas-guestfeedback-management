@@ -76,7 +76,7 @@ export function WorkOrderCard({ workOrder, onEdit, onViewDetails, onDelete, isAd
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 opacity-60 sm:opacity-0 group-hover:opacity-100 transition-opacity"
+              className="h-8 w-8 p-0 opacity-60 sm:opacity-0 group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px] sm:min-h-[32px] sm:min-w-[32px]"
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit(workOrder);

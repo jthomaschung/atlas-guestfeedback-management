@@ -132,43 +132,44 @@ export function WorkOrderFilters({
           />
         </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <Button
-            variant={sortOrder === 'newest' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => onSortOrderChange('newest')}
-            className="flex items-center gap-2 justify-center"
-          >
-            <CalendarArrowDown className="h-4 w-4" />
-            <span className="hidden sm:inline">Newest First</span>
-            <span className="sm:hidden">Newest</span>
-          </Button>
-          <Button
-            variant={sortOrder === 'oldest' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => onSortOrderChange('oldest')}
-            className="flex items-center gap-2 justify-center"
-          >
-            <CalendarArrowUp className="h-4 w-4" />
-            <span className="hidden sm:inline">Oldest First</span>
-            <span className="sm:hidden">Oldest</span>
-          </Button>
+        <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:space-x-2">
+            <Button
+              variant={sortOrder === 'newest' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => onSortOrderChange('newest')}
+              className="flex items-center gap-2 justify-center min-h-[44px] w-full sm:w-auto"
+            >
+              <CalendarArrowDown className="h-4 w-4" />
+              <span className="hidden sm:inline">Newest First</span>
+              <span className="sm:hidden">Newest</span>
+            </Button>
+            <Button
+              variant={sortOrder === 'oldest' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => onSortOrderChange('oldest')}
+              className="flex items-center gap-2 justify-center min-h-[44px] w-full sm:w-auto"
+            >
+              <CalendarArrowUp className="h-4 w-4" />
+              <span className="hidden sm:inline">Oldest First</span>
+              <span className="sm:hidden">Oldest</span>
+            </Button>
+          </div>
+          
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClearFilters}
+              className="text-muted-foreground hover:text-foreground min-h-[44px] w-full sm:w-auto"
+            >
+              <X className="h-3 w-3 mr-1" />
+              <span className="hidden sm:inline">Clear Filters</span>
+              <span className="sm:hidden">Clear</span>
+            </Button>
+          )}
         </div>
       </div>
-      
-      {hasActiveFilters && (
-        <div className="flex justify-end">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClearFilters}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <X className="h-3 w-3 mr-1" />
-            Clear Filters
-          </Button>
-        </div>
-      )}
     </div>
   );
 }

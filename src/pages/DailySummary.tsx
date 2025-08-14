@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { useAuth } from "@/hooks/useAuth";
+import { MobileWorkOrderTable } from "@/components/work-orders/MobileWorkOrderTable";
 
 type WorkOrderRow = Database['public']['Tables']['work_orders']['Row'];
 
@@ -206,16 +207,17 @@ export default function DailySummary() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Daily Summary</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold">Daily Summary</h1>
         <div className="flex items-center gap-2">
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="justify-start">
+              <Button variant="outline" className="justify-start min-h-[44px] text-sm">
                 <CalendarDays className="mr-2 h-4 w-4" />
-                {format(selectedDate, "MMMM dd, yyyy")}
+                <span className="hidden sm:inline">{format(selectedDate, "MMMM dd, yyyy")}</span>
+                <span className="sm:hidden">{format(selectedDate, "MMM dd")}</span>
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="end">
@@ -231,14 +233,14 @@ export default function DailySummary() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {stats.map((stat, index) => (
           <Card key={index} className={`${stat.color} ${stat.textColor} border-0`}>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium opacity-90">{stat.title}</p>
-                  <p className="text-3xl font-bold">{stat.value}</p>
+                  <p className="text-xs sm:text-sm font-medium opacity-90">{stat.title}</p>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold">{stat.value}</p>
                 </div>
               </div>
             </CardContent>
@@ -259,43 +261,55 @@ export default function DailySummary() {
           </CollapsibleTrigger>
           <CollapsibleContent>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Store</TableHead>
-                    <TableHead>Market</TableHead>
-                    <TableHead>Priority</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Title</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {summaryData.newTickets.map((ticket) => (
-                    <TableRow 
-                      key={ticket.id}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleRowClick(ticket.id)}
-                    >
-                      <TableCell>{ticket.store_number}</TableCell>
-                      <TableCell>{ticket.market}</TableCell>
-                      <TableCell>
-                        <Badge variant={getPriorityBadgeVariant(ticket.priority)}>
-                          {ticket.priority}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{format(new Date(ticket.created_at), "h:mm a")}</TableCell>
-                      <TableCell className="max-w-xs truncate">{ticket.description}</TableCell>
-                    </TableRow>
-                  ))}
-                  {summaryData.newTickets.length === 0 && (
+              {/* Desktop Table */}
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                        No new tickets for {format(selectedDate, "MMMM dd, yyyy")}
-                      </TableCell>
+                      <TableHead>Store</TableHead>
+                      <TableHead>Market</TableHead>
+                      <TableHead>Priority</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead>Title</TableHead>
                     </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {summaryData.newTickets.map((ticket) => (
+                      <TableRow 
+                        key={ticket.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => handleRowClick(ticket.id)}
+                      >
+                        <TableCell>{ticket.store_number}</TableCell>
+                        <TableCell>{ticket.market}</TableCell>
+                        <TableCell>
+                          <Badge variant={getPriorityBadgeVariant(ticket.priority)}>
+                            {ticket.priority}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{format(new Date(ticket.created_at), "h:mm a")}</TableCell>
+                        <TableCell className="max-w-xs truncate">{ticket.description}</TableCell>
+                      </TableRow>
+                    ))}
+                    {summaryData.newTickets.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                          No new tickets for {format(selectedDate, "MMMM dd, yyyy")}
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+              
+              {/* Mobile Cards */}
+              <div className="md:hidden">
+                <MobileWorkOrderTable 
+                  tickets={summaryData.newTickets}
+                  onRowClick={handleRowClick}
+                  title="New Tickets"
+                />
+              </div>
             </CardContent>
           </CollapsibleContent>
         </Card>
@@ -314,47 +328,59 @@ export default function DailySummary() {
           </CollapsibleTrigger>
           <CollapsibleContent>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Store</TableHead>
-                    <TableHead>Priority</TableHead>
-                    <TableHead>Completed</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Title</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {summaryData.completedTickets.map((ticket) => (
-                    <TableRow 
-                      key={ticket.id}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleRowClick(ticket.id)}
-                    >
-                      <TableCell>{ticket.store_number}</TableCell>
-                      <TableCell>
-                        <Badge variant={getPriorityBadgeVariant(ticket.priority)}>
-                          {ticket.priority}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {ticket.completed_at ? format(new Date(ticket.completed_at), "h:mm a") : "-"}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">Completed</Badge>
-                      </TableCell>
-                      <TableCell className="max-w-xs truncate">{ticket.description}</TableCell>
-                    </TableRow>
-                  ))}
-                  {summaryData.completedTickets.length === 0 && (
+              {/* Desktop Table */}
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                        No completed tickets for {format(selectedDate, "MMMM dd, yyyy")}
-                      </TableCell>
+                      <TableHead>Store</TableHead>
+                      <TableHead>Priority</TableHead>
+                      <TableHead>Completed</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Title</TableHead>
                     </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {summaryData.completedTickets.map((ticket) => (
+                      <TableRow 
+                        key={ticket.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => handleRowClick(ticket.id)}
+                      >
+                        <TableCell>{ticket.store_number}</TableCell>
+                        <TableCell>
+                          <Badge variant={getPriorityBadgeVariant(ticket.priority)}>
+                            {ticket.priority}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {ticket.completed_at ? format(new Date(ticket.completed_at), "h:mm a") : "-"}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">Completed</Badge>
+                        </TableCell>
+                        <TableCell className="max-w-xs truncate">{ticket.description}</TableCell>
+                      </TableRow>
+                    ))}
+                    {summaryData.completedTickets.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                          No completed tickets for {format(selectedDate, "MMMM dd, yyyy")}
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+              
+              {/* Mobile Cards */}
+              <div className="md:hidden">
+                <MobileWorkOrderTable 
+                  tickets={summaryData.completedTickets}
+                  onRowClick={handleRowClick}
+                  title="Completed Tickets"
+                />
+              </div>
             </CardContent>
           </CollapsibleContent>
         </Card>
