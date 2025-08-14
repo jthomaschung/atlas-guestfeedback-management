@@ -507,7 +507,12 @@ const Index = () => {
   };
   const handleStatsFilterChange = (type: 'status' | 'priority', value: string) => {
     if (type === 'status') {
-      setStatusFilter([value]);
+      if (value === 'open') {
+        // Clear status filter to show all open work orders
+        setStatusFilter([]);
+      } else {
+        setStatusFilter([value]);
+      }
       // Reset other filters when clicking stats
       setPriorityFilter([]);
     } else if (type === 'priority') {

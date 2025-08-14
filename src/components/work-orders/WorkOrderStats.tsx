@@ -20,7 +20,7 @@ export function WorkOrderStats({ workOrders, onFilterChange }: WorkOrderStatsPro
       value: totalOpenOrders,
       icon: ClipboardList,
       color: 'text-primary',
-      onClick: () => onFilterChange('status', 'all'),
+      onClick: () => onFilterChange('status', 'open'),
     },
     {
       title: 'In Progress',
