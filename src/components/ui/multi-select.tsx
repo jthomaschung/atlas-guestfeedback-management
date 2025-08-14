@@ -64,14 +64,7 @@ export function MultiSelect({
                     }}
                   >
                     {option?.label}
-                    <Button
-                      asChild
-                      variant="ghost"
-                      size="sm"
-                      className="ml-1 h-auto p-0 text-muted-foreground hover:text-foreground"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
+                    <X className="h-3 w-3 ml-1 cursor-pointer hover:text-foreground" />
                   </Badge>
                 )
               })}
