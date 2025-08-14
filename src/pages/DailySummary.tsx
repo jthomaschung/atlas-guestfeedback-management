@@ -209,12 +209,12 @@ export default function DailySummary() {
   return (
     <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <h1 className="text-2xl sm:text-3xl font-bold">Daily Summary</h1>
         <div className="flex items-center gap-2">
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="justify-start min-h-[44px] text-sm">
+              <Button variant="outline" className="justify-start sm:min-h-[44px]">
                 <CalendarDays className="mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">{format(selectedDate, "MMMM dd, yyyy")}</span>
                 <span className="sm:hidden">{format(selectedDate, "MMM dd")}</span>
@@ -233,14 +233,14 @@ export default function DailySummary() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         {stats.map((stat, index) => (
           <Card key={index} className={`${stat.color} ${stat.textColor} border-0`}>
             <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs sm:text-sm font-medium opacity-90">{stat.title}</p>
-                  <p className="text-xl sm:text-2xl md:text-3xl font-bold">{stat.value}</p>
+                  <p className="text-lg sm:text-2xl lg:text-3xl font-bold">{stat.value}</p>
                 </div>
               </div>
             </CardContent>

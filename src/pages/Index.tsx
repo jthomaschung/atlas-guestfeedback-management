@@ -527,7 +527,7 @@ const Index = () => {
   };
   return <div className="min-h-screen bg-background">
       <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Work Order Dashboard</h1>
             <p className="text-sm sm:text-base text-muted-foreground mt-1">
