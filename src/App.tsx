@@ -8,6 +8,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppSidebar } from '@/components/AppSidebar';
 import { NotificationBell } from '@/components/NotificationBell';
+import { PortalSwitcher } from '@/components/PortalSwitcher';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import Welcome from '@/pages/Welcome';
@@ -50,8 +51,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
               <SidebarTrigger className="text-atlas-dark-foreground hover:bg-atlas-red/10 hover:text-atlas-red transition-colors sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center" />
               <div className="text-atlas-dark-foreground">
                 <span className="text-lg sm:text-xl lg:text-2xl font-bold tracking-wide">ATLAS</span>
-                <span className="hidden sm:inline ml-2 text-xs sm:text-sm text-atlas-dark-foreground/80">Facilities Management Portal</span>
+                <span className="hidden sm:inline ml-2 text-xs sm:text-sm text-atlas-dark-foreground/80">Management Portal</span>
               </div>
+              <PortalSwitcher />
             </div>
             <div className="flex items-center gap-1 sm:gap-2">
               <NotificationBell />

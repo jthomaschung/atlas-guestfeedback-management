@@ -31,6 +31,24 @@ export function AppSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
 
+  // Hide navigation on portal selection page
+  if (currentPath === '/portal-selection') {
+    return (
+      <Sidebar collapsible="icon">
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>Portal Selection</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <div className="p-4 text-sm text-muted-foreground">
+                Select a portal to view navigation options
+              </div>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+    );
+  }
+
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent/50";
