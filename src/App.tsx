@@ -23,6 +23,7 @@ import UserHierarchy from '@/pages/UserHierarchy';
 import Settings from '@/pages/Settings';
 import PortalSelection from '@/pages/PortalSelection';
 import { SmartRedirect } from '@/components/SmartRedirect';
+import { FacilitiesRedirect } from '@/components/FacilitiesRedirect';
 
 const queryClient = new QueryClient();
 
@@ -114,7 +115,7 @@ function App() {
                 path="/dashboard" 
                 element={
                   <ProtectedRoute>
-                    <Index />
+                    <FacilitiesRedirect />
                   </ProtectedRoute>
                 } 
               />
