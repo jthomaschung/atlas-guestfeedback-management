@@ -44,7 +44,7 @@ export default function PortalSelection() {
       title: 'Facilities Management',
       description: 'Work orders, maintenance, and facility operations',
       icon: Wrench,
-      href: '/dashboard',
+      href: '/',
       available: permissions.canAccessFacilities
     },
     {
