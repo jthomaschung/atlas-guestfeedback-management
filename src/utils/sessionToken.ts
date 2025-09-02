@@ -16,18 +16,21 @@ export const sessionTokenUtils = {
     return {
       access_token: session.access_token,
       refresh_token: session.refresh_token,
-      expires_at: session.expires_at || Date.now() / 1000 + 3600 // fallback 1 hour
+      expires_at: session.expires_at || 0
     };
   },
 
-  // Create URL with session tokens
+  // Create an authenticated URL with session tokens
   createAuthenticatedUrl: async (baseUrl: string): Promise<string> => {
     const tokens = await sessionTokenUtils.getCurrentSessionTokens();
     
-    if (!tokens) return baseUrl;
-    
+    if (!tokens) {
+      console.warn('No session tokens available for URL creation');
+      return baseUrl;
+    }
+
     const url = new URL(baseUrl);
-    url.searchParams.set('auth_token', tokens.access_token);
+    url.searchParams.set('access_token', tokens.access_token);
     url.searchParams.set('refresh_token', tokens.refresh_token);
     url.searchParams.set('expires_at', tokens.expires_at.toString());
     
@@ -37,47 +40,60 @@ export const sessionTokenUtils = {
   // Extract tokens from URL parameters
   extractTokensFromUrl: (): SessionTokenData | null => {
     const urlParams = new URLSearchParams(window.location.search);
-    const access_token = urlParams.get('auth_token');
+    const access_token = urlParams.get('access_token');
     const refresh_token = urlParams.get('refresh_token');
     const expires_at = urlParams.get('expires_at');
-    
-    if (!access_token || !refresh_token || !expires_at) return null;
-    
+
+    if (!access_token || !refresh_token) {
+      return null;
+    }
+
     return {
       access_token,
       refresh_token,
-      expires_at: parseInt(expires_at)
+      expires_at: expires_at ? parseInt(expires_at) : 0
     };
   },
 
   // Authenticate with tokens from URL
   authenticateWithTokens: async (tokens: SessionTokenData): Promise<boolean> => {
     try {
-      const { error } = await supabase.auth.setSession({
+      const { data: { session }, error } = await supabase.auth.setSession({
         access_token: tokens.access_token,
         refresh_token: tokens.refresh_token
       });
-      
-      return !error;
+
+      if (error) {
+        console.error('Error setting session:', error);
+        return false;
+      }
+
+      if (!session) {
+        console.error('No session returned after setting tokens');
+        return false;
+      }
+
+      console.log('Successfully authenticated with session tokens');
+      return true;
     } catch (error) {
-      console.error('Error authenticating with tokens:', error);
+      console.error('Exception during token authentication:', error);
       return false;
     }
   },
 
-  // Clean URL parameters after authentication
-  cleanUrl: () => {
+  // Clean URL from session tokens
+  cleanUrl: (): void => {
     const url = new URL(window.location.href);
-    url.searchParams.delete('auth_token');
+    url.searchParams.delete('access_token');
     url.searchParams.delete('refresh_token');
     url.searchParams.delete('expires_at');
     
-    window.history.replaceState({}, document.title, url.toString());
+    window.history.replaceState({}, '', url.toString());
   },
 
   // Check if tokens are still valid
   areTokensValid: (tokens: SessionTokenData): boolean => {
     const now = Date.now() / 1000;
-    return tokens.expires_at > now + 60; // Valid if expires in more than 1 minute
+    return tokens.expires_at > now;
   }
 };
