@@ -10,8 +10,8 @@ const portals = [
     key: 'facilities',
     title: 'Facilities',
     icon: Wrench,
-    href: '/dashboard',
-    externalUrl: 'https://atlas-facilities-management.lovable.app'
+    href: '/facilities',
+    externalUrl: 'https://preview--atlas-facilities-management.lovable.app'
   },
   {
     key: 'catering',
