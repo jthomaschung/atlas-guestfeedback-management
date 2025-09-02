@@ -139,24 +139,39 @@ export type Database = {
       }
       user_permissions: {
         Row: {
+          can_access_catering_dev: boolean | null
+          can_access_facilities_dev: boolean | null
+          can_access_guest_feedback_dev: boolean | null
+          can_access_hr_dev: boolean | null
           created_at: string
           id: string
+          is_development_user: boolean | null
           markets: string[] | null
           stores: string[] | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          can_access_catering_dev?: boolean | null
+          can_access_facilities_dev?: boolean | null
+          can_access_guest_feedback_dev?: boolean | null
+          can_access_hr_dev?: boolean | null
           created_at?: string
           id?: string
+          is_development_user?: boolean | null
           markets?: string[] | null
           stores?: string[] | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          can_access_catering_dev?: boolean | null
+          can_access_facilities_dev?: boolean | null
+          can_access_guest_feedback_dev?: boolean | null
+          can_access_hr_dev?: boolean | null
           created_at?: string
           id?: string
+          is_development_user?: boolean | null
           markets?: string[] | null
           stores?: string[] | null
           updated_at?: string
@@ -168,6 +183,7 @@ export type Database = {
         Row: {
           assignee: string | null
           completed_at: string | null
+          cost: number | null
           created_at: string
           description: string
           ecosure: string
@@ -186,6 +202,7 @@ export type Database = {
         Insert: {
           assignee?: string | null
           completed_at?: string | null
+          cost?: number | null
           created_at?: string
           description: string
           ecosure: string
@@ -204,6 +221,7 @@ export type Database = {
         Update: {
           assignee?: string | null
           completed_at?: string | null
+          cost?: number | null
           created_at?: string
           description?: string
           ecosure?: string

@@ -61,6 +61,11 @@ interface UserPermissions {
   user_id: string;
   markets: string[];
   stores: string[];
+  can_access_facilities_dev?: boolean;
+  can_access_catering_dev?: boolean;
+  can_access_hr_dev?: boolean;
+  can_access_guest_feedback_dev?: boolean;
+  is_development_user?: boolean;
 }
 
 interface CombinedUserData {
@@ -94,7 +99,12 @@ export default function UserHierarchy() {
     email_on_tagged: true,
     email_on_assignment: true,
     markets: [] as string[],
-    stores: [] as string[]
+    stores: [] as string[],
+    can_access_facilities_dev: true,
+    can_access_catering_dev: false,
+    can_access_hr_dev: false,
+    can_access_guest_feedback_dev: false,
+    is_development_user: false
   });
   
   const [selectedMarket, setSelectedMarket] = useState('');
@@ -205,7 +215,12 @@ export default function UserHierarchy() {
       email_on_tagged: userData.notifications?.email_on_tagged ?? true,
       email_on_assignment: userData.notifications?.email_on_assignment ?? true,
       markets: userData.permissions?.markets || [],
-      stores: userData.permissions?.stores || []
+      stores: userData.permissions?.stores || [],
+      can_access_facilities_dev: userData.permissions?.can_access_facilities_dev ?? true,
+      can_access_catering_dev: userData.permissions?.can_access_catering_dev ?? false,
+      can_access_hr_dev: userData.permissions?.can_access_hr_dev ?? false,
+      can_access_guest_feedback_dev: userData.permissions?.can_access_guest_feedback_dev ?? false,
+      is_development_user: userData.permissions?.is_development_user ?? false
     });
     setSelectedMarket('');
     setSelectedStore('');
@@ -228,7 +243,12 @@ export default function UserHierarchy() {
       email_on_tagged: true,
       email_on_assignment: true,
       markets: [],
-      stores: []
+      stores: [],
+      can_access_facilities_dev: true,
+      can_access_catering_dev: false,
+      can_access_hr_dev: false,
+      can_access_guest_feedback_dev: false,
+      is_development_user: false
     });
     setSelectedMarket('');
     setSelectedStore('');
@@ -374,7 +394,12 @@ export default function UserHierarchy() {
           .from('user_permissions')
           .update({
             markets: formData.markets,
-            stores: formData.stores
+            stores: formData.stores,
+            can_access_facilities_dev: formData.can_access_facilities_dev,
+            can_access_catering_dev: formData.can_access_catering_dev,
+            can_access_hr_dev: formData.can_access_hr_dev,
+            can_access_guest_feedback_dev: formData.can_access_guest_feedback_dev,
+            is_development_user: formData.is_development_user
           })
           .eq('user_id', userId);
 
@@ -388,7 +413,12 @@ export default function UserHierarchy() {
           .insert({
             user_id: userId,
             markets: formData.markets,
-            stores: formData.stores
+            stores: formData.stores,
+            can_access_facilities_dev: formData.can_access_facilities_dev,
+            can_access_catering_dev: formData.can_access_catering_dev,
+            can_access_hr_dev: formData.can_access_hr_dev,
+            can_access_guest_feedback_dev: formData.can_access_guest_feedback_dev,
+            is_development_user: formData.is_development_user
           });
 
         if (permissionError) {
@@ -589,11 +619,14 @@ export default function UserHierarchy() {
           </DialogHeader>
 
           <Tabs defaultValue="basic" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className={`grid w-full ${formData.is_development_user ? 'grid-cols-5' : 'grid-cols-4'}`}>
               <TabsTrigger value="basic">Basic Info</TabsTrigger>
               <TabsTrigger value="hierarchy">Role & Manager</TabsTrigger>
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="permissions">Permissions</TabsTrigger>
+              {formData.is_development_user && (
+                <TabsTrigger value="portal-access">Portal Access</TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="basic" className="space-y-4">
@@ -868,6 +901,102 @@ export default function UserHierarchy() {
                 </div>
               </div>
             </TabsContent>
+
+            {formData.is_development_user && (
+              <TabsContent value="portal-access" className="space-y-4">
+                <div className="space-y-6">
+                  <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Network className="h-4 w-4 text-blue-600" />
+                      <span className="font-medium text-blue-900">Portal Access Management</span>
+                      <Badge variant="secondary" className="text-xs">Development Feature</Badge>
+                    </div>
+                    <p className="text-sm text-blue-700">
+                      Configure which portals this user can access. This feature is currently in development.
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="portal_facilities"
+                        checked={formData.can_access_facilities_dev}
+                        onCheckedChange={(checked) => 
+                          setFormData(prev => ({ ...prev, can_access_facilities_dev: checked as boolean }))
+                        }
+                      />
+                      <Label htmlFor="portal_facilities" className="flex items-center gap-2">
+                        <Shield className="h-4 w-4" />
+                        Facilities Portal
+                      </Label>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="portal_catering"
+                        checked={formData.can_access_catering_dev}
+                        onCheckedChange={(checked) => 
+                          setFormData(prev => ({ ...prev, can_access_catering_dev: checked as boolean }))
+                        }
+                      />
+                      <Label htmlFor="portal_catering" className="flex items-center gap-2">
+                        <UserCheck className="h-4 w-4" />
+                        Catering Portal
+                      </Label>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="portal_hr"
+                        checked={formData.can_access_hr_dev}
+                        onCheckedChange={(checked) => 
+                          setFormData(prev => ({ ...prev, can_access_hr_dev: checked as boolean }))
+                        }
+                      />
+                      <Label htmlFor="portal_hr" className="flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        HR Portal
+                      </Label>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="portal_guest_feedback"
+                        checked={formData.can_access_guest_feedback_dev}
+                        onCheckedChange={(checked) => 
+                          setFormData(prev => ({ ...prev, can_access_guest_feedback_dev: checked as boolean }))
+                        }
+                      />
+                      <Label htmlFor="portal_guest_feedback" className="flex items-center gap-2">
+                        <Bell className="h-4 w-4" />
+                        Guest Feedback Portal
+                      </Label>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="bg-muted/50 p-4 rounded-lg">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Checkbox
+                          id="is_development_user"
+                          checked={formData.is_development_user}
+                          onCheckedChange={(checked) => 
+                            setFormData(prev => ({ ...prev, is_development_user: checked as boolean }))
+                          }
+                        />
+                        <Label htmlFor="is_development_user" className="font-medium">
+                          Development User Access
+                        </Label>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Enable this to allow the user to see development features like this Portal Access tab. 
+                        Only enable for testing purposes.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            )}
           </Tabs>
 
           <div className="flex justify-end gap-2 pt-4 border-t">
