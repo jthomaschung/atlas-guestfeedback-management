@@ -84,6 +84,7 @@ export default function UserHierarchy() {
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [checkingAdmin, setCheckingAdmin] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentUserIsDevelopmentUser, setCurrentUserIsDevelopmentUser] = useState<boolean>(false);
   
   // Form states for the selected user
   const [formData, setFormData] = useState({
@@ -115,6 +116,7 @@ export default function UserHierarchy() {
 
   useEffect(() => {
     checkAdminStatus();
+    checkCurrentUserDevelopmentStatus();
   }, [user]);
 
   useEffect(() => {
@@ -122,6 +124,31 @@ export default function UserHierarchy() {
       loadAllUsers();
     }
   }, [isAdmin]);
+
+  const checkCurrentUserDevelopmentStatus = async () => {
+    if (!user) {
+      setCurrentUserIsDevelopmentUser(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('user_permissions')
+        .select('is_development_user')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error checking development user status:', error);
+        setCurrentUserIsDevelopmentUser(false);
+      } else {
+        setCurrentUserIsDevelopmentUser(data?.is_development_user || false);
+      }
+    } catch (error) {
+      console.error('Error checking development user status:', error);
+      setCurrentUserIsDevelopmentUser(false);
+    }
+  };
 
   const checkAdminStatus = async () => {
     if (!user) {
@@ -619,12 +646,12 @@ export default function UserHierarchy() {
           </DialogHeader>
 
           <Tabs defaultValue="basic" className="w-full">
-            <TabsList className={`grid w-full ${formData.is_development_user ? 'grid-cols-5' : 'grid-cols-4'}`}>
+            <TabsList className={`grid w-full ${currentUserIsDevelopmentUser ? 'grid-cols-5' : 'grid-cols-4'}`}>
               <TabsTrigger value="basic">Basic Info</TabsTrigger>
               <TabsTrigger value="hierarchy">Role & Manager</TabsTrigger>
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="permissions">Permissions</TabsTrigger>
-              {formData.is_development_user && (
+              {currentUserIsDevelopmentUser && (
                 <TabsTrigger value="portal-access">Portal Access</TabsTrigger>
               )}
             </TabsList>
@@ -902,7 +929,7 @@ export default function UserHierarchy() {
               </div>
             </TabsContent>
 
-            {formData.is_development_user && (
+            {currentUserIsDevelopmentUser && (
               <TabsContent value="portal-access" className="space-y-4">
                 <div className="space-y-6">
                   <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
