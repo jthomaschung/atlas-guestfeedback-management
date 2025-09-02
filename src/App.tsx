@@ -31,8 +31,9 @@ import { TokenProcessingProvider, useTokenProcessing } from '@/hooks/useTokenPro
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const { isProcessingTokens } = useTokenProcessing();
+  const { loading: permissionsLoading } = useUserPermissions();
   
   // Check if there are session tokens in the URL that might be processed
   const urlParams = new URLSearchParams(window.location.search);
@@ -40,14 +41,15 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   
   console.log('🔍 ProtectedRoute: Checking auth state', {
     user: !!user,
-    loading,
+    authLoading,
+    permissionsLoading,
     isProcessingTokens,
     hasSessionTokens,
     currentUrl: window.location.href
   });
   
-  if (loading) {
-    console.log('🔍 ProtectedRoute: Still loading auth state');
+  if (authLoading || permissionsLoading) {
+    console.log('🔍 ProtectedRoute: Still loading', { authLoading, permissionsLoading });
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-slate-600">Loading...</div>
