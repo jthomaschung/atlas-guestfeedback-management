@@ -31,6 +31,7 @@ import { TokenProcessingProvider, useTokenProcessing } from '@/hooks/useTokenPro
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  console.log('🔥🔥🔥 PROTECTED ROUTE EXECUTED 🔥🔥🔥');
   const { user, loading: authLoading, signOut } = useAuth();
   const { isProcessingTokens } = useTokenProcessing();
   const { loading: permissionsLoading } = useUserPermissions();
