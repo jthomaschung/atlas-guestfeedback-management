@@ -127,9 +127,12 @@ export default function UserHierarchy() {
 
   const checkCurrentUserDevelopmentStatus = async () => {
     if (!user) {
+      console.log('No user found for development check');
       setCurrentUserIsDevelopmentUser(false);
       return;
     }
+
+    console.log('Checking development status for user:', user.email, user.id);
 
     try {
       const { data, error } = await supabase
@@ -138,11 +141,15 @@ export default function UserHierarchy() {
         .eq('user_id', user.id)
         .maybeSingle();
 
+      console.log('Development check result:', { data, error });
+
       if (error) {
         console.error('Error checking development user status:', error);
         setCurrentUserIsDevelopmentUser(false);
       } else {
-        setCurrentUserIsDevelopmentUser(data?.is_development_user || false);
+        const isDev = data?.is_development_user || false;
+        console.log('Setting currentUserIsDevelopmentUser to:', isDev);
+        setCurrentUserIsDevelopmentUser(isDev);
       }
     } catch (error) {
       console.error('Error checking development user status:', error);
