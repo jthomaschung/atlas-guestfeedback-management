@@ -7,43 +7,56 @@ export function SessionTokenHandler() {
 
   useEffect(() => {
     const handleIncomingTokens = async () => {
-      console.log('SessionTokenHandler: Checking for tokens, user:', !!user);
+      console.log('🔍 SessionTokenHandler: Starting token check');
+      console.log('🔍 Current URL:', window.location.href);
+      console.log('🔍 User authenticated:', !!user);
       
       // Only process tokens if user is not already authenticated
       if (user) {
-        console.log('SessionTokenHandler: User already authenticated, cleaning URL');
+        console.log('✅ User already authenticated, cleaning URL');
         sessionTokenUtils.cleanUrl();
         return;
       }
 
       const tokens = sessionTokenUtils.extractTokensFromUrl();
-      console.log('SessionTokenHandler: Extracted tokens:', !!tokens);
+      console.log('🔍 Extracted tokens:', tokens ? '✅ Found' : '❌ Not found');
       
-      if (!tokens) return;
+      if (!tokens) {
+        console.log('❌ No tokens found in URL');
+        return;
+      }
+
+      console.log('🔍 Token details:', {
+        hasAccessToken: !!tokens.access_token,
+        hasRefreshToken: !!tokens.refresh_token,
+        expiresAt: tokens.expires_at
+      });
 
       // Check if tokens are still valid
       if (!sessionTokenUtils.areTokensValid(tokens)) {
-        console.warn('SessionTokenHandler: Received expired tokens');
+        console.warn('⚠️ Received expired tokens');
         sessionTokenUtils.cleanUrl();
         return;
       }
 
       try {
-        console.log('SessionTokenHandler: Attempting to authenticate with tokens');
+        console.log('🚀 Attempting to authenticate with tokens...');
         const success = await sessionTokenUtils.authenticateWithTokens(tokens);
+        console.log('🔍 Authentication result:', success ? '✅ Success' : '❌ Failed');
         
         if (success) {
-          console.log('SessionTokenHandler: Successfully authenticated with session tokens');
+          console.log('✅ Successfully authenticated with session tokens');
           // Clean up URL after successful authentication
           setTimeout(() => {
+            console.log('🧹 Cleaning URL...');
             sessionTokenUtils.cleanUrl();
           }, 1000);
         } else {
-          console.error('SessionTokenHandler: Failed to authenticate with session tokens');
+          console.error('❌ Failed to authenticate with session tokens');
           sessionTokenUtils.cleanUrl();
         }
       } catch (error) {
-        console.error('SessionTokenHandler: Error processing session tokens:', error);
+        console.error('💥 Error processing session tokens:', error);
         sessionTokenUtils.cleanUrl();
       }
     };

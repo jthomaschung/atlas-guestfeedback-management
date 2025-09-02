@@ -8,12 +8,24 @@ export function SmartRedirect() {
   const { user } = useAuth();
   const { permissions, loading } = useUserPermissions();
 
+  console.log('🔍 SmartRedirect: Current state', {
+    hasUser: !!user,
+    loading,
+    url: window.location.href
+  });
+
   // Check if there are session tokens in the URL that need to be processed
   const urlParams = new URLSearchParams(window.location.search);
   const hasSessionTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
 
+  console.log('🔍 SmartRedirect: Session tokens check', {
+    hasSessionTokens,
+    hasUser: !!user
+  });
+
   // If we have session tokens but no user yet, wait for authentication
   if (hasSessionTokens && !user) {
+    console.log('⏳ Waiting for authentication with session tokens...');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-muted-foreground">Authenticating...</div>
@@ -22,12 +34,15 @@ export function SmartRedirect() {
   }
 
   if (loading) {
+    console.log('⏳ Loading permissions...');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-muted-foreground">Loading...</div>
       </div>
     );
   }
+
+  console.log('🔍 SmartRedirect: Permissions loaded', permissions);
 
   // Count accessible portals
   const accessiblePortals = [];
