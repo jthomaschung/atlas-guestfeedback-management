@@ -24,6 +24,7 @@ import Settings from '@/pages/Settings';
 
 import { SmartRedirect } from '@/components/SmartRedirect';
 import { FacilitiesRedirect } from '@/components/FacilitiesRedirect';
+import { SessionTokenHandler } from '@/components/SessionTokenHandler';
 
 const queryClient = new QueryClient();
 
@@ -101,6 +102,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AuthProvider>
+          <SessionTokenHandler />
           <Router>
             <Routes>
               <Route 
