@@ -20,11 +20,20 @@ export function FacilitiesRedirect() {
   if (permissions.canAccessHr) accessiblePortals.push('hr');
   if (permissions.canAccessGuestFeedback) accessiblePortals.push('guest-feedback');
 
-  // If user has multiple portal access, redirect to portal selection
-  if (accessiblePortals.length > 1) {
-    return <Navigate to="/portal-selection" replace />;
+  // Check if user has facilities access
+  if (!permissions.canAccessFacilities) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-foreground mb-2">Access Denied</h2>
+          <p className="text-muted-foreground">
+            You don't have access to facilities management. Please contact your administrator.
+          </p>
+        </div>
+      </div>
+    );
   }
 
-  // If user only has facilities access or no access, show the facilities dashboard
+  // Show the facilities dashboard
   return <Index />;
 }

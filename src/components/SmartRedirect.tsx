@@ -24,11 +24,20 @@ export function SmartRedirect() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // If user has multiple portal access, show portal selection
-  if (accessiblePortals.length > 1) {
-    return <Navigate to="/portal-selection" replace />;
+  // If user has guest feedback access (single or multiple portals), redirect to guest feedback
+  if (permissions.canAccessGuestFeedback) {
+    return <Navigate to="/facilities" replace />;
   }
 
-  // If user has no portal access, still show portal selection (it will handle the access denied case)
-  return <Navigate to="/portal-selection" replace />;
+  // If user has no access, show access denied message
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold text-foreground mb-2">Access Denied</h2>
+        <p className="text-muted-foreground">
+          You don't have access to any portals. Please contact your administrator.
+        </p>
+      </div>
+    </div>
+  );
 }

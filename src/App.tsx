@@ -21,7 +21,7 @@ import Completed from '@/pages/Completed';
 import Reporting from '@/pages/Reporting';
 import UserHierarchy from '@/pages/UserHierarchy';
 import Settings from '@/pages/Settings';
-import PortalSelection from '@/pages/PortalSelection';
+
 import { SmartRedirect } from '@/components/SmartRedirect';
 import { FacilitiesRedirect } from '@/components/FacilitiesRedirect';
 
@@ -54,9 +54,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
                 <span className="text-lg sm:text-xl lg:text-2xl font-bold tracking-wide">ATLAS</span>
                 <span className="hidden sm:inline ml-2 text-xs sm:text-sm text-atlas-dark-foreground/80">Management Portal</span>
               </div>
-              <PortalSwitcher />
             </div>
             <div className="flex items-center gap-1 sm:gap-2">
+              <PortalSwitcher />
               <NotificationBell />
               <Button 
                 variant="ghost" 
@@ -188,14 +188,6 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Settings />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/portal-selection" 
-                element={
-                  <ProtectedRoute>
-                    <PortalSelection />
                   </ProtectedRoute>
                 } 
               />
