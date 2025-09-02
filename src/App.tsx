@@ -120,6 +120,14 @@ function App() {
                 } 
               />
               <Route 
+                path="/facilities" 
+                element={
+                  <ProtectedRoute>
+                    <Index />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
                 path="/submit" 
                 element={
                   <ProtectedRoute>
