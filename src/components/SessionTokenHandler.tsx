@@ -16,7 +16,14 @@ export function SessionTokenHandler() {
     const urlParams = new URLSearchParams(window.location.search);
     const hasTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
     
+    console.log('🔍 SessionTokenHandler: Initial check', {
+      hasTokens,
+      user: !!user,
+      currentUrl: window.location.href
+    });
+    
     if (hasTokens && !user) {
+      console.log('🚀 SessionTokenHandler: Setting processing state to true');
       setIsProcessingTokens(true);
     }
     

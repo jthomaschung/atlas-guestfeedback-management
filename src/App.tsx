@@ -34,7 +34,20 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading, signOut } = useAuth();
   const { isProcessingTokens } = useTokenProcessing();
   
+  // Check if there are session tokens in the URL that might be processed
+  const urlParams = new URLSearchParams(window.location.search);
+  const hasSessionTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
+  
+  console.log('🔍 ProtectedRoute: Checking auth state', {
+    user: !!user,
+    loading,
+    isProcessingTokens,
+    hasSessionTokens,
+    currentUrl: window.location.href
+  });
+  
   if (loading) {
+    console.log('🔍 ProtectedRoute: Still loading auth state');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-slate-600">Loading...</div>
@@ -42,22 +55,23 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
   
-  // Check if there are session tokens in the URL that might be processed
-  const urlParams = new URLSearchParams(window.location.search);
-  const hasSessionTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
   
   if (!user && !hasSessionTokens && !isProcessingTokens) {
+    console.log('🚨 ProtectedRoute: Redirecting to welcome - no user, no tokens, not processing');
     return <Navigate to="/welcome" replace />;
   }
   
   // If user is null but we have tokens or are processing tokens, show loading
   if (!user && (hasSessionTokens || isProcessingTokens)) {
+    console.log('🔍 ProtectedRoute: Waiting for authentication - showing authenticating state');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-slate-600">Authenticating...</div>
       </div>
     );
   }
+  
+  console.log('✅ ProtectedRoute: User authenticated, rendering app');
   
   return (
     <SidebarProvider>
