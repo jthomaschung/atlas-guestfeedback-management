@@ -12,6 +12,14 @@ export function SessionTokenHandler() {
     console.log('🚀 User state:', !!user);
     console.log('🚀 Current URL:', window.location.href);
     
+    // Check if we have tokens in URL immediately
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
+    
+    if (hasTokens && !user) {
+      setIsProcessingTokens(true);
+    }
+    
     const handleIncomingTokens = async () => {
       console.log('🔍 SessionTokenHandler: Starting token check');
       console.log('🔍 Current URL:', window.location.href);

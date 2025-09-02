@@ -46,7 +46,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const urlParams = new URLSearchParams(window.location.search);
   const hasSessionTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
   
-  if (!user && !hasSessionTokens) {
+  if (!user && !hasSessionTokens && !isProcessingTokens) {
     return <Navigate to="/welcome" replace />;
   }
   
