@@ -90,7 +90,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
   }
   
   if (user) {
-    return <Navigate to="/portal-selection" replace />;
+    return <Navigate to="/" replace />;
   }
   
   return <>{children}</>;
