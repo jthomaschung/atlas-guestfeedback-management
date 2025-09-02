@@ -1,11 +1,14 @@
 import { Navigate } from 'react-router-dom';
 import { useUserPermissions } from '@/hooks/useUserPermissions';
+import { useAuth } from '@/hooks/useAuth';
 import Index from '@/pages/Index';
 
 export function FacilitiesRedirect() {
+  const { user, loading: authLoading } = useAuth();
   const { permissions, loading } = useUserPermissions();
 
-  if (loading) {
+  // Wait for both auth and permissions to load
+  if (authLoading || loading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-muted-foreground">Loading...</div>
