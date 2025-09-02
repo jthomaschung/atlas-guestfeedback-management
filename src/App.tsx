@@ -31,7 +31,6 @@ const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading, signOut } = useAuth();
-  const [authTimeout, setAuthTimeout] = useState(false);
   
   if (loading) {
     return (
@@ -45,28 +44,12 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const urlParams = new URLSearchParams(window.location.search);
   const hasSessionTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
   
-  // Set a timeout for token processing to prevent infinite "Authenticating..."
-  useEffect(() => {
-    if (hasSessionTokens && !user) {
-      const timer = setTimeout(() => {
-        console.log('Auth timeout reached, redirecting to welcome');
-        setAuthTimeout(true);
-      }, 5000); // 5 second timeout
-      
-      return () => clearTimeout(timer);
-    }
-  }, [hasSessionTokens, user]);
-  
   if (!user && !hasSessionTokens) {
     return <Navigate to="/welcome" replace />;
   }
   
-  if (!user && authTimeout) {
-    console.log('Authentication timed out, redirecting to welcome');
-    return <Navigate to="/welcome" replace />;
-  }
-  
   // If user is null but we have tokens, show loading while tokens are processed
+  // The SessionTokenHandler will process them and update the auth state
   if (!user && hasSessionTokens) {
     return (
       <div className="min-h-screen flex items-center justify-center">
