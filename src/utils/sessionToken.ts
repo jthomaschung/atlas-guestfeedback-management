@@ -93,6 +93,11 @@ export const sessionTokenUtils = {
 
   // Check if tokens are still valid
   areTokensValid: (tokens: SessionTokenData): boolean => {
+    // If no expires_at was provided in URL, let Supabase handle validation
+    if (!tokens.expires_at || tokens.expires_at === 0) {
+      return true;
+    }
+    
     const now = Date.now() / 1000;
     return tokens.expires_at > now;
   }
