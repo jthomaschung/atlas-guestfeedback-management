@@ -1,10 +1,25 @@
 import { Navigate } from 'react-router-dom';
 import { useUserPermissions } from '@/hooks/useUserPermissions';
+import { useAuth } from '@/hooks/useAuth';
 import { sessionTokenUtils } from '@/utils/sessionToken';
 import { useEffect, useState } from 'react';
 
 export function SmartRedirect() {
+  const { user } = useAuth();
   const { permissions, loading } = useUserPermissions();
+
+  // Check if there are session tokens in the URL that need to be processed
+  const urlParams = new URLSearchParams(window.location.search);
+  const hasSessionTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
+
+  // If we have session tokens but no user yet, wait for authentication
+  if (hasSessionTokens && !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-muted-foreground">Authenticating...</div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
