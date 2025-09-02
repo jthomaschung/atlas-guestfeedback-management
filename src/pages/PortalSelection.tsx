@@ -1,11 +1,12 @@
 import { useUserPermissions } from '@/hooks/useUserPermissions';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Wrench, UtensilsCrossed, Users, MessageSquare } from 'lucide-react';
 
 export default function PortalSelection() {
   const { permissions, loading } = useUserPermissions();
+  const navigate = useNavigate();
 
   if (loading) {
     return (
@@ -15,16 +16,12 @@ export default function PortalSelection() {
     );
   }
 
-  // If user only has facilities access, redirect to dashboard
+  // Count accessible portals
   const accessiblePortals = [];
   if (permissions.canAccessFacilities) accessiblePortals.push('facilities');
   if (permissions.canAccessCatering) accessiblePortals.push('catering');
   if (permissions.canAccessHr) accessiblePortals.push('hr');
   if (permissions.canAccessGuestFeedback) accessiblePortals.push('guest-feedback');
-
-  if (accessiblePortals.length === 1 && accessiblePortals[0] === 'facilities') {
-    return <Navigate to="/dashboard" replace />;
-  }
 
   if (accessiblePortals.length === 0) {
     return (
@@ -106,13 +103,11 @@ export default function PortalSelection() {
                 </CardHeader>
                 <CardContent>
                   <Button 
-                    asChild 
                     className="w-full"
                     disabled={!portal.available}
+                    onClick={() => navigate(portal.href)}
                   >
-                    <a href={portal.href}>
-                      Access {portal.title}
-                    </a>
+                    Access {portal.title}
                   </Button>
                 </CardContent>
               </Card>
