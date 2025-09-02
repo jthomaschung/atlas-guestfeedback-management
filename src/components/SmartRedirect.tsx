@@ -11,6 +11,8 @@ export function SmartRedirect() {
     const handleRedirect = async () => {
       if (loading || redirecting) return;
 
+      console.log('SmartRedirect permissions:', permissions);
+
       // Count accessible portals
       const accessiblePortals = [];
       if (permissions.canAccessFacilities) accessiblePortals.push('facilities');
@@ -18,24 +20,32 @@ export function SmartRedirect() {
       if (permissions.canAccessHr) accessiblePortals.push('hr');
       if (permissions.canAccessGuestFeedback) accessiblePortals.push('guest-feedback');
 
+      console.log('Accessible portals:', accessiblePortals);
+
       // If user has guest feedback access, redirect to guest feedback app with session tokens
       if (permissions.canAccessGuestFeedback) {
+        console.log('Redirecting to guest feedback app...');
         setRedirecting(true);
         try {
           const authenticatedUrl = await sessionTokenUtils.createAuthenticatedUrl(
             'https://preview--atlas-guestfeedback-management.lovable.app'
           );
+          console.log('Created authenticated URL:', authenticatedUrl);
           window.location.href = authenticatedUrl;
         } catch (error) {
           console.error('Error creating authenticated URL:', error);
           // Fallback to direct navigation
           window.location.href = 'https://preview--atlas-guestfeedback-management.lovable.app';
         }
+        return; // Prevent further execution
       }
     };
 
-    handleRedirect();
-  }, [permissions, loading, redirecting]);
+    // Only run once when permissions are loaded
+    if (!loading && !redirecting) {
+      handleRedirect();
+    }
+  }, [permissions.canAccessGuestFeedback, loading]); // More specific dependencies
 
   if (loading || redirecting) {
     return (
