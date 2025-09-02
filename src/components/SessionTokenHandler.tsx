@@ -12,7 +12,7 @@ export function SessionTokenHandler() {
     console.log('🚀 User state:', !!user);
     console.log('🚀 Current URL:', window.location.href);
     
-    // Check if we have tokens in URL immediately
+    // IMMEDIATELY check for tokens and set processing state
     const urlParams = new URLSearchParams(window.location.search);
     const hasTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
     
@@ -22,11 +22,13 @@ export function SessionTokenHandler() {
       currentUrl: window.location.href
     });
     
-    if (hasTokens && !user) {
-      console.log('🚀 SessionTokenHandler: Setting processing state to true');
+    // Set processing state IMMEDIATELY if we have tokens (before any async operations)
+    if (hasTokens) {
+      console.log('🚀 SessionTokenHandler: Found tokens, setting processing state IMMEDIATELY');
       setIsProcessingTokens(true);
     }
     
+    // Process tokens asynchronously
     const handleIncomingTokens = async () => {
       console.log('🔍 SessionTokenHandler: Starting token check');
       console.log('🔍 Current URL:', window.location.href);
@@ -49,8 +51,6 @@ export function SessionTokenHandler() {
         return;
       }
 
-      setIsProcessingTokens(true);
-
       console.log('🔍 Token details:', {
         hasAccessToken: !!tokens.access_token,
         hasRefreshToken: !!tokens.refresh_token,
@@ -61,6 +61,7 @@ export function SessionTokenHandler() {
       if (!sessionTokenUtils.areTokensValid(tokens)) {
         console.warn('⚠️ Received expired tokens');
         sessionTokenUtils.cleanUrl();
+        setIsProcessingTokens(false);
         return;
       }
 
