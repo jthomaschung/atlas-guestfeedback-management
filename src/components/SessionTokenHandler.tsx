@@ -6,6 +6,10 @@ export function SessionTokenHandler() {
   const { user } = useAuth();
 
   useEffect(() => {
+    console.log('🚀 SessionTokenHandler: Component mounted');
+    console.log('🚀 User state:', !!user);
+    console.log('🚀 Current URL:', window.location.href);
+    
     const handleIncomingTokens = async () => {
       console.log('🔍 SessionTokenHandler: Starting token check');
       console.log('🔍 Current URL:', window.location.href);
