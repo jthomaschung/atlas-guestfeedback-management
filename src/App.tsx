@@ -26,11 +26,13 @@ import Settings from '@/pages/Settings';
 import { SmartRedirect } from '@/components/SmartRedirect';
 import { FacilitiesRedirect } from '@/components/FacilitiesRedirect';
 import { SessionTokenHandler } from '@/components/SessionTokenHandler';
+import { TokenProcessingProvider, useTokenProcessing } from '@/hooks/useTokenProcessing';
 
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading, signOut } = useAuth();
+  const { isProcessingTokens } = useTokenProcessing();
   
   if (loading) {
     return (
@@ -48,8 +50,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/welcome" replace />;
   }
   
-  // If user is null but we have tokens, show loading while tokens are processed
-  if (!user && hasSessionTokens) {
+  // If user is null but we have tokens or are processing tokens, show loading
+  if (!user && (hasSessionTokens || isProcessingTokens)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-slate-600">Authenticating...</div>
@@ -116,8 +118,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AuthProvider>
-          <SessionTokenHandler />
-          <Router>
+          <TokenProcessingProvider>
+            <SessionTokenHandler />
+            <Router>
             <Routes>
               <Route 
                 path="/welcome" 
@@ -227,6 +230,7 @@ function App() {
             <Toaster />
             <Sonner />
           </Router>
+          </TokenProcessingProvider>
         </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>

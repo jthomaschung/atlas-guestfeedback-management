@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import { sessionTokenUtils } from '@/utils/sessionToken';
 import { useAuth } from '@/hooks/useAuth';
+import { useTokenProcessing } from '@/hooks/useTokenProcessing';
 
 export function SessionTokenHandler() {
   const { user } = useAuth();
+  const { setIsProcessingTokens } = useTokenProcessing();
 
   useEffect(() => {
     console.log('🚀 SessionTokenHandler: Component mounted');
@@ -19,6 +21,7 @@ export function SessionTokenHandler() {
       if (user) {
         console.log('✅ User already authenticated, cleaning URL');
         sessionTokenUtils.cleanUrl();
+        setIsProcessingTokens(false);
         return;
       }
 
@@ -27,8 +30,11 @@ export function SessionTokenHandler() {
       
       if (!tokens) {
         console.log('❌ No tokens found in URL');
+        setIsProcessingTokens(false);
         return;
       }
+
+      setIsProcessingTokens(true);
 
       console.log('🔍 Token details:', {
         hasAccessToken: !!tokens.access_token,
@@ -54,14 +60,17 @@ export function SessionTokenHandler() {
           setTimeout(() => {
             console.log('🧹 Cleaning URL...');
             sessionTokenUtils.cleanUrl();
+            setIsProcessingTokens(false);
           }, 1000);
         } else {
           console.error('❌ Failed to authenticate with session tokens');
           sessionTokenUtils.cleanUrl();
+          setIsProcessingTokens(false);
         }
       } catch (error) {
         console.error('💥 Error processing session tokens:', error);
         sessionTokenUtils.cleanUrl();
+        setIsProcessingTokens(false);
       }
     };
 
