@@ -8,7 +8,13 @@ interface TokenProcessingContextType {
 const TokenProcessingContext = createContext<TokenProcessingContextType | undefined>(undefined);
 
 export function TokenProcessingProvider({ children }: { children: ReactNode }) {
-  const [isProcessingTokens, setIsProcessingTokens] = useState(false);
+  // Check for tokens immediately during initial render (synchronous)
+  const initialTokenCheck = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.has('access_token') && urlParams.has('refresh_token');
+  };
+
+  const [isProcessingTokens, setIsProcessingTokens] = useState(initialTokenCheck);
 
   return (
     <TokenProcessingContext.Provider value={{ isProcessingTokens, setIsProcessingTokens }}>

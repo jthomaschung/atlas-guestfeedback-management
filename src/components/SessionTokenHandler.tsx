@@ -12,7 +12,7 @@ export function SessionTokenHandler() {
     console.log('🚀 User state:', !!user);
     console.log('🚀 Current URL:', window.location.href);
     
-    // IMMEDIATELY check for tokens and set processing state
+    // Check if we have tokens in URL
     const urlParams = new URLSearchParams(window.location.search);
     const hasTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
     
@@ -21,12 +21,6 @@ export function SessionTokenHandler() {
       user: !!user,
       currentUrl: window.location.href
     });
-    
-    // Set processing state IMMEDIATELY if we have tokens (before any async operations)
-    if (hasTokens) {
-      console.log('🚀 SessionTokenHandler: Found tokens, setting processing state IMMEDIATELY');
-      setIsProcessingTokens(true);
-    }
     
     // Process tokens asynchronously
     const handleIncomingTokens = async () => {
