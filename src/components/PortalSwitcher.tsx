@@ -31,8 +31,8 @@ const portals = [
     key: 'guest-feedback',
     title: 'Guest Feedback',
     icon: MessageSquare,
-    href: '/dashboard', // Internal navigation for current app
-    externalUrl: null // Current app, no external URL needed
+    href: '/dashboard',
+    externalUrl: 'https://preview--atlas-guestfeedback-management.lovable.app/dashboard'
   }
 ];
 
