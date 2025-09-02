@@ -24,9 +24,9 @@ export function SmartRedirect() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // If user has guest feedback access (single or multiple portals), redirect to guest feedback
+  // If user has guest feedback access (single or multiple portals), redirect to guest feedback dashboard
   if (permissions.canAccessGuestFeedback) {
-    return <Navigate to="/facilities" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   // If user has no access, show access denied message
