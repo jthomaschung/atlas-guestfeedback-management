@@ -40,22 +40,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
   
-  // Check if there are session tokens in the URL that might be processed
-  const urlParams = new URLSearchParams(window.location.search);
-  const hasSessionTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
-  
-  if (!user && !hasSessionTokens) {
+  if (!user) {
     return <Navigate to="/welcome" replace />;
-  }
-  
-  // If user is null but we have tokens, show loading while tokens are processed
-  // The SessionTokenHandler will process them and update the auth state
-  if (!user && hasSessionTokens) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-slate-600">Authenticating...</div>
-      </div>
-    );
   }
   
   return (
