@@ -24,9 +24,10 @@ export function SmartRedirect() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // If user has guest feedback access (single or multiple portals), redirect to guest feedback dashboard
+  // If user has guest feedback access, redirect to guest feedback app
   if (permissions.canAccessGuestFeedback) {
-    return <Navigate to="/dashboard" replace />;
+    window.location.href = 'https://preview--atlas-guestfeedback-management.lovable.app';
+    return null;
   }
 
   // If user has no access, show access denied message
