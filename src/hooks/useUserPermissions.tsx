@@ -6,6 +6,11 @@ interface UserPermissions {
   markets: string[];
   stores: string[];
   isAdmin: boolean;
+  canAccessFacilities: boolean;
+  canAccessCatering: boolean;
+  canAccessHr: boolean;
+  canAccessGuestFeedback: boolean;
+  isDevelopmentUser: boolean;
 }
 
 export function useUserPermissions() {
@@ -13,7 +18,12 @@ export function useUserPermissions() {
   const [permissions, setPermissions] = useState<UserPermissions>({
     markets: [],
     stores: [],
-    isAdmin: false
+    isAdmin: false,
+    canAccessFacilities: true, // Default for existing users
+    canAccessCatering: false,
+    canAccessHr: false,
+    canAccessGuestFeedback: false,
+    isDevelopmentUser: false
   });
   const [loading, setLoading] = useState(true);
 
@@ -21,7 +31,16 @@ export function useUserPermissions() {
     if (user) {
       fetchPermissions();
     } else {
-      setPermissions({ markets: [], stores: [], isAdmin: false });
+      setPermissions({ 
+        markets: [], 
+        stores: [], 
+        isAdmin: false,
+        canAccessFacilities: true,
+        canAccessCatering: false,
+        canAccessHr: false,
+        canAccessGuestFeedback: false,
+        isDevelopmentUser: false
+      });
       setLoading(false);
     }
   }, [user]);
@@ -34,26 +53,47 @@ export function useUserPermissions() {
       const { data: adminCheck } = await supabase
         .rpc('is_admin', { user_id: user.id });
 
-      let userPermissions = { markets: [], stores: [], isAdmin: adminCheck || false };
+      let userPermissions = { 
+        markets: [], 
+        stores: [], 
+        isAdmin: adminCheck || false,
+        canAccessFacilities: true, // Default for existing users
+        canAccessCatering: false,
+        canAccessHr: false,
+        canAccessGuestFeedback: false,
+        isDevelopmentUser: false
+      };
 
-      // If not admin, fetch specific permissions
-      if (!adminCheck) {
-        const { data: permissions } = await supabase
-          .from('user_permissions')
-          .select('markets, stores')
-          .eq('user_id', user.id)
-          .maybeSingle();
+      // Fetch user permissions (both admin and non-admin users can have specific permissions)
+      const { data: permissions } = await supabase
+        .from('user_permissions')
+        .select('markets, stores, can_access_facilities_dev, can_access_catering_dev, can_access_hr_dev, can_access_guest_feedback_dev, is_development_user')
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-        if (permissions) {
-          userPermissions.markets = permissions.markets || [];
-          userPermissions.stores = permissions.stores || [];
-        }
+      if (permissions) {
+        userPermissions.markets = permissions.markets || [];
+        userPermissions.stores = permissions.stores || [];
+        userPermissions.canAccessFacilities = permissions.can_access_facilities_dev ?? true;
+        userPermissions.canAccessCatering = permissions.can_access_catering_dev ?? false;
+        userPermissions.canAccessHr = permissions.can_access_hr_dev ?? false;
+        userPermissions.canAccessGuestFeedback = permissions.can_access_guest_feedback_dev ?? false;
+        userPermissions.isDevelopmentUser = permissions.is_development_user ?? false;
       }
 
       setPermissions(userPermissions);
     } catch (error) {
       console.error('Error fetching user permissions:', error);
-      setPermissions({ markets: [], stores: [], isAdmin: false });
+      setPermissions({ 
+        markets: [], 
+        stores: [], 
+        isAdmin: false,
+        canAccessFacilities: true,
+        canAccessCatering: false,
+        canAccessHr: false,
+        canAccessGuestFeedback: false,
+        isDevelopmentUser: false
+      });
     } finally {
       setLoading(false);
     }

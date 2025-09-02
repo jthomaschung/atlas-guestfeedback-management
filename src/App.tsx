@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/hooks/useAuth';
+import { useUserPermissions } from '@/hooks/useUserPermissions';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -19,6 +20,8 @@ import Completed from '@/pages/Completed';
 import Reporting from '@/pages/Reporting';
 import UserHierarchy from '@/pages/UserHierarchy';
 import Settings from '@/pages/Settings';
+import PortalSelection from '@/pages/PortalSelection';
+import { SmartRedirect } from '@/components/SmartRedirect';
 
 const queryClient = new QueryClient();
 
@@ -177,8 +180,30 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              <Route 
+                path="/portal-selection" 
+                element={
+                  <ProtectedRoute>
+                    <PortalSelection />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/" 
+                element={
+                  <ProtectedRoute>
+                    <SmartRedirect />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="*" 
+                element={
+                  <ProtectedRoute>
+                    <SmartRedirect />
+                  </ProtectedRoute>
+                } 
+              />
             </Routes>
             <Toaster />
             <Sonner />
