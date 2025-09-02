@@ -5,49 +5,8 @@ import { useEffect, useState } from 'react';
 
 export function SmartRedirect() {
   const { permissions, loading } = useUserPermissions();
-  const [redirecting, setRedirecting] = useState(false);
 
-  useEffect(() => {
-    const handleRedirect = async () => {
-      if (loading || redirecting) return;
-
-      console.log('SmartRedirect permissions:', permissions);
-
-      // Count accessible portals
-      const accessiblePortals = [];
-      if (permissions.canAccessFacilities) accessiblePortals.push('facilities');
-      if (permissions.canAccessCatering) accessiblePortals.push('catering');
-      if (permissions.canAccessHr) accessiblePortals.push('hr');
-      if (permissions.canAccessGuestFeedback) accessiblePortals.push('guest-feedback');
-
-      console.log('Accessible portals:', accessiblePortals);
-
-      // If user has guest feedback access, redirect to guest feedback app with session tokens
-      if (permissions.canAccessGuestFeedback) {
-        console.log('Redirecting to guest feedback app...');
-        setRedirecting(true);
-        try {
-          const authenticatedUrl = await sessionTokenUtils.createAuthenticatedUrl(
-            'https://preview--atlas-guestfeedback-management.lovable.app'
-          );
-          console.log('Created authenticated URL:', authenticatedUrl);
-          window.location.href = authenticatedUrl;
-        } catch (error) {
-          console.error('Error creating authenticated URL:', error);
-          // Fallback to direct navigation
-          window.location.href = 'https://preview--atlas-guestfeedback-management.lovable.app';
-        }
-        return; // Prevent further execution
-      }
-    };
-
-    // Only run once when permissions are loaded
-    if (!loading && !redirecting) {
-      handleRedirect();
-    }
-  }, [permissions.canAccessGuestFeedback, loading]); // More specific dependencies
-
-  if (loading || redirecting) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-muted-foreground">Loading...</div>
@@ -62,9 +21,19 @@ export function SmartRedirect() {
   if (permissions.canAccessHr) accessiblePortals.push('hr');
   if (permissions.canAccessGuestFeedback) accessiblePortals.push('guest-feedback');
 
-  // If user only has facilities access, go straight to dashboard (existing behavior)
-  if (accessiblePortals.length === 1 && accessiblePortals[0] === 'facilities') {
+  // If user has guest feedback access, stay in this app and go to dashboard
+  if (permissions.canAccessGuestFeedback) {
     return <Navigate to="/dashboard" replace />;
+  }
+
+  // If user has facilities access but not guest feedback, redirect to facilities app
+  if (permissions.canAccessFacilities) {
+    window.location.href = 'https://atlas-facilities-management.lovable.app';
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-muted-foreground">Redirecting to Facilities...</div>
+      </div>
+    );
   }
 
   // If user has no access, show access denied message
