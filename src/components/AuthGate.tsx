@@ -10,7 +10,7 @@ interface AuthGateProps {
 
 export function AuthGate({ children }: AuthGateProps) {
   const { user, loading: authLoading } = useAuth();
-  const { loading: permissionsLoading } = useUserPermissions();
+  const { permissions, loading: permissionsLoading } = useUserPermissions();
   const [isProcessingTokens, setIsProcessingTokens] = useState(false);
 
   // Check for tokens immediately (synchronous)
@@ -62,12 +62,31 @@ export function AuthGate({ children }: AuthGateProps) {
   }, [hasTokens, user]);
 
   // Show loading while auth or permissions are loading, or while processing tokens
-  if (authLoading || permissionsLoading || isProcessingTokens) {
+  // Also wait for permissions to actually be loaded (not just loading=false)
+  const permissionsLoaded = !permissionsLoading && permissions && (
+    permissions.isAdmin || 
+    permissions.markets.length > 0 || 
+    permissions.stores.length > 0 ||
+    permissions.canAccessFacilities ||
+    permissions.canAccessCatering ||
+    permissions.canAccessHr ||
+    permissions.canAccessGuestFeedback
+  );
+
+  if (authLoading || permissionsLoading || isProcessingTokens || (user && !permissionsLoaded)) {
     console.log('🔍 AUTHGATE: Showing loading state', {
       authLoading,
       permissionsLoading,
       isProcessingTokens,
-      hasTokens
+      hasTokens,
+      user: !!user,
+      permissionsLoaded,
+      permissions: permissions ? {
+        isAdmin: permissions.isAdmin,
+        markets: permissions.markets?.length || 0,
+        stores: permissions.stores?.length || 0,
+        canAccessGuestFeedback: permissions.canAccessGuestFeedback
+      } : null
     });
     
     return (
