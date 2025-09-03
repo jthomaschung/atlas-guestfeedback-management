@@ -81,12 +81,15 @@ export const sessionTokenUtils = {
     }
   },
 
-  // Clean URL from session tokens
+  // Clean URL from session tokens and redirect to root
   cleanUrl: (): void => {
     const url = new URL(window.location.href);
     url.searchParams.delete('access_token');
     url.searchParams.delete('refresh_token');
     url.searchParams.delete('expires_at');
+    
+    // Always redirect to root path to avoid /welcome flash
+    url.pathname = '/';
     
     window.history.replaceState({}, '', url.toString());
   },
