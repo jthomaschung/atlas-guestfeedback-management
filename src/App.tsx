@@ -154,8 +154,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
               <div className="flex items-center gap-2 sm:gap-4">
                 <SidebarTrigger className="text-atlas-dark-foreground hover:bg-atlas-red/10 hover:text-atlas-red transition-colors sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center" />
                 <div className="text-atlas-dark-foreground">
-                  <span className="text-lg sm:text-xl lg:text-2xl font-bold tracking-wide">ATLAS</span>
-                  <span className="hidden sm:inline ml-2 text-xs sm:text-sm text-atlas-dark-foreground/80">Management Portal</span>
+                  <span className="text-lg sm:text-xl lg:text-2xl font-bold tracking-wide">Guest Feedback</span>
+                  <span className="hidden sm:inline ml-2 text-xs sm:text-sm text-atlas-dark-foreground/80">Portal</span>
                 </div>
               </div>
               <div className="flex items-center gap-1 sm:gap-2">

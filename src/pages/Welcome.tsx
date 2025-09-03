@@ -101,7 +101,7 @@ export default function Welcome() {
                 FACILITIES
               </h1>
               <h2 className="text-2xl md:text-4xl font-bold text-atlas-red mb-8 tracking-wide animate-fade-in">
-                MANAGEMENT PORTAL
+                GUEST FEEDBACK PORTAL
               </h2>
               
               <p className="text-4xl md:text-6xl font-bold text-white mb-4 tracking-wide animate-fade-in">
@@ -226,7 +226,7 @@ export default function Welcome() {
 
             <div className="text-center mt-6">
               <p className="text-slate-400 text-sm">
-                © 2024 Atlas Facilities Management Portal
+                © 2024 Guest Feedback Portal
               </p>
             </div>
           </div>
