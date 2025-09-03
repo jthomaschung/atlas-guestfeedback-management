@@ -56,26 +56,27 @@ export function SmartRedirect() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // If user has facilities access but not guest feedback, redirect to facilities app
-  if (permissions.canAccessFacilities) {
-    const [isRedirecting, setIsRedirecting] = useState(false);
-    
-    useEffect(() => {
-      if (!isRedirecting) {
-        setIsRedirecting(true);
-        const redirectToFacilities = async () => {
-          try {
-            const authenticatedUrl = await sessionTokenUtils.createAuthenticatedUrl('https://preview--atlas-facilities-management.lovable.app');
-            window.location.href = authenticatedUrl;
-          } catch (error) {
-            console.error('Error creating authenticated URL:', error);
-            window.location.href = 'https://preview--atlas-facilities-management.lovable.app';
-          }
-        };
-        redirectToFacilities();
-      }
-    }, [isRedirecting]);
-    
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  
+  useEffect(() => {
+    // If user has facilities access but not guest feedback, redirect to facilities app
+    if (permissions.canAccessFacilities && !permissions.canAccessGuestFeedback && !isRedirecting) {
+      setIsRedirecting(true);
+      const redirectToFacilities = async () => {
+        try {
+          const authenticatedUrl = await sessionTokenUtils.createAuthenticatedUrl('https://preview--atlas-facilities-management.lovable.app');
+          window.location.href = authenticatedUrl;
+        } catch (error) {
+          console.error('Error creating authenticated URL:', error);
+          window.location.href = 'https://preview--atlas-facilities-management.lovable.app';
+        }
+      };
+      redirectToFacilities();
+    }
+  }, [permissions.canAccessFacilities, permissions.canAccessGuestFeedback, isRedirecting]);
+
+  // If user has facilities access but not guest feedback, show redirecting message
+  if (permissions.canAccessFacilities && !permissions.canAccessGuestFeedback) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-muted-foreground">Redirecting to Facilities...</div>
