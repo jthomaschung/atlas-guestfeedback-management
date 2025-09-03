@@ -25,91 +25,122 @@ import Settings from '@/pages/Settings';
 
 import { SmartRedirect } from '@/components/SmartRedirect';
 import { FacilitiesRedirect } from '@/components/FacilitiesRedirect';
-import { AuthGate } from '@/components/AuthGate';
-import { SessionTokenHandler } from '@/components/SessionTokenHandler';
-import { TokenProcessingProvider, useTokenProcessing } from '@/hooks/useTokenProcessing';
 
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  console.log('🔥🔥🔥 PROTECTED ROUTE EXECUTED 🔥🔥🔥');
   const { user, loading: authLoading, signOut } = useAuth();
-  const { isProcessingTokens } = useTokenProcessing();
-  const { loading: permissionsLoading } = useUserPermissions();
+  const { permissions, loading: permissionsLoading } = useUserPermissions();
+  const [isProcessingTokens, setIsProcessingTokens] = useState(false);
   
-  // Check if there are session tokens in the URL that might be processed
-  const urlParams = new URLSearchParams(window.location.search);
-  const hasSessionTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
-  
-  console.log('🔍 ProtectedRoute: Checking auth state', {
-    user: !!user,
-    authLoading,
-    permissionsLoading,
-    isProcessingTokens,
-    hasSessionTokens,
-    currentUrl: window.location.href
-  });
-  
-  if (authLoading || permissionsLoading) {
-    console.log('🔍 ProtectedRoute: Still loading', { authLoading, permissionsLoading });
+  // Check for tokens immediately (synchronous)
+  const hasTokensInUrl = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.has('access_token') && urlParams.has('refresh_token');
+  };
+
+  const hasTokens = hasTokensInUrl();
+
+  useEffect(() => {
+    if (hasTokens && !user) {
+      setIsProcessingTokens(true);
+      
+      const processTokens = async () => {
+        try {
+          const { sessionTokenUtils } = await import('@/utils/sessionToken');
+          const tokens = sessionTokenUtils.extractTokensFromUrl();
+          if (tokens && sessionTokenUtils.areTokensValid(tokens)) {
+            const success = await sessionTokenUtils.authenticateWithTokens(tokens);
+            if (success) {
+              sessionTokenUtils.cleanUrl();
+              setIsProcessingTokens(false);
+            } else {
+              setIsProcessingTokens(false);
+            }
+          } else {
+            setIsProcessingTokens(false);
+          }
+        } catch (error) {
+          setIsProcessingTokens(false);
+        }
+      };
+
+      processTokens();
+    } else if (!hasTokens || user) {
+      setIsProcessingTokens(false);
+    }
+  }, [hasTokens, user]);
+
+  // Show loading while auth or permissions are loading, or while processing tokens
+  // Also wait for permissions to actually be loaded (not just loading=false)
+  const permissionsLoaded = !permissionsLoading && permissions && (
+    permissions.isAdmin || 
+    permissions.markets.length > 0 || 
+    permissions.stores.length > 0 ||
+    permissions.canAccessFacilities ||
+    permissions.canAccessCatering ||
+    permissions.canAccessHr ||
+    permissions.canAccessGuestFeedback
+  );
+
+  if (authLoading || permissionsLoading || isProcessingTokens || (user && !permissionsLoaded)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-slate-600">Loading...</div>
-      </div>
-    );
-  }
-  
-  
-  if (!user && !hasSessionTokens && !isProcessingTokens) {
-    console.log('🚨 ProtectedRoute: Redirecting to welcome - no user, no tokens, not processing');
-    return <Navigate to="/welcome" replace />;
-  }
-  
-  // If user is null but we have tokens or are processing tokens, show loading
-  if (!user && (hasSessionTokens || isProcessingTokens)) {
-    console.log('🔍 ProtectedRoute: Waiting for authentication - showing authenticating state');
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-slate-600">Authenticating...</div>
-      </div>
-    );
-  }
-  
-  console.log('✅ ProtectedRoute: User authenticated, rendering app');
-  
-  return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <AppSidebar />
-        <div className="flex-1 flex flex-col">
-          <header className="h-14 sm:h-16 flex items-center justify-between bg-atlas-dark border-b border-atlas-dark px-3 sm:px-6">
-            <div className="flex items-center gap-2 sm:gap-4">
-              <SidebarTrigger className="text-atlas-dark-foreground hover:bg-atlas-red/10 hover:text-atlas-red transition-colors sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center" />
-              <div className="text-atlas-dark-foreground">
-                <span className="text-lg sm:text-xl lg:text-2xl font-bold tracking-wide">ATLAS</span>
-                <span className="hidden sm:inline ml-2 text-xs sm:text-sm text-atlas-dark-foreground/80">Management Portal</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-1 sm:gap-2">
-              <PortalSwitcher />
-              <NotificationBell />
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={signOut}
-                className="text-atlas-dark-foreground hover:text-atlas-red hover:bg-atlas-red/10 p-2 sm:min-h-[44px] sm:min-w-[44px]"
-              >
-                <LogOut className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Logout</span>
-              </Button>
-            </div>
-          </header>
-          <main className="flex-1 overflow-auto bg-background p-2 sm:p-4 md:p-6">
-            {children}
-          </main>
+        <div className="text-slate-600">
+          {isProcessingTokens ? 'Authenticating...' : 'Loading...'}
         </div>
       </div>
-    </SidebarProvider>
+    );
+  }
+
+  // Redirect to welcome if no user and no tokens to process
+  if (!user && !hasTokens) {
+    return <Navigate to="/welcome" replace />;
+  }
+
+  // If we have a user, render the protected content with layout
+  if (user) {
+    return (
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full">
+          <AppSidebar />
+          <div className="flex-1 flex flex-col">
+            <header className="h-14 sm:h-16 flex items-center justify-between bg-atlas-dark border-b border-atlas-dark px-3 sm:px-6">
+              <div className="flex items-center gap-2 sm:gap-4">
+                <SidebarTrigger className="text-atlas-dark-foreground hover:bg-atlas-red/10 hover:text-atlas-red transition-colors sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center" />
+                <div className="text-atlas-dark-foreground">
+                  <span className="text-lg sm:text-xl lg:text-2xl font-bold tracking-wide">ATLAS</span>
+                  <span className="hidden sm:inline ml-2 text-xs sm:text-sm text-atlas-dark-foreground/80">Management Portal</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 sm:gap-2">
+                <PortalSwitcher />
+                <NotificationBell />
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={signOut}
+                  className="text-atlas-dark-foreground hover:text-atlas-red hover:bg-atlas-red/10 p-2 sm:min-h-[44px] sm:min-w-[44px]"
+                >
+                  <LogOut className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Logout</span>
+                </Button>
+              </div>
+            </header>
+            <main className="flex-1 overflow-auto bg-background p-2 sm:p-4 md:p-6">
+              {children}
+            </main>
+          </div>
+        </div>
+      </SidebarProvider>
+    );
+  }
+
+  // Fallback - should not reach here
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-slate-600">Loading...</div>
+    </div>
   );
 }
 
@@ -136,8 +167,6 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AuthProvider>
-          <TokenProcessingProvider>
-            <SessionTokenHandler />
             <Router>
             <Routes>
               <Route 
@@ -151,17 +180,17 @@ function App() {
                <Route 
                 path="/dashboard" 
                 element={
-                  <AuthGate>
+                  <ProtectedRoute>
                     <FacilitiesRedirect />
-                  </AuthGate>
+                  </ProtectedRoute>
                 } 
               />
                <Route 
                 path="/facilities" 
                 element={
-                  <AuthGate>
+                  <ProtectedRoute>
                     <Index />
-                  </AuthGate>
+                  </ProtectedRoute>
                 } 
               />
               <Route 
@@ -248,7 +277,6 @@ function App() {
             <Toaster />
             <Sonner />
           </Router>
-          </TokenProcessingProvider>
         </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
