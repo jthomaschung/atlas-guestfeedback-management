@@ -51,19 +51,37 @@ export function PortalSwitcher() {
 
   // Handle portal navigation
   const handlePortalNavigation = async (portal: typeof portals[0]) => {
+    console.log('🚀 Portal navigation started:', {
+      targetPortal: portal.key,
+      currentPortal: getCurrentPortal(),
+      externalUrl: portal.externalUrl,
+      hasExternalUrl: !!portal.externalUrl
+    });
+
     // If it's the current portal or has no external URL, use internal navigation
     if (portal.key === getCurrentPortal() || !portal.externalUrl) {
+      console.log('🔄 Using internal navigation');
       navigate(portal.href);
       return;
     }
 
+    console.log('🌐 Starting external portal navigation...');
     try {
       // For external portals, create authenticated URL and navigate
+      console.log('🔐 Creating authenticated URL...');
       const authenticatedUrl = await sessionTokenUtils.createAuthenticatedUrl(portal.externalUrl);
+      console.log('✅ Authenticated URL created:', {
+        originalUrl: portal.externalUrl,
+        authenticatedUrl: authenticatedUrl.substring(0, 100) + '...',
+        hasTokens: authenticatedUrl.includes('access_token')
+      });
+      
+      console.log('🚀 Redirecting to authenticated URL...');
       window.location.href = authenticatedUrl;
     } catch (error) {
-      console.error('Error creating authenticated URL:', error);
+      console.error('❌ Error creating authenticated URL:', error);
       // Fallback to direct navigation
+      console.log('🔄 Falling back to direct navigation');
       window.location.href = portal.externalUrl;
     }
   };
