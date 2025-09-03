@@ -11,7 +11,13 @@ export function TokenProcessingProvider({ children }: { children: ReactNode }) {
   // Check for tokens immediately during initial render (synchronous)
   const initialTokenCheck = () => {
     const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.has('access_token') && urlParams.has('refresh_token');
+    const hasTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
+    console.log('🚀🚀🚀 TOKEN PROCESSING PROVIDER INITIAL CHECK 🚀🚀🚀', {
+      hasTokens,
+      url: window.location.href,
+      searchParams: window.location.search
+    });
+    return hasTokens;
   };
 
   const [isProcessingTokens, setIsProcessingTokens] = useState(initialTokenCheck);
