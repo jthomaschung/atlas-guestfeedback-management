@@ -37,37 +37,82 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const urlParams = new URLSearchParams(window.location.search);
   const hasTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
   
+  console.log('🔍 GUEST FEEDBACK ProtectedRoute: State check', {
+    hasTokens,
+    hasUser: !!user,
+    authLoading,
+    permissionsLoading,
+    currentUrl: window.location.href,
+    searchParams: window.location.search
+  });
+  
   const [isProcessingTokens, setIsProcessingTokens] = useState(() => {
     // If we have tokens in URL, we're processing them
-    return hasTokens;
+    const shouldProcess = hasTokens;
+    console.log('🔄 GUEST FEEDBACK ProtectedRoute: Initial token processing state', {
+      hasTokens,
+      shouldProcess,
+      user: !!user
+    });
+    return shouldProcess;
   });
 
   useEffect(() => {
+    console.log('🔄 GUEST FEEDBACK ProtectedRoute: useEffect triggered', {
+      hasTokens,
+      hasUser: !!user,
+      isProcessingTokens
+    });
+
     if (hasTokens && !user) {
+      console.log('🚀 GUEST FEEDBACK ProtectedRoute: Starting token processing...');
+      
       const processTokens = async () => {
         try {
+          console.log('🔐 GUEST FEEDBACK ProtectedRoute: Extracting tokens from URL...');
           const tokens = sessionTokenUtils.extractTokensFromUrl();
+          
           if (tokens && sessionTokenUtils.areTokensValid(tokens)) {
+            console.log('✅ GUEST FEEDBACK ProtectedRoute: Tokens valid, authenticating...', {
+              hasAccessToken: !!tokens.access_token,
+              hasRefreshToken: !!tokens.refresh_token,
+              expiresAt: tokens.expires_at
+            });
+            
             const success = await sessionTokenUtils.authenticateWithTokens(tokens);
+            
             if (success) {
+              console.log('✅ GUEST FEEDBACK ProtectedRoute: Authentication successful, cleaning URL...');
               sessionTokenUtils.cleanUrl();
+            } else {
+              console.log('❌ GUEST FEEDBACK ProtectedRoute: Authentication failed');
             }
+          } else {
+            console.log('❌ GUEST FEEDBACK ProtectedRoute: Tokens invalid or missing');
           }
         } catch (error) {
-          console.error('Token processing error:', error);
+          console.error('❌ GUEST FEEDBACK ProtectedRoute: Token processing error:', error);
         } finally {
+          console.log('🏁 GUEST FEEDBACK ProtectedRoute: Token processing complete');
           setIsProcessingTokens(false);
         }
       };
 
       processTokens();
     } else if (!hasTokens) {
+      console.log('⏭️ GUEST FEEDBACK ProtectedRoute: No tokens, stopping processing');
       setIsProcessingTokens(false);
     }
   }, [hasTokens, user]);
 
   // Show loading while auth or permissions are loading, or while processing tokens
   if (authLoading || permissionsLoading || isProcessingTokens) {
+    console.log('⏳ GUEST FEEDBACK ProtectedRoute: Showing loading state', {
+      authLoading,
+      permissionsLoading,
+      isProcessingTokens
+    });
+    
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-slate-600">
@@ -79,8 +124,23 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   // Redirect to welcome if no user and no tokens to process
   if (!user) {
+    console.log('🔄 GUEST FEEDBACK ProtectedRoute: No user, redirecting to welcome', {
+      hasUser: !!user,
+      hasTokens,
+      isProcessingTokens
+    });
     return <Navigate to="/welcome" replace />;
   }
+
+  console.log('✅ GUEST FEEDBACK ProtectedRoute: User authenticated, rendering protected content', {
+    userId: user.id,
+    email: user.email,
+    permissions: {
+      canAccessFacilities: permissions.canAccessFacilities,
+      canAccessGuestFeedback: permissions.canAccessGuestFeedback,
+      isAdmin: permissions.isAdmin
+    }
+  });
 
   // If we have a user, render the protected content with layout
   if (user) {

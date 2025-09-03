@@ -57,6 +57,14 @@ export const sessionTokenUtils = {
 
   // Authenticate with tokens from URL
   authenticateWithTokens: async (tokens: SessionTokenData): Promise<boolean> => {
+    console.log('🔐 GUEST FEEDBACK sessionTokenUtils.authenticateWithTokens: Starting authentication...', {
+      hasAccessToken: !!tokens.access_token,
+      hasRefreshToken: !!tokens.refresh_token,
+      expiresAt: tokens.expires_at,
+      accessTokenLength: tokens.access_token?.length,
+      refreshTokenLength: tokens.refresh_token?.length
+    });
+
     try {
       const { data: { session }, error } = await supabase.auth.setSession({
         access_token: tokens.access_token,
@@ -64,25 +72,36 @@ export const sessionTokenUtils = {
       });
 
       if (error) {
-        console.error('Error setting session:', error);
+        console.error('❌ GUEST FEEDBACK sessionTokenUtils.authenticateWithTokens: Error setting session:', error);
         return false;
       }
 
       if (!session) {
-        console.error('No session returned after setting tokens');
+        console.error('❌ GUEST FEEDBACK sessionTokenUtils.authenticateWithTokens: No session returned after setting tokens');
         return false;
       }
 
-      console.log('Successfully authenticated with session tokens');
+      console.log('✅ GUEST FEEDBACK sessionTokenUtils.authenticateWithTokens: Successfully authenticated with session tokens', {
+        sessionId: session.access_token?.substring(0, 20) + '...',
+        userId: session.user?.id,
+        userEmail: session.user?.email
+      });
       return true;
     } catch (error) {
-      console.error('Exception during token authentication:', error);
+      console.error('❌ GUEST FEEDBACK sessionTokenUtils.authenticateWithTokens: Exception during token authentication:', error);
       return false;
     }
   },
 
   // Clean URL from session tokens and redirect to root
   cleanUrl: (): void => {
+    const currentUrl = window.location.href;
+    console.log('🧹 GUEST FEEDBACK sessionTokenUtils.cleanUrl: Starting URL cleanup...', {
+      currentUrl,
+      pathname: window.location.pathname,
+      search: window.location.search
+    });
+
     const url = new URL(window.location.href);
     url.searchParams.delete('access_token');
     url.searchParams.delete('refresh_token');
@@ -91,7 +110,18 @@ export const sessionTokenUtils = {
     // Always redirect to root path to avoid /welcome flash
     url.pathname = '/';
     
+    console.log('🔄 GUEST FEEDBACK sessionTokenUtils.cleanUrl: Redirecting to clean URL...', {
+      from: currentUrl,
+      to: url.toString()
+    });
+
     window.history.replaceState({}, '', url.toString());
+    
+    console.log('✅ GUEST FEEDBACK sessionTokenUtils.cleanUrl: URL cleanup complete', {
+      newUrl: window.location.href,
+      newPathname: window.location.pathname,
+      newSearch: window.location.search
+    });
   },
 
   // Check if tokens are still valid
