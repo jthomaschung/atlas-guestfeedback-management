@@ -58,7 +58,24 @@ export function SmartRedirect() {
 
   // If user has facilities access but not guest feedback, redirect to facilities app
   if (permissions.canAccessFacilities) {
-    window.location.href = 'https://atlas-facilities-management.lovable.app';
+    const [isRedirecting, setIsRedirecting] = useState(false);
+    
+    useEffect(() => {
+      if (!isRedirecting) {
+        setIsRedirecting(true);
+        const redirectToFacilities = async () => {
+          try {
+            const authenticatedUrl = await sessionTokenUtils.createAuthenticatedUrl('https://preview--atlas-facilities-management.lovable.app');
+            window.location.href = authenticatedUrl;
+          } catch (error) {
+            console.error('Error creating authenticated URL:', error);
+            window.location.href = 'https://preview--atlas-facilities-management.lovable.app';
+          }
+        };
+        redirectToFacilities();
+      }
+    }, [isRedirecting]);
+    
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-muted-foreground">Redirecting to Facilities...</div>
