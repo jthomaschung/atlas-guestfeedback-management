@@ -25,6 +25,7 @@ import Settings from '@/pages/Settings';
 
 import { SmartRedirect } from '@/components/SmartRedirect';
 import { FacilitiesRedirect } from '@/components/FacilitiesRedirect';
+import { AuthGate } from '@/components/AuthGate';
 import { SessionTokenHandler } from '@/components/SessionTokenHandler';
 import { TokenProcessingProvider, useTokenProcessing } from '@/hooks/useTokenProcessing';
 
@@ -147,20 +148,20 @@ function App() {
                   </PublicRoute>
                 } 
               />
-              <Route 
+               <Route 
                 path="/dashboard" 
                 element={
-                  <ProtectedRoute>
+                  <AuthGate>
                     <FacilitiesRedirect />
-                  </ProtectedRoute>
+                  </AuthGate>
                 } 
               />
-              <Route 
+               <Route 
                 path="/facilities" 
                 element={
-                  <ProtectedRoute>
+                  <AuthGate>
                     <Index />
-                  </ProtectedRoute>
+                  </AuthGate>
                 } 
               />
               <Route 
