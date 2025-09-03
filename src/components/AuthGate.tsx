@@ -39,10 +39,8 @@ export function AuthGate({ children }: AuthGateProps) {
             const success = await sessionTokenUtils.authenticateWithTokens(tokens);
             if (success) {
               console.log('✅ AUTHGATE: Token authentication successful');
-              setTimeout(() => {
-                sessionTokenUtils.cleanUrl();
-                setIsProcessingTokens(false);
-              }, 1000);
+              sessionTokenUtils.cleanUrl();
+              setIsProcessingTokens(false);
             } else {
               console.error('❌ AUTHGATE: Token authentication failed');
               setIsProcessingTokens(false);
@@ -58,6 +56,9 @@ export function AuthGate({ children }: AuthGateProps) {
       };
 
       processTokens();
+    } else if (!hasTokens || user) {
+      // Reset processing state if no tokens or user is already authenticated
+      setIsProcessingTokens(false);
     }
   }, [hasTokens, user]);
 
