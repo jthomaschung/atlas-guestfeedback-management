@@ -3,13 +3,19 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserPermissions } from '@/hooks/useUserPermissions';
 import { sessionTokenUtils } from '@/utils/sessionToken';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/AppSidebar';
+import { NotificationBell } from '@/components/NotificationBell';
+import { PortalSwitcher } from '@/components/PortalSwitcher';
+import { Button } from '@/components/ui/button';
+import { LogOut } from 'lucide-react';
 
 interface AuthGateProps {
   children: React.ReactNode;
 }
 
 export function AuthGate({ children }: AuthGateProps) {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
   const [isProcessingTokens, setIsProcessingTokens] = useState(false);
 
@@ -105,10 +111,43 @@ export function AuthGate({ children }: AuthGateProps) {
     return <Navigate to="/welcome" replace />;
   }
 
-  // If we have a user, render the protected content
+  // If we have a user, render the protected content with layout
   if (user) {
     console.log('✅ AUTHGATE: User authenticated, rendering app');
-    return <>{children}</>;
+    return (
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full">
+          <AppSidebar />
+          <div className="flex-1 flex flex-col">
+            <header className="h-14 sm:h-16 flex items-center justify-between bg-atlas-dark border-b border-atlas-dark px-3 sm:px-6">
+              <div className="flex items-center gap-2 sm:gap-4">
+                <SidebarTrigger className="text-atlas-dark-foreground hover:bg-atlas-red/10 hover:text-atlas-red transition-colors sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center" />
+                <div className="text-atlas-dark-foreground">
+                  <span className="text-lg sm:text-xl lg:text-2xl font-bold tracking-wide">ATLAS</span>
+                  <span className="hidden sm:inline ml-2 text-xs sm:text-sm text-atlas-dark-foreground/80">Management Portal</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 sm:gap-2">
+                <PortalSwitcher />
+                <NotificationBell />
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={signOut}
+                  className="text-atlas-dark-foreground hover:text-atlas-red hover:bg-atlas-red/10 p-2 sm:min-h-[44px] sm:min-w-[44px]"
+                >
+                  <LogOut className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Logout</span>
+                </Button>
+              </div>
+            </header>
+            <main className="flex-1 overflow-auto bg-background p-2 sm:p-4 md:p-6">
+              {children}
+            </main>
+          </div>
+        </div>
+      </SidebarProvider>
+    );
   }
 
   // Fallback - should not reach here
