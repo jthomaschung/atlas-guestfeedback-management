@@ -72,18 +72,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }, [hasTokens, user]);
 
   // Show loading while auth or permissions are loading, or while processing tokens
-  // Also wait for permissions to actually be loaded (not just loading=false)
-  const permissionsLoaded = !permissionsLoading && permissions && (
-    permissions.isAdmin || 
-    permissions.markets.length > 0 || 
-    permissions.stores.length > 0 ||
-    permissions.canAccessFacilities ||
-    permissions.canAccessCatering ||
-    permissions.canAccessHr ||
-    permissions.canAccessGuestFeedback
-  );
-
-  if (authLoading || permissionsLoading || isProcessingTokens || (user && !permissionsLoaded)) {
+  if (authLoading || permissionsLoading || isProcessingTokens) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-slate-600">
