@@ -38,6 +38,10 @@ interface FeedbackWebhookData {
   
   // Priority (optional, will default to 'Low' if not provided)
   priority?: 'Praise' | 'Low' | 'High' | 'Critical'
+  
+  // Additional fields
+  ee_action?: string
+  period?: string
 }
 
 function validateFeedbackData(data: any): FeedbackWebhookData | null {
@@ -95,7 +99,9 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
     customer_phone: data.customer_phone || null,
     case_number,
     assignee: data.assignee || null,
-    priority: data.priority || defaultPriority
+    priority: data.priority || defaultPriority,
+    ee_action: data.ee_action || null,
+    period: data.period || null
   }
 }
 
