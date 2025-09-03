@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { CustomerFeedback } from "@/types/feedback";
 import { CustomerFeedbackTable } from "@/components/feedback/CustomerFeedbackTable";
+import { CustomerFeedbackStats } from "@/components/feedback/CustomerFeedbackStats";
 import { dummyFeedback } from "@/data/dummyFeedback";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -37,6 +38,14 @@ const Index = () => {
     });
   };
 
+  const handleFilterChange = (type: 'status' | 'priority', value: string) => {
+    console.log(`Filter by ${type}:`, value);
+    toast({
+      title: "Filter Applied",
+      description: `Filtering by ${type}: ${value}`,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl">
@@ -48,11 +57,22 @@ const Index = () => {
             </p>
           </div>
           
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            New Response
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline">
+              <Filter className="h-4 w-4 mr-2" />
+              Filters
+            </Button>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              New Response
+            </Button>
+          </div>
         </div>
+
+        <CustomerFeedbackStats 
+          feedbacks={feedbacks} 
+          onFilterChange={handleFilterChange}
+        />
 
         <CustomerFeedbackTable
           feedbacks={feedbacks}
