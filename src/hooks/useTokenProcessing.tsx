@@ -20,7 +20,10 @@ export function TokenProcessingProvider({ children }: { children: ReactNode }) {
     return hasTokens;
   };
 
-  const [isProcessingTokens, setIsProcessingTokens] = useState(initialTokenCheck);
+  const [isProcessingTokens, setIsProcessingTokens] = useState(() => {
+    // If we have tokens in URL, we're processing them
+    return initialTokenCheck();
+  });
 
   return (
     <TokenProcessingContext.Provider value={{ isProcessingTokens, setIsProcessingTokens }}>

@@ -31,15 +31,15 @@ const queryClient = new QueryClient();
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading, signOut } = useAuth();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
-  const [isProcessingTokens, setIsProcessingTokens] = useState(false);
   
-  // Check for tokens immediately (synchronous)
-  const hasTokensInUrl = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.has('access_token') && urlParams.has('refresh_token');
-  };
-
-  const hasTokens = hasTokensInUrl();
+  // Check for tokens immediately during render (synchronous)
+  const urlParams = new URLSearchParams(window.location.search);
+  const hasTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
+  
+  const [isProcessingTokens, setIsProcessingTokens] = useState(() => {
+    // If we have tokens in URL and no user, we're processing tokens
+    return hasTokens && !user;
+  });
 
   useEffect(() => {
     if (hasTokens && !user) {
