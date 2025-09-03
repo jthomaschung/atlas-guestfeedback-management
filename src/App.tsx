@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from '@/hooks/useAuth';
 import { useUserPermissions } from '@/hooks/useUserPermissions';
+import { sessionTokenUtils } from '@/utils/sessionToken';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -37,53 +38,47 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const hasTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
   
   const [isProcessingTokens, setIsProcessingTokens] = useState(() => {
-    // If we have tokens in URL and no user, we're processing tokens
-    return hasTokens && !user;
+    // If we have tokens in URL, we're processing them
+    return hasTokens;
   });
 
   useEffect(() => {
     if (hasTokens && !user) {
-      setIsProcessingTokens(true);
-      
       const processTokens = async () => {
         try {
-          const { sessionTokenUtils } = await import('@/utils/sessionToken');
           const tokens = sessionTokenUtils.extractTokensFromUrl();
           if (tokens && sessionTokenUtils.areTokensValid(tokens)) {
             const success = await sessionTokenUtils.authenticateWithTokens(tokens);
             if (success) {
               sessionTokenUtils.cleanUrl();
-              setIsProcessingTokens(false);
-            } else {
-              setIsProcessingTokens(false);
             }
-          } else {
-            setIsProcessingTokens(false);
           }
         } catch (error) {
+          console.error('Token processing error:', error);
+        } finally {
           setIsProcessingTokens(false);
         }
       };
 
       processTokens();
-    } else if (!hasTokens || user) {
+    } else if (!hasTokens) {
       setIsProcessingTokens(false);
     }
   }, [hasTokens, user]);
 
-  // Show loading while auth or permissions are loading, or while processing tokens, or if we have tokens in URL
-  if (authLoading || permissionsLoading || isProcessingTokens || (hasTokens && !user)) {
+  // Show loading while auth or permissions are loading, or while processing tokens
+  if (authLoading || permissionsLoading || isProcessingTokens) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-slate-600">
-          {isProcessingTokens || (hasTokens && !user) ? 'Authenticating...' : 'Loading...'}
+          {isProcessingTokens ? 'Authenticating...' : 'Loading...'}
         </div>
       </div>
     );
   }
 
-  // Only redirect to welcome if no user AND no tokens to process
-  if (!user && !hasTokens && !isProcessingTokens) {
+  // Redirect to welcome if no user and no tokens to process
+  if (!user) {
     return <Navigate to="/welcome" replace />;
   }
 
@@ -152,6 +147,46 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  // Immediate token detection - synchronous check before any React rendering
+  const urlParams = new URLSearchParams(window.location.search);
+  const hasTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
+  
+  const [isInitializing, setIsInitializing] = useState(() => {
+    // If we have tokens in URL, show loading immediately
+    return hasTokens;
+  });
+
+  useEffect(() => {
+    if (hasTokens) {
+      const processTokensImmediately = async () => {
+        try {
+          const tokens = sessionTokenUtils.extractTokensFromUrl();
+          if (tokens && sessionTokenUtils.areTokensValid(tokens)) {
+            await sessionTokenUtils.authenticateWithTokens(tokens);
+            sessionTokenUtils.cleanUrl();
+          }
+        } catch (error) {
+          console.error('Immediate token processing error:', error);
+        } finally {
+          setIsInitializing(false);
+        }
+      };
+
+      processTokensImmediately();
+    } else {
+      setIsInitializing(false);
+    }
+  }, [hasTokens]);
+
+  // Show loading immediately if we have tokens
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-slate-600">Authenticating...</div>
+      </div>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
