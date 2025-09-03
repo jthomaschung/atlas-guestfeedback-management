@@ -11,7 +11,7 @@ const portals = [
     title: 'Facilities',
     icon: Wrench,
     href: '/facilities',
-    externalUrl: 'https://preview--atlas-facilities-management.lovable.app'
+    externalUrl: 'https://preview--atlas-facilities-management.lovable.app/'  // Add trailing slash to go directly to root
   },
   {
     key: 'catering',
@@ -69,9 +69,19 @@ export function PortalSwitcher() {
     try {
       // For external portals, create authenticated URL and navigate
       console.log('🔐 Creating authenticated URL...');
-      const authenticatedUrl = await sessionTokenUtils.createAuthenticatedUrl(portal.externalUrl);
+      
+      // For facilities app, try to send directly to root with a hash to bypass welcome page
+      let targetUrl = portal.externalUrl;
+      if (portal.key === 'facilities') {
+        // Try sending to root with a hash fragment to potentially bypass welcome redirect
+        targetUrl = portal.externalUrl + '#authenticated';
+        console.log('🏢 Facilities-specific URL modification:', targetUrl);
+      }
+      
+      const authenticatedUrl = await sessionTokenUtils.createAuthenticatedUrl(targetUrl);
       console.log('✅ Authenticated URL created:', {
         originalUrl: portal.externalUrl,
+        targetUrl,
         authenticatedUrl: authenticatedUrl.substring(0, 100) + '...',
         hasTokens: authenticatedUrl.includes('access_token')
       });
