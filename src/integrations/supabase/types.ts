@@ -23,10 +23,12 @@ export type Database = {
           customer_email: string | null
           customer_name: string | null
           customer_phone: string | null
+          ee_action: string | null
           feedback_date: string
           feedback_text: string | null
           id: string
           market: string
+          period: string | null
           rating: number | null
           resolution_notes: string | null
           resolution_status: string | null
@@ -42,10 +44,12 @@ export type Database = {
           customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
+          ee_action?: string | null
           feedback_date: string
           feedback_text?: string | null
           id?: string
           market: string
+          period?: string | null
           rating?: number | null
           resolution_notes?: string | null
           resolution_status?: string | null
@@ -61,10 +65,12 @@ export type Database = {
           customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
+          ee_action?: string | null
           feedback_date?: string
           feedback_text?: string | null
           id?: string
           market?: string
+          period?: string | null
           rating?: number | null
           resolution_notes?: string | null
           resolution_status?: string | null

@@ -177,6 +177,8 @@ Deno.serve(async (req) => {
             customer_email: validatedData.customer_email,
             customer_phone: validatedData.customer_phone,
             feedback_text: validatedData.feedback_text,
+            ee_action: validatedData.ee_action,
+            period: validatedData.period,
             user_id: '00000000-0000-0000-0000-000000000000' // System user ID for webhook ingestion
           })
           .select()
