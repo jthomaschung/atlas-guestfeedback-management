@@ -1,1 +1,56 @@
 project_id = "frmjdxziwwlfpgevszga"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[inbucket]
+enabled = true
+port = 54324
+smtp_port = 54325
+pop3_port = 54326
+
+[storage]
+enabled = true
+port = 54327
+image_transformation = { enabled = true }
+
+[auth]
+enabled = true
+port = 54328
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://frmjdxziwwlfpgevszga.supabase.co"]
+jwt_expiry = 3600
+refresh_token_rotation = { enabled = true, automatic_reuse_detection = true }
+enable_signup = true
+
+[auth.email]
+enabled = true
+double_confirm_changes = true
+enable_confirmations = false
+
+[edge_functions]
+enabled = true
+port = 54329
+
+[functions.send-notifications]
+verify_jwt = false
+
+[functions.redirect-to-work-order]
+verify_jwt = false
+
+[functions.create-user]
+verify_jwt = false
+
+[functions.ingest-feedback]
+verify_jwt = false
