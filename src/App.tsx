@@ -122,10 +122,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Redirect to welcome if no user and no tokens to process
-  if (!user) {
-    console.log('🔄 GUEST FEEDBACK ProtectedRoute: No user, redirecting to welcome', {
+  // Redirect to welcome if no user and no tokens to process AND not currently loading auth
+  if (!user && !authLoading && !isProcessingTokens) {
+    console.log('🔄 GUEST FEEDBACK ProtectedRoute: No user and not loading, redirecting to welcome', {
       hasUser: !!user,
+      authLoading,
       hasTokens,
       isProcessingTokens
     });
