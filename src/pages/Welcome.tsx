@@ -226,7 +226,7 @@ export default function Welcome() {
 
             <div className="text-center mt-6">
               <p className="text-slate-400 text-sm">
-                © 2024 Guest Feedback Portal
+                © 2024 Atlas Guest Feedback Portal
               </p>
             </div>
           </div>

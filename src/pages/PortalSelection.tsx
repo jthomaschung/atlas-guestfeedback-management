@@ -79,7 +79,7 @@ export default function PortalSelection() {
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="w-full max-w-4xl mx-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Guest Feedback Portal Selection</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">ATLAS Portal Selection</h1>
           <p className="text-muted-foreground">Select the portal you'd like to access</p>
         </div>
         
