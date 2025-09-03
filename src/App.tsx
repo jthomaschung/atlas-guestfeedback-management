@@ -71,19 +71,19 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     }
   }, [hasTokens, user]);
 
-  // Show loading while auth or permissions are loading, or while processing tokens
-  if (authLoading || permissionsLoading || isProcessingTokens) {
+  // Show loading while auth or permissions are loading, or while processing tokens, or if we have tokens in URL
+  if (authLoading || permissionsLoading || isProcessingTokens || (hasTokens && !user)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-slate-600">
-          {isProcessingTokens ? 'Authenticating...' : 'Loading...'}
+          {isProcessingTokens || (hasTokens && !user) ? 'Authenticating...' : 'Loading...'}
         </div>
       </div>
     );
   }
 
-  // Redirect to welcome if no user and no tokens to process
-  if (!user && !hasTokens) {
+  // Only redirect to welcome if no user AND no tokens to process
+  if (!user && !hasTokens && !isProcessingTokens) {
     return <Navigate to="/welcome" replace />;
   }
 
