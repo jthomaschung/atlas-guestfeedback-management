@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      customer_feedback: {
+        Row: {
+          case_number: string
+          channel: Database["public"]["Enums"]["feedback_channel"]
+          complaint_category: Database["public"]["Enums"]["complaint_category"]
+          created_at: string
+          customer_email: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          feedback_date: string
+          feedback_text: string | null
+          id: string
+          market: string
+          rating: number | null
+          resolution_notes: string | null
+          resolution_status: string | null
+          store_number: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          case_number: string
+          channel: Database["public"]["Enums"]["feedback_channel"]
+          complaint_category: Database["public"]["Enums"]["complaint_category"]
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          feedback_date: string
+          feedback_text?: string | null
+          id?: string
+          market: string
+          rating?: number | null
+          resolution_notes?: string | null
+          resolution_status?: string | null
+          store_number: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          case_number?: string
+          channel?: Database["public"]["Enums"]["feedback_channel"]
+          complaint_category?: Database["public"]["Enums"]["complaint_category"]
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          feedback_date?: string
+          feedback_text?: string | null
+          id?: string
+          market?: string
+          rating?: number | null
+          resolution_notes?: string | null
+          resolution_status?: string | null
+          store_number?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notification_log: {
         Row: {
           id: string
@@ -267,7 +327,22 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      complaint_category:
+        | "sandwich_made_wrong"
+        | "slow_service"
+        | "rude_service"
+        | "product_issue"
+        | "closed_early"
+        | "praise"
+        | "missing_item"
+        | "credit_card_issue"
+        | "bread_quality"
+        | "out_of_product"
+        | "other"
+        | "cleanliness"
+        | "possible_food_poisoning"
+        | "loyalty_program_issues"
+      feedback_channel: "yelp" | "qualtrics" | "jimmy_johns"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -394,6 +469,24 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      complaint_category: [
+        "sandwich_made_wrong",
+        "slow_service",
+        "rude_service",
+        "product_issue",
+        "closed_early",
+        "praise",
+        "missing_item",
+        "credit_card_issue",
+        "bread_quality",
+        "out_of_product",
+        "other",
+        "cleanliness",
+        "possible_food_poisoning",
+        "loyalty_program_issues",
+      ],
+      feedback_channel: ["yelp", "qualtrics", "jimmy_johns"],
+    },
   },
 } as const
