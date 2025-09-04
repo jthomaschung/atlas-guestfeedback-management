@@ -1,16 +1,17 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { CustomerFeedback } from "@/types/feedback";
 import { CustomerFeedbackTable } from "@/components/feedback/CustomerFeedbackTable";
 import { CustomerFeedbackStats } from "@/components/feedback/CustomerFeedbackStats";
 import { FeedbackFilters } from "@/components/feedback/FeedbackFilters";
-import { dummyFeedback } from "@/data/dummyFeedback";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
-  const [feedbacks] = useState<CustomerFeedback[]>(dummyFeedback);
+  const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [priorityFilter, setPriorityFilter] = useState<string[]>([]);
@@ -22,6 +23,66 @@ const Index = () => {
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const { toast } = useToast();
   const { user } = useAuth();
+
+  useEffect(() => {
+    fetchFeedbacks();
+  }, []);
+
+  const fetchFeedbacks = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('customer_feedback')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching feedback:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load customer feedback"
+        });
+        return;
+      }
+
+      // Map database records to CustomerFeedback interface
+      const mappedFeedbacks: CustomerFeedback[] = (data || []).map(item => ({
+        id: item.id,
+        feedback_date: item.feedback_date,
+        complaint_category: item.complaint_category as CustomerFeedback['complaint_category'],
+        channel: item.channel as CustomerFeedback['channel'],
+        rating: item.rating,
+        resolution_status: (item.resolution_status || 'unopened') as CustomerFeedback['resolution_status'],
+        resolution_notes: item.resolution_notes,
+        store_number: item.store_number,
+        market: item.market,
+        case_number: item.case_number,
+        customer_name: item.customer_name,
+        customer_email: item.customer_email,
+        customer_phone: item.customer_phone,
+        feedback_text: item.feedback_text,
+        user_id: item.user_id,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        // Set default values for fields that might be missing
+        priority: 'Low' as CustomerFeedback['priority'], // Default priority
+        assignee: 'Unassigned',
+        viewed: false
+      }));
+
+      setFeedbacks(mappedFeedbacks);
+    } catch (error) {
+      console.error('Error fetching feedback:', error);
+      toast({
+        variant: "destructive", 
+        title: "Error",
+        description: "Failed to load customer feedback"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Filter and sort feedbacks
   const filteredFeedbacks = useMemo(() => {
@@ -84,13 +145,38 @@ const Index = () => {
     });
   };
 
-  const handleDelete = (feedback: CustomerFeedback) => {
-    console.log("Delete feedback:", feedback);
-    toast({
-      title: "Delete Feedback",
-      description: `Deleted feedback case ${feedback.case_number}`,
-      variant: "destructive",
-    });
+  const handleDelete = async (feedback: CustomerFeedback) => {
+    try {
+      const { error } = await supabase
+        .from('customer_feedback')
+        .delete()
+        .eq('id', feedback.id);
+
+      if (error) {
+        console.error('Error deleting feedback:', error);
+        toast({
+          variant: "destructive",
+          title: "Error", 
+          description: "Failed to delete feedback"
+        });
+        return;
+      }
+
+      toast({
+        title: "Success",
+        description: `Deleted feedback case ${feedback.case_number}`
+      });
+      
+      // Refresh the list
+      fetchFeedbacks();
+    } catch (error) {
+      console.error('Error deleting feedback:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete feedback"
+      });
+    }
   };
 
   const handleClearAllFilters = () => {
@@ -103,6 +189,26 @@ const Index = () => {
     setMarketFilter([]);
     setAssigneeFilter([]);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Customer Feedback Dashboard</h1>
+              <p className="text-sm sm:text-base text-muted-foreground mt-1">
+                Monitor and respond to customer feedback from Yelp, Qualtrics, and Jimmy John's channels
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center justify-center h-64">
+            <div className="text-lg">Loading feedback...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
