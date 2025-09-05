@@ -80,79 +80,96 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   let normalizedCategory = complaint_category.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z_]/g, '')
   console.log('Initial normalized category:', normalizedCategory, 'from:', complaint_category)
   
-  // If category is "other" or invalid, also analyze feedback text for better categorization
-  if (!['praise', 'service', 'food_quality', 'cleanliness', 'order_accuracy', 'wait_time', 'facility_issue'].includes(normalizedCategory) || normalizedCategory === 'other') {
+  // Check if we need to do advanced categorization
+  const needsCategorization = !['praise', 'service', 'food_quality', 'cleanliness', 'order_accuracy', 'wait_time', 'facility_issue'].includes(normalizedCategory) || normalizedCategory === 'other'
+  
+  if (needsCategorization) {
     console.log('Analyzing category from complaint and feedback text:', complaint_category)
     console.log('Will analyze text for better categorization')
     
-    // Combine category and feedback text for analysis
+    // Analyze both the complaint category and feedback text
+    const categoryToAnalyze = complaint_category.toLowerCase()
     const feedbackTextToAnalyze = (data.feedback_text || data.complaint_text || '').toLowerCase()
-    const categoryText = (complaint_category + ' ' + feedbackTextToAnalyze).toLowerCase().replace(/\s+/g, '_').replace(/[^a-z_]/g, '')
     
-    // Comprehensive category mapping based on provided variations
+    console.log('Category to analyze:', categoryToAnalyze)
+    console.log('Feedback text to analyze:', feedbackTextToAnalyze)
+    
+    // Check for order accuracy issues in complaint category
     if (
-      // Order accuracy issues
-      categoryText.includes('order') && (categoryText.includes('made') || categoryText.includes('wrong') || categoryText.includes('issue')) ||
-      categoryText.includes('sandwich') && (categoryText.includes('made') || categoryText.includes('wrong')) ||
-      categoryText.includes('sandwish') || categoryText.includes('sanduwich') ||
-      categoryText.includes('missing') && (categoryText.includes('item') || categoryText.includes('itrem')) ||
-      categoryText.includes('wrap') && (categoryText.includes('wrong') || categoryText.includes('delivery') || categoryText.includes('order')) ||
-      categoryText.includes('chicken') && categoryText.includes('wrap') ||
-      categoryText.includes('san') && categoryText.includes('wrong') // Handles "San" with wrong
+      categoryToAnalyze.includes('sandwich') && categoryToAnalyze.includes('made') && categoryToAnalyze.includes('wrong') ||
+      categoryToAnalyze.includes('order') && categoryToAnalyze.includes('made') && categoryToAnalyze.includes('wrong') ||
+      categoryToAnalyze.includes('order') && categoryToAnalyze.includes('issue') ||
+      categoryToAnalyze.includes('missing') && categoryToAnalyze.includes('item')
     ) {
+      console.log('Categorized as order_accuracy based on complaint category')
       normalizedCategory = 'order_accuracy'
-    } else if (
-      // Service issues  
-      categoryText.includes('rude') && categoryText.includes('service') ||
-      categoryText.includes('slow') && categoryText.includes('service') ||
-      categoryText.includes('sllow') || categoryText.includes('sloe') || categoryText.includes('saervice') ||
-      categoryText.includes('service') ||
-      categoryText.includes('no') && categoryText.includes('driver') ||
-      categoryText.includes('do') && categoryText.includes('driver') // Typo for "no driver"
+    }
+    // Also check feedback text for additional context
+    else if (
+      feedbackTextToAnalyze.includes('sandwich') || feedbackTextToAnalyze.includes('wrap') ||
+      feedbackTextToAnalyze.includes('order') && feedbackTextToAnalyze.includes('wrong') ||
+      feedbackTextToAnalyze.includes('missing') && feedbackTextToAnalyze.includes('chicken')
     ) {
+      console.log('Categorized as order_accuracy based on feedback text')
+      normalizedCategory = 'order_accuracy'
+    }
+    // Service issues
+    else if (
+      categoryToAnalyze.includes('rude') && categoryToAnalyze.includes('service') ||
+      categoryToAnalyze.includes('slow') && categoryToAnalyze.includes('service') ||
+      categoryToAnalyze.includes('service') ||
+      categoryToAnalyze.includes('no') && categoryToAnalyze.includes('driver')
+    ) {
+      console.log('Categorized as service based on complaint category')
       normalizedCategory = 'service'
-    } else if (
-      // Food quality issues
-      categoryText.includes('bread') && categoryText.includes('quality') ||
-      categoryText.includes('bread') && categoryText.includes('qualtiy') ||
-      categoryText.includes('product') && (categoryText.includes('quality') || categoryText.includes('issues')) ||
-      categoryText.includes('out') && categoryText.includes('bread')
+    }
+    // Food quality issues
+    else if (
+      categoryToAnalyze.includes('bread') && categoryToAnalyze.includes('quality') ||
+      categoryToAnalyze.includes('product') && categoryToAnalyze.includes('quality') ||
+      categoryToAnalyze.includes('out') && categoryToAnalyze.includes('bread')
     ) {
+      console.log('Categorized as food_quality based on complaint category')
       normalizedCategory = 'food_quality'
-    } else if (
-      // Wait time / delivery issues
-      categoryText.includes('delivery') && (categoryText.includes('issue') || categoryText.includes('fee')) ||
-      categoryText.includes('online') && categoryText.includes('ordering') ||
-      categoryText.includes('online') && categoryText.includes('ording') // Typo
+    }
+    // Wait time / delivery issues
+    else if (
+      categoryToAnalyze.includes('delivery') && categoryToAnalyze.includes('issue') ||
+      categoryToAnalyze.includes('online') && categoryToAnalyze.includes('ordering') ||
+      categoryToAnalyze.includes('delivery') && categoryToAnalyze.includes('fee')
     ) {
+      console.log('Categorized as wait_time based on complaint category')
       normalizedCategory = 'wait_time'
-    } else if (
-      // Facility issues
-      categoryText.includes('store') && categoryText.includes('closed') ||
-      categoryText.includes('closing') && categoryText.includes('early') ||
-      categoryText.includes('closed') && categoryText.includes('earlier')
+    }
+    // Facility issues
+    else if (
+      categoryToAnalyze.includes('store') && categoryToAnalyze.includes('closed') ||
+      categoryToAnalyze.includes('closing') && categoryToAnalyze.includes('early') ||
+      categoryToAnalyze.includes('closed') && categoryToAnalyze.includes('earlier')
     ) {
+      console.log('Categorized as facility_issue based on complaint category')
       normalizedCategory = 'facility_issue'
-    } else if (
-      // Praise variations
-      categoryText.includes('praise') || categoryText.includes('prasie')
+    }
+    // Praise
+    else if (
+      categoryToAnalyze.includes('praise')
     ) {
+      console.log('Categorized as praise based on complaint category')
       normalizedCategory = 'praise'
-    } else if (
-      // Loyalty/Marketing (map to service for now)
-      categoryText.includes('loyalty') || categoryText.includes('loyatly') ||
-      categoryText.includes('marketing')
+    }
+    // Loyalty/Marketing (map to service)
+    else if (
+      categoryToAnalyze.includes('loyalty') || categoryToAnalyze.includes('marketing')
     ) {
+      console.log('Categorized as service (loyalty/marketing) based on complaint category')
       normalizedCategory = 'service'
-    } else if (
-      // Other variations
-      categoryText.includes('other') || categoryText.includes('otlher')
-    ) {
-      normalizedCategory = 'other'
-    } else {
-      // Default fallback
+    }
+    else {
+      console.log('No specific category match found, defaulting to other')
       normalizedCategory = 'other'
     }
+    
+    console.log('Final categorization result after analysis:', normalizedCategory)
   }
   
   // Generate case number if not provided
