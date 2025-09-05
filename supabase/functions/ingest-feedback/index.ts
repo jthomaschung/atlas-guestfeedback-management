@@ -77,14 +77,26 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   let normalizedCategory = complaint_category.toLowerCase().replace(/\s+/g, '_')
   if (!['praise', 'service', 'food_quality', 'cleanliness', 'order_accuracy', 'wait_time', 'facility_issue', 'other'].includes(normalizedCategory)) {
     console.log('Normalizing category from:', complaint_category)
-    // Try to map common variations
-    if (normalizedCategory.includes('food')) normalizedCategory = 'food_quality'
-    else if (normalizedCategory.includes('service')) normalizedCategory = 'service'
-    else if (normalizedCategory.includes('clean')) normalizedCategory = 'cleanliness'
-    else if (normalizedCategory.includes('wait') || normalizedCategory.includes('time')) normalizedCategory = 'wait_time'
-    else if (normalizedCategory.includes('order')) normalizedCategory = 'order_accuracy'
-    else if (normalizedCategory.includes('praise') || normalizedCategory.includes('good')) normalizedCategory = 'praise'
-    else normalizedCategory = 'other'
+    // Try to map common variations - check more specific patterns first
+    if (normalizedCategory.includes('sandwich') || normalizedCategory.includes('burger') || normalizedCategory.includes('made') || normalizedCategory.includes('wrong') || normalizedCategory.includes('incorrect')) {
+      normalizedCategory = 'order_accuracy'
+    } else if (normalizedCategory.includes('food') || normalizedCategory.includes('quality') || normalizedCategory.includes('taste') || normalizedCategory.includes('fresh')) {
+      normalizedCategory = 'food_quality'
+    } else if (normalizedCategory.includes('service') || normalizedCategory.includes('staff') || normalizedCategory.includes('employee') || normalizedCategory.includes('rude')) {
+      normalizedCategory = 'service'
+    } else if (normalizedCategory.includes('clean') || normalizedCategory.includes('dirty') || normalizedCategory.includes('sanit')) {
+      normalizedCategory = 'cleanliness'
+    } else if (normalizedCategory.includes('wait') || normalizedCategory.includes('time') || normalizedCategory.includes('slow') || normalizedCategory.includes('delay')) {
+      normalizedCategory = 'wait_time'
+    } else if (normalizedCategory.includes('order') || normalizedCategory.includes('missing') || normalizedCategory.includes('forgot')) {
+      normalizedCategory = 'order_accuracy'
+    } else if (normalizedCategory.includes('praise') || normalizedCategory.includes('good') || normalizedCategory.includes('great') || normalizedCategory.includes('excellent')) {
+      normalizedCategory = 'praise'
+    } else if (normalizedCategory.includes('facility') || normalizedCategory.includes('building') || normalizedCategory.includes('location')) {
+      normalizedCategory = 'facility_issue'
+    } else {
+      normalizedCategory = 'other'
+    }
   }
   
   // Generate case number if not provided
