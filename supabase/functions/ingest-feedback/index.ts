@@ -74,27 +74,72 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   }
   
   // Normalize complaint category
-  let normalizedCategory = complaint_category.toLowerCase().replace(/\s+/g, '_')
+  let normalizedCategory = complaint_category.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z_]/g, '')
   if (!['praise', 'service', 'food_quality', 'cleanliness', 'order_accuracy', 'wait_time', 'facility_issue', 'other'].includes(normalizedCategory)) {
     console.log('Normalizing category from:', complaint_category)
-    // Try to map common variations - check more specific patterns first
-    if (normalizedCategory.includes('sandwich') || normalizedCategory.includes('burger') || normalizedCategory.includes('made') || normalizedCategory.includes('wrong') || normalizedCategory.includes('incorrect')) {
+    
+    const categoryText = normalizedCategory
+    
+    // Comprehensive category mapping based on provided variations
+    if (
+      // Order accuracy issues
+      categoryText.includes('order') && (categoryText.includes('made') || categoryText.includes('wrong') || categoryText.includes('issue')) ||
+      categoryText.includes('sandwich') && (categoryText.includes('made') || categoryText.includes('wrong')) ||
+      categoryText.includes('sandwish') || categoryText.includes('sanduwich') ||
+      categoryText.includes('missing') && (categoryText.includes('item') || categoryText.includes('itrem')) ||
+      categoryText.includes('san') && categoryText.length <= 5 // Handles "San" as truncated sandwich
+    ) {
       normalizedCategory = 'order_accuracy'
-    } else if (normalizedCategory.includes('food') || normalizedCategory.includes('quality') || normalizedCategory.includes('taste') || normalizedCategory.includes('fresh')) {
-      normalizedCategory = 'food_quality'
-    } else if (normalizedCategory.includes('service') || normalizedCategory.includes('staff') || normalizedCategory.includes('employee') || normalizedCategory.includes('rude')) {
+    } else if (
+      // Service issues  
+      categoryText.includes('rude') && categoryText.includes('service') ||
+      categoryText.includes('slow') && categoryText.includes('service') ||
+      categoryText.includes('sllow') || categoryText.includes('sloe') || categoryText.includes('saervice') ||
+      categoryText.includes('service') ||
+      categoryText.includes('no') && categoryText.includes('driver') ||
+      categoryText.includes('do') && categoryText.includes('driver') // Typo for "no driver"
+    ) {
       normalizedCategory = 'service'
-    } else if (normalizedCategory.includes('clean') || normalizedCategory.includes('dirty') || normalizedCategory.includes('sanit')) {
-      normalizedCategory = 'cleanliness'
-    } else if (normalizedCategory.includes('wait') || normalizedCategory.includes('time') || normalizedCategory.includes('slow') || normalizedCategory.includes('delay')) {
+    } else if (
+      // Food quality issues
+      categoryText.includes('bread') && categoryText.includes('quality') ||
+      categoryText.includes('bread') && categoryText.includes('qualtiy') ||
+      categoryText.includes('product') && (categoryText.includes('quality') || categoryText.includes('issues')) ||
+      categoryText.includes('out') && categoryText.includes('bread')
+    ) {
+      normalizedCategory = 'food_quality'
+    } else if (
+      // Wait time / delivery issues
+      categoryText.includes('delivery') && (categoryText.includes('issue') || categoryText.includes('fee')) ||
+      categoryText.includes('online') && categoryText.includes('ordering') ||
+      categoryText.includes('online') && categoryText.includes('ording') // Typo
+    ) {
       normalizedCategory = 'wait_time'
-    } else if (normalizedCategory.includes('order') || normalizedCategory.includes('missing') || normalizedCategory.includes('forgot')) {
-      normalizedCategory = 'order_accuracy'
-    } else if (normalizedCategory.includes('praise') || normalizedCategory.includes('good') || normalizedCategory.includes('great') || normalizedCategory.includes('excellent')) {
-      normalizedCategory = 'praise'
-    } else if (normalizedCategory.includes('facility') || normalizedCategory.includes('building') || normalizedCategory.includes('location')) {
+    } else if (
+      // Facility issues
+      categoryText.includes('store') && categoryText.includes('closed') ||
+      categoryText.includes('closing') && categoryText.includes('early') ||
+      categoryText.includes('closed') && categoryText.includes('earlier')
+    ) {
       normalizedCategory = 'facility_issue'
+    } else if (
+      // Praise variations
+      categoryText.includes('praise') || categoryText.includes('prasie')
+    ) {
+      normalizedCategory = 'praise'
+    } else if (
+      // Loyalty/Marketing (map to service for now)
+      categoryText.includes('loyalty') || categoryText.includes('loyatly') ||
+      categoryText.includes('marketing')
+    ) {
+      normalizedCategory = 'service'
+    } else if (
+      // Other variations
+      categoryText.includes('other') || categoryText.includes('otlher')
+    ) {
+      normalizedCategory = 'other'
     } else {
+      // Default fallback
       normalizedCategory = 'other'
     }
   }
