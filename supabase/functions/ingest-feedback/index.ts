@@ -126,15 +126,30 @@ Deno.serve(async (req) => {
       )
     }
     
-    // Parse request body
+    // Parse request body - handle both JSON and form data
     let requestData
+    const contentType = req.headers.get('content-type') || ''
+    
     try {
-      requestData = await req.json()
-      console.log('Received webhook data:', requestData)
+      if (contentType.includes('application/json')) {
+        requestData = await req.json()
+        console.log('Received JSON webhook data:', requestData)
+      } else if (contentType.includes('application/x-www-form-urlencoded')) {
+        const formData = await req.formData()
+        requestData = {}
+        for (const [key, value] of formData.entries()) {
+          requestData[key] = value
+        }
+        console.log('Received form webhook data:', requestData)
+      } else {
+        // Try JSON as fallback
+        requestData = await req.json()
+        console.log('Received webhook data (fallback JSON):', requestData)
+      }
     } catch (error) {
-      console.error('Failed to parse JSON:', error)
+      console.error('Failed to parse request body:', error)
       return new Response(
-        JSON.stringify({ error: 'Invalid JSON payload' }),
+        JSON.stringify({ error: 'Invalid request payload' }),
         { 
           status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
