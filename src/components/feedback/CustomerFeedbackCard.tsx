@@ -74,12 +74,12 @@ export function CustomerFeedbackCard({ feedback, onEdit, onViewDetails, onDelete
                 {feedback.market}
               </Badge>
               <Badge variant="outline" className="text-xs">
-                {channelLabels[feedback.channel]}
+                {channelLabels[feedback.channel as keyof typeof channelLabels] || feedback.channel}
               </Badge>
             </div>
             
             <h3 className="font-semibold text-sm text-foreground leading-tight mb-1">
-              {categoryLabels[feedback.complaint_category]}
+              {categoryLabels[feedback.complaint_category as keyof typeof categoryLabels] || feedback.complaint_category}
             </h3>
             
             <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
