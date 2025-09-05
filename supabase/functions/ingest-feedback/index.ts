@@ -193,7 +193,7 @@ Deno.serve(async (req) => {
         requestData = formObject.data || formObject
         console.log('Final request data:', JSON.stringify(requestData, null, 2))
         
-      } else {
+      } else if (contentType.includes('application/json') || rawBody.trim().startsWith('{')) {
         console.log('Parsing as JSON...')
         const parsed = JSON.parse(rawBody)
         console.log('Parsed JSON:', JSON.stringify(parsed, null, 2))
@@ -201,6 +201,19 @@ Deno.serve(async (req) => {
         // Extract nested data if present
         requestData = parsed.data || parsed
         console.log('Final request data:', JSON.stringify(requestData, null, 2))
+      } else {
+        console.log('Unknown content type, treating as form data...')
+        // Fallback: try form data parsing
+        const formData = new URLSearchParams(rawBody)
+        const formObject: any = {}
+        
+        for (const [key, value] of formData.entries()) {
+          console.log(`Form field: ${key} = ${value}`)
+          formObject[key] = value
+        }
+        
+        requestData = formObject
+        console.log('Fallback form data:', JSON.stringify(requestData, null, 2))
       }
     } catch (parseError) {
       console.error('Parse error:', parseError)
