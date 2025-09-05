@@ -99,7 +99,7 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   }
   
   console.log('=== VALIDATION SUCCESS ===')
-  console.log('Final categorization result:', normalizedCategory)
+  console.log('Final complaint category:', complaint_category)
   console.log('Validated data:', JSON.stringify(validatedData, null, 2))
   
   return validatedData
