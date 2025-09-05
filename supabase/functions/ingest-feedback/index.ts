@@ -133,13 +133,17 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
 }
 
 Deno.serve(async (req) => {
-  console.log('Feedback ingestion webhook called:', req.method, req.url)
+  console.log('=== WEBHOOK CALLED ===')
+  console.log('Method:', req.method)
+  console.log('URL:', req.url)
+  console.log('Headers:', Object.fromEntries(req.headers.entries()))
   
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('CORS preflight request')
     return new Response(null, { headers: corsHeaders })
   }
-  
+
   try {
     // Only accept POST requests
     if (req.method !== 'POST') {
@@ -152,20 +156,29 @@ Deno.serve(async (req) => {
         }
       )
     }
-    
-    // Parse request body - handle both JSON and form data
-    let requestData
+
+    // Get content type
     const contentType = req.headers.get('content-type') || ''
+    console.log('Content-Type:', contentType)
+    
+    // Read raw body first
+    const rawBody = await req.text()
+    console.log('Raw body length:', rawBody.length)
+    console.log('Raw body (first 500 chars):', rawBody.substring(0, 500))
+    
+    let requestData
     
     try {
       if (contentType.includes('application/x-www-form-urlencoded')) {
-        // Handle form data from Zapier
-        const formData = await req.formData()
+        console.log('Parsing as form data...')
+        // Parse form data manually from raw body
+        const formData = new URLSearchParams(rawBody)
         const formObject: any = {}
+        
         for (const [key, value] of formData.entries()) {
+          console.log(`Form field: ${key} = ${value}`)
           // Handle nested data structure from Zapier
           if (key.startsWith('data[') && key.endsWith(']')) {
-            // Extract the actual field name from data[fieldname]
             const fieldName = key.slice(5, -1)
             if (!formObject.data) formObject.data = {}
             formObject.data[fieldName] = value
@@ -174,146 +187,110 @@ Deno.serve(async (req) => {
           }
         }
         
-        // If Zapier sent data nested under "data" key, extract it
-        if (formObject.data) {
-          requestData = formObject.data
-        } else {
-          requestData = formObject
-        }
-        console.log('Received form webhook data:', formObject)
-        console.log('Extracted feedback data:', requestData)
-      } else {
-        // Handle JSON data or try JSON as fallback
-        const text = await req.text()
-        console.log('Received raw text:', text)
+        console.log('Parsed form object:', JSON.stringify(formObject, null, 2))
         
-        try {
-          const parsed = JSON.parse(text)
-          // If JSON has nested data structure, extract it
-          if (parsed.data && typeof parsed.data === 'object') {
-            requestData = parsed.data
-          } else {
-            requestData = parsed
-          }
-          console.log('Parsed JSON:', parsed)
-          console.log('Extracted feedback data:', requestData)
-        } catch (jsonError) {
-          console.error('Failed to parse as JSON:', jsonError)
-          return new Response(
-            JSON.stringify({ error: 'Invalid request payload - not valid JSON or form data' }),
-            { 
-              status: 400, 
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-            }
-          )
-        }
+        // Extract actual feedback data
+        requestData = formObject.data || formObject
+        console.log('Final request data:', JSON.stringify(requestData, null, 2))
+        
+      } else {
+        console.log('Parsing as JSON...')
+        const parsed = JSON.parse(rawBody)
+        console.log('Parsed JSON:', JSON.stringify(parsed, null, 2))
+        
+        // Extract nested data if present
+        requestData = parsed.data || parsed
+        console.log('Final request data:', JSON.stringify(requestData, null, 2))
       }
-    } catch (error) {
-      console.error('Failed to parse request body:', error)
+    } catch (parseError) {
+      console.error('Parse error:', parseError)
       return new Response(
-        JSON.stringify({ error: 'Failed to read request body' }),
+        JSON.stringify({ 
+          error: 'Failed to parse request body',
+          details: parseError.message,
+          contentType,
+          bodyLength: rawBody.length
+        }),
         { 
           status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
     }
-    
-    // Handle bulk feedback (array) or single feedback (object)
-    const feedbackItems = Array.isArray(requestData) ? requestData : [requestData]
-    const results = []
-    
-    for (const item of feedbackItems) {
-      // Validate the feedback data
-      const validatedData = validateFeedbackData(item)
-      if (!validatedData) {
-        console.error('Validation failed for item:', item)
-        results.push({
-          success: false,
-          error: 'Invalid feedback data',
-          data: item
-        })
-        continue
-      }
-      
-      try {
-        // Insert feedback into database
-        // Note: We need a user_id for RLS, so we'll use a system user or bypass RLS with service role
-        const { data: insertedData, error: insertError } = await supabase
-          .from('customer_feedback')
-          .insert({
-            feedback_date: validatedData.feedback_date,
-            complaint_category: validatedData.complaint_category,
-            channel: validatedData.channel,
-            rating: validatedData.rating,
-            resolution_status: 'unopened', // Default status for new feedback
-            store_number: validatedData.store_number,
-            market: validatedData.market,
-            case_number: validatedData.case_number,
-            customer_name: validatedData.customer_name,
-            customer_email: validatedData.customer_email,
-            customer_phone: validatedData.customer_phone,
-            feedback_text: validatedData.feedback_text,
-            ee_action: validatedData.ee_action,
-            period: validatedData.period,
-            user_id: '00000000-0000-0000-0000-000000000000' // System user ID for webhook ingestion
-          })
-          .select()
-          .single()
-        
-        if (insertError) {
-          console.error('Database insert error:', insertError)
-          results.push({
-            success: false,
-            error: insertError.message,
-            data: validatedData
-          })
-        } else {
-          console.log('Successfully inserted feedback:', insertedData.id)
-          results.push({
-            success: true,
-            id: insertedData.id,
-            case_number: insertedData.case_number,
-            data: validatedData
-          })
+
+    // Validate data
+    const validatedData = validateFeedbackData(requestData)
+    if (!validatedData) {
+      console.error('Validation failed for data:', JSON.stringify(requestData, null, 2))
+      return new Response(
+        JSON.stringify({ 
+          error: 'Validation failed',
+          receivedData: requestData
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
-      } catch (dbError) {
-        console.error('Database operation failed:', dbError)
-        results.push({
-          success: false,
-          error: 'Database operation failed',
-          data: validatedData
-        })
-      }
+      )
     }
-    
-    // Return results
-    const successCount = results.filter(r => r.success).length
-    const totalCount = results.length
-    
-    const response = {
-      message: `Processed ${successCount}/${totalCount} feedback items`,
-      results,
-      timestamp: new Date().toISOString()
+
+    // Try to insert into database
+    console.log('Inserting into database...')
+    const { data: insertedData, error: insertError } = await supabase
+      .from('customer_feedback')
+      .insert({
+        feedback_date: validatedData.feedback_date,
+        complaint_category: validatedData.complaint_category,
+        channel: validatedData.channel,
+        rating: validatedData.rating,
+        resolution_status: 'unopened',
+        store_number: validatedData.store_number,
+        market: validatedData.market,
+        case_number: validatedData.case_number,
+        customer_name: validatedData.customer_name,
+        customer_email: validatedData.customer_email,
+        customer_phone: validatedData.customer_phone,
+        feedback_text: validatedData.feedback_text,
+        user_id: '00000000-0000-0000-0000-000000000000' // System user
+      })
+      .select()
+      .single()
+
+    if (insertError) {
+      console.error('Database insert error:', insertError)
+      return new Response(
+        JSON.stringify({ 
+          error: 'Database insert failed',
+          details: insertError.message
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
     }
-    
-    console.log('Webhook processing complete:', response)
+
+    console.log('Success! Inserted feedback:', insertedData.id)
     
     return new Response(
-      JSON.stringify(response),
+      JSON.stringify({
+        success: true,
+        id: insertedData.id,
+        case_number: insertedData.case_number,
+        message: 'Feedback ingested successfully'
+      }),
       { 
-        status: successCount > 0 ? 200 : 400,
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     )
-    
+
   } catch (error) {
-    console.error('Webhook processing error:', error)
+    console.error('Webhook error:', error)
     return new Response(
       JSON.stringify({ 
         error: 'Internal server error',
-        message: error.message,
-        timestamp: new Date().toISOString()
+        message: error.message
       }),
       { 
         status: 500, 
