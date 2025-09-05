@@ -75,10 +75,14 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   
   // Normalize complaint category
   let normalizedCategory = complaint_category.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z_]/g, '')
-  if (!['praise', 'service', 'food_quality', 'cleanliness', 'order_accuracy', 'wait_time', 'facility_issue', 'other'].includes(normalizedCategory)) {
-    console.log('Normalizing category from:', complaint_category)
+  
+  // If category is "other" or invalid, also analyze feedback text for better categorization
+  if (!['praise', 'service', 'food_quality', 'cleanliness', 'order_accuracy', 'wait_time', 'facility_issue'].includes(normalizedCategory) || normalizedCategory === 'other') {
+    console.log('Analyzing category from complaint and feedback text:', complaint_category)
     
-    const categoryText = normalizedCategory
+    // Combine category and feedback text for analysis
+    const feedbackTextToAnalyze = (data.feedback_text || data.complaint_text || '').toLowerCase()
+    const categoryText = (complaint_category + ' ' + feedbackTextToAnalyze).toLowerCase().replace(/\s+/g, '_').replace(/[^a-z_]/g, '')
     
     // Comprehensive category mapping based on provided variations
     if (
@@ -87,7 +91,9 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
       categoryText.includes('sandwich') && (categoryText.includes('made') || categoryText.includes('wrong')) ||
       categoryText.includes('sandwish') || categoryText.includes('sanduwich') ||
       categoryText.includes('missing') && (categoryText.includes('item') || categoryText.includes('itrem')) ||
-      categoryText.includes('san') && categoryText.length <= 5 // Handles "San" as truncated sandwich
+      categoryText.includes('wrap') && (categoryText.includes('wrong') || categoryText.includes('delivery') || categoryText.includes('order')) ||
+      categoryText.includes('chicken') && categoryText.includes('wrap') ||
+      categoryText.includes('san') && categoryText.includes('wrong') // Handles "San" with wrong
     ) {
       normalizedCategory = 'order_accuracy'
     } else if (
