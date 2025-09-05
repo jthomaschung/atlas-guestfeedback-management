@@ -48,6 +48,9 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   console.log('=== VALIDATION START ===')
   console.log('Input data keys:', Object.keys(data))
   console.log('Input data:', JSON.stringify(data, null, 2))
+  console.log('Raw complaint_category field:', data.complaint_category)
+  console.log('Raw feedback_text field:', data.feedback_text)
+  console.log('Raw complaint_text field:', data.complaint_text)
   
   // Basic data check
   if (!data || typeof data !== 'object') {
@@ -75,10 +78,12 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   
   // Normalize complaint category
   let normalizedCategory = complaint_category.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z_]/g, '')
+  console.log('Initial normalized category:', normalizedCategory, 'from:', complaint_category)
   
   // If category is "other" or invalid, also analyze feedback text for better categorization
   if (!['praise', 'service', 'food_quality', 'cleanliness', 'order_accuracy', 'wait_time', 'facility_issue'].includes(normalizedCategory) || normalizedCategory === 'other') {
     console.log('Analyzing category from complaint and feedback text:', complaint_category)
+    console.log('Will analyze text for better categorization')
     
     // Combine category and feedback text for analysis
     const feedbackTextToAnalyze = (data.feedback_text || data.complaint_text || '').toLowerCase()
@@ -182,6 +187,7 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   }
   
   console.log('=== VALIDATION SUCCESS ===')
+  console.log('Final categorization result:', normalizedCategory)
   console.log('Validated data:', JSON.stringify(validatedData, null, 2))
   
   return validatedData
