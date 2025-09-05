@@ -131,10 +131,8 @@ Deno.serve(async (req) => {
     const contentType = req.headers.get('content-type') || ''
     
     try {
-      if (contentType.includes('application/json')) {
-        requestData = await req.json()
-        console.log('Received JSON webhook data:', requestData)
-      } else if (contentType.includes('application/x-www-form-urlencoded')) {
+      if (contentType.includes('application/x-www-form-urlencoded')) {
+        // Handle form data from Zapier
         const formData = await req.formData()
         requestData = {}
         for (const [key, value] of formData.entries()) {
@@ -142,14 +140,28 @@ Deno.serve(async (req) => {
         }
         console.log('Received form webhook data:', requestData)
       } else {
-        // Try JSON as fallback
-        requestData = await req.json()
-        console.log('Received webhook data (fallback JSON):', requestData)
+        // Handle JSON data or try JSON as fallback
+        const text = await req.text()
+        console.log('Received raw text:', text)
+        
+        try {
+          requestData = JSON.parse(text)
+          console.log('Parsed as JSON:', requestData)
+        } catch (jsonError) {
+          console.error('Failed to parse as JSON:', jsonError)
+          return new Response(
+            JSON.stringify({ error: 'Invalid request payload - not valid JSON or form data' }),
+            { 
+              status: 400, 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          )
+        }
       }
     } catch (error) {
       console.error('Failed to parse request body:', error)
       return new Response(
-        JSON.stringify({ error: 'Invalid request payload' }),
+        JSON.stringify({ error: 'Failed to read request body' }),
         { 
           status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
