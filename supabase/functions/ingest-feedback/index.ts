@@ -13,11 +13,11 @@ const supabase = createClient(
 
 interface FeedbackWebhookData {
   // Channel information
-  channel: 'yelp' | 'qualtrics' | 'jimmy_johns'
+  channel: string
   
   // Feedback details
   feedback_date: string
-  complaint_category: 'praise' | 'service' | 'food_quality' | 'cleanliness' | 'order_accuracy' | 'wait_time' | 'facility_issue' | 'other'
+  complaint_category: string // Accept any string value from the webhook
   feedback_text?: string
   rating?: number
   
@@ -61,134 +61,29 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   // Handle missing required fields with reasonable defaults
   const channel = data.channel || 'qualtrics' // Default to qualtrics based on your example
   const feedback_date = data.feedback_date || new Date().toISOString().split('T')[0] // Today's date
-  const complaint_category = data.complaint_category || 'other' // Default category
+  const complaint_category = data.complaint_category || 'Other' // Keep original category exactly as received
   const store_number = data.store_number || '000' // Default store
   const market = data.market || 'Unknown' // Default market
 
-  // Normalize channel value
-  let normalizedChannel = channel.toLowerCase()
-  if (!['yelp', 'qualtrics', 'jimmy_johns'].includes(normalizedChannel)) {
-    console.log('Normalizing channel from:', channel)
-    if (normalizedChannel.includes('jimmy') || normalizedChannel.includes('johns')) {
-      normalizedChannel = 'jimmy_johns'
-    } else {
-      normalizedChannel = 'qualtrics' // Default fallback
-    }
-  }
-  
-  // Normalize complaint category
-  let normalizedCategory = complaint_category.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z_]/g, '')
-  console.log('Initial normalized category:', normalizedCategory, 'from:', complaint_category)
-  
-  // Check if we need to do advanced categorization
-  const needsCategorization = !['praise', 'service', 'food_quality', 'cleanliness', 'order_accuracy', 'wait_time', 'facility_issue'].includes(normalizedCategory) || normalizedCategory === 'other'
-  
-  if (needsCategorization) {
-    console.log('Analyzing category from complaint and feedback text:', complaint_category)
-    console.log('Will analyze text for better categorization')
-    
-    // Analyze both the complaint category and feedback text
-    const categoryToAnalyze = complaint_category.toLowerCase()
-    const feedbackTextToAnalyze = (data.feedback_text || data.complaint_text || '').toLowerCase()
-    
-    console.log('Category to analyze:', categoryToAnalyze)
-    console.log('Feedback text to analyze:', feedbackTextToAnalyze)
-    
-    // Check for order accuracy issues in complaint category
-    if (
-      categoryToAnalyze.includes('sandwich') && categoryToAnalyze.includes('made') && categoryToAnalyze.includes('wrong') ||
-      categoryToAnalyze.includes('order') && categoryToAnalyze.includes('made') && categoryToAnalyze.includes('wrong') ||
-      categoryToAnalyze.includes('order') && categoryToAnalyze.includes('issue') ||
-      categoryToAnalyze.includes('missing') && categoryToAnalyze.includes('item')
-    ) {
-      console.log('Categorized as order_accuracy based on complaint category')
-      normalizedCategory = 'order_accuracy'
-    }
-    // Also check feedback text for additional context
-    else if (
-      feedbackTextToAnalyze.includes('sandwich') || feedbackTextToAnalyze.includes('wrap') ||
-      feedbackTextToAnalyze.includes('order') && feedbackTextToAnalyze.includes('wrong') ||
-      feedbackTextToAnalyze.includes('missing') && feedbackTextToAnalyze.includes('chicken')
-    ) {
-      console.log('Categorized as order_accuracy based on feedback text')
-      normalizedCategory = 'order_accuracy'
-    }
-    // Service issues
-    else if (
-      categoryToAnalyze.includes('rude') && categoryToAnalyze.includes('service') ||
-      categoryToAnalyze.includes('slow') && categoryToAnalyze.includes('service') ||
-      categoryToAnalyze.includes('service') ||
-      categoryToAnalyze.includes('no') && categoryToAnalyze.includes('driver')
-    ) {
-      console.log('Categorized as service based on complaint category')
-      normalizedCategory = 'service'
-    }
-    // Food quality issues
-    else if (
-      categoryToAnalyze.includes('bread') && categoryToAnalyze.includes('quality') ||
-      categoryToAnalyze.includes('product') && categoryToAnalyze.includes('quality') ||
-      categoryToAnalyze.includes('out') && categoryToAnalyze.includes('bread')
-    ) {
-      console.log('Categorized as food_quality based on complaint category')
-      normalizedCategory = 'food_quality'
-    }
-    // Wait time / delivery issues
-    else if (
-      categoryToAnalyze.includes('delivery') && categoryToAnalyze.includes('issue') ||
-      categoryToAnalyze.includes('online') && categoryToAnalyze.includes('ordering') ||
-      categoryToAnalyze.includes('delivery') && categoryToAnalyze.includes('fee')
-    ) {
-      console.log('Categorized as wait_time based on complaint category')
-      normalizedCategory = 'wait_time'
-    }
-    // Facility issues
-    else if (
-      categoryToAnalyze.includes('store') && categoryToAnalyze.includes('closed') ||
-      categoryToAnalyze.includes('closing') && categoryToAnalyze.includes('early') ||
-      categoryToAnalyze.includes('closed') && categoryToAnalyze.includes('earlier')
-    ) {
-      console.log('Categorized as facility_issue based on complaint category')
-      normalizedCategory = 'facility_issue'
-    }
-    // Praise
-    else if (
-      categoryToAnalyze.includes('praise')
-    ) {
-      console.log('Categorized as praise based on complaint category')
-      normalizedCategory = 'praise'
-    }
-    // Loyalty/Marketing (map to service)
-    else if (
-      categoryToAnalyze.includes('loyalty') || categoryToAnalyze.includes('marketing')
-    ) {
-      console.log('Categorized as service (loyalty/marketing) based on complaint category')
-      normalizedCategory = 'service'
-    }
-    else {
-      console.log('No specific category match found, defaulting to other')
-      normalizedCategory = 'other'
-    }
-    
-    console.log('Final categorization result after analysis:', normalizedCategory)
-  }
-  
   // Generate case number if not provided
   const case_number = data.case_number || `CF-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`
   
-  // Set default priority based on complaint category
+  // Set default priority based on complaint category keywords
   let defaultPriority: 'Praise' | 'Low' | 'High' | 'Critical' = 'Low'
-  if (normalizedCategory === 'praise') {
+  const categoryLower = complaint_category.toLowerCase()
+  
+  if (categoryLower.includes('praise')) {
     defaultPriority = 'Praise'
-  } else if (['facility_issue', 'cleanliness'].includes(normalizedCategory)) {
+  } else if (categoryLower.includes('closed') || categoryLower.includes('bread') || categoryLower.includes('quality')) {
     defaultPriority = 'High'
-  } else if (normalizedCategory === 'food_quality' && data.rating && parseInt(data.rating) <= 2) {
+  } else if (categoryLower.includes('rude') || categoryLower.includes('service')) {
     defaultPriority = 'Critical'
   }
   
   const validatedData = {
-    channel: normalizedChannel as 'yelp' | 'qualtrics' | 'jimmy_johns',
+    channel: channel, // Keep original channel value
     feedback_date,
-    complaint_category: normalizedCategory as any,
+    complaint_category: complaint_category, // Keep original category exactly as received
     feedback_text: data.feedback_text || data.complaint_text || '',
     rating: data.rating ? parseInt(data.rating) : null,
     store_number,

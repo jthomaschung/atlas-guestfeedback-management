@@ -1,8 +1,8 @@
 export interface CustomerFeedback {
   id: string;
   feedback_date: string;
-  complaint_category: 'praise' | 'service' | 'food_quality' | 'cleanliness' | 'order_accuracy' | 'wait_time' | 'facility_issue' | 'other';
-  channel: 'yelp' | 'qualtrics' | 'jimmy_johns';
+  complaint_category: string; // Accept any string from webhook
+  channel: string; // Accept any string from webhook
   rating?: number;
   resolution_status: 'unopened' | 'responded' | 'resolved' | 'escalated';
   resolution_notes?: string;
