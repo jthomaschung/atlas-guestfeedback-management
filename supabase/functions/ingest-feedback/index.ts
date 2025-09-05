@@ -45,31 +45,53 @@ interface FeedbackWebhookData {
 }
 
 function validateFeedbackData(data: any): FeedbackWebhookData | null {
-  console.log('Validating feedback data:', data)
+  console.log('=== VALIDATION START ===')
+  console.log('Validating feedback data:', JSON.stringify(data, null, 2))
   
-  // Required fields validation
-  if (!data.channel || !['yelp', 'qualtrics', 'jimmy_johns'].includes(data.channel)) {
-    console.error('Invalid or missing channel:', data.channel)
+  // Required fields validation with more flexible matching
+  if (!data.channel) {
+    console.error('Missing channel field')
     return null
+  }
+  
+  // Normalize channel value
+  let normalizedChannel = data.channel.toLowerCase()
+  if (!['yelp', 'qualtrics', 'jimmy_johns'].includes(normalizedChannel)) {
+    console.error('Invalid channel:', data.channel, 'normalized:', normalizedChannel)
+    // Try to map common variations
+    if (normalizedChannel === 'jimmy johns' || normalizedChannel === 'jimmyjohns') {
+      normalizedChannel = 'jimmy_johns'
+    } else {
+      console.error('Channel could not be normalized')
+      return null
+    }
   }
   
   if (!data.feedback_date) {
-    console.error('Missing feedback_date')
+    console.error('Missing feedback_date field')
     return null
   }
   
-  if (!data.complaint_category || !['praise', 'service', 'food_quality', 'cleanliness', 'order_accuracy', 'wait_time', 'facility_issue', 'other'].includes(data.complaint_category)) {
-    console.error('Invalid or missing complaint_category:', data.complaint_category)
+  if (!data.complaint_category) {
+    console.error('Missing complaint_category field')
     return null
+  }
+  
+  // Normalize complaint category
+  let normalizedCategory = data.complaint_category.toLowerCase().replace(/\s+/g, '_')
+  if (!['praise', 'service', 'food_quality', 'cleanliness', 'order_accuracy', 'wait_time', 'facility_issue', 'other'].includes(normalizedCategory)) {
+    console.error('Invalid complaint_category:', data.complaint_category, 'normalized:', normalizedCategory)
+    // Default to 'other' for unknown categories
+    normalizedCategory = 'other'
   }
   
   if (!data.store_number) {
-    console.error('Missing store_number')
+    console.error('Missing store_number field')
     return null
   }
   
   if (!data.market) {
-    console.error('Missing market')
+    console.error('Missing market field')
     return null
   }
   
@@ -78,18 +100,18 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   
   // Set default priority based on complaint category
   let defaultPriority: 'Praise' | 'Low' | 'High' | 'Critical' = 'Low'
-  if (data.complaint_category === 'praise') {
+  if (normalizedCategory === 'praise') {
     defaultPriority = 'Praise'
-  } else if (['facility_issue', 'cleanliness'].includes(data.complaint_category)) {
+  } else if (['facility_issue', 'cleanliness'].includes(normalizedCategory)) {
     defaultPriority = 'High'
-  } else if (data.complaint_category === 'food_quality' && data.rating && data.rating <= 2) {
+  } else if (normalizedCategory === 'food_quality' && data.rating && parseInt(data.rating) <= 2) {
     defaultPriority = 'Critical'
   }
   
-  return {
-    channel: data.channel,
+  const validatedData = {
+    channel: normalizedChannel as 'yelp' | 'qualtrics' | 'jimmy_johns',
     feedback_date: data.feedback_date,
-    complaint_category: data.complaint_category,
+    complaint_category: normalizedCategory as any,
     feedback_text: data.feedback_text || '',
     rating: data.rating ? parseInt(data.rating) : null,
     store_number: data.store_number,
@@ -103,6 +125,11 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
     ee_action: data.ee_action || null,
     period: data.period || null
   }
+  
+  console.log('=== VALIDATION SUCCESS ===')
+  console.log('Validated data:', JSON.stringify(validatedData, null, 2))
+  
+  return validatedData
 }
 
 Deno.serve(async (req) => {
