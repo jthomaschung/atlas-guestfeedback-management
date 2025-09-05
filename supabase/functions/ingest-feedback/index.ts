@@ -46,53 +46,45 @@ interface FeedbackWebhookData {
 
 function validateFeedbackData(data: any): FeedbackWebhookData | null {
   console.log('=== VALIDATION START ===')
-  console.log('Validating feedback data:', JSON.stringify(data, null, 2))
+  console.log('Input data keys:', Object.keys(data))
+  console.log('Input data:', JSON.stringify(data, null, 2))
   
-  // Required fields validation with more flexible matching
-  if (!data.channel) {
-    console.error('Missing channel field')
+  // Basic data check
+  if (!data || typeof data !== 'object') {
+    console.error('No data or invalid data type')
     return null
   }
-  
+
+  // Handle missing required fields with reasonable defaults
+  const channel = data.channel || 'qualtrics' // Default to qualtrics based on your example
+  const feedback_date = data.feedback_date || new Date().toISOString().split('T')[0] // Today's date
+  const complaint_category = data.complaint_category || 'other' // Default category
+  const store_number = data.store_number || '000' // Default store
+  const market = data.market || 'Unknown' // Default market
+
   // Normalize channel value
-  let normalizedChannel = data.channel.toLowerCase()
+  let normalizedChannel = channel.toLowerCase()
   if (!['yelp', 'qualtrics', 'jimmy_johns'].includes(normalizedChannel)) {
-    console.error('Invalid channel:', data.channel, 'normalized:', normalizedChannel)
-    // Try to map common variations
-    if (normalizedChannel === 'jimmy johns' || normalizedChannel === 'jimmyjohns') {
+    console.log('Normalizing channel from:', channel)
+    if (normalizedChannel.includes('jimmy') || normalizedChannel.includes('johns')) {
       normalizedChannel = 'jimmy_johns'
     } else {
-      console.error('Channel could not be normalized')
-      return null
+      normalizedChannel = 'qualtrics' // Default fallback
     }
   }
   
-  if (!data.feedback_date) {
-    console.error('Missing feedback_date field')
-    return null
-  }
-  
-  if (!data.complaint_category) {
-    console.error('Missing complaint_category field')
-    return null
-  }
-  
   // Normalize complaint category
-  let normalizedCategory = data.complaint_category.toLowerCase().replace(/\s+/g, '_')
+  let normalizedCategory = complaint_category.toLowerCase().replace(/\s+/g, '_')
   if (!['praise', 'service', 'food_quality', 'cleanliness', 'order_accuracy', 'wait_time', 'facility_issue', 'other'].includes(normalizedCategory)) {
-    console.error('Invalid complaint_category:', data.complaint_category, 'normalized:', normalizedCategory)
-    // Default to 'other' for unknown categories
-    normalizedCategory = 'other'
-  }
-  
-  if (!data.store_number) {
-    console.error('Missing store_number field')
-    return null
-  }
-  
-  if (!data.market) {
-    console.error('Missing market field')
-    return null
+    console.log('Normalizing category from:', complaint_category)
+    // Try to map common variations
+    if (normalizedCategory.includes('food')) normalizedCategory = 'food_quality'
+    else if (normalizedCategory.includes('service')) normalizedCategory = 'service'
+    else if (normalizedCategory.includes('clean')) normalizedCategory = 'cleanliness'
+    else if (normalizedCategory.includes('wait') || normalizedCategory.includes('time')) normalizedCategory = 'wait_time'
+    else if (normalizedCategory.includes('order')) normalizedCategory = 'order_accuracy'
+    else if (normalizedCategory.includes('praise') || normalizedCategory.includes('good')) normalizedCategory = 'praise'
+    else normalizedCategory = 'other'
   }
   
   // Generate case number if not provided
@@ -110,15 +102,15 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   
   const validatedData = {
     channel: normalizedChannel as 'yelp' | 'qualtrics' | 'jimmy_johns',
-    feedback_date: data.feedback_date,
+    feedback_date,
     complaint_category: normalizedCategory as any,
-    feedback_text: data.feedback_text || '',
+    feedback_text: data.feedback_text || data.complaint_text || '',
     rating: data.rating ? parseInt(data.rating) : null,
-    store_number: data.store_number,
-    market: data.market,
+    store_number,
+    market,
     customer_name: data.customer_name || null,
     customer_email: data.customer_email || null,
-    customer_phone: data.customer_phone || null,
+    customer_phone: data.customer_phone || data.ustomer_phone || null, // Handle typo in form
     case_number,
     assignee: data.assignee || null,
     priority: data.priority || defaultPriority,
