@@ -14,11 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
+      catering_orders: {
+        Row: {
+          address: string | null
+          business_date: string | null
+          business_day: string | null
+          catering_delivery_charge: number | null
+          city: string | null
+          customer_name: string | null
+          delivery_charge: number | null
+          email: Json | null
+          email_date: string | null
+          has_ez_cater: boolean | null
+          id: number
+          order_id: number | null
+          order_reference: string | null
+          order_total: number | null
+          phone: string | null
+          processed_at: string | null
+          report_end_date: string | null
+          report_start_date: string | null
+          source_file: string | null
+          state: string | null
+          store_number: string | null
+          sub_total: number | null
+          tax: number | null
+          total_delivery_fees: number | null
+          zip: string | null
+        }
+        Insert: {
+          address?: string | null
+          business_date?: string | null
+          business_day?: string | null
+          catering_delivery_charge?: number | null
+          city?: string | null
+          customer_name?: string | null
+          delivery_charge?: number | null
+          email?: Json | null
+          email_date?: string | null
+          has_ez_cater?: boolean | null
+          id?: number
+          order_id?: number | null
+          order_reference?: string | null
+          order_total?: number | null
+          phone?: string | null
+          processed_at?: string | null
+          report_end_date?: string | null
+          report_start_date?: string | null
+          source_file?: string | null
+          state?: string | null
+          store_number?: string | null
+          sub_total?: number | null
+          tax?: number | null
+          total_delivery_fees?: number | null
+          zip?: string | null
+        }
+        Update: {
+          address?: string | null
+          business_date?: string | null
+          business_day?: string | null
+          catering_delivery_charge?: number | null
+          city?: string | null
+          customer_name?: string | null
+          delivery_charge?: number | null
+          email?: Json | null
+          email_date?: string | null
+          has_ez_cater?: boolean | null
+          id?: number
+          order_id?: number | null
+          order_reference?: string | null
+          order_total?: number | null
+          phone?: string | null
+          processed_at?: string | null
+          report_end_date?: string | null
+          report_start_date?: string | null
+          source_file?: string | null
+          state?: string | null
+          store_number?: string | null
+          sub_total?: number | null
+          tax?: number | null
+          total_delivery_fees?: number | null
+          zip?: string | null
+        }
+        Relationships: []
+      }
       customer_feedback: {
         Row: {
           case_number: string
-          channel: Database["public"]["Enums"]["feedback_channel"]
-          complaint_category: Database["public"]["Enums"]["complaint_category"]
+          channel: string
+          complaint_category: string
           created_at: string
           customer_email: string | null
           customer_name: string | null
@@ -38,8 +122,8 @@ export type Database = {
         }
         Insert: {
           case_number: string
-          channel: Database["public"]["Enums"]["feedback_channel"]
-          complaint_category: Database["public"]["Enums"]["complaint_category"]
+          channel: string
+          complaint_category: string
           created_at?: string
           customer_email?: string | null
           customer_name?: string | null
@@ -59,8 +143,8 @@ export type Database = {
         }
         Update: {
           case_number?: string
-          channel?: Database["public"]["Enums"]["feedback_channel"]
-          complaint_category?: Database["public"]["Enums"]["complaint_category"]
+          channel?: string
+          complaint_category?: string
           created_at?: string
           customer_email?: string | null
           customer_name?: string | null
@@ -251,18 +335,24 @@ export type Database = {
           completed_at: string | null
           cost: number | null
           created_at: string
+          defer_reason: string | null
+          deferred_at: string | null
+          deferred_by: string | null
           description: string
           ecosure: string
           id: string
           image_url: string | null
           market: string
           notes: string[] | null
+          previous_status: string | null
           priority: string
           repair_type: string
           status: string
           store_number: string
           updated_at: string
           user_id: string
+          vendor_scheduled_date: string | null
+          vendor_scheduled_timeframe: string | null
           viewed: boolean | null
         }
         Insert: {
@@ -270,18 +360,24 @@ export type Database = {
           completed_at?: string | null
           cost?: number | null
           created_at?: string
+          defer_reason?: string | null
+          deferred_at?: string | null
+          deferred_by?: string | null
           description: string
           ecosure: string
           id?: string
           image_url?: string | null
           market: string
           notes?: string[] | null
+          previous_status?: string | null
           priority: string
           repair_type: string
           status?: string
           store_number: string
           updated_at?: string
           user_id: string
+          vendor_scheduled_date?: string | null
+          vendor_scheduled_timeframe?: string | null
           viewed?: boolean | null
         }
         Update: {
@@ -289,18 +385,24 @@ export type Database = {
           completed_at?: string | null
           cost?: number | null
           created_at?: string
+          defer_reason?: string | null
+          deferred_at?: string | null
+          deferred_by?: string | null
           description?: string
           ecosure?: string
           id?: string
           image_url?: string | null
           market?: string
           notes?: string[] | null
+          previous_status?: string | null
           priority?: string
           repair_type?: string
           status?: string
           store_number?: string
           updated_at?: string
           user_id?: string
+          vendor_scheduled_date?: string | null
+          vendor_scheduled_timeframe?: string | null
           viewed?: boolean | null
         }
         Relationships: []
@@ -330,6 +432,14 @@ export type Database = {
       is_admin: {
         Args: { user_id: string }
         Returns: boolean
+      }
+      is_jsonb_array_of_strings: {
+        Args: { j: Json }
+        Returns: boolean
+      }
+      jsonb_try_parse: {
+        Args: { txt: string }
+        Returns: Json
       }
     }
     Enums: {
