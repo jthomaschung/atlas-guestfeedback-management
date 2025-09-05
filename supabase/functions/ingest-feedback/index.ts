@@ -134,19 +134,42 @@ Deno.serve(async (req) => {
       if (contentType.includes('application/x-www-form-urlencoded')) {
         // Handle form data from Zapier
         const formData = await req.formData()
-        requestData = {}
+        const formObject: any = {}
         for (const [key, value] of formData.entries()) {
-          requestData[key] = value
+          // Handle nested data structure from Zapier
+          if (key.startsWith('data[') && key.endsWith(']')) {
+            // Extract the actual field name from data[fieldname]
+            const fieldName = key.slice(5, -1)
+            if (!formObject.data) formObject.data = {}
+            formObject.data[fieldName] = value
+          } else {
+            formObject[key] = value
+          }
         }
-        console.log('Received form webhook data:', requestData)
+        
+        // If Zapier sent data nested under "data" key, extract it
+        if (formObject.data) {
+          requestData = formObject.data
+        } else {
+          requestData = formObject
+        }
+        console.log('Received form webhook data:', formObject)
+        console.log('Extracted feedback data:', requestData)
       } else {
         // Handle JSON data or try JSON as fallback
         const text = await req.text()
         console.log('Received raw text:', text)
         
         try {
-          requestData = JSON.parse(text)
-          console.log('Parsed as JSON:', requestData)
+          const parsed = JSON.parse(text)
+          // If JSON has nested data structure, extract it
+          if (parsed.data && typeof parsed.data === 'object') {
+            requestData = parsed.data
+          } else {
+            requestData = parsed
+          }
+          console.log('Parsed JSON:', parsed)
+          console.log('Extracted feedback data:', requestData)
         } catch (jsonError) {
           console.error('Failed to parse as JSON:', jsonError)
           return new Response(
