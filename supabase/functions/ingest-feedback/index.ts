@@ -142,7 +142,29 @@ Deno.serve(async (req) => {
     let requestData
     
     try {
-      if (contentType.includes('application/x-www-form-urlencoded')) {
+      if (contentType.includes('multipart/form-data')) {
+        console.log('Parsing as multipart form data...')
+        // Parse multipart form data
+        const formData = new FormData()
+        const request = new Request('http://dummy', {
+          method: 'POST',
+          headers: { 'content-type': contentType },
+          body: rawBody
+        })
+        const parsedFormData = await request.formData()
+        const formObject: any = {}
+        
+        for (const [key, value] of parsedFormData.entries()) {
+          console.log(`Multipart field: ${key} = ${typeof value === 'string' ? value : '[File]'}`)
+          if (typeof value === 'string') {
+            formObject[key] = value
+          }
+        }
+        
+        console.log('Parsed multipart form object:', JSON.stringify(formObject, null, 2))
+        requestData = formObject
+        
+      } else if (contentType.includes('application/x-www-form-urlencoded')) {
         console.log('Parsing as form data...')
         // Parse form data manually from raw body
         const formData = new URLSearchParams(rawBody)
