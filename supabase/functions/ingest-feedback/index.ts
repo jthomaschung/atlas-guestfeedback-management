@@ -59,11 +59,11 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   }
 
   // Handle missing required fields with reasonable defaults
-  const channel = data.channel || 'qualtrics' // Default to qualtrics based on your example
-  const feedback_date = data.feedback_date || new Date().toISOString().split('T')[0] // Today's date
-  const complaint_category = data.complaint_category || 'Other' // Keep original category exactly as received
-  const store_number = data.store_number || '000' // Default store
-  const market = data.market || 'Unknown' // Default market
+  const channel = data.channel || data.Source || 'qualtrics' // Map Source to channel
+  const feedback_date = data.feedback_date || data.Date || new Date().toISOString().split('T')[0] // Map Date to feedback_date
+  const complaint_category = data.complaint_category || data['Type of Complaint'] || 'Other' // Map field names
+  const store_number = data.store_number || data.Store || '000' // Map Store to store_number
+  const market = data.market || data.Market || 'Unknown' // Map Market to market
 
   // Generate case number if not provided
   const case_number = data.case_number || `CF-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`
@@ -84,18 +84,18 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
     channel: channel, // Keep original channel value
     feedback_date,
     complaint_category: complaint_category, // Keep original category exactly as received
-    feedback_text: data.feedback_text || data.complaint_text || '',
+    feedback_text: data.feedback_text || data.Feedback || data.complaint_text || '',
     rating: data.rating ? parseInt(data.rating) : null,
     store_number,
     market,
-    customer_name: data.customer_name || null,
-    customer_email: data.customer_email || null,
-    customer_phone: data.customer_phone || data.ustomer_phone || null, // Handle typo in form
+    customer_name: data.customer_name || data.Name || null,
+    customer_email: data.customer_email || data.Email || null,
+    customer_phone: data.customer_phone || data.Phone || data.ustomer_phone || null, // Handle field mapping
     case_number,
     assignee: data.assignee || null,
     priority: data.priority || defaultPriority,
-    ee_action: data.ee_action || null,
-    period: data.period || null
+    ee_action: data.ee_action || data.Action || null,
+    period: data.period || data.Period || null
   }
   
   console.log('=== VALIDATION SUCCESS ===')
