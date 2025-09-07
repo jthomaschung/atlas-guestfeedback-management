@@ -3,6 +3,7 @@ import { CustomerFeedback } from "@/types/feedback";
 import { CustomerFeedbackTable } from "@/components/feedback/CustomerFeedbackTable";
 import { CustomerFeedbackStats } from "@/components/feedback/CustomerFeedbackStats";
 import { FeedbackFilters } from "@/components/feedback/FeedbackFilters";
+import { FeedbackDetailsDialog } from "@/components/feedback/FeedbackDetailsDialog";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -12,6 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 const Index = () => {
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedFeedback, setSelectedFeedback] = useState<CustomerFeedback | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [priorityFilter, setPriorityFilter] = useState<string[]>([]);
@@ -130,19 +133,13 @@ const Index = () => {
   }, [feedbacks]);
 
   const handleEdit = (feedback: CustomerFeedback) => {
-    console.log("Edit feedback:", feedback);
-    toast({
-      title: "Edit Feedback",
-      description: `Editing feedback from ${feedback.customer_name}`,
-    });
+    setSelectedFeedback(feedback);
+    setIsDialogOpen(true);
   };
 
   const handleViewDetails = (feedback: CustomerFeedback) => {
-    console.log("View feedback details:", feedback);
-    toast({
-      title: "View Details",
-      description: `Viewing details for case ${feedback.case_number}`,
-    });
+    setSelectedFeedback(feedback);
+    setIsDialogOpen(true);
   };
 
   const handleDelete = async (feedback: CustomerFeedback) => {
@@ -264,6 +261,16 @@ const Index = () => {
           onViewDetails={handleViewDetails}
           onDelete={handleDelete}
           isAdmin={true}
+        />
+
+        <FeedbackDetailsDialog
+          feedback={selectedFeedback}
+          isOpen={isDialogOpen}
+          onClose={() => {
+            setIsDialogOpen(false);
+            setSelectedFeedback(null);
+          }}
+          onUpdate={fetchFeedbacks}
         />
       </div>
     </div>
