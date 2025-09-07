@@ -162,7 +162,23 @@ Deno.serve(async (req) => {
         }
         
         console.log('Parsed multipart form object:', JSON.stringify(formObject, null, 2))
-        requestData = formObject
+        
+        // Extract actual feedback data from nested URL-encoded data
+        if (formObject.data && typeof formObject.data === 'string') {
+          console.log('Parsing nested URL-encoded data...')
+          const nestedFormData = new URLSearchParams(formObject.data)
+          const nestedObject: any = {}
+          
+          for (const [key, value] of nestedFormData.entries()) {
+            console.log(`Nested form field: ${key} = ${value}`)
+            nestedObject[key] = value
+          }
+          
+          console.log('Parsed nested form data:', JSON.stringify(nestedObject, null, 2))
+          requestData = nestedObject
+        } else {
+          requestData = formObject
+        }
         
       } else if (contentType.includes('application/x-www-form-urlencoded')) {
         console.log('Parsing as form data...')
