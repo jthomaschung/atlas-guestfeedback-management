@@ -42,16 +42,20 @@ const priorityIcons = {
 };
 
 const categoryOptions = [
-  { value: 'praise', label: 'Praise' },
-  { value: 'service', label: 'Service' },
-  { value: 'food_quality', label: 'Food Quality' },
-  { value: 'cleanliness', label: 'Cleanliness' },
-  { value: 'order_accuracy', label: 'Order Accuracy' },
-  { value: 'wait_time', label: 'Wait Time' },
-  { value: 'facility_issue', label: 'Facility Issue' },
-  { value: 'Missing Item', label: 'Missing Item' },
+  { value: 'Sandwich Made wrong', label: 'Sandwich Made wrong' },
   { value: 'Slow Service', label: 'Slow Service' },
-  { value: 'other', label: 'Other' }
+  { value: 'Rude Service', label: 'Rude Service' },
+  { value: 'Product issue', label: 'Product issue' },
+  { value: 'Closed Early', label: 'Closed Early' },
+  { value: 'Praise', label: 'Praise' },
+  { value: 'Missing Item', label: 'Missing Item' },
+  { value: 'Credit Card Issue', label: 'Credit Card Issue' },
+  { value: 'Bread Quality', label: 'Bread Quality' },
+  { value: 'Out of product', label: 'Out of product' },
+  { value: 'Other', label: 'Other' },
+  { value: 'Cleanliness', label: 'Cleanliness' },
+  { value: 'Possible Food Poisoning', label: 'Possible Food Poisoning' },
+  { value: 'Loyalty Program Issues', label: 'Loyalty Program Issues' }
 ];
 
 const categoryLabels = categoryOptions.reduce((acc, option) => {

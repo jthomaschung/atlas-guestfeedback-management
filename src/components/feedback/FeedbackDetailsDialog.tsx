@@ -36,14 +36,20 @@ const priorityColors = {
 };
 
 const categoryLabels = {
-  praise: 'Praise',
-  service: 'Service',
-  food_quality: 'Food Quality',
-  cleanliness: 'Cleanliness',
-  order_accuracy: 'Order Accuracy',
-  wait_time: 'Wait Time',
-  facility_issue: 'Facility Issue',
-  other: 'Other'
+  'Sandwich Made wrong': 'Sandwich Made wrong',
+  'Slow Service': 'Slow Service',
+  'Rude Service': 'Rude Service',
+  'Product issue': 'Product issue',
+  'Closed Early': 'Closed Early',
+  'Praise': 'Praise',
+  'Missing Item': 'Missing Item',
+  'Credit Card Issue': 'Credit Card Issue',
+  'Bread Quality': 'Bread Quality',
+  'Out of product': 'Out of product',
+  'Other': 'Other',
+  'Cleanliness': 'Cleanliness',
+  'Possible Food Poisoning': 'Possible Food Poisoning',
+  'Loyalty Program Issues': 'Loyalty Program Issues'
 };
 
 const channelLabels = {
@@ -246,16 +252,20 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="praise">Praise</SelectItem>
-                      <SelectItem value="service">Service</SelectItem>
-                      <SelectItem value="food_quality">Food Quality</SelectItem>
-                      <SelectItem value="cleanliness">Cleanliness</SelectItem>
-                      <SelectItem value="order_accuracy">Order Accuracy</SelectItem>
-                      <SelectItem value="wait_time">Wait Time</SelectItem>
-                      <SelectItem value="facility_issue">Facility Issue</SelectItem>
-                      <SelectItem value="Missing Item">Missing Item</SelectItem>
+                      <SelectItem value="Sandwich Made wrong">Sandwich Made wrong</SelectItem>
                       <SelectItem value="Slow Service">Slow Service</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="Rude Service">Rude Service</SelectItem>
+                      <SelectItem value="Product issue">Product issue</SelectItem>
+                      <SelectItem value="Closed Early">Closed Early</SelectItem>
+                      <SelectItem value="Praise">Praise</SelectItem>
+                      <SelectItem value="Missing Item">Missing Item</SelectItem>
+                      <SelectItem value="Credit Card Issue">Credit Card Issue</SelectItem>
+                      <SelectItem value="Bread Quality">Bread Quality</SelectItem>
+                      <SelectItem value="Out of product">Out of product</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                      <SelectItem value="Cleanliness">Cleanliness</SelectItem>
+                      <SelectItem value="Possible Food Poisoning">Possible Food Poisoning</SelectItem>
+                      <SelectItem value="Loyalty Program Issues">Loyalty Program Issues</SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (
