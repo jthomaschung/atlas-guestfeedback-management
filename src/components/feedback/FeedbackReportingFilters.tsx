@@ -117,10 +117,17 @@ export function FeedbackReportingFilters({
 
   const periodOptions = [
     { value: 'all', label: 'All Periods' },
-    ...(availablePeriods || []).map(period => ({ 
-      value: period.id, 
-      label: `${period.name} (${format(new Date(period.start_date + 'T00:00:00'), 'MMM dd, yyyy')} - ${format(new Date(period.end_date + 'T00:00:00'), 'MMM dd, yyyy')})` 
-    }))
+    ...(availablePeriods || []).map(period => {
+      const startParts = period.start_date.split('-');
+      const endParts = period.end_date.split('-');
+      const startDate = new Date(parseInt(startParts[0]), parseInt(startParts[1]) - 1, parseInt(startParts[2]));
+      const endDate = new Date(parseInt(endParts[0]), parseInt(endParts[1]) - 1, parseInt(endParts[2]));
+      
+      return {
+        value: period.id, 
+        label: `${period.name} (${format(startDate, 'MMM dd, yyyy')} - ${format(endDate, 'MMM dd, yyyy')})` 
+      };
+    })
   ];
 
   const hasActiveFilters = 
