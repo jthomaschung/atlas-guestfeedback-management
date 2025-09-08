@@ -57,6 +57,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const [assignee, setAssignee] = useState<string>('');
   const [resolutionNotes, setResolutionNotes] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   // Update local state when feedback changes
   useState(() => {
