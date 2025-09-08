@@ -41,17 +41,10 @@ export default function GuestFeedbackManagement() {
 
       console.log('Admin check result:', isAdminData, 'for user:', user?.id);
 
-      let query = supabase
+      // Let RLS policy handle filtering based on market/store access
+      const query = supabase
         .from('customer_feedback')
         .select('*');
-
-      // If not admin, filter by assignee
-      if (!isAdminData) {
-        console.log('Non-admin user, filtering by assignee:', user?.email);
-        query = query.eq('assignee', user?.email);
-      } else {
-        console.log('Admin user, showing all feedback');
-      }
 
       const { data, error } = await query
         .in('resolution_status', ['opened', 'responded'])
