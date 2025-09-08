@@ -56,6 +56,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const [status, setStatus] = useState<string>('');
   const [priority, setPriority] = useState<string>('');
   const [assignee, setAssignee] = useState<string>('');
+  const [category, setCategory] = useState<string>('');
   const [resolutionNotes, setResolutionNotes] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -67,6 +68,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
       setStatus(feedback.resolution_status);
       setPriority(feedback.priority);
       setAssignee(feedback.assignee || '');
+      setCategory(feedback.complaint_category || '');
       setResolutionNotes(feedback.resolution_notes || '');
     }
   }, [feedback]);
@@ -135,6 +137,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
           resolution_status: status,
           priority: priority,
           assignee: assignee || null,
+          complaint_category: category,
           resolution_notes: resolutionNotes || null,
           updated_at: new Date().toISOString(),
         })
@@ -236,30 +239,8 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
                   return !permissionsLoading && permissions.isAdmin;
                 })() ? (
                   <Select 
-                    value={feedback.complaint_category} 
-                    onValueChange={async (newCategory) => {
-                      try {
-                        const { error } = await supabase
-                          .from('customer_feedback')
-                          .update({ complaint_category: newCategory })
-                          .eq('id', feedback.id);
-
-                        if (error) throw error;
-                        
-                        onUpdate();
-                        toast({
-                          title: "Success",
-                          description: "Category updated successfully"
-                        });
-                      } catch (error) {
-                        console.error('Error updating category:', error);
-                        toast({
-                          variant: "destructive",
-                          title: "Error", 
-                          description: "Failed to update category"
-                        });
-                      }
-                    }}
+                    value={category} 
+                    onValueChange={setCategory}
                   >
                     <SelectTrigger className="h-8 border-none p-0 bg-transparent hover:bg-muted/50 focus:ring-0">
                       <SelectValue />
