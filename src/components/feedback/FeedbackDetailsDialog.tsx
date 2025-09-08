@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useUserPermissions } from "@/hooks/useUserPermissions";
 
 interface FeedbackDetailsDialogProps {
   feedback: CustomerFeedback | null;
@@ -58,6 +59,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const [resolutionNotes, setResolutionNotes] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { permissions } = useUserPermissions();
 
   // Update local state when feedback changes
   useState(() => {
@@ -171,48 +173,54 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4" />
-                <Select 
-                  value={feedback.complaint_category} 
-                  onValueChange={async (newCategory) => {
-                    try {
-                      const { error } = await supabase
-                        .from('customer_feedback')
-                        .update({ complaint_category: newCategory })
-                        .eq('id', feedback.id);
+                {permissions.isAdmin ? (
+                  <Select 
+                    value={feedback.complaint_category} 
+                    onValueChange={async (newCategory) => {
+                      try {
+                        const { error } = await supabase
+                          .from('customer_feedback')
+                          .update({ complaint_category: newCategory })
+                          .eq('id', feedback.id);
 
-                      if (error) throw error;
-                      
-                      onUpdate();
-                      toast({
-                        title: "Success",
-                        description: "Category updated successfully"
-                      });
-                    } catch (error) {
-                      console.error('Error updating category:', error);
-                      toast({
-                        variant: "destructive",
-                        title: "Error", 
-                        description: "Failed to update category"
-                      });
-                    }
-                  }}
-                >
-                  <SelectTrigger className="h-8 border-none p-0 bg-transparent hover:bg-muted/50 focus:ring-0">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="praise">Praise</SelectItem>
-                    <SelectItem value="service">Service</SelectItem>
-                    <SelectItem value="food_quality">Food Quality</SelectItem>
-                    <SelectItem value="cleanliness">Cleanliness</SelectItem>
-                    <SelectItem value="order_accuracy">Order Accuracy</SelectItem>
-                    <SelectItem value="wait_time">Wait Time</SelectItem>
-                    <SelectItem value="facility_issue">Facility Issue</SelectItem>
-                    <SelectItem value="Missing Item">Missing Item</SelectItem>
-                    <SelectItem value="Slow Service">Slow Service</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
+                        if (error) throw error;
+                        
+                        onUpdate();
+                        toast({
+                          title: "Success",
+                          description: "Category updated successfully"
+                        });
+                      } catch (error) {
+                        console.error('Error updating category:', error);
+                        toast({
+                          variant: "destructive",
+                          title: "Error", 
+                          description: "Failed to update category"
+                        });
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="h-8 border-none p-0 bg-transparent hover:bg-muted/50 focus:ring-0">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="praise">Praise</SelectItem>
+                      <SelectItem value="service">Service</SelectItem>
+                      <SelectItem value="food_quality">Food Quality</SelectItem>
+                      <SelectItem value="cleanliness">Cleanliness</SelectItem>
+                      <SelectItem value="order_accuracy">Order Accuracy</SelectItem>
+                      <SelectItem value="wait_time">Wait Time</SelectItem>
+                      <SelectItem value="facility_issue">Facility Issue</SelectItem>
+                      <SelectItem value="Missing Item">Missing Item</SelectItem>
+                      <SelectItem value="Slow Service">Slow Service</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <span className="text-muted-foreground">
+                    {categoryLabels[feedback.complaint_category as keyof typeof categoryLabels] || feedback.complaint_category}
+                  </span>
+                )}
               </div>
               {feedback.rating && (
                 <div className="flex items-center gap-2 text-sm">
