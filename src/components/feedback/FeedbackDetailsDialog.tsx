@@ -59,7 +59,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const [resolutionNotes, setResolutionNotes] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { permissions } = useUserPermissions();
+  const { permissions, loading: permissionsLoading } = useUserPermissions();
 
   // Update local state when feedback changes
   useState(() => {
@@ -173,7 +173,15 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4" />
-                {permissions.isAdmin ? (
+                {(() => {
+                  console.log('🔍 FEEDBACK DIALOG: Permission check', { 
+                    isAdmin: permissions.isAdmin, 
+                    permissions,
+                    permissionsLoading,
+                    userEmail: feedback.user_id 
+                  });
+                  return !permissionsLoading && permissions.isAdmin;
+                })() ? (
                   <Select 
                     value={feedback.complaint_category} 
                     onValueChange={async (newCategory) => {
