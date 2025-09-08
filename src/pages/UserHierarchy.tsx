@@ -889,11 +889,16 @@ export default function UserHierarchy() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <Button onClick={() => {
-                      console.log('Add button clicked - Selected Market:', selectedMarket, 'Button disabled:', !selectedMarket);
-                      addMarket();
-                    }} size="sm" disabled={!selectedMarket}>
-                      Add {selectedMarket && `(${selectedMarket})`}
+                    <Button 
+                      onClick={() => {
+                        console.log('BUTTON CLICKED! Selected Market:', selectedMarket);
+                        addMarket();
+                      }} 
+                      size="sm" 
+                      disabled={!selectedMarket}
+                      className="bg-red-500 hover:bg-red-600"
+                    >
+                      ADD FL2 NOW
                     </Button>
                   </div>
                   <div className="flex flex-wrap gap-2 mt-2">
