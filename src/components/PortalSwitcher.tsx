@@ -28,6 +28,13 @@ const portals = [
     externalUrl: 'https://atlas-hr-management.lovable.app' // Update with actual URL
   },
   {
+    key: 'training',
+    title: 'Training Dashboard',
+    icon: Users,
+    href: '/training',
+    externalUrl: 'https://preview--trainingportal.lovable.app/welcome'
+  },
+  {
     key: 'guest-feedback',
     title: 'Guest Feedback',
     icon: MessageSquare,
@@ -105,6 +112,8 @@ export function PortalSwitcher() {
         return permissions.canAccessCatering;
       case 'hr':
         return permissions.canAccessHr;
+      case 'training':
+        return permissions.canAccessFacilities; // Use facilities permission for now
       case 'guest-feedback':
         return permissions.canAccessGuestFeedback;
       default:
