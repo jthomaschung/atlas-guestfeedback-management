@@ -95,11 +95,31 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   // Determine assignee based on complaint category
   let defaultAssignee = 'Unassigned'
   
-  // Store level assignment: Missing Item, Sandwich Made Wrong, Praise
-  const storeLevelCategories = ['Missing Item', 'Sandwich Made wrong', 'Praise']
+  // Store level assignment
+  const storeLevelCategories = [
+    'Sandwich Made wrong', 
+    'Closed Early', 
+    'Praise', 
+    'Missing Item', 
+    'Cleanliness'
+  ]
   
-  // District/Director level assignment: Rude, Out of Product
-  const districtLevelCategories = ['Rude Service', 'Out of product']
+  // DM and Dir and VP level assignment
+  const dmLevelCategories = [
+    'Rude Service', 
+    'Out of product', 
+    'Possible Food Poisoning'
+  ]
+  
+  // Guest feedback manager level assignment
+  const guestFeedbackCategories = [
+    'Slow Service',
+    'Product issue',
+    'Credit Card Issue', 
+    'Bread Quality',
+    'Other',
+    'Loyalty Program Issues'
+  ]
   
   if (storeLevelCategories.includes(complaint_category)) {
     // Query for actual store user email from profiles
@@ -108,14 +128,14 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
         .from('profiles')
         .select('email')
         .eq('email', `store${store_number}@atlawe.com`)
-        .single()
+        .maybeSingle()
       
       defaultAssignee = storeUser?.email || 'Unassigned'
     } catch (error) {
       console.error('Error fetching store user:', error)
       defaultAssignee = 'Unassigned'
     }
-  } else if (districtLevelCategories.includes(complaint_category)) {
+  } else if (dmLevelCategories.includes(complaint_category)) {
     // Query for actual district manager/director overseeing this store
     try {
       const { data: districtManager } = await supabase
@@ -126,15 +146,18 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
         `)
         .eq('role', 'admin')
         .limit(1)
-        .single()
+        .maybeSingle()
       
       defaultAssignee = districtManager?.profiles?.email || 'Unassigned'
     } catch (error) {
       console.error('Error fetching district manager:', error)
       defaultAssignee = 'Unassigned'
     }
+  } else if (guestFeedbackCategories.includes(complaint_category)) {
+    // Assign to guest feedback manager
+    defaultAssignee = 'guestfeedback@atlaswe.com'
   } else {
-    // All others assign to guest feedback manager
+    // Default fallback for any other categories
     defaultAssignee = 'guestfeedback@atlaswe.com'
   }
   
