@@ -3,11 +3,13 @@ import { CustomerFeedbackTable } from "@/components/feedback/CustomerFeedbackTab
 import { CustomerFeedback } from "@/types/feedback";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useUserPermissions } from "@/hooks/useUserPermissions";
 
 export default function CustomerFeedbackPage() {
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { permissions } = useUserPermissions();
 
   useEffect(() => {
     fetchFeedbacks();
@@ -151,8 +153,8 @@ export default function CustomerFeedbackPage() {
         onViewDetails={handleViewDetails}
         onDelete={handleDelete}
         onCategoryChange={handleCategoryChange}
-        isAdmin={true}
-        canEditCategory={true}
+        isAdmin={permissions.isAdmin}
+        canEditCategory={permissions.isAdmin}
       />
     </div>
   );
