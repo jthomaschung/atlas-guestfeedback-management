@@ -77,6 +77,15 @@ export default function CustomerFeedbackPage() {
     console.log("View feedback details:", feedback);
   };
 
+  const handleCategoryChange = (feedback: CustomerFeedback, newCategory: string) => {
+    // Update the local state to reflect the change
+    setFeedbacks(prev => prev.map(f => 
+      f.id === feedback.id 
+        ? { ...f, complaint_category: newCategory }
+        : f
+    ));
+  };
+
   const handleDelete = async (feedback: CustomerFeedback) => {
     try {
       const { error } = await supabase
@@ -141,7 +150,9 @@ export default function CustomerFeedbackPage() {
         onEdit={handleEdit}
         onViewDetails={handleViewDetails}
         onDelete={handleDelete}
+        onCategoryChange={handleCategoryChange}
         isAdmin={true}
+        canEditCategory={true}
       />
     </div>
   );

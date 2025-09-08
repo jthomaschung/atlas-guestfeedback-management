@@ -2,16 +2,22 @@ import { CustomerFeedback } from "@/types/feedback";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Edit, Calendar, Eye, User, Clock, AlertTriangle, Trash2, Star } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface CustomerFeedbackCardProps {
   feedback: CustomerFeedback;
   onEdit: (feedback: CustomerFeedback) => void;
   onViewDetails: (feedback: CustomerFeedback) => void;
   onDelete?: (feedback: CustomerFeedback) => void;
+  onCategoryChange?: (feedback: CustomerFeedback, newCategory: string) => void;
   isAdmin?: boolean;
+  canEditCategory?: boolean;
 }
 
 const statusColors = {
@@ -35,16 +41,23 @@ const priorityIcons = {
   Critical: AlertTriangle,
 };
 
-const categoryLabels = {
-  praise: 'Praise',
-  service: 'Service',
-  food_quality: 'Food Quality',
-  cleanliness: 'Cleanliness',
-  order_accuracy: 'Order Accuracy',
-  wait_time: 'Wait Time',
-  facility_issue: 'Facility Issue',
-  other: 'Other'
-};
+const categoryOptions = [
+  { value: 'praise', label: 'Praise' },
+  { value: 'service', label: 'Service' },
+  { value: 'food_quality', label: 'Food Quality' },
+  { value: 'cleanliness', label: 'Cleanliness' },
+  { value: 'order_accuracy', label: 'Order Accuracy' },
+  { value: 'wait_time', label: 'Wait Time' },
+  { value: 'facility_issue', label: 'Facility Issue' },
+  { value: 'missing_item', label: 'Missing Item' },
+  { value: 'slow_service', label: 'Slow Service' },
+  { value: 'other', label: 'Other' }
+];
+
+const categoryLabels = categoryOptions.reduce((acc, option) => {
+  acc[option.value] = option.label;
+  return acc;
+}, {} as Record<string, string>);
 
 const channelLabels = {
   yelp: 'Yelp',
@@ -52,9 +65,40 @@ const channelLabels = {
   jimmy_johns: "Jimmy John's"
 };
 
-export function CustomerFeedbackCard({ feedback, onEdit, onViewDetails, onDelete, isAdmin }: CustomerFeedbackCardProps) {
+export function CustomerFeedbackCard({ 
+  feedback, 
+  onEdit, 
+  onViewDetails, 
+  onDelete, 
+  onCategoryChange,
+  isAdmin, 
+  canEditCategory = false 
+}: CustomerFeedbackCardProps) {
+  const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
   const PriorityIcon = priorityIcons[feedback.priority as keyof typeof priorityIcons];
   const isUrgent = feedback.priority === 'Critical';
+
+  const handleCategoryChange = async (newCategory: string) => {
+    if (!canEditCategory || isUpdatingCategory) return;
+    
+    setIsUpdatingCategory(true);
+    try {
+      const { error } = await supabase
+        .from('customer_feedback')
+        .update({ complaint_category: newCategory })
+        .eq('id', feedback.id);
+
+      if (error) throw error;
+
+      onCategoryChange?.(feedback, newCategory);
+      toast.success('Category updated successfully');
+    } catch (error) {
+      console.error('Error updating category:', error);
+      toast.error('Failed to update category');
+    } finally {
+      setIsUpdatingCategory(false);
+    }
+  };
 
   return (
     <Card className={cn(
@@ -78,9 +122,30 @@ export function CustomerFeedbackCard({ feedback, onEdit, onViewDetails, onDelete
               </Badge>
             </div>
             
-            <h3 className="font-semibold text-sm text-foreground leading-tight mb-1">
-              {categoryLabels[feedback.complaint_category as keyof typeof categoryLabels] || feedback.complaint_category}
-            </h3>
+            {canEditCategory ? (
+              <div className="mb-1" onClick={(e) => e.stopPropagation()}>
+                <Select
+                  value={feedback.complaint_category}
+                  onValueChange={handleCategoryChange}
+                  disabled={isUpdatingCategory}
+                >
+                  <SelectTrigger className="h-7 text-sm font-semibold border-none px-0 focus:ring-0 focus:ring-offset-0 bg-transparent hover:bg-muted/50 transition-colors">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categoryOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : (
+              <h3 className="font-semibold text-sm text-foreground leading-tight mb-1">
+                {categoryLabels[feedback.complaint_category as keyof typeof categoryLabels] || feedback.complaint_category}
+              </h3>
+            )}
             
             <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
               {feedback.feedback_text}
