@@ -874,7 +874,10 @@ export default function UserHierarchy() {
                     Markets {formData.role === 'Store Level' ? '(Single Selection)' : '(Multiple Allowed)'}
                   </Label>
                   <div className="flex gap-2 mt-2">
-                    <Select value={selectedMarket} onValueChange={setSelectedMarket}>
+                    <Select value={selectedMarket} onValueChange={(value) => {
+                      console.log('Market selection changed to:', value);
+                      setSelectedMarket(value);
+                    }}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select market" />
                       </SelectTrigger>
@@ -886,7 +889,10 @@ export default function UserHierarchy() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <Button onClick={addMarket} size="sm" disabled={!selectedMarket}>
+                    <Button onClick={() => {
+                      console.log('Add button clicked - Selected Market:', selectedMarket, 'Button disabled:', !selectedMarket);
+                      addMarket();
+                    }} size="sm" disabled={!selectedMarket}>
                       Add
                     </Button>
                   </div>
