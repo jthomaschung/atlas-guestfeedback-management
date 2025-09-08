@@ -78,7 +78,7 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
     'Rude Service': 'Critical',
     'Product issue': 'Low',
     'Closed Early': 'High',
-    'Praise': 'Praise',
+    'Praise': 'High',
     'Missing Item': 'High',
     'Credit Card Issue': 'Low',
     'Bread Quality': 'Medium',
