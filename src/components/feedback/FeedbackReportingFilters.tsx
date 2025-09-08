@@ -119,7 +119,7 @@ export function FeedbackReportingFilters({
     { value: 'all', label: 'All Periods' },
     ...(availablePeriods || []).map(period => ({ 
       value: period.id, 
-      label: `${period.name} (${format(new Date(period.start_date), 'MMM dd, yyyy')} - ${format(new Date(period.end_date), 'MMM dd, yyyy')})` 
+      label: `${period.name} (${format(new Date(period.start_date + 'T00:00:00'), 'MMM dd, yyyy')} - ${format(new Date(period.end_date + 'T00:00:00'), 'MMM dd, yyyy')})` 
     }))
   ];
 
