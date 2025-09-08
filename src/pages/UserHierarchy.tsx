@@ -424,7 +424,8 @@ export default function UserHierarchy() {
 
       // Update or insert permissions
       if (!isCreateMode && selectedUser?.permissions) {
-        const { error: permissionError } = await supabase
+        console.log('Updating permissions for user:', userId, 'Markets:', formData.markets, 'Stores:', formData.stores);
+        const { data: permissionData, error: permissionError } = await supabase
           .from('user_permissions')
           .update({
             markets: formData.markets,
@@ -435,14 +436,17 @@ export default function UserHierarchy() {
             can_access_guest_feedback_dev: formData.can_access_guest_feedback_dev,
             is_development_user: formData.is_development_user
           })
-          .eq('user_id', userId);
+          .eq('user_id', userId)
+          .select();
 
+        console.log('Permission update result:', { permissionData, permissionError });
         if (permissionError) {
           console.error('Permission update error:', permissionError);
           throw permissionError;
         }
       } else {
-        const { error: permissionError } = await supabase
+        console.log('Inserting permissions for user:', userId, 'Markets:', formData.markets, 'Stores:', formData.stores);
+        const { data: permissionData, error: permissionError } = await supabase
           .from('user_permissions')
           .insert({
             user_id: userId,
@@ -453,8 +457,10 @@ export default function UserHierarchy() {
             can_access_hr_dev: formData.can_access_hr_dev,
             can_access_guest_feedback_dev: formData.can_access_guest_feedback_dev,
             is_development_user: formData.is_development_user
-          });
+          })
+          .select();
 
+        console.log('Permission insert result:', { permissionData, permissionError });
         if (permissionError) {
           console.error('Permission insert error:', permissionError);
           throw permissionError;
