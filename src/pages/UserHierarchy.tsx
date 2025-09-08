@@ -893,7 +893,7 @@ export default function UserHierarchy() {
                       console.log('Add button clicked - Selected Market:', selectedMarket, 'Button disabled:', !selectedMarket);
                       addMarket();
                     }} size="sm" disabled={!selectedMarket}>
-                      Add
+                      Add {selectedMarket && `(${selectedMarket})`}
                     </Button>
                   </div>
                   <div className="flex flex-wrap gap-2 mt-2">
