@@ -81,20 +81,19 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
         shouldUpdate: !feedback.viewed || feedback.resolution_status === 'unopened'
       });
       
-      if (!feedback.viewed || feedback.resolution_status === 'unopened') {
+      // Only update if not already viewed AND status is unopened
+      // This prevents multiple updates of the same feedback
+      if (!feedback.viewed && feedback.resolution_status === 'unopened') {
         const updateFeedback = async () => {
           try {
             const updateData: any = {
               viewed: true,
               updated_at: new Date().toISOString(),
+              resolution_status: 'opened'
             };
             
-            // If status is unopened, change it to opened
-            if (feedback.resolution_status === 'unopened') {
-              updateData.resolution_status = 'opened';
-              setStatus('opened');
-              console.log('🔄 FEEDBACK DIALOG: Changing status from unopened to opened');
-            }
+            // Update local state immediately to prevent multiple triggers
+            setStatus('opened');
             
             console.log('📝 FEEDBACK DIALOG: Updating feedback', { feedbackId: feedback.id, updateData });
             
@@ -106,12 +105,16 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
 
             if (error) {
               console.error('❌ FEEDBACK DIALOG: Update error', error);
+              // Revert local state on error
+              setStatus(feedback.resolution_status);
             } else {
               console.log('✅ FEEDBACK DIALOG: Update successful', data);
               onUpdate(); // Refresh the list to show updated status
             }
           } catch (error) {
             console.error('❌ FEEDBACK DIALOG: Exception during update', error);
+            // Revert local state on error
+            setStatus(feedback.resolution_status);
           }
         };
         
@@ -119,7 +122,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
         setTimeout(updateFeedback, 200);
       }
     }
-  }, [feedback, isOpen, onUpdate]);
+  }, [feedback?.id, isOpen]); // Only depend on feedback ID and isOpen, not the whole feedback object
 
   const handleSave = async () => {
     if (!feedback) return;
