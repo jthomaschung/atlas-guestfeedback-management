@@ -1,4 +1,4 @@
-import { PlusCircle, LayoutDashboard, BarChart3, ClipboardList, Users, Settings, Calendar } from "lucide-react";
+import { PlusCircle, LayoutDashboard, BarChart3, ClipboardList, Users, Settings, Calendar, MessageSquare, Archive } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
 import {
@@ -14,7 +14,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const items = [
+const workOrderItems = [
   { title: "Submit New Work Order", url: "/submit", icon: PlusCircle },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Daily Summary", url: "/daily-summary", icon: Calendar },
@@ -22,6 +22,14 @@ const items = [
   { title: "On Hold", url: "/on-hold", icon: ClipboardList },
   { title: "Completed", url: "/completed", icon: ClipboardList },
   { title: "Reporting", url: "/reporting", icon: BarChart3 },
+];
+
+const guestFeedbackItems = [
+  { title: "Guest Feedback Management", url: "/guest-feedback-management", icon: MessageSquare },
+  { title: "Feedback Archive", url: "/feedback-archive", icon: Archive },
+];
+
+const adminItems = [
   { title: "User Management", url: "/user-hierarchy", icon: Users },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
@@ -60,10 +68,45 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Work Orders</SidebarGroupLabel>
-
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {workOrderItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink to={item.url} end className={getNavCls}>
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {state !== "collapsed" && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Guest Feedback</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {guestFeedbackItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink to={item.url} end className={getNavCls}>
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {state !== "collapsed" && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Administration</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {adminItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} end className={getNavCls}>

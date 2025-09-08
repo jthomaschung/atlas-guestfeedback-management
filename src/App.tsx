@@ -22,6 +22,8 @@ import OnHold from '@/pages/OnHold';
 import Completed from '@/pages/Completed';
 import Reporting from '@/pages/Reporting';
 import UserHierarchy from '@/pages/UserHierarchy';
+import GuestFeedbackManagement from '@/pages/GuestFeedbackManagement';
+import FeedbackArchive from '@/pages/FeedbackArchive';
 import Settings from '@/pages/Settings';
 
 import { SmartRedirect } from '@/components/SmartRedirect';
@@ -331,6 +333,22 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <UserHierarchy />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/guest-feedback-management" 
+                element={
+                  <ProtectedRoute>
+                    <GuestFeedbackManagement />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/feedback-archive" 
+                element={
+                  <ProtectedRoute>
+                    <FeedbackArchive />
                   </ProtectedRoute>
                 } 
               />
