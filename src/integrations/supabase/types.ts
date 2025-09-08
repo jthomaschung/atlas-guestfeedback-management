@@ -917,6 +917,7 @@ export type Database = {
           can_access_facilities_dev: boolean | null
           can_access_guest_feedback_dev: boolean | null
           can_access_hr_dev: boolean | null
+          can_access_training_dev: boolean | null
           created_at: string
           id: string
           is_development_user: boolean | null
@@ -930,6 +931,7 @@ export type Database = {
           can_access_facilities_dev?: boolean | null
           can_access_guest_feedback_dev?: boolean | null
           can_access_hr_dev?: boolean | null
+          can_access_training_dev?: boolean | null
           created_at?: string
           id?: string
           is_development_user?: boolean | null
@@ -943,6 +945,7 @@ export type Database = {
           can_access_facilities_dev?: boolean | null
           can_access_guest_feedback_dev?: boolean | null
           can_access_hr_dev?: boolean | null
+          can_access_training_dev?: boolean | null
           created_at?: string
           id?: string
           is_development_user?: boolean | null
