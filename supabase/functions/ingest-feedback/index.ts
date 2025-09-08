@@ -102,8 +102,8 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   const districtLevelCategories = ['Rude Service', 'Out of product']
   
   if (storeLevelCategories.includes(complaint_category)) {
-    // Assign to store level user (store{store_number}@atlaswe.com)
-    defaultAssignee = `store${store_number}@atlaswe.com`
+    // Assign to store level user (store{store_number}@atlawe.com)
+    defaultAssignee = `store${store_number}@atlawe.com`
   } else if (districtLevelCategories.includes(complaint_category)) {
     // Query for actual district manager/director overseeing this store
     try {
