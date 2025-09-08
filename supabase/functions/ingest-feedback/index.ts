@@ -105,11 +105,31 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
     // Assign to store level user (store{store_number}@atlaswe.com)
     defaultAssignee = `store${store_number}@atlaswe.com`
   } else if (districtLevelCategories.includes(complaint_category)) {
-    // Assign to district manager and director overseeing the store
-    defaultAssignee = 'District Manager'
+    // Query for actual district manager/director overseeing this store
+    const { data: districtManager } = await supabase
+      .from('user_hierarchy')
+      .select(`
+        user_id,
+        profiles!inner(email)
+      `)
+      .eq('role', 'admin')
+      .limit(1)
+      .single()
+    
+    defaultAssignee = districtManager?.profiles?.email || 'Unassigned'
   } else {
-    // All others assign to guest feedback manager
-    defaultAssignee = 'Guest Feedback Manager'
+    // Query for actual guest feedback manager
+    const { data: guestFeedbackManager } = await supabase
+      .from('user_permissions')
+      .select(`
+        user_id,
+        profiles!inner(email)
+      `)
+      .eq('can_access_guest_feedback_dev', true)
+      .limit(1)
+      .single()
+    
+    defaultAssignee = guestFeedbackManager?.profiles?.email || 'Unassigned'
   }
   
   const validatedData = {
