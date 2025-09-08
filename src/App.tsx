@@ -16,10 +16,6 @@ import { LogOut } from 'lucide-react';
 import Welcome from '@/pages/Welcome';
 import Index from '@/pages/Index';
 import SubmitWorkOrder from '@/pages/SubmitWorkOrder';
-import DailySummary from '@/pages/DailySummary';
-import PendingApproval from '@/pages/PendingApproval';
-import OnHold from '@/pages/OnHold';
-import Completed from '@/pages/Completed';
 import Reporting from '@/pages/Reporting';
 import UserHierarchy from '@/pages/UserHierarchy';
 import GuestFeedbackManagement from '@/pages/GuestFeedbackManagement';
@@ -285,38 +281,6 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <SubmitWorkOrder />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/daily-summary" 
-                element={
-                  <ProtectedRoute>
-                    <DailySummary />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/pending-approval" 
-                element={
-                  <ProtectedRoute>
-                    <PendingApproval />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/on-hold" 
-                element={
-                  <ProtectedRoute>
-                    <OnHold />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/completed" 
-                element={
-                  <ProtectedRoute>
-                    <Completed />
                   </ProtectedRoute>
                 } 
               />
