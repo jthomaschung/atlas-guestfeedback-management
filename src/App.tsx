@@ -22,6 +22,9 @@ import GuestFeedbackManagement from '@/pages/GuestFeedbackManagement';
 import GFM from '@/pages/GFM';
 import FeedbackArchive from '@/pages/FeedbackArchive';
 import Settings from '@/pages/Settings';
+import PortalSelection from '@/pages/PortalSelection';
+import FeedbackReporting from '@/pages/FeedbackReporting';
+import { AuthGate } from '@/components/AuthGate';
 
 import { SmartRedirect } from '@/components/SmartRedirect';
 import { FacilitiesRedirect } from '@/components/FacilitiesRedirect';
@@ -290,6 +293,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Reporting />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/feedback-reporting" 
+                element={
+                  <ProtectedRoute>
+                    <FeedbackReporting />
                   </ProtectedRoute>
                 } 
               />

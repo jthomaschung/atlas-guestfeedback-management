@@ -18,7 +18,8 @@ const guestFeedbackItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Guest Feedback Management", url: "/guest-feedback-management", icon: MessageSquare },
   { title: "GFM (Guest Feedback Manager)", url: "/gfm", icon: UserCheck },
-  { title: "Reporting", url: "/reporting", icon: BarChart3 },
+  { title: "Feedback Reporting", url: "/feedback-reporting", icon: BarChart3 },
+  { title: "Work Order Reporting", url: "/reporting", icon: BarChart3 },
 ];
 
 const archiveItems = [

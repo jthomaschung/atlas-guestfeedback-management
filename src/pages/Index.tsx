@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
+  const [periods, setPeriods] = useState<Array<{ id: string; name: string; start_date: string; end_date: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFeedback, setSelectedFeedback] = useState<CustomerFeedback | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -25,6 +26,7 @@ const Index = () => {
   const [storeFilter, setStoreFilter] = useState<string[]>([]);
   const [marketFilter, setMarketFilter] = useState<string[]>([]);
   const [assigneeFilter, setAssigneeFilter] = useState<string[]>([]);
+  const [periodFilter, setPeriodFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const { toast } = useToast();
   const { user, profile } = useAuth();
@@ -32,6 +34,7 @@ const Index = () => {
 
   useEffect(() => {
     fetchFeedbacks();
+    fetchPeriods();
   }, []);
 
   const fetchFeedbacks = async () => {
@@ -90,6 +93,25 @@ const Index = () => {
     }
   };
 
+  const fetchPeriods = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('periods')
+        .select('*')
+        .eq('year', 2025)
+        .order('period_number');
+
+      if (error) {
+        console.error('Error fetching periods:', error);
+        return;
+      }
+
+      setPeriods(data || []);
+    } catch (error) {
+      console.error('Error fetching periods:', error);
+    }
+  };
+
   // Filter and sort feedbacks
   const filteredFeedbacks = useMemo(() => {
     const filtered = feedbacks.filter(fb => {
@@ -107,8 +129,20 @@ const Index = () => {
                              (assigneeFilter.includes('unassigned') && (!fb.assignee || fb.assignee === 'Unassigned')) ||
                              (fb.assignee && assigneeFilter.includes(fb.assignee));
       
+      // Period filter
+      let matchesPeriod = true;
+      if (periodFilter !== 'all') {
+        const selectedPeriod = periods.find(p => p.id === periodFilter);
+        if (selectedPeriod) {
+          const feedbackDate = new Date(fb.feedback_date);
+          const periodStart = new Date(selectedPeriod.start_date);
+          const periodEnd = new Date(selectedPeriod.end_date);
+          matchesPeriod = feedbackDate >= periodStart && feedbackDate <= periodEnd;
+        }
+      }
+      
       return matchesSearch && matchesStatus && matchesPriority && matchesCategory && 
-             matchesChannel && matchesStore && matchesMarket && matchesAssignee;
+             matchesChannel && matchesStore && matchesMarket && matchesAssignee && matchesPeriod;
     });
 
     // Apply sorting
@@ -117,7 +151,7 @@ const Index = () => {
       const dateB = new Date(b.created_at).getTime();
       return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
     });
-  }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, sortOrder]);
+  }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, sortOrder]);
 
   // Get available filter options
   const availableStores = useMemo(() => {
@@ -188,6 +222,7 @@ const Index = () => {
     setStoreFilter([]);
     setMarketFilter([]);
     setAssigneeFilter([]);
+    setPeriodFilter('all');
   };
 
   if (loading) {
@@ -279,6 +314,9 @@ const Index = () => {
           availableStores={availableStores}
           availableMarkets={availableMarkets}
           availableAssignees={availableAssignees}
+          availablePeriods={periods}
+          periodFilter={periodFilter}
+          onPeriodFilterChange={setPeriodFilter}
           onClearAllFilters={handleClearAllFilters}
         />
 

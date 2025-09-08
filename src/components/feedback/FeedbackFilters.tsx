@@ -29,6 +29,9 @@ interface FeedbackFiltersProps {
   availableStores: string[];
   availableMarkets: string[];
   availableAssignees: string[];
+  availablePeriods?: Array<{ id: string; name: string; start_date: string; end_date: string }>;
+  periodFilter?: string;
+  onPeriodFilterChange?: (value: string) => void;
   onClearAllFilters: () => void;
 }
 
@@ -91,6 +94,9 @@ export function FeedbackFilters({
   availableStores,
   availableMarkets,
   availableAssignees,
+  availablePeriods,
+  periodFilter,
+  onPeriodFilterChange,
   onClearAllFilters,
 }: FeedbackFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
