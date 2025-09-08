@@ -49,8 +49,8 @@ const categoryOptions = [
   { value: 'order_accuracy', label: 'Order Accuracy' },
   { value: 'wait_time', label: 'Wait Time' },
   { value: 'facility_issue', label: 'Facility Issue' },
-  { value: 'missing_item', label: 'Missing Item' },
-  { value: 'slow_service', label: 'Slow Service' },
+  { value: 'Missing Item', label: 'Missing Item' },
+  { value: 'Slow Service', label: 'Slow Service' },
   { value: 'other', label: 'Other' }
 ];
 
@@ -129,12 +129,12 @@ export function CustomerFeedbackCard({
                   onValueChange={handleCategoryChange}
                   disabled={isUpdatingCategory}
                 >
-                  <SelectTrigger className="h-7 text-sm font-semibold border-none px-0 focus:ring-0 focus:ring-offset-0 bg-transparent hover:bg-muted/50 transition-colors">
-                    <SelectValue />
+                  <SelectTrigger className="h-8 text-sm font-semibold border border-border px-2 focus:ring-2 focus:ring-offset-1 bg-background hover:bg-muted transition-colors rounded-md">
+                    <SelectValue placeholder="Select category" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="z-50 bg-popover border border-border shadow-lg">
                     {categoryOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
+                      <SelectItem key={option.value} value={option.value} className="cursor-pointer">
                         {option.label}
                       </SelectItem>
                     ))}
