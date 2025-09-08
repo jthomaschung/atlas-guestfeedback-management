@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CustomerFeedback } from "@/types/feedback";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -61,17 +61,28 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const { toast } = useToast();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
 
-  // Update local state when feedback changes and mark as viewed
-  useState(() => {
+  // Update local state when feedback changes
+  useEffect(() => {
     if (feedback) {
       setStatus(feedback.resolution_status);
       setPriority(feedback.priority);
       setAssignee(feedback.assignee || '');
       setResolutionNotes(feedback.resolution_notes || '');
+    }
+  }, [feedback]);
+
+  // Auto-mark as viewed and change status when dialog opens
+  useEffect(() => {
+    if (feedback && isOpen) {
+      console.log('🔍 FEEDBACK DIALOG: Auto-update check', {
+        feedbackId: feedback.id,
+        currentStatus: feedback.resolution_status,
+        isViewed: feedback.viewed,
+        shouldUpdate: !feedback.viewed || feedback.resolution_status === 'unopened'
+      });
       
-      // Auto-mark as viewed and change status from unopened to responded when dialog opens
       if (!feedback.viewed || feedback.resolution_status === 'unopened') {
-        setTimeout(async () => {
+        const updateFeedback = async () => {
           try {
             const updateData: any = {
               viewed: true,
@@ -82,23 +93,33 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
             if (feedback.resolution_status === 'unopened') {
               updateData.resolution_status = 'responded';
               setStatus('responded');
+              console.log('🔄 FEEDBACK DIALOG: Changing status from unopened to responded');
             }
             
-            const { error } = await supabase
+            console.log('📝 FEEDBACK DIALOG: Updating feedback', { feedbackId: feedback.id, updateData });
+            
+            const { data, error } = await supabase
               .from('customer_feedback')
               .update(updateData)
-              .eq('id', feedback.id);
+              .eq('id', feedback.id)
+              .select();
 
-            if (!error) {
+            if (error) {
+              console.error('❌ FEEDBACK DIALOG: Update error', error);
+            } else {
+              console.log('✅ FEEDBACK DIALOG: Update successful', data);
               onUpdate(); // Refresh the list to show updated status
             }
           } catch (error) {
-            console.error('Error marking feedback as viewed:', error);
+            console.error('❌ FEEDBACK DIALOG: Exception during update', error);
           }
-        }, 100); // Small delay to avoid race conditions
+        };
+        
+        // Small delay to ensure dialog is fully mounted
+        setTimeout(updateFeedback, 200);
       }
     }
-  });
+  }, [feedback, isOpen, onUpdate]);
 
   const handleSave = async () => {
     if (!feedback) return;
