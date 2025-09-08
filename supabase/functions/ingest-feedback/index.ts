@@ -68,17 +68,29 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   // Generate case number if not provided
   const case_number = data.case_number || `CF-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`
   
-  // Set default priority based on complaint category keywords
+  // Set priority based on exact complaint category mapping
   let defaultPriority: 'Praise' | 'Low' | 'High' | 'Critical' = 'Low'
-  const categoryLower = complaint_category.toLowerCase()
   
-  if (categoryLower.includes('praise')) {
-    defaultPriority = 'Praise'
-  } else if (categoryLower.includes('closed') || categoryLower.includes('bread') || categoryLower.includes('quality')) {
-    defaultPriority = 'High'
-  } else if (categoryLower.includes('rude') || categoryLower.includes('service')) {
-    defaultPriority = 'Critical'
+  // Hardcoded priority mapping per user requirements
+  const priorityMapping: Record<string, 'Praise' | 'Low' | 'High' | 'Critical'> = {
+    'Sandwich Made wrong': 'High',
+    'Slow Service': 'High', // Med mapped to High since we don't have Medium
+    'Rude Service': 'Critical',
+    'Product issue': 'Low',
+    'Closed Early': 'High',
+    'Praise': 'Praise',
+    'Missing Item': 'High',
+    'Credit Card Issue': 'Low',
+    'Bread Quality': 'High', // Med mapped to High since we don't have Medium
+    'Out of product': 'High',
+    'Other': 'Low',
+    'Cleanliness': 'High', // Med mapped to High since we don't have Medium
+    'Possible Food Poisoning': 'Critical',
+    'Loyalty Program Issues': 'Low'
   }
+  
+  // Use exact category match for priority assignment
+  defaultPriority = priorityMapping[complaint_category] || 'Low'
   
   const validatedData = {
     channel: channel, // Keep original channel value
