@@ -71,30 +71,6 @@ export default function GFM() {
     setDetailsDialogOpen(true);
   };
 
-  const handleCategoryChange = async (feedback: CustomerFeedback, newCategory: string) => {
-    try {
-      const { error } = await supabase
-        .from('customer_feedback')
-        .update({ complaint_category: newCategory })
-        .eq('id', feedback.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Feedback category updated successfully.",
-      });
-
-      await loadGFMFeedback();
-    } catch (error) {
-      console.error('Error updating category:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update category. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
 
   const handleSaveFeedback = async (updatedFeedback: CustomerFeedback) => {
     try {
@@ -175,8 +151,7 @@ export default function GFM() {
                 feedbacks={filteredFeedbacks}
                 onEdit={handleEdit}
                 onViewDetails={handleViewDetails}
-                onCategoryChange={handleCategoryChange}
-                canEditCategory={true}
+                canEditCategory={false}
               />
             )}
           </div>
