@@ -71,9 +71,9 @@ const Index = () => {
         created_at: item.created_at,
         updated_at: item.updated_at,
         // Set default values for fields that might be missing
-        priority: 'Low' as CustomerFeedback['priority'], // Default priority
-        assignee: 'Unassigned',
-        viewed: false
+        priority: (item.priority || 'Low') as CustomerFeedback['priority'],
+        assignee: item.assignee || 'Unassigned',
+        viewed: item.viewed || false
       }));
 
       setFeedbacks(mappedFeedbacks);
