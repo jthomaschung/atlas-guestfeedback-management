@@ -92,6 +92,26 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   // Use exact category match for priority assignment
   defaultPriority = priorityMapping[complaint_category] || 'Low'
   
+  // Determine assignee based on complaint category
+  let defaultAssignee = 'Unassigned'
+  
+  // Store level assignment: Missing Item, Sandwich Made Wrong, Praise
+  const storeLevelCategories = ['Missing Item', 'Sandwich Made wrong', 'Praise']
+  
+  // District/Director level assignment: Rude, Out of Product
+  const districtLevelCategories = ['Rude Service', 'Out of product']
+  
+  if (storeLevelCategories.includes(complaint_category)) {
+    // Assign to store level user (store{store_number}@atlaswe.com)
+    defaultAssignee = `store${store_number}@atlaswe.com`
+  } else if (districtLevelCategories.includes(complaint_category)) {
+    // Assign to district manager and director overseeing the store
+    defaultAssignee = 'District Manager'
+  } else {
+    // All others assign to guest feedback manager
+    defaultAssignee = 'Guest Feedback Manager'
+  }
+  
   const validatedData = {
     channel: channel, // Keep original channel value
     feedback_date,
@@ -104,7 +124,7 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
     customer_email: data.customer_email || data.Email || null,
     customer_phone: data.customer_phone || data.Phone || data.ustomer_phone || null, // Handle field mapping
     case_number,
-    assignee: data.assignee || null,
+    assignee: data.assignee || defaultAssignee,
     priority: data.priority || defaultPriority,
     ee_action: data.ee_action || data.Action || null,
     period: data.period || data.Period || null
