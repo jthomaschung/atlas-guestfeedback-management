@@ -41,6 +41,8 @@ export default function GuestFeedbackManagement() {
 
       console.log('Admin check result:', isAdminData, 'for user:', user?.id);
 
+      console.log('Current user ID:', user?.id);
+      
       // Let RLS policy handle filtering based on market/store access
       const query = supabase
         .from('customer_feedback')
