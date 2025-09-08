@@ -102,8 +102,19 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   const districtLevelCategories = ['Rude Service', 'Out of product']
   
   if (storeLevelCategories.includes(complaint_category)) {
-    // Assign to store level user (store{store_number}@atlawe.com)
-    defaultAssignee = `store${store_number}@atlawe.com`
+    // Query for actual store user email from profiles
+    try {
+      const { data: storeUser } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('email', `store${store_number}@atlawe.com`)
+        .single()
+      
+      defaultAssignee = storeUser?.email || 'Unassigned'
+    } catch (error) {
+      console.error('Error fetching store user:', error)
+      defaultAssignee = 'Unassigned'
+    }
   } else if (districtLevelCategories.includes(complaint_category)) {
     // Query for actual district manager/director overseeing this store
     try {
