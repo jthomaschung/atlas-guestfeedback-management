@@ -61,13 +61,42 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const { toast } = useToast();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
 
-  // Update local state when feedback changes
+  // Update local state when feedback changes and mark as viewed
   useState(() => {
     if (feedback) {
       setStatus(feedback.resolution_status);
       setPriority(feedback.priority);
       setAssignee(feedback.assignee || '');
       setResolutionNotes(feedback.resolution_notes || '');
+      
+      // Auto-mark as viewed and change status from unopened to responded when dialog opens
+      if (!feedback.viewed || feedback.resolution_status === 'unopened') {
+        setTimeout(async () => {
+          try {
+            const updateData: any = {
+              viewed: true,
+              updated_at: new Date().toISOString(),
+            };
+            
+            // If status is unopened, change it to responded
+            if (feedback.resolution_status === 'unopened') {
+              updateData.resolution_status = 'responded';
+              setStatus('responded');
+            }
+            
+            const { error } = await supabase
+              .from('customer_feedback')
+              .update(updateData)
+              .eq('id', feedback.id);
+
+            if (!error) {
+              onUpdate(); // Refresh the list to show updated status
+            }
+          } catch (error) {
+            console.error('Error marking feedback as viewed:', error);
+          }
+        }, 100); // Small delay to avoid race conditions
+      }
     }
   });
 
