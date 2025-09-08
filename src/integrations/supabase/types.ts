@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          badge_icon: string
+          created_at: string
+          criteria: Json
+          description: string
+          id: string
+          name: string
+        }
+        Insert: {
+          badge_icon: string
+          created_at?: string
+          criteria: Json
+          description: string
+          id?: string
+          name: string
+        }
+        Update: {
+          badge_icon?: string
+          created_at?: string
+          criteria?: Json
+          description?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       catering_orders: {
         Row: {
           address: string | null
@@ -491,6 +518,39 @@ export type Database = {
         }
         Relationships: []
       }
+      periods: {
+        Row: {
+          created_at: string
+          end_date: string
+          id: string
+          name: string
+          period_number: number
+          start_date: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          end_date: string
+          id?: string
+          name: string
+          period_number: number
+          start_date: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          end_date?: string
+          id?: string
+          name?: string
+          period_number?: number
+          start_date?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
       positions: {
         Row: {
           created_at: string | null
@@ -782,6 +842,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          earned_at: string
+          id: string
+          period_id: string
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          earned_at?: string
+          id?: string
+          period_id: string
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          earned_at?: string
+          id?: string
+          period_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_achievements_period_id_fkey"
+            columns: ["period_id"]
+            isOneToOne: false
+            referencedRelation: "periods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_hierarchy: {
         Row: {
           created_at: string
@@ -959,6 +1058,18 @@ export type Database = {
       }
     }
     Functions: {
+      check_red_carpet_badge: {
+        Args: { period_uuid: string; user_uuid: string }
+        Returns: boolean
+      }
+      check_sniper_badge: {
+        Args: { period_uuid: string; user_uuid: string }
+        Returns: boolean
+      }
+      check_speed_demon_badge: {
+        Args: { period_uuid: string; user_uuid: string }
+        Returns: boolean
+      }
       generate_display_name: {
         Args: { email: string; first_name: string; last_name: string }
         Returns: string
