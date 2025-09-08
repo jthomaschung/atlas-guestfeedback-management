@@ -69,22 +69,22 @@ function validateFeedbackData(data: any): FeedbackWebhookData | null {
   const case_number = data.case_number || `CF-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`
   
   // Set priority based on exact complaint category mapping
-  let defaultPriority: 'Praise' | 'Low' | 'High' | 'Critical' = 'Low'
+  let defaultPriority: 'Praise' | 'Low' | 'Medium' | 'High' | 'Critical' = 'Low'
   
   // Hardcoded priority mapping per user requirements
-  const priorityMapping: Record<string, 'Praise' | 'Low' | 'High' | 'Critical'> = {
+  const priorityMapping: Record<string, 'Praise' | 'Low' | 'Medium' | 'High' | 'Critical'> = {
     'Sandwich Made wrong': 'High',
-    'Slow Service': 'High', // Med mapped to High since we don't have Medium
+    'Slow Service': 'Medium',
     'Rude Service': 'Critical',
     'Product issue': 'Low',
     'Closed Early': 'High',
     'Praise': 'Praise',
     'Missing Item': 'High',
     'Credit Card Issue': 'Low',
-    'Bread Quality': 'High', // Med mapped to High since we don't have Medium
+    'Bread Quality': 'Medium',
     'Out of product': 'High',
     'Other': 'Low',
-    'Cleanliness': 'High', // Med mapped to High since we don't have Medium
+    'Cleanliness': 'Medium',
     'Possible Food Poisoning': 'Critical',
     'Loyalty Program Issues': 'Low'
   }

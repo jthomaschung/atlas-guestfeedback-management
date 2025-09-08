@@ -16,7 +16,7 @@ export interface CustomerFeedback {
   user_id: string;
   created_at: string;
   updated_at: string;
-  priority: 'Praise' | 'Low' | 'High' | 'Critical';
+  priority: 'Praise' | 'Low' | 'Medium' | 'High' | 'Critical';
   assignee?: string;
   viewed?: boolean;
 }
