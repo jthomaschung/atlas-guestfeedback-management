@@ -141,7 +141,6 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
         .from('customer_feedback')
         .update({
           resolution_status: status,
-          priority: priority,
           assignee: assignee || null,
           complaint_category: category,
           resolution_notes: resolutionNotes || null,
@@ -292,7 +291,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
           </div>
 
           {/* Edit Fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
             <div className="space-y-2">
               <Label htmlFor="status">Resolution Status</Label>
               <Select value={status} onValueChange={setStatus}>
@@ -309,21 +308,6 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="priority">Priority</Label>
-              <Select value={priority} onValueChange={setPriority}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Praise">Praise</SelectItem>
-                  <SelectItem value="Low">Low</SelectItem>
-                  <SelectItem value="High">High</SelectItem>
-                  <SelectItem value="Critical">Critical</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2 md:col-span-2">
               <Label htmlFor="assignee">Assignee</Label>
               <Input
                 id="assignee"
@@ -333,6 +317,8 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
               />
             </div>
           </div>
+
+
 
           {/* Resolution Notes */}
           <div className="space-y-2">
