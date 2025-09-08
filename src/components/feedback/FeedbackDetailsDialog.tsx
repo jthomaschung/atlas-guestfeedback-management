@@ -89,11 +89,11 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
               updated_at: new Date().toISOString(),
             };
             
-            // If status is unopened, change it to responded
+            // If status is unopened, change it to opened
             if (feedback.resolution_status === 'unopened') {
-              updateData.resolution_status = 'responded';
-              setStatus('responded');
-              console.log('🔄 FEEDBACK DIALOG: Changing status from unopened to responded');
+              updateData.resolution_status = 'opened';
+              setStatus('opened');
+              console.log('🔄 FEEDBACK DIALOG: Changing status from unopened to opened');
             }
             
             console.log('📝 FEEDBACK DIALOG: Updating feedback', { feedbackId: feedback.id, updateData });
