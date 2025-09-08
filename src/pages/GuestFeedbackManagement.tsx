@@ -30,11 +30,25 @@ export default function GuestFeedbackManagement() {
     try {
       setLoading(true);
       
-      // Get feedback assigned to current user only
-      const { data, error } = await supabase
+      // Check if user is admin first
+      const { data: isAdminData, error: adminError } = await supabase
+        .rpc('is_admin', { user_id: user?.id });
+      
+      if (adminError) {
+        console.error('Error checking admin status:', adminError);
+        return;
+      }
+
+      let query = supabase
         .from('customer_feedback')
-        .select('*')
-        .eq('assignee', user?.email)
+        .select('*');
+
+      // If not admin, filter by assignee
+      if (!isAdminData) {
+        query = query.eq('assignee', user?.email);
+      }
+
+      const { data, error } = await query
         .in('resolution_status', ['opened', 'responded'])
         .order('created_at', { ascending: false });
 
