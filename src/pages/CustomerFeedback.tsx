@@ -18,6 +18,7 @@ export default function CustomerFeedbackPage() {
   const fetchFeedbacks = async () => {
     try {
       setLoading(true);
+      console.log('=== FETCHING FEEDBACK AT:', new Date().toISOString());
       const { data, error } = await supabase
         .from('customer_feedback')
         .select('*')
