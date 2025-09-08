@@ -34,29 +34,38 @@ export default function CustomerFeedbackPage() {
       }
 
       // Map database records to CustomerFeedback interface
-      const mappedFeedbacks: CustomerFeedback[] = (data || []).map(item => ({
-        id: item.id,
-        feedback_date: item.feedback_date,
-        complaint_category: item.complaint_category as CustomerFeedback['complaint_category'],
-        channel: item.channel as CustomerFeedback['channel'],
-        rating: item.rating,
-        resolution_status: (item.resolution_status || 'unopened') as CustomerFeedback['resolution_status'],
-        resolution_notes: item.resolution_notes,
-        store_number: item.store_number,
-        market: item.market,
-        case_number: item.case_number,
-        customer_name: item.customer_name,
-        customer_email: item.customer_email,
-        customer_phone: item.customer_phone,
-        feedback_text: item.feedback_text,
-        user_id: item.user_id,
-        created_at: item.created_at,
-        updated_at: item.updated_at,
-        // Set default values for fields that might be missing
-        priority: (item.priority || 'Low') as CustomerFeedback['priority'],
-        assignee: item.assignee || 'Unassigned',
-        viewed: item.viewed || false
-      }));
+      const mappedFeedbacks: CustomerFeedback[] = (data || []).map(item => {
+        console.log('Raw database item:', {
+          id: item.id,
+          complaint_category: item.complaint_category,
+          priority: item.priority,
+          case_number: item.case_number
+        });
+        
+        return {
+          id: item.id,
+          feedback_date: item.feedback_date,
+          complaint_category: item.complaint_category as CustomerFeedback['complaint_category'],
+          channel: item.channel as CustomerFeedback['channel'],
+          rating: item.rating,
+          resolution_status: (item.resolution_status || 'unopened') as CustomerFeedback['resolution_status'],
+          resolution_notes: item.resolution_notes,
+          store_number: item.store_number,
+          market: item.market,
+          case_number: item.case_number,
+          customer_name: item.customer_name,
+          customer_email: item.customer_email,
+          customer_phone: item.customer_phone,
+          feedback_text: item.feedback_text,
+          user_id: item.user_id,
+          created_at: item.created_at,
+          updated_at: item.updated_at,
+          // Set default values for fields that might be missing
+          priority: (item.priority || 'Low') as CustomerFeedback['priority'],
+          assignee: item.assignee || 'Unassigned',
+          viewed: item.viewed || false
+        };
+      });
 
       setFeedbacks(mappedFeedbacks);
     } catch (error) {
