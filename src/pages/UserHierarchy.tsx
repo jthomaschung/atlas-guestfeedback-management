@@ -488,13 +488,18 @@ export default function UserHierarchy() {
   };
 
   const addMarket = () => {
+    console.log('Adding market:', selectedMarket, 'Current markets:', formData.markets, 'Role:', formData.role);
     if (selectedMarket && !formData.markets.includes(selectedMarket)) {
       if (formData.role === 'Store Level') {
+        console.log('Store Level role - replacing markets with:', [selectedMarket]);
         setFormData(prev => ({ ...prev, markets: [selectedMarket] }));
       } else {
+        console.log('Non-Store Level role - adding to markets:', [...formData.markets, selectedMarket]);
         setFormData(prev => ({ ...prev, markets: [...prev.markets, selectedMarket] }));
       }
       setSelectedMarket('');
+    } else {
+      console.log('Market not added - either empty or already exists');
     }
   };
 
