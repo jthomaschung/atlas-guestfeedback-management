@@ -19,6 +19,7 @@ import SubmitWorkOrder from '@/pages/SubmitWorkOrder';
 import Reporting from '@/pages/Reporting';
 import UserHierarchy from '@/pages/UserHierarchy';
 import GuestFeedbackManagement from '@/pages/GuestFeedbackManagement';
+import GFM from '@/pages/GFM';
 import FeedbackArchive from '@/pages/FeedbackArchive';
 import Settings from '@/pages/Settings';
 
@@ -305,6 +306,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <GuestFeedbackManagement />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/gfm" 
+                element={
+                  <ProtectedRoute>
+                    <GFM />
                   </ProtectedRoute>
                 } 
               />

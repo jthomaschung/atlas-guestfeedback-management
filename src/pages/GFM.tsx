@@ -11,7 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 
-export default function GuestFeedbackManagement() {
+export default function GFM() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
@@ -21,20 +21,18 @@ export default function GuestFeedbackManagement() {
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
 
   useEffect(() => {
-    if (user?.email) {
-      loadGuestFeedbackManagerFeedback();
-    }
-  }, [user?.email]);
+    loadGFMFeedback();
+  }, []);
 
-  const loadGuestFeedbackManagerFeedback = async () => {
+  const loadGFMFeedback = async () => {
     try {
       setLoading(true);
       
-      // Get feedback assigned to current user only
+      // Get feedback assigned to guestfeedback@atlaswe.com (Guest Feedback Manager)
       const { data, error } = await supabase
         .from('customer_feedback')
         .select('*')
-        .eq('assignee', user?.email)
+        .eq('assignee', 'guestfeedback@atlaswe.com')
         .in('resolution_status', ['opened', 'responded'])
         .order('created_at', { ascending: false });
 
@@ -52,10 +50,10 @@ export default function GuestFeedbackManagement() {
       setFeedbacks(formattedData);
       setFilteredFeedbacks(formattedData);
     } catch (error) {
-      console.error('Error loading guest feedback:', error);
+      console.error('Error loading GFM feedback:', error);
       toast({
         title: "Error",
-        description: "Failed to load guest feedback. Please try again.",
+        description: "Failed to load guest feedback manager cases. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -87,7 +85,7 @@ export default function GuestFeedbackManagement() {
         description: "Feedback category updated successfully.",
       });
 
-      await loadGuestFeedbackManagerFeedback();
+      await loadGFMFeedback();
     } catch (error) {
       console.error('Error updating category:', error);
       toast({
@@ -119,7 +117,7 @@ export default function GuestFeedbackManagement() {
       });
 
       setDetailsDialogOpen(false);
-      await loadGuestFeedbackManagerFeedback();
+      await loadGFMFeedback();
     } catch (error) {
       console.error('Error updating feedback:', error);
       toast({
@@ -142,9 +140,9 @@ export default function GuestFeedbackManagement() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Guest Feedback Management</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">GFM (Guest Feedback Manager)</h1>
           <p className="text-muted-foreground mt-1">
-            Manage and respond to guest feedback assigned to your account
+            Manage and respond to centrally assigned guest feedback cases
           </p>
         </div>
         <Badge variant="secondary" className="text-sm">
@@ -156,9 +154,9 @@ export default function GuestFeedbackManagement() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Active Feedback Cases</CardTitle>
+          <CardTitle>Centrally Assigned Feedback Cases</CardTitle>
           <CardDescription>
-            Feedback assigned to you that requires attention
+            Feedback assigned to guestfeedback@atlaswe.com that requires attention
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -170,7 +168,7 @@ export default function GuestFeedbackManagement() {
             
             {filteredFeedbacks.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">No active feedback cases found.</p>
+                <p className="text-muted-foreground">No centrally assigned feedback cases found.</p>
               </div>
             ) : (
               <CustomerFeedbackTable
@@ -190,7 +188,7 @@ export default function GuestFeedbackManagement() {
           feedback={selectedFeedback}
           isOpen={detailsDialogOpen}
           onClose={() => setDetailsDialogOpen(false)}
-          onUpdate={loadGuestFeedbackManagerFeedback}
+          onUpdate={loadGFMFeedback}
         />
       )}
     </div>
