@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserPermissions } from "@/hooks/useUserPermissions";
 import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
@@ -25,7 +26,8 @@ const Index = () => {
   const [assigneeFilter, setAssigneeFilter] = useState<string[]>([]);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const { permissions } = useUserPermissions();
 
   useEffect(() => {
     fetchFeedbacks();
@@ -210,6 +212,28 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl">
+        {/* Welcome Message */}
+        <div className="bg-card border rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">
+                Welcome, {profile?.display_name || profile?.first_name || user?.email?.split('@')[0] || 'User'}!
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {permissions.isAdmin ? (
+                  "Administrator Access - All Markets & Stores"
+                ) : permissions.markets.length > 0 ? (
+                  `Market Access: ${permissions.markets.join(', ')}`
+                ) : permissions.stores.length > 0 ? (
+                  `Store Access: ${permissions.stores.join(', ')}`
+                ) : (
+                  "Loading access permissions..."
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Customer Feedback Dashboard</h1>
