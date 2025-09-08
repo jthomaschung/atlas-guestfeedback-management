@@ -16,7 +16,6 @@ import { LogOut } from 'lucide-react';
 import Welcome from '@/pages/Welcome';
 import Index from '@/pages/Index';
 import SubmitWorkOrder from '@/pages/SubmitWorkOrder';
-import Reporting from '@/pages/Reporting';
 import UserHierarchy from '@/pages/UserHierarchy';
 import GuestFeedbackManagement from '@/pages/GuestFeedbackManagement';
 import GFM from '@/pages/GFM';
@@ -285,14 +284,6 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <SubmitWorkOrder />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/reporting" 
-                element={
-                  <ProtectedRoute>
-                    <Reporting />
                   </ProtectedRoute>
                 } 
               />
