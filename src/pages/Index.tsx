@@ -4,6 +4,7 @@ import { CustomerFeedbackTable } from "@/components/feedback/CustomerFeedbackTab
 import { CustomerFeedbackStats } from "@/components/feedback/CustomerFeedbackStats";
 import { FeedbackFilters } from "@/components/feedback/FeedbackFilters";
 import { FeedbackDetailsDialog } from "@/components/feedback/FeedbackDetailsDialog";
+import { ComplaintTrendsChart } from "@/components/feedback/ComplaintTrendsChart";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -253,6 +254,8 @@ const Index = () => {
         <CustomerFeedbackStats 
           feedbacks={filteredFeedbacks} 
         />
+
+        <ComplaintTrendsChart className="mb-6" />
 
         <FeedbackFilters
           searchTerm={searchTerm}
