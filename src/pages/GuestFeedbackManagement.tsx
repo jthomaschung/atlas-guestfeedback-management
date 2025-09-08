@@ -39,18 +39,26 @@ export default function GuestFeedbackManagement() {
         return;
       }
 
+      console.log('Admin check result:', isAdminData, 'for user:', user?.id);
+
       let query = supabase
         .from('customer_feedback')
         .select('*');
 
       // If not admin, filter by assignee
       if (!isAdminData) {
+        console.log('Non-admin user, filtering by assignee:', user?.email);
         query = query.eq('assignee', user?.email);
+      } else {
+        console.log('Admin user, showing all feedback');
       }
 
       const { data, error } = await query
         .in('resolution_status', ['opened', 'responded'])
         .order('created_at', { ascending: false });
+
+      console.log('Query result:', data?.length, 'records found');
+      console.log('First few records:', data?.slice(0, 3));
 
       if (error) throw error;
 
