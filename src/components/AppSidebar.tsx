@@ -1,4 +1,4 @@
-import { PlusCircle, LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive } from "lucide-react";
+import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
 import {
@@ -14,14 +14,13 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const workOrderItems = [
-  { title: "Submit New Work Order", url: "/submit", icon: PlusCircle },
+const guestFeedbackItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Guest Feedback Management", url: "/guest-feedback-management", icon: MessageSquare },
   { title: "Reporting", url: "/reporting", icon: BarChart3 },
 ];
 
-const guestFeedbackItems = [
-  { title: "Guest Feedback Management", url: "/guest-feedback-management", icon: MessageSquare },
+const archiveItems = [
   { title: "Feedback Archive", url: "/feedback-archive", icon: Archive },
 ];
 
@@ -63,10 +62,10 @@ export function AppSidebar() {
     >
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Work Orders</SidebarGroupLabel>
+          <SidebarGroupLabel>Guest Feedback</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {workOrderItems.map((item) => (
+              {guestFeedbackItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} end className={getNavCls}>
@@ -81,10 +80,10 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Guest Feedback</SidebarGroupLabel>
+          <SidebarGroupLabel>Archive</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {guestFeedbackItems.map((item) => (
+              {archiveItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} end className={getNavCls}>
