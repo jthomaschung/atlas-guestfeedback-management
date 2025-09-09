@@ -824,6 +824,7 @@ export type Database = {
       }
       training_modules: {
         Row: {
+          category: string | null
           created_at: string | null
           description: string | null
           external_key: string | null
@@ -834,6 +835,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          category?: string | null
           created_at?: string | null
           description?: string | null
           external_key?: string | null
@@ -844,6 +846,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          category?: string | null
           created_at?: string | null
           description?: string | null
           external_key?: string | null
@@ -1112,7 +1115,10 @@ export type Database = {
         Returns: string
       }
       get_company_completion_trends: {
-        Args: Record<PropertyKey, never>
+        Args:
+          | Record<PropertyKey, never>
+          | { module_id?: string }
+          | { target_category?: string }
         Returns: {
           completed: number
           completion_rate: number
@@ -1127,7 +1133,10 @@ export type Database = {
         Returns: string
       }
       get_market_completion_trends: {
-        Args: Record<PropertyKey, never>
+        Args:
+          | Record<PropertyKey, never>
+          | { module_id?: string }
+          | { target_category?: string }
         Returns: {
           completed: number
           completion_rate: number
@@ -1139,7 +1148,10 @@ export type Database = {
         }[]
       }
       get_store_completion_trends: {
-        Args: { target_market: string }
+        Args:
+          | { module_id?: string; target_market: string }
+          | { target_category?: string; target_market: string }
+          | { target_market: string }
         Returns: {
           completed: number
           completion_rate: number
@@ -1152,7 +1164,10 @@ export type Database = {
         }[]
       }
       get_training_completions_for_store: {
-        Args: { store_num: string }
+        Args:
+          | { module_id?: string; store_num: string }
+          | { store_num: string }
+          | { store_num: string; target_category?: string }
         Returns: {
           completed_date: string
           employee_id: string
