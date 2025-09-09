@@ -43,6 +43,14 @@ export function ComplaintTrendsChart({ className }: ComplaintTrendsChartProps) {
     fetchTrendData();
   }, []);
 
+  // Force refresh when component mounts to show latest data
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchTrendData();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   const fetchTrendData = async () => {
     try {
       setLoading(true);
