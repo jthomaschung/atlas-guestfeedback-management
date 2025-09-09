@@ -62,7 +62,8 @@ export function PortalSwitcher() {
       targetPortal: portal.key,
       currentPortal: getCurrentPortal(),
       externalUrl: portal.externalUrl,
-      hasExternalUrl: !!portal.externalUrl
+      hasExternalUrl: !!portal.externalUrl,
+      permissions: permissions
     });
 
     // If it's the current portal or has no external URL, use internal navigation
