@@ -356,6 +356,8 @@ Deno.serve(async (req) => {
         customer_email: validatedData.customer_email,
         customer_phone: validatedData.customer_phone,
         feedback_text: validatedData.feedback_text,
+        priority: validatedData.priority,
+        assignee: validatedData.assignee,
         user_id: '00000000-0000-0000-0000-000000000000' // System user
       })
       .select()
