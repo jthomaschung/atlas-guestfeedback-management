@@ -179,6 +179,56 @@ const Index = () => {
     setIsDialogOpen(true);
   };
 
+  const handleFeedbackUpdate = async () => {
+    // Fetch only the updated feedback item to avoid replacing the entire array
+    if (selectedFeedback) {
+      try {
+        const { data, error } = await supabase
+          .from('customer_feedback')
+          .select('*')
+          .eq('id', selectedFeedback.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching updated feedback:', error);
+          return;
+        }
+
+        // Update the feedbacks array with the updated item
+        const updatedFeedback: CustomerFeedback = {
+          id: data.id,
+          feedback_date: data.feedback_date,
+          complaint_category: data.complaint_category as CustomerFeedback['complaint_category'],
+          channel: data.channel as CustomerFeedback['channel'],
+          rating: data.rating,
+          resolution_status: (data.resolution_status || 'unopened') as CustomerFeedback['resolution_status'],
+          resolution_notes: data.resolution_notes,
+          store_number: data.store_number,
+          market: data.market,
+          case_number: data.case_number,
+          customer_name: data.customer_name,
+          customer_email: data.customer_email,
+          customer_phone: data.customer_phone,
+          feedback_text: data.feedback_text,
+          user_id: data.user_id,
+          created_at: data.created_at,
+          updated_at: data.updated_at,
+          priority: (data.priority || 'Low') as CustomerFeedback['priority'],
+          assignee: data.assignee || 'Unassigned',
+          viewed: data.viewed || false
+        };
+
+        // Update the feedbacks array
+        setFeedbacks(prev => prev.map(fb => fb.id === updatedFeedback.id ? updatedFeedback : fb));
+        
+        // Update the selected feedback to prevent stale reference
+        setSelectedFeedback(updatedFeedback);
+      } catch (error) {
+        console.error('Error updating feedback:', error);
+      }
+    }
+  };
+
   const handleDelete = async (feedback: CustomerFeedback) => {
     try {
       const { error } = await supabase
@@ -335,7 +385,7 @@ const Index = () => {
             setIsDialogOpen(false);
             setSelectedFeedback(null);
           }}
-          onUpdate={fetchFeedbacks}
+          onUpdate={handleFeedbackUpdate}
         />
       </div>
     </div>
