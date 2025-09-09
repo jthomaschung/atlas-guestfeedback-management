@@ -22,15 +22,15 @@ interface ComplaintTrendsChartProps {
 const chartConfig = {
   rudeService: {
     label: "Rude Service",
-    color: "hsl(var(--destructive))",
+    color: "#ef4444",
   },
   sandwichMadeWrong: {
     label: "Sandwich Made Wrong",
-    color: "hsl(var(--warning))",
+    color: "#f59e0b",
   },
   missingItem: {
     label: "Missing Item", 
-    color: "hsl(var(--info))",
+    color: "#3b82f6",
   },
 };
 
