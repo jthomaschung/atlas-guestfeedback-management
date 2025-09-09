@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { CustomerFeedback } from "@/types/feedback";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -67,6 +67,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
+  const processedFeedbackId = useRef<string | null>(null);
 
   // Update local state when feedback changes
   useEffect(() => {
@@ -81,17 +82,19 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
 
   // Auto-mark as viewed and change status when dialog opens
   useEffect(() => {
-    if (feedback && isOpen) {
+    if (feedback && isOpen && feedback.id !== processedFeedbackId.current) {
       console.log('🔍 FEEDBACK DIALOG: Auto-update check', {
         feedbackId: feedback.id,
         currentStatus: feedback.resolution_status,
         isViewed: feedback.viewed,
-        shouldUpdate: !feedback.viewed || feedback.resolution_status === 'unopened'
+        shouldUpdate: !feedback.viewed && feedback.resolution_status === 'unopened'
       });
       
       // Only update if not already viewed AND status is unopened
       // This prevents multiple updates of the same feedback
       if (!feedback.viewed && feedback.resolution_status === 'unopened') {
+        processedFeedbackId.current = feedback.id;
+        
         const updateFeedback = async () => {
           try {
             const updateData: any = {
@@ -99,9 +102,6 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
               updated_at: new Date().toISOString(),
               resolution_status: 'opened'
             };
-            
-            // Update local state immediately to prevent multiple triggers
-            setStatus('opened');
             
             console.log('📝 FEEDBACK DIALOG: Updating feedback', { feedbackId: feedback.id, updateData });
             
@@ -113,24 +113,28 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
 
             if (error) {
               console.error('❌ FEEDBACK DIALOG: Update error', error);
-              // Revert local state on error
-              setStatus(feedback.resolution_status);
+              processedFeedbackId.current = null; // Reset on error
             } else {
               console.log('✅ FEEDBACK DIALOG: Update successful', data);
               onUpdate(); // Refresh the list to show updated status
             }
           } catch (error) {
             console.error('❌ FEEDBACK DIALOG: Exception during update', error);
-            // Revert local state on error
-            setStatus(feedback.resolution_status);
+            processedFeedbackId.current = null; // Reset on error
           }
         };
         
-        // Small delay to ensure dialog is fully mounted
-        setTimeout(updateFeedback, 200);
+        updateFeedback();
       }
     }
-  }, [feedback?.id, isOpen]); // Only depend on feedback ID and isOpen, not the whole feedback object
+  }, [feedback?.id, isOpen, feedback?.viewed, feedback?.resolution_status, onUpdate]);
+
+  // Reset processed ID when dialog closes
+  useEffect(() => {
+    if (!isOpen) {
+      processedFeedbackId.current = null;
+    }
+  }, [isOpen]);
 
   const handleSave = async () => {
     if (!feedback) return;
@@ -179,6 +183,9 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
             <MessageSquare className="h-5 w-5" />
             Feedback Details - Case #{feedback.case_number}
           </DialogTitle>
+          <DialogDescription>
+            View and manage customer feedback details, status, and resolution notes.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-6">
@@ -234,15 +241,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4" />
-                {(() => {
-                  console.log('🔍 FEEDBACK DIALOG: Permission check', { 
-                    isAdmin: permissions.isAdmin, 
-                    permissions,
-                    permissionsLoading,
-                    userEmail: feedback.user_id 
-                  });
-                  return !permissionsLoading && permissions.isAdmin;
-                })() ? (
+                {!permissionsLoading && permissions.isAdmin ? (
                   <Select 
                     value={category} 
                     onValueChange={setCategory}
