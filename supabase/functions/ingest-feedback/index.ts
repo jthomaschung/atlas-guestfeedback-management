@@ -98,17 +98,17 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
   // Store level assignment
   const storeLevelCategories = [
     'Sandwich Made wrong', 
-    'Closed Early', 
     'Praise', 
     'Missing Item', 
     'Cleanliness'
   ]
   
-  // DM and Dir and VP level assignment
+  // DM level assignment
   const dmLevelCategories = [
     'Rude Service', 
     'Out of product', 
-    'Possible Food Poisoning'
+    'Possible Food Poisoning',
+    'Closed Early'
   ]
   
   // Guest feedback manager level assignment
@@ -136,7 +136,7 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
       defaultAssignee = 'Unassigned'
     }
   } else if (dmLevelCategories.includes(complaint_category)) {
-    // Query for actual district manager/director overseeing this store
+    // Query for district manager who has access to this market
     try {
       const { data: districtManager } = await supabase
         .from('user_hierarchy')
@@ -144,11 +144,53 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
           user_id,
           profiles!inner(email)
         `)
-        .eq('role', 'admin')
+        .eq('role', 'DM')
         .limit(1)
         .maybeSingle()
       
-      defaultAssignee = districtManager?.profiles?.email || 'Unassigned'
+      if (districtManager) {
+        // Check if this DM has access to the store's market
+        const { data: permissions } = await supabase
+          .from('user_permissions')
+          .select('markets')
+          .eq('user_id', districtManager.user_id)
+          .maybeSingle()
+        
+        if (permissions?.markets?.includes(market)) {
+          defaultAssignee = districtManager.profiles.email
+        } else {
+          // Fallback: find any DM with access to this market
+          const { data: marketDm } = await supabase
+            .from('user_permissions')
+            .select(`
+              user_id,
+              profiles!inner(email)
+            `)
+            .contains('markets', [market])
+            .limit(1)
+            .maybeSingle()
+          
+          if (marketDm) {
+            // Verify this user is actually a DM
+            const { data: dmCheck } = await supabase
+              .from('user_hierarchy')
+              .select('role')
+              .eq('user_id', marketDm.user_id)
+              .eq('role', 'DM')
+              .maybeSingle()
+            
+            if (dmCheck) {
+              defaultAssignee = marketDm.profiles.email
+            } else {
+              defaultAssignee = 'Unassigned'
+            }
+          } else {
+            defaultAssignee = 'Unassigned'
+          }
+        }
+      } else {
+        defaultAssignee = 'Unassigned'
+      }
     } catch (error) {
       console.error('Error fetching district manager:', error)
       defaultAssignee = 'Unassigned'
