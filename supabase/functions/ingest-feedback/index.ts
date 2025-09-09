@@ -44,7 +44,7 @@ interface FeedbackWebhookData {
   period?: string
 }
 
-function validateFeedbackData(data: any): FeedbackWebhookData | null {
+async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | null> {
   console.log('=== VALIDATION START ===')
   console.log('Input data keys:', Object.keys(data))
   console.log('Input data:', JSON.stringify(data, null, 2))
@@ -324,7 +324,7 @@ Deno.serve(async (req) => {
     }
 
     // Validate data
-    const validatedData = validateFeedbackData(requestData)
+    const validatedData = await validateFeedbackData(requestData)
     if (!validatedData) {
       console.error('Validation failed for data:', JSON.stringify(requestData, null, 2))
       return new Response(
