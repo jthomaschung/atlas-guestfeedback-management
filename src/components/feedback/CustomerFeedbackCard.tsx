@@ -108,8 +108,7 @@ export function CustomerFeedbackCard({
     <Card className={cn(
       "group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer",
       isUrgent && "ring-2 ring-red-200 dark:ring-red-800/50",
-      feedback.resolution_status === 'resolved' && "opacity-75",
-      !feedback.viewed && "opacity-60 grayscale-[0.3]"
+      feedback.resolution_status === 'resolved' && "opacity-75"
     )} onClick={() => onViewDetails(feedback)}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
