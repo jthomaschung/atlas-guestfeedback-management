@@ -167,7 +167,6 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const [isLoading, setIsLoading] = useState(false);
   const [showEmailComposer, setShowEmailComposer] = useState(false);
   const [emailMessage, setEmailMessage] = useState('');
-  const [testMode, setTestMode] = useState(false);
   const { toast } = useToast();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
   const processedFeedbackId = useRef<string | null>(null);
@@ -353,20 +352,18 @@ Customer Service Team`);
         body: {
           feedbackId: feedback.id,
           method: 'email',
-          messageContent: emailMessage,
-          testMode
+          messageContent: emailMessage
         }
       });
 
       if (error) throw error;
 
       toast({
-        title: testMode ? "Test Email Logged" : "Outreach Email Sent",
-        description: testMode ? "Test email content has been logged (not actually sent)." : "Customer outreach email has been sent successfully.",
+        title: "Outreach Email Sent",
+        description: "Customer outreach email has been sent successfully.",
       });
 
       setShowEmailComposer(false);
-      setTestMode(false);
       onUpdate();
     } catch (error) {
       console.error('Error sending outreach:', error);
@@ -520,18 +517,6 @@ Customer Service Team`);
                               className="mt-1"
                             />
                            </div>
-                           <div className="flex items-center gap-2 mb-3">
-                             <input
-                               type="checkbox"
-                               id="testMode"
-                               checked={testMode}
-                               onChange={(e) => setTestMode(e.target.checked)}
-                               className="rounded border-input"
-                             />
-                             <label htmlFor="testMode" className="text-sm text-muted-foreground">
-                               Test mode (log email content without sending)
-                             </label>
-                           </div>
                            <div className="flex gap-2">
                              <Button 
                                onClick={handleSendOutreach}
@@ -539,19 +524,16 @@ Customer Service Team`);
                                className="flex-1"
                              >
                                <Mail className="h-4 w-4 mr-2" />
-                               {isLoading ? "Sending..." : testMode ? "Test Email" : "Send Email"}
+                               {isLoading ? "Sending..." : "Send Email"}
                              </Button>
                              <Button 
                                variant="outline" 
-                               onClick={() => {
-                                 setShowEmailComposer(false);
-                                 setTestMode(false);
-                               }}
+                               onClick={() => setShowEmailComposer(false)}
                                disabled={isLoading}
                              >
                                Cancel
                              </Button>
-                          </div>
+                           </div>
                         </div>
                       )}
                     </div>
