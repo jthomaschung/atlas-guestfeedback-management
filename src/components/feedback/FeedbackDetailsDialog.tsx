@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Calendar, User, Star, MapPin, Phone, Mail, MessageSquare, Clock, AlertTriangle } from "lucide-react";
+import { Calendar, User, Star, MapPin, Phone, Mail, MessageSquare, Clock, AlertTriangle, Store } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -58,12 +58,59 @@ const channelLabels = {
   jimmy_johns: "Jimmy John's"
 };
 
+// Assignment logic function that mirrors the edge function
+const getAssigneeForFeedback = async (storeNumber: string, market: string, category: string): Promise<string> => {
+  // Store-level complaints go to store email
+  const storeLevelCategories = ['Missing Item', 'Sandwich Made wrong', 'Closed Early', 'Cleanliness', 'Possible Food Poisoning'];
+  if (storeLevelCategories.includes(category)) {
+    return `store${storeNumber}@atlaswe.com`;
+  }
+
+  // Guest feedback complaints go to guest feedback email
+  const guestFeedbackCategories = ['Loyalty Program Issues', 'Credit Card Issue'];
+  if (guestFeedbackCategories.includes(category)) {
+    return 'guestfeedback@atlaswe.com';
+  }
+
+  // DM-level complaints - lookup DM for the market
+  const dmLevelCategories = ['Rude Service', 'Slow Service', 'Product issue', 'Bread Quality', 'Out of product', 'Other'];
+  if (dmLevelCategories.includes(category)) {
+    try {
+      // First get the DM user_ids for this market
+      const { data: dmData } = await supabase
+        .from('user_hierarchy')
+        .select('user_id')
+        .eq('role', 'DM');
+
+      if (dmData && dmData.length > 0) {
+        // Then get their profiles and filter by email containing market
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('email')
+          .in('user_id', dmData.map(dm => dm.user_id))
+          .filter('email', 'like', `%${market.toLowerCase().replace(/\s+/g, '')}%`)
+          .maybeSingle();
+
+        if (profileData?.email) {
+          return profileData.email;
+        }
+      }
+    } catch (error) {
+      console.error('Error looking up DM:', error);
+    }
+  }
+
+  return 'Unassigned';
+};
+
 export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: FeedbackDetailsDialogProps) {
   const [status, setStatus] = useState<string>('');
   const [priority, setPriority] = useState<string>('');
   const [assignee, setAssignee] = useState<string>('');
   const [category, setCategory] = useState<string>('');
   const [resolutionNotes, setResolutionNotes] = useState<string>('');
+  const [storeNumber, setStoreNumber] = useState<string>('');
+  const [market, setMarket] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
@@ -77,6 +124,8 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
       setAssignee(feedback.assignee || '');
       setCategory(feedback.complaint_category || '');
       setResolutionNotes(feedback.resolution_notes || '');
+      setStoreNumber(feedback.store_number || '');
+      setMarket(feedback.market || '');
     }
   }, [feedback]);
 
@@ -136,6 +185,49 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
     }
   }, [isOpen]);
 
+  // Handle store number change and auto-assign
+  const handleStoreNumberChange = async (newStoreNumber: string) => {
+    setStoreNumber(newStoreNumber);
+    
+    if (newStoreNumber && newStoreNumber !== feedback?.store_number) {
+      try {
+        // Lookup market for the new store number
+        const { data: storeData } = await supabase
+          .from('stores')
+          .select('region')
+          .eq('store_number', newStoreNumber)
+          .maybeSingle();
+
+        if (storeData?.region) {
+          const newMarket = storeData.region;
+          setMarket(newMarket);
+          
+          // Auto-assign based on new store and category
+          const newAssignee = await getAssigneeForFeedback(newStoreNumber, newMarket, category);
+          setAssignee(newAssignee);
+          
+          toast({
+            title: "Store Updated",
+            description: `Updated to store ${newStoreNumber} in ${newMarket}. Assignee updated to ${newAssignee}.`,
+          });
+        } else {
+          toast({
+            title: "Store Not Found",
+            description: `Store ${newStoreNumber} not found in database.`,
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error('Error looking up store:', error);
+        toast({
+          title: "Error",
+          description: "Failed to lookup store information.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   const handleSave = async () => {
     if (!feedback) return;
 
@@ -148,6 +240,8 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
           assignee: assignee || null,
           complaint_category: category,
           resolution_notes: resolutionNotes || null,
+          store_number: storeNumber,
+          market: market,
           updated_at: new Date().toISOString(),
         })
         .eq('id', feedback.id);
@@ -192,10 +286,10 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
           {/* Header Info */}
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline" className="font-medium">
-              Store #{feedback.store_number}
+              Store #{storeNumber}
             </Badge>
             <Badge variant="secondary">
-              {feedback.market}
+              {market}
             </Badge>
             <Badge variant="outline">
               {channelLabels[feedback.channel as keyof typeof channelLabels] || feedback.channel}
@@ -290,7 +384,23 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
           </div>
 
           {/* Edit Fields */}
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Admin-only Store Number field */}
+            {!permissionsLoading && permissions.isAdmin && (
+              <div className="space-y-2">
+                <Label htmlFor="store-number" className="flex items-center gap-2">
+                  <Store className="h-4 w-4" />
+                  Store Number
+                </Label>
+                <Input
+                  id="store-number"
+                  placeholder="Enter store number"
+                  value={storeNumber}
+                  onChange={(e) => handleStoreNumberChange(e.target.value)}
+                />
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="status">Resolution Status</Label>
               <Select value={status} onValueChange={setStatus}>
