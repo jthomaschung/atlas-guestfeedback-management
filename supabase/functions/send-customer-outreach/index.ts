@@ -11,6 +11,7 @@ interface OutreachRequest {
   feedbackId: string;
   method: 'email';
   messageContent?: string;
+  testMode?: boolean;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -33,9 +34,9 @@ const handler = async (req: Request): Promise<Response> => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { feedbackId, method, messageContent }: OutreachRequest = await req.json();
+    const { feedbackId, method, messageContent, testMode }: OutreachRequest = await req.json();
 
-    console.log('Processing outreach request:', { feedbackId, method });
+    console.log('Processing outreach request:', { feedbackId, method, testMode });
 
     // Get feedback details
     const { data: feedback, error: feedbackError } = await supabase
@@ -79,7 +80,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Send email
+    // Send email or simulate in test mode
     try {
       const emailSubject = `Thank you for your feedback - Case #${feedback.case_number}`;
       const emailBody = messageContent || `
@@ -95,14 +96,28 @@ const handler = async (req: Request): Promise<Response> => {
         <p>Best regards,<br>Customer Service Team</p>
       `;
 
-      const emailResponse = await resend.emails.send({
-        from: 'Customer Service <noreply@resend.dev>',
-        to: [feedback.customer_email],
-        subject: emailSubject,
-        html: emailBody,
-      });
+      let emailResponse;
+      
+      if (testMode) {
+        // Test mode: Log email content instead of sending
+        console.log('TEST MODE - Email would be sent with:', {
+          from: 'Customer Service <noreply@resend.dev>',
+          to: feedback.customer_email,
+          subject: emailSubject,
+          html: emailBody
+        });
+        emailResponse = { id: 'test-email-' + Date.now() };
+      } else {
+        // Production mode: Actually send the email
+        emailResponse = await resend.emails.send({
+          from: 'Customer Service <noreply@resend.dev>',
+          to: [feedback.customer_email],
+          subject: emailSubject,
+          html: emailBody,
+        });
+      }
 
-      console.log('Email sent successfully:', emailResponse);
+      console.log('Email processed successfully:', emailResponse);
 
       // Update outreach log with success
       await supabase
@@ -122,8 +137,9 @@ const handler = async (req: Request): Promise<Response> => {
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: 'Outreach email sent successfully',
-          outreachLogId: outreachLog.id 
+          message: testMode ? 'Test email logged successfully (not sent)' : 'Outreach email sent successfully',
+          outreachLogId: outreachLog.id,
+          testMode 
         }),
         { 
           status: 200, 
