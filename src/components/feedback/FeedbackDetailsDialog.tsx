@@ -82,7 +82,7 @@ const getAssigneeForFeedback = async (storeNumber: string, market: string, categ
   if (dmLevelCategories.includes(category)) {
     console.log('🔍 ASSIGNMENT: DM-level complaint, looking up DM for market:', market);
     try {
-      // First get the DM user_ids for this market
+      // Get all DMs first
       const { data: dmData } = await supabase
         .from('user_hierarchy')
         .select('user_id')
@@ -91,37 +91,62 @@ const getAssigneeForFeedback = async (storeNumber: string, market: string, categ
       console.log('🔍 ASSIGNMENT: Found DMs:', dmData);
 
       if (dmData && dmData.length > 0) {
-        // Get all DM profiles to see what emails look like
-        const { data: allProfiles } = await supabase
-          .from('profiles')
-          .select('email')
-          .in('user_id', dmData.map(dm => dm.user_id));
-
-        console.log('🔍 ASSIGNMENT: All DM profiles:', allProfiles);
-
-        // Try different market format variations
-        const marketVariations = [
-          market.toLowerCase().replace(/\s+/g, ''), // "ne4"
-          market.toLowerCase(), // "ne 4"
-          market.toUpperCase().replace(/\s+/g, ''), // "NE4"
-          market.toUpperCase(), // "NE 4"
-        ];
-
-        console.log('🔍 ASSIGNMENT: Trying market variations:', marketVariations);
-
-        for (const variation of marketVariations) {
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('email')
-            .in('user_id', dmData.map(dm => dm.user_id))
-            .filter('email', 'like', `%${variation}%`)
+        // Check each DM's permissions to find who has access to this market
+        for (const dm of dmData) {
+          const { data: permissions } = await supabase
+            .from('user_permissions')
+            .select('markets')
+            .eq('user_id', dm.user_id)
             .maybeSingle();
-
-          console.log(`🔍 ASSIGNMENT: Searching for "${variation}" found:`, profileData);
-
-          if (profileData?.email) {
-            console.log('✅ ASSIGNMENT: DM-level complaint assigned to', profileData.email);
-            return profileData.email;
+          
+          console.log(`🔍 ASSIGNMENT: DM ${dm.user_id} has markets:`, permissions?.markets);
+          
+          if (permissions?.markets?.includes(market)) {
+            // Get the email for this DM
+            const { data: dmProfile } = await supabase
+              .from('profiles')
+              .select('email')
+              .eq('user_id', dm.user_id)
+              .maybeSingle();
+              
+            if (dmProfile?.email) {
+              console.log(`✅ ASSIGNMENT: Found exact market match for DM: ${dmProfile.email}`);
+              return dmProfile.email;
+            }
+          }
+        }
+        
+        // If no exact match found, try normalized market names
+        const normalizedMarket = market.replace(/\s+/g, '');
+        console.log(`🔍 ASSIGNMENT: Trying normalized market: ${normalizedMarket}`);
+        
+        for (const dm of dmData) {
+          const { data: permissions } = await supabase
+            .from('user_permissions')
+            .select('markets')
+            .eq('user_id', dm.user_id)
+            .maybeSingle();
+          
+          if (permissions?.markets) {
+            const hasMatchingMarket = permissions.markets.some(m => {
+              const normalizedPermission = m.replace(/\s+/g, '');
+              console.log(`🔍 ASSIGNMENT: Comparing ${normalizedMarket} with ${normalizedPermission}`);
+              return normalizedPermission === normalizedMarket;
+            });
+            
+            if (hasMatchingMarket) {
+              // Get the email for this DM
+              const { data: dmProfile } = await supabase
+                .from('profiles')
+                .select('email')
+                .eq('user_id', dm.user_id)
+                .maybeSingle();
+                
+              if (dmProfile?.email) {
+                console.log(`✅ ASSIGNMENT: Found normalized market match for DM: ${dmProfile.email}`);
+                return dmProfile.email;
+              }
+            }
           }
         }
       }
