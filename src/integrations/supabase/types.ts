@@ -985,10 +985,14 @@ export type Database = {
           ecosure: string
           id: string
           image_url: string | null
+          is_recurring: boolean | null
           market: string
           notes: string[] | null
           previous_status: string | null
           priority: string
+          recurrence_confidence_score: number | null
+          recurrence_reason: string | null
+          recurrence_source_id: string | null
           repair_type: string
           status: string
           store_number: string
@@ -1010,10 +1014,14 @@ export type Database = {
           ecosure: string
           id?: string
           image_url?: string | null
+          is_recurring?: boolean | null
           market: string
           notes?: string[] | null
           previous_status?: string | null
           priority: string
+          recurrence_confidence_score?: number | null
+          recurrence_reason?: string | null
+          recurrence_source_id?: string | null
           repair_type: string
           status?: string
           store_number: string
@@ -1035,10 +1043,14 @@ export type Database = {
           ecosure?: string
           id?: string
           image_url?: string | null
+          is_recurring?: boolean | null
           market?: string
           notes?: string[] | null
           previous_status?: string | null
           priority?: string
+          recurrence_confidence_score?: number | null
+          recurrence_reason?: string | null
+          recurrence_source_id?: string | null
           repair_type?: string
           status?: string
           store_number?: string
@@ -1048,7 +1060,15 @@ export type Database = {
           vendor_scheduled_timeframe?: string | null
           viewed?: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "work_orders_recurrence_source_id_fkey"
+            columns: ["recurrence_source_id"]
+            isOneToOne: false
+            referencedRelation: "work_orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
