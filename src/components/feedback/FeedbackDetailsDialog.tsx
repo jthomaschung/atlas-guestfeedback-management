@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useUserPermissions } from "@/hooks/useUserPermissions";
+import { EmailConversationDialog } from "./EmailConversationDialog";
 
 interface FeedbackDetailsDialogProps {
   feedback: CustomerFeedback | null;
@@ -167,6 +168,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const [isLoading, setIsLoading] = useState(false);
   const [showEmailComposer, setShowEmailComposer] = useState(false);
   const [emailMessage, setEmailMessage] = useState('');
+  const [showEmailConversation, setShowEmailConversation] = useState(false);
   const { toast } = useToast();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
   const processedFeedbackId = useRef<string | null>(null);
@@ -476,7 +478,7 @@ Customer Service Team`);
                   </div>
                   
                   {feedback.outreach_sent_at ? (
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <div className="flex items-center gap-2 text-sm">
                         <span className="text-muted-foreground">Outreach sent:</span>
                         <span>{new Date(feedback.outreach_sent_at).toLocaleDateString()} at {new Date(feedback.outreach_sent_at).toLocaleTimeString()}</span>
@@ -492,6 +494,14 @@ Customer Service Team`);
                           </Badge>
                         </div>
                       )}
+                      <Button 
+                        onClick={() => setShowEmailConversation(true)}
+                        variant="outline"
+                        className="w-full"
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        View Email Conversation
+                      </Button>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -711,6 +721,17 @@ Customer Service Team`);
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      {/* Email Conversation Dialog */}
+      {feedback?.customer_email && (
+        <EmailConversationDialog
+          feedbackId={feedback.id}
+          customerEmail={feedback.customer_email}
+          customerName={feedback.customer_name || feedback.customer_email}
+          isOpen={showEmailConversation}
+          onOpenChange={setShowEmailConversation}
+        />
+      )}
     </Dialog>
   );
 };

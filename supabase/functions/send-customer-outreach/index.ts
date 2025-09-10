@@ -27,6 +27,8 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    const { feedbackId, method, messageContent }: OutreachRequest = await req.json();
+    
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
     if (!resendApiKey) {
       console.error('RESEND_API_KEY environment variable is not set');
@@ -43,8 +45,9 @@ const handler = async (req: Request): Promise<Response> => {
     console.log('Using Resend API key (first 10 chars):', resendApiKey.substring(0, 10));
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    const { feedbackId, method, messageContent }: OutreachRequest = await req.json();
+    
+    // Generate a unique thread ID for this email conversation
+    const emailThreadId = `feedback-${feedbackId}-${Date.now()}`;
 
     console.log('Processing outreach request:', { feedbackId, method });
 
@@ -75,9 +78,13 @@ const handler = async (req: Request): Promise<Response> => {
       .from('customer_outreach_log')
       .insert({
         feedback_id: feedbackId,
+        direction: 'outbound',
         outreach_method: method,
         message_content: messageContent || `Thank you for your feedback regarding your visit to our store #${feedback.store_number}. We take all customer feedback seriously and are working to address your concerns.`,
-        delivery_status: 'pending'
+        delivery_status: 'pending',
+        email_thread_id: emailThreadId,
+        from_email: 'guestfeedback@atlaswe.com',
+        to_email: feedback.customer_email
       })
       .select()
       .single();
@@ -125,10 +132,14 @@ const handler = async (req: Request): Promise<Response> => {
 
       console.log('Email sent successfully with ID:', emailResponse.data.id);
 
-      // Update outreach log with success
+      // Update outreach log with success and email message ID
       await supabase
         .from('customer_outreach_log')
-        .update({ delivery_status: 'delivered' })
+        .update({ 
+          delivery_status: 'delivered',
+          email_message_id: emailResponse.data.id,
+          subject: emailSubject
+        })
         .eq('id', outreachLog.id);
 
       // Update feedback record with outreach info
