@@ -91,19 +91,38 @@ const getAssigneeForFeedback = async (storeNumber: string, market: string, categ
       console.log('🔍 ASSIGNMENT: Found DMs:', dmData);
 
       if (dmData && dmData.length > 0) {
-        // Then get their profiles and filter by email containing market
-        const { data: profileData } = await supabase
+        // Get all DM profiles to see what emails look like
+        const { data: allProfiles } = await supabase
           .from('profiles')
           .select('email')
-          .in('user_id', dmData.map(dm => dm.user_id))
-          .filter('email', 'like', `%${market.toLowerCase().replace(/\s+/g, '')}%`)
-          .maybeSingle();
+          .in('user_id', dmData.map(dm => dm.user_id));
 
-        console.log('🔍 ASSIGNMENT: Found DM profile:', profileData);
+        console.log('🔍 ASSIGNMENT: All DM profiles:', allProfiles);
 
-        if (profileData?.email) {
-          console.log('✅ ASSIGNMENT: DM-level complaint assigned to', profileData.email);
-          return profileData.email;
+        // Try different market format variations
+        const marketVariations = [
+          market.toLowerCase().replace(/\s+/g, ''), // "ne4"
+          market.toLowerCase(), // "ne 4"
+          market.toUpperCase().replace(/\s+/g, ''), // "NE4"
+          market.toUpperCase(), // "NE 4"
+        ];
+
+        console.log('🔍 ASSIGNMENT: Trying market variations:', marketVariations);
+
+        for (const variation of marketVariations) {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('email')
+            .in('user_id', dmData.map(dm => dm.user_id))
+            .filter('email', 'like', `%${variation}%`)
+            .maybeSingle();
+
+          console.log(`🔍 ASSIGNMENT: Searching for "${variation}" found:`, profileData);
+
+          if (profileData?.email) {
+            console.log('✅ ASSIGNMENT: DM-level complaint assigned to', profileData.email);
+            return profileData.email;
+          }
         }
       }
     } catch (error) {
