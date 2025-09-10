@@ -124,11 +124,14 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
   if (storeLevelCategories.includes(complaint_category)) {
     // Query for actual store user email from profiles
     try {
+      console.log(`Looking for store email: store${store_number}@atlaswe.com`)
       const { data: storeUser } = await supabase
         .from('profiles')
         .select('email')
-        .eq('email', `store${store_number}@atlawe.com`)
+        .eq('email', `store${store_number}@atlaswe.com`)
         .maybeSingle()
+      
+      console.log('Store user found:', storeUser)
       
       defaultAssignee = storeUser?.email || 'Unassigned'
     } catch (error) {
@@ -149,6 +152,7 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
       
       if (marketDm && marketDm.length > 0) {
         // Check each DM's permissions to find who has access to this market
+        console.log(`Looking for DM with access to market: ${market}`)
         for (const dm of marketDm) {
           const { data: permissions } = await supabase
             .from('user_permissions')
@@ -156,7 +160,9 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
             .eq('user_id', dm.user_id)
             .maybeSingle()
           
+          console.log(`DM ${dm.profiles.email} has markets:`, permissions?.markets)
           if (permissions?.markets?.includes(market)) {
+            console.log(`Found exact market match for DM: ${dm.profiles.email}`)
             defaultAssignee = dm.profiles.email
             break
           }
@@ -174,11 +180,15 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
             if (permissions?.markets) {
               // Check for variations like "AZ 1" vs "AZ1", "NE 4" vs "NE4", etc.
               const normalizedMarket = market.replace(/\s+/g, '')
-              const hasMatchingMarket = permissions.markets.some(m => 
-                m.replace(/\s+/g, '') === normalizedMarket
-              )
+              console.log(`Trying normalized market: ${normalizedMarket}`)
+              const hasMatchingMarket = permissions.markets.some(m => {
+                const normalizedPermission = m.replace(/\s+/g, '')
+                console.log(`Comparing ${normalizedMarket} with ${normalizedPermission}`)
+                return normalizedPermission === normalizedMarket
+              })
               
               if (hasMatchingMarket) {
+                console.log(`Found normalized market match for DM: ${dm.profiles.email}`)
                 defaultAssignee = dm.profiles.email
                 break
               }
