@@ -128,6 +128,7 @@ export type Database = {
       customer_feedback: {
         Row: {
           assignee: string | null
+          calculated_score: number | null
           case_number: string
           channel: string
           complaint_category: string
@@ -135,11 +136,15 @@ export type Database = {
           customer_email: string | null
           customer_name: string | null
           customer_phone: string | null
+          customer_responded_at: string | null
+          customer_response_sentiment: string | null
           ee_action: string | null
           feedback_date: string
           feedback_text: string | null
           id: string
           market: string
+          outreach_method: string | null
+          outreach_sent_at: string | null
           period: string | null
           priority: string | null
           rating: number | null
@@ -152,6 +157,7 @@ export type Database = {
         }
         Insert: {
           assignee?: string | null
+          calculated_score?: number | null
           case_number: string
           channel: string
           complaint_category: string
@@ -159,11 +165,15 @@ export type Database = {
           customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
+          customer_responded_at?: string | null
+          customer_response_sentiment?: string | null
           ee_action?: string | null
           feedback_date: string
           feedback_text?: string | null
           id?: string
           market: string
+          outreach_method?: string | null
+          outreach_sent_at?: string | null
           period?: string | null
           priority?: string | null
           rating?: number | null
@@ -176,6 +186,7 @@ export type Database = {
         }
         Update: {
           assignee?: string | null
+          calculated_score?: number | null
           case_number?: string
           channel?: string
           complaint_category?: string
@@ -183,11 +194,15 @@ export type Database = {
           customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
+          customer_responded_at?: string | null
+          customer_response_sentiment?: string | null
           ee_action?: string | null
           feedback_date?: string
           feedback_text?: string | null
           id?: string
           market?: string
+          outreach_method?: string | null
+          outreach_sent_at?: string | null
           period?: string | null
           priority?: string | null
           rating?: number | null
@@ -199,6 +214,50 @@ export type Database = {
           viewed?: boolean | null
         }
         Relationships: []
+      }
+      customer_outreach_log: {
+        Row: {
+          created_at: string
+          delivery_status: string | null
+          feedback_id: string
+          id: string
+          message_content: string | null
+          outreach_method: string
+          response_received: boolean | null
+          response_sentiment: string | null
+          sent_at: string
+        }
+        Insert: {
+          created_at?: string
+          delivery_status?: string | null
+          feedback_id: string
+          id?: string
+          message_content?: string | null
+          outreach_method: string
+          response_received?: boolean | null
+          response_sentiment?: string | null
+          sent_at?: string
+        }
+        Update: {
+          created_at?: string
+          delivery_status?: string | null
+          feedback_id?: string
+          id?: string
+          message_content?: string | null
+          outreach_method?: string
+          response_received?: boolean | null
+          response_sentiment?: string | null
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_outreach_log_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "customer_feedback"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       customers: {
         Row: {
@@ -1118,6 +1177,15 @@ export type Database = {
       }
     }
     Functions: {
+      calculate_feedback_score: {
+        Args: {
+          complaint_category: string
+          customer_response_sentiment: string
+          feedback_date: string
+          outreach_sent_at: string
+        }
+        Returns: number
+      }
       check_red_carpet_badge: {
         Args: { period_uuid: string; user_uuid: string }
         Returns: boolean
