@@ -165,6 +165,8 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const [storeNumber, setStoreNumber] = useState<string>('');
   const [market, setMarket] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showEmailComposer, setShowEmailComposer] = useState(false);
+  const [emailMessage, setEmailMessage] = useState('');
   const { toast } = useToast();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
   const processedFeedbackId = useRef<string | null>(null);
@@ -181,6 +183,22 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
       setResolutionNotes(feedback.resolution_notes || '');
       setStoreNumber(feedback.store_number || '');
       setMarket(feedback.market || '');
+      
+      // Set default email message
+      setEmailMessage(`Dear ${feedback.customer_name || 'Valued Customer'},
+
+Thank you for taking the time to share your feedback regarding your recent visit to our store #${feedback.store_number}.
+
+We take all customer feedback seriously and are committed to providing excellent service. Your feedback helps us improve our operations and better serve our customers.
+
+${feedback.feedback_text ? `We have reviewed your specific concern: "${feedback.feedback_text}"` : ''}
+
+We would like to follow up with you to ensure your concerns are addressed. Please don't hesitate to contact us if you have any questions or would like to discuss this further.
+
+Thank you for choosing us and giving us the opportunity to serve you better.
+
+Best regards,
+Customer Service Team`);
     }
   }, [feedback]);
 
@@ -319,12 +337,22 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
       return;
     }
 
+    if (!emailMessage.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter an email message before sending.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       const { error } = await supabase.functions.invoke('send-customer-outreach', {
         body: {
           feedbackId: feedback.id,
-          method: 'email'
+          method: 'email',
+          messageContent: emailMessage
         }
       });
 
@@ -335,6 +363,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
         description: "Customer outreach email has been sent successfully.",
       });
 
+      setShowEmailComposer(false);
       onUpdate();
     } catch (error) {
       console.error('Error sending outreach:', error);
@@ -465,14 +494,49 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
                       )}
                     </div>
                   ) : (
-                    <Button 
-                      onClick={handleSendOutreach}
-                      disabled={isLoading}
-                      className="w-full"
-                    >
-                      <Mail className="h-4 w-4 mr-2" />
-                      Send Outreach Email
-                    </Button>
+                    <div className="space-y-3">
+                      {!showEmailComposer ? (
+                        <Button 
+                          onClick={() => setShowEmailComposer(true)}
+                          disabled={isLoading}
+                          className="w-full"
+                        >
+                          <Mail className="h-4 w-4 mr-2" />
+                          Compose Email to Customer
+                        </Button>
+                      ) : (
+                        <div className="space-y-3">
+                          <div>
+                            <Label htmlFor="emailMessage">Email Message</Label>
+                            <Textarea 
+                              id="emailMessage"
+                              value={emailMessage}
+                              onChange={(e) => setEmailMessage(e.target.value)}
+                              placeholder="Write your message to the customer..."
+                              rows={8}
+                              className="mt-1"
+                            />
+                          </div>
+                          <div className="flex gap-2">
+                            <Button 
+                              onClick={handleSendOutreach}
+                              disabled={isLoading || !emailMessage.trim()}
+                              className="flex-1"
+                            >
+                              <Mail className="h-4 w-4 mr-2" />
+                              {isLoading ? "Sending..." : "Send Email"}
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              onClick={() => setShowEmailComposer(false)}
+                              disabled={isLoading}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               ) : (
