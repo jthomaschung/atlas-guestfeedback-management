@@ -102,7 +102,17 @@ const handler = async (req: Request): Promise<Response> => {
         html: emailBody,
       });
 
-      console.log('Email sent successfully:', emailResponse);
+      console.log('Resend API response:', JSON.stringify(emailResponse, null, 2));
+      
+      if (emailResponse.error) {
+        throw new Error(`Resend API error: ${JSON.stringify(emailResponse.error)}`);
+      }
+      
+      if (!emailResponse.data) {
+        throw new Error(`No data returned from Resend: ${JSON.stringify(emailResponse)}`);
+      }
+
+      console.log('Email sent successfully with ID:', emailResponse.data.id);
 
       // Update outreach log with success
       await supabase
