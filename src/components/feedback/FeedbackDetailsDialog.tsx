@@ -444,7 +444,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
               </div>
                 <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4" />
-                {!permissionsLoading && permissions.isAdmin ? (
+                {!permissionsLoading && permissions.isDirectorOrAbove ? (
                   <Select 
                     value={category} 
                     onValueChange={handleCategoryChange}
@@ -495,7 +495,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
           {/* Edit Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Admin-only Store Number field */}
-            {!permissionsLoading && permissions.isAdmin && (
+            {!permissionsLoading && permissions.isDirectorOrAbove && (
               <div className="space-y-2">
                 <Label htmlFor="store-number" className="flex items-center gap-2">
                   <Store className="h-4 w-4" />

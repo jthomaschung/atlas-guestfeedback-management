@@ -11,6 +11,8 @@ interface UserPermissions {
   canAccessHr: boolean;
   canAccessGuestFeedback: boolean;
   isDevelopmentUser: boolean;
+  role?: string; // Add role information
+  isDirectorOrAbove?: boolean; // Helper flag for Director, VP, Admin
 }
 
 export function useUserPermissions() {
@@ -23,7 +25,9 @@ export function useUserPermissions() {
     canAccessCatering: false,
     canAccessHr: false,
     canAccessGuestFeedback: false,
-    isDevelopmentUser: false
+    isDevelopmentUser: false,
+    role: undefined,
+    isDirectorOrAbove: false
   });
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +43,9 @@ export function useUserPermissions() {
         canAccessCatering: false,
         canAccessHr: false,
         canAccessGuestFeedback: false,
-        isDevelopmentUser: false
+        isDevelopmentUser: false,
+        role: undefined,
+        isDirectorOrAbove: false
       });
       setLoading(false);
     }
@@ -61,8 +67,25 @@ export function useUserPermissions() {
         canAccessCatering: false,
         canAccessHr: false,
         canAccessGuestFeedback: false,
-        isDevelopmentUser: false
+        isDevelopmentUser: false,
+        role: undefined,
+        isDirectorOrAbove: false
       };
+
+      // Fetch user role from hierarchy
+      const { data: hierarchyData } = await supabase
+        .from('user_hierarchy')
+        .select('role')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (hierarchyData?.role) {
+        userPermissions.role = hierarchyData.role;
+        // Set director or above flag
+        userPermissions.isDirectorOrAbove = ['Admin', 'Director', 'VP'].includes(hierarchyData.role) || adminCheck;
+      } else {
+        userPermissions.isDirectorOrAbove = adminCheck || false;
+      }
 
       // Fetch user permissions (both admin and non-admin users can have specific permissions)
       const { data: permissions } = await supabase
@@ -92,7 +115,9 @@ export function useUserPermissions() {
         canAccessCatering: false,
         canAccessHr: false,
         canAccessGuestFeedback: false,
-        isDevelopmentUser: false
+        isDevelopmentUser: false,
+        role: undefined,
+        isDirectorOrAbove: false
       });
     } finally {
       setLoading(false);
