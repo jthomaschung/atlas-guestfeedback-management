@@ -118,7 +118,7 @@ const getAssigneeForFeedback = async (storeNumber: string, market: string, categ
         
         // If no exact match found, try normalized market names
         const normalizedMarket = market.replace(/\s+/g, '');
-        console.log(`🔍 ASSIGNMENT: Trying normalized market: ${normalizedMarket}`);
+        console.log(`🔍 ASSIGNMENT: Trying normalized market: "${normalizedMarket}" (original: "${market}")`);
         
         for (const dm of dmData) {
           const { data: permissions } = await supabase
@@ -130,8 +130,12 @@ const getAssigneeForFeedback = async (storeNumber: string, market: string, categ
           if (permissions?.markets) {
             const hasMatchingMarket = permissions.markets.some(m => {
               const normalizedPermission = m.replace(/\s+/g, '');
-              console.log(`🔍 ASSIGNMENT: Comparing ${normalizedMarket} with ${normalizedPermission}`);
-              return normalizedPermission === normalizedMarket;
+              console.log(`🔍 ASSIGNMENT: Comparing "${normalizedMarket}" with "${normalizedPermission}" (original: "${m}")`);
+              const matches = normalizedPermission === normalizedMarket;
+              if (matches) {
+                console.log(`🎯 ASSIGNMENT: MATCH FOUND! "${normalizedMarket}" === "${normalizedPermission}"`);
+              }
+              return matches;
             });
             
             if (hasMatchingMarket) {
