@@ -34,10 +34,10 @@ export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFee
     },
     {
       title: 'Needs Response',
-      value: opened,
+      value: totalOpen, // All non-resolved feedback needs response
       icon: AlertTriangle,
       color: 'text-orange-600',
-      onClick: () => onFilterChange?.('status', 'opened'),
+      onClick: () => onFilterChange?.('status', 'open'),
     },
     {
       title: 'Resolved',
