@@ -171,7 +171,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const { permissions, loading: permissionsLoading } = useUserPermissions();
   const processedFeedbackId = useRef<string | null>(null);
 
-  const isAdmin = permissions?.role === 'admin' || permissions?.role === 'dm';
+  const isAdmin = permissions?.role?.toLowerCase() === 'admin' || permissions?.role?.toLowerCase() === 'dm' || permissions?.isAdmin;
 
   // Update local state when feedback changes
   useEffect(() => {
