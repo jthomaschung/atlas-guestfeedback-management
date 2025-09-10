@@ -60,27 +60,35 @@ const channelLabels = {
 
 // Assignment logic function that mirrors the edge function
 const getAssigneeForFeedback = async (storeNumber: string, market: string, category: string): Promise<string> => {
+  console.log('🔍 ASSIGNMENT: Starting assignment logic', { storeNumber, market, category });
+  
   // Store-level complaints go to store email
   const storeLevelCategories = ['Missing Item', 'Sandwich Made wrong', 'Closed Early', 'Cleanliness', 'Possible Food Poisoning'];
   if (storeLevelCategories.includes(category)) {
-    return `store${storeNumber}@atlaswe.com`;
+    const assignee = `store${storeNumber}@atlaswe.com`;
+    console.log('✅ ASSIGNMENT: Store-level complaint assigned to', assignee);
+    return assignee;
   }
 
   // Guest feedback complaints go to guest feedback email
   const guestFeedbackCategories = ['Loyalty Program Issues', 'Credit Card Issue'];
   if (guestFeedbackCategories.includes(category)) {
+    console.log('✅ ASSIGNMENT: Guest feedback complaint assigned to guestfeedback@atlaswe.com');
     return 'guestfeedback@atlaswe.com';
   }
 
   // DM-level complaints - lookup DM for the market
   const dmLevelCategories = ['Rude Service', 'Slow Service', 'Product issue', 'Bread Quality', 'Out of product', 'Other'];
   if (dmLevelCategories.includes(category)) {
+    console.log('🔍 ASSIGNMENT: DM-level complaint, looking up DM for market:', market);
     try {
       // First get the DM user_ids for this market
       const { data: dmData } = await supabase
         .from('user_hierarchy')
         .select('user_id')
         .eq('role', 'DM');
+
+      console.log('🔍 ASSIGNMENT: Found DMs:', dmData);
 
       if (dmData && dmData.length > 0) {
         // Then get their profiles and filter by email containing market
@@ -91,15 +99,19 @@ const getAssigneeForFeedback = async (storeNumber: string, market: string, categ
           .filter('email', 'like', `%${market.toLowerCase().replace(/\s+/g, '')}%`)
           .maybeSingle();
 
+        console.log('🔍 ASSIGNMENT: Found DM profile:', profileData);
+
         if (profileData?.email) {
+          console.log('✅ ASSIGNMENT: DM-level complaint assigned to', profileData.email);
           return profileData.email;
         }
       }
     } catch (error) {
-      console.error('Error looking up DM:', error);
+      console.error('❌ ASSIGNMENT: Error looking up DM:', error);
     }
   }
 
+  console.log('⚠️ ASSIGNMENT: No assignment found, defaulting to Unassigned');
   return 'Unassigned';
 };
 
@@ -187,11 +199,14 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
 
   // Handle category change and auto-assign
   const handleCategoryChange = async (newCategory: string) => {
+    console.log('🔄 CATEGORY CHANGE: Changing category from', category, 'to', newCategory);
     setCategory(newCategory);
     
     if (newCategory && storeNumber && market) {
+      console.log('🔄 CATEGORY CHANGE: Triggering reassignment with', { storeNumber, market, newCategory });
       try {
         const newAssignee = await getAssigneeForFeedback(storeNumber, market, newCategory);
+        console.log('🔄 CATEGORY CHANGE: New assignee determined:', newAssignee);
         setAssignee(newAssignee);
         
         toast({
@@ -199,8 +214,10 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
           description: `Complaint category changed to "${newCategory}". Assignee updated to ${newAssignee}.`,
         });
       } catch (error) {
-        console.error('Error reassigning after category change:', error);
+        console.error('❌ CATEGORY CHANGE: Error reassigning after category change:', error);
       }
+    } else {
+      console.log('⚠️ CATEGORY CHANGE: Missing required data', { newCategory, storeNumber, market });
     }
   };
 
