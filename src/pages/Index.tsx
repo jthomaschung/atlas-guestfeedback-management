@@ -6,7 +6,7 @@ import { FeedbackFilters } from "@/components/feedback/FeedbackFilters";
 import { FeedbackDetailsDialog } from "@/components/feedback/FeedbackDetailsDialog";
 import { ComplaintTrendsChart } from "@/components/feedback/ComplaintTrendsChart";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserPermissions } from "@/hooks/useUserPermissions";
@@ -328,12 +328,6 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="flex gap-2">
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              New Response
-            </Button>
-          </div>
         </div>
 
         <CustomerFeedbackStats 
@@ -381,6 +375,22 @@ const Index = () => {
           onPeriodFilterChange={setPeriodFilter}
           onClearAllFilters={handleClearAllFilters}
         />
+
+        {/* Prominent Clear Filters Button */}
+        {(searchTerm || statusFilter.length > 0 || priorityFilter.length > 0 || 
+          categoryFilter.length > 0 || channelFilter.length > 0 || storeFilter.length > 0 || 
+          marketFilter.length > 0 || assigneeFilter.length > 0 || periodFilter !== 'all') && (
+          <div className="flex justify-center">
+            <Button 
+              variant="outline" 
+              onClick={handleClearAllFilters}
+              className="bg-background hover:bg-accent"
+            >
+              <X className="h-4 w-4 mr-2" />
+              Clear All Filters
+            </Button>
+          </div>
+        )}
 
         <CustomerFeedbackTable
           feedbacks={filteredFeedbacks}
