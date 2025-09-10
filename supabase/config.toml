@@ -54,3 +54,6 @@ verify_jwt = false
 
 [functions.ingest-feedback]
 verify_jwt = false
+
+[functions.send-customer-outreach]
+verify_jwt = true

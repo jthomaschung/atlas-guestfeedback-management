@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { CustomerFeedback } from "@/types/feedback";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 import { Calendar, User, Star, MapPin, Phone, Mail, MessageSquare, Clock, AlertTriangle, Store } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -48,115 +49,107 @@ const categoryLabels = {
   'Out of product': 'Out of product',
   'Other': 'Other',
   'Cleanliness': 'Cleanliness',
-  'Possible Food Poisoning': 'Possible Food Poisoning',
-  'Loyalty Program Issues': 'Loyalty Program Issues'
+  'Food Quality': 'Food Quality',
+  'Staff Service': 'Staff Service',
+  'Delivery Service': 'Delivery Service',
+  'Store Appearance': 'Store Appearance',
+  'Wait Time': 'Wait Time',
+  'Order Accuracy': 'Order Accuracy',
+  'Temperature': 'Temperature',
+  'Quantity': 'Quantity',
+  'Experience': 'Experience',
+  'Multiple Issues': 'Multiple Issues',
+  'Manager/Supervisor Contact Request': 'Manager/Supervisor Contact Request',
+  'Training': 'Training',
+  'Appreciation': 'Appreciation'
 };
 
 const channelLabels = {
-  yelp: 'Yelp',
-  qualtrics: 'Qualtrics',
-  jimmy_johns: "Jimmy John's"
+  'Digital Guest Contact': 'Digital Contact',
+  'Point of Sale': 'POS',
+  'social media': 'Social Media',
+  'email': 'Email',
+  'phone': 'Phone',
+  'survey': 'Survey',
+  'website': 'Website'
 };
 
-// Assignment logic function that mirrors the edge function
+// Helper function to determine assignee based on category, store, and market
 const getAssigneeForFeedback = async (storeNumber: string, market: string, category: string): Promise<string> => {
-  console.log('🔍 ASSIGNMENT: Starting assignment logic', { storeNumber, market, category });
-  
-  // Store-level complaints go to store email
-  const storeLevelCategories = ['Missing Item', 'Sandwich Made wrong', 'Closed Early', 'Cleanliness', 'Possible Food Poisoning'];
-  if (storeLevelCategories.includes(category)) {
-    const assignee = `store${storeNumber}@atlaswe.com`;
-    console.log('✅ ASSIGNMENT: Store-level complaint assigned to', assignee);
-    return assignee;
-  }
+  console.log('🔍 ASSIGNMENT: Looking up assignee for', { storeNumber, market, category });
 
-  // Guest feedback complaints go to guest feedback email
-  const guestFeedbackCategories = ['Loyalty Program Issues', 'Credit Card Issue'];
-  if (guestFeedbackCategories.includes(category)) {
-    console.log('✅ ASSIGNMENT: Guest feedback complaint assigned to guestfeedback@atlaswe.com');
-    return 'guestfeedback@atlaswe.com';
-  }
+  try {
+    // Get the store manager first
+    const { data: storeData } = await supabase
+      .from('stores')
+      .select('manager')
+      .eq('store_number', storeNumber)
+      .maybeSingle();
 
-  // DM-level complaints - lookup DM for the market
-  const dmLevelCategories = ['Rude Service', 'Slow Service', 'Product issue', 'Bread Quality', 'Out of product', 'Other'];
-  if (dmLevelCategories.includes(category)) {
-    console.log('🔍 ASSIGNMENT: DM-level complaint, looking up DM for market:', market);
-    try {
-      // Get all DMs first
-      const { data: dmData } = await supabase
-        .from('user_hierarchy')
+    const storeManager = storeData?.manager;
+    console.log('🏪 ASSIGNMENT: Store manager found:', storeManager);
+
+    // Special handling for Praise category - assign to store manager if available
+    if (category === 'Praise') {
+      if (storeManager && storeManager.trim() !== '') {
+        console.log('👏 ASSIGNMENT: Assigning praise to store manager:', storeManager);
+        return storeManager;
+      }
+    }
+
+    // Categories that should go to store managers
+    const storeManagerCategories = [
+      'Sandwich Made wrong', 'Slow Service', 'Rude Service', 'Missing Item',
+      'Cleanliness', 'Food Quality', 'Staff Service', 'Store Appearance',
+      'Wait Time', 'Order Accuracy', 'Temperature', 'Quantity', 'Experience',
+      'Training', 'Manager/Supervisor Contact Request'
+    ];
+
+    if (storeManagerCategories.includes(category)) {
+      if (storeManager && storeManager.trim() !== '') {
+        console.log('🏪 ASSIGNMENT: Assigning to store manager for category:', category);
+        return storeManager;
+      }
+    }
+
+    // Categories that should go to DMs
+    const dmCategories = [
+      'Product issue', 'Closed Early', 'Credit Card Issue', 'Bread Quality',
+      'Out of product', 'Other', 'Multiple Issues', 'Delivery Service'
+    ];
+
+    if (dmCategories.includes(category)) {
+      console.log('📊 ASSIGNMENT: Looking for DM for category:', category);
+      
+      // Look up DM for the market - simplified approach
+      const { data: dmUsers } = await supabase
+        .from('user_permissions')
         .select('user_id')
-        .eq('role', 'DM');
+        .contains('markets', [market]);
 
-      console.log('🔍 ASSIGNMENT: Found DMs:', dmData);
+      if (dmUsers && dmUsers.length > 0) {
+        // Get the profile for the first DM user
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('display_name')
+          .eq('user_id', dmUsers[0].user_id)
+          .single();
 
-      if (dmData && dmData.length > 0) {
-        // Check each DM's permissions to find who has access to this market
-        for (const dm of dmData) {
-          const { data: permissions } = await supabase
-            .from('user_permissions')
-            .select('markets')
-            .eq('user_id', dm.user_id)
-            .maybeSingle();
-          
-          console.log(`🔍 ASSIGNMENT: DM ${dm.user_id} has markets:`, permissions?.markets);
-          
-          if (permissions?.markets?.includes(market)) {
-            // Get the email for this DM
-            const { data: dmProfile } = await supabase
-              .from('profiles')
-              .select('email')
-              .eq('user_id', dm.user_id)
-              .maybeSingle();
-              
-            if (dmProfile?.email) {
-              console.log(`✅ ASSIGNMENT: Found exact market match for DM: ${dmProfile.email}`);
-              return dmProfile.email;
-            }
-          }
-        }
-        
-        // If no exact match found, try normalized market names
-        const normalizedMarket = market.replace(/\s+/g, '');
-        console.log(`🔍 ASSIGNMENT: Trying normalized market: "${normalizedMarket}" (original: "${market}")`);
-        
-        for (const dm of dmData) {
-          const { data: permissions } = await supabase
-            .from('user_permissions')
-            .select('markets')
-            .eq('user_id', dm.user_id)
-            .maybeSingle();
-          
-          if (permissions?.markets) {
-            const hasMatchingMarket = permissions.markets.some(m => {
-              const normalizedPermission = m.replace(/\s+/g, '');
-              console.log(`🔍 ASSIGNMENT: Comparing "${normalizedMarket}" with "${normalizedPermission}" (original: "${m}")`);
-              const matches = normalizedPermission === normalizedMarket;
-              if (matches) {
-                console.log(`🎯 ASSIGNMENT: MATCH FOUND! "${normalizedMarket}" === "${normalizedPermission}"`);
-              }
-              return matches;
-            });
-            
-            if (hasMatchingMarket) {
-              // Get the email for this DM
-              const { data: dmProfile } = await supabase
-                .from('profiles')
-                .select('email')
-                .eq('user_id', dm.user_id)
-                .maybeSingle();
-                
-              if (dmProfile?.email) {
-                console.log(`✅ ASSIGNMENT: Found normalized market match for DM: ${dmProfile.email}`);
-                return dmProfile.email;
-              }
-            }
-          }
+        if (profileData?.display_name) {
+          console.log('📊 ASSIGNMENT: Found DM:', profileData.display_name);
+          return profileData.display_name;
         }
       }
-    } catch (error) {
-      console.error('❌ ASSIGNMENT: Error looking up DM:', error);
     }
+
+    // Fallback to store manager if no specific assignment found
+    if (storeManager && storeManager.trim() !== '') {
+      console.log('🔄 ASSIGNMENT: Fallback to store manager:', storeManager);
+      return storeManager;
+    }
+
+  } catch (error) {
+    console.error('❌ ASSIGNMENT: Error looking up assignee:', error);
   }
 
   console.log('⚠️ ASSIGNMENT: No assignment found, defaulting to Unassigned');
@@ -175,6 +168,8 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const { toast } = useToast();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
   const processedFeedbackId = useRef<string | null>(null);
+
+  const isAdmin = permissions?.role === 'admin' || permissions?.role === 'dm';
 
   // Update local state when feedback changes
   useEffect(() => {
@@ -196,105 +191,82 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
         feedbackId: feedback.id,
         currentStatus: feedback.resolution_status,
         isViewed: feedback.viewed,
-        shouldUpdate: !feedback.viewed && feedback.resolution_status === 'unopened'
+        processedId: processedFeedbackId.current
       });
+
+      const shouldUpdate = !feedback.viewed || feedback.resolution_status === 'unopened';
       
-      // Only update if not already viewed AND status is unopened
-      // This prevents multiple updates of the same feedback
-      if (!feedback.viewed && feedback.resolution_status === 'unopened') {
+      if (shouldUpdate) {
+        console.log('🔄 FEEDBACK DIALOG: Performing auto-update');
+        
+        // Mark this feedback as processed to prevent multiple updates
         processedFeedbackId.current = feedback.id;
         
         const updateFeedback = async () => {
           try {
-            const updateData: any = {
+            const updates: any = {
               viewed: true,
               updated_at: new Date().toISOString(),
-              resolution_status: 'opened'
             };
-            
-            console.log('📝 FEEDBACK DIALOG: Updating feedback', { feedbackId: feedback.id, updateData });
-            
-            const { data, error } = await supabase
+
+            // Only change status if it's currently 'unopened'
+            if (feedback.resolution_status === 'unopened') {
+              updates.resolution_status = 'opened';
+              setStatus('opened');
+            }
+
+            const { error } = await supabase
               .from('customer_feedback')
-              .update(updateData)
-              .eq('id', feedback.id)
-              .select();
+              .update(updates)
+              .eq('id', feedback.id);
 
             if (error) {
-              console.error('❌ FEEDBACK DIALOG: Update error', error);
-              processedFeedbackId.current = null; // Reset on error
+              console.error('❌ FEEDBACK DIALOG: Error auto-updating feedback:', error);
             } else {
-              console.log('✅ FEEDBACK DIALOG: Update successful', data);
-              onUpdate(); // Refresh the list to show updated status
+              console.log('✅ FEEDBACK DIALOG: Auto-update successful');
             }
           } catch (error) {
-            console.error('❌ FEEDBACK DIALOG: Exception during update', error);
-            processedFeedbackId.current = null; // Reset on error
+            console.error('❌ FEEDBACK DIALOG: Exception during auto-update:', error);
           }
         };
-        
+
         updateFeedback();
+      } else {
+        console.log('⏭️ FEEDBACK DIALOG: No auto-update needed');
       }
     }
-  }, [feedback?.id, isOpen, feedback?.viewed, feedback?.resolution_status, onUpdate]);
+  }, [feedback, isOpen]);
 
-  // Reset processed ID when dialog closes
+  // Reset processedFeedbackId when dialog closes
   useEffect(() => {
     if (!isOpen) {
       processedFeedbackId.current = null;
     }
   }, [isOpen]);
 
-  // Handle category change and auto-assign
   const handleCategoryChange = async (newCategory: string) => {
-    console.log('🔄 CATEGORY CHANGE: Changing category from', category, 'to', newCategory);
     setCategory(newCategory);
     
-    if (newCategory && storeNumber && market) {
-      console.log('🔄 CATEGORY CHANGE: Triggering reassignment with', { storeNumber, market, newCategory });
+    // Auto-assign based on the new category and current store/market
+    if (feedback && storeNumber && market) {
       try {
         const newAssignee = await getAssigneeForFeedback(storeNumber, market, newCategory);
-        console.log('🔄 CATEGORY CHANGE: New assignee determined:', newAssignee);
         setAssignee(newAssignee);
         
-        // Auto-save the changes to the database
-        const { error } = await supabase
-          .from('customer_feedback')
-          .update({
-            complaint_category: newCategory,
-            assignee: newAssignee || null,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', feedback!.id);
-
-        if (error) {
-          console.error('❌ CATEGORY CHANGE: Error saving changes:', error);
-          toast({
-            title: "Error",
-            description: "Failed to save changes. Please try again.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Category Updated", 
-            description: `Complaint category changed to "${newCategory}". Assignee updated to ${newAssignee}.`,
-          });
-          onUpdate(); // Refresh the parent component to show updated data
-        }
-      } catch (error) {
-        console.error('❌ CATEGORY CHANGE: Error reassigning after category change:', error);
         toast({
-          title: "Error",
-          description: "Failed to update assignment. Please try again.",
-          variant: "destructive",
+          title: "Category Updated",
+          description: `Category changed to ${newCategory}. Assignee updated to ${newAssignee}.`,
+        });
+      } catch (error) {
+        console.error('Error auto-assigning:', error);
+        toast({
+          title: "Category Updated",
+          description: `Category changed to ${newCategory}. Please manually set the assignee.`,
         });
       }
-    } else {
-      console.log('⚠️ CATEGORY CHANGE: Missing required data', { newCategory, storeNumber, market });
     }
   };
 
-  // Handle store number change and auto-assign
   const handleStoreNumberChange = async (newStoreNumber: string) => {
     setStoreNumber(newStoreNumber);
     
@@ -334,6 +306,45 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
           variant: "destructive",
         });
       }
+    }
+  };
+
+  const handleSendOutreach = async () => {
+    if (!feedback?.customer_email) {
+      toast({
+        title: "Error",
+        description: "No customer email available for outreach.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-customer-outreach', {
+        body: {
+          feedbackId: feedback.id,
+          method: 'email'
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Outreach Email Sent",
+        description: "Customer outreach email has been sent successfully.",
+      });
+
+      onUpdate();
+    } catch (error) {
+      console.error('Error sending outreach:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send outreach email. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -397,170 +408,245 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
             <Badge variant="outline" className="font-medium">
               Store #{storeNumber}
             </Badge>
-            <Badge variant="secondary">
-              {market}
+            <Badge variant="secondary">{market}</Badge>
+            <Badge 
+              variant={status === 'resolved' ? 'default' : status === 'escalated' ? 'destructive' : 'secondary'}
+            >
+              {status}
             </Badge>
-            <Badge variant="outline">
-              {channelLabels[feedback.channel as keyof typeof channelLabels] || feedback.channel}
+            <Badge variant="outline" className={`${
+              priority === 'Critical' ? 'border-red-500 text-red-500' :
+              priority === 'High' ? 'border-orange-500 text-orange-500' :
+              priority === 'Medium' ? 'border-yellow-500 text-yellow-500' :
+              priority === 'Low' ? 'border-blue-500 text-blue-500' :
+              'border-green-500 text-green-500'
+            }`}>
+              {priority} Priority
             </Badge>
-            <Badge className={cn("transition-colors", statusColors[feedback.resolution_status as keyof typeof statusColors])}>
-              {feedback.resolution_status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-            </Badge>
-            <Badge className={cn("transition-colors", priorityColors[feedback.priority as keyof typeof priorityColors])}>
-              {feedback.priority === 'Praise' && <Star className="h-3 w-3 mr-1" />}
-              {(feedback.priority === 'High' || feedback.priority === 'Critical') && <AlertTriangle className="h-3 w-3 mr-1" />}
-              {feedback.priority}
-            </Badge>
+            {feedback.outreach_sent_at && (
+              <Badge variant="outline" className="border-green-500 text-green-500">
+                <Mail className="h-3 w-3 mr-1" />
+                Email Sent
+              </Badge>
+            )}
           </div>
 
-          {/* Customer Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
-            <div className="space-y-2">
-              <h4 className="font-semibold">Customer Information</h4>
-              {feedback.customer_name && (
-                <div className="flex items-center gap-2 text-sm">
-                  <User className="h-4 w-4" />
-                  {feedback.customer_name}
+          {/* Customer Outreach Section */}
+          {isAdmin && (
+            <div className="border rounded-lg p-4 bg-muted/20">
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
+                <Mail className="h-4 w-4" />
+                Customer Outreach
+              </h3>
+              
+              {feedback.customer_email ? (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-muted-foreground">Email:</span>
+                    <span>{feedback.customer_email}</span>
+                  </div>
+                  
+                  {feedback.outreach_sent_at ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="text-muted-foreground">Outreach sent:</span>
+                        <span>{new Date(feedback.outreach_sent_at).toLocaleDateString()} at {new Date(feedback.outreach_sent_at).toLocaleTimeString()}</span>
+                      </div>
+                      {feedback.customer_response_sentiment && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className="text-muted-foreground">Response sentiment:</span>
+                          <Badge variant={
+                            feedback.customer_response_sentiment === 'positive' ? 'default' :
+                            feedback.customer_response_sentiment === 'negative' ? 'destructive' : 'secondary'
+                          }>
+                            {feedback.customer_response_sentiment}
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <Button 
+                      onClick={handleSendOutreach}
+                      disabled={isLoading}
+                      className="w-full"
+                    >
+                      <Mail className="h-4 w-4 mr-2" />
+                      Send Outreach Email
+                    </Button>
+                  )}
                 </div>
-              )}
-              {feedback.customer_email && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Mail className="h-4 w-4" />
-                  {feedback.customer_email}
-                </div>
-              )}
-              {feedback.customer_phone && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Phone className="h-4 w-4" />
-                  {feedback.customer_phone}
-                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No customer email available for outreach.</p>
               )}
             </div>
-            <div className="space-y-2">
-              <h4 className="font-semibold">Feedback Details</h4>
-              <div className="flex items-center gap-2 text-sm">
+          )}
+
+          {/* Customer Information */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="p-4">
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Customer Information
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Name:</span> {feedback.customer_name || 'Not provided'}
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Email:</span> {feedback.customer_email || 'Not provided'}
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Phone:</span> {feedback.customer_phone || 'Not provided'}
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Case Number:</span> {feedback.case_number}
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-4">
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                {format(new Date(feedback.feedback_date), 'MMM d, yyyy')}
-              </div>
-                <div className="flex items-center gap-2 text-sm">
-                <MapPin className="h-4 w-4" />
-                {!permissionsLoading && permissions.isDirectorOrAbove ? (
-                  <Select 
-                    value={category} 
-                    onValueChange={handleCategoryChange}
-                  >
-                    <SelectTrigger className="h-8 border-none p-0 bg-transparent hover:bg-muted/50 focus:ring-0">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Sandwich Made wrong">Sandwich Made wrong</SelectItem>
-                      <SelectItem value="Slow Service">Slow Service</SelectItem>
-                      <SelectItem value="Rude Service">Rude Service</SelectItem>
-                      <SelectItem value="Product issue">Product issue</SelectItem>
-                      <SelectItem value="Closed Early">Closed Early</SelectItem>
-                      <SelectItem value="Praise">Praise</SelectItem>
-                      <SelectItem value="Missing Item">Missing Item</SelectItem>
-                      <SelectItem value="Credit Card Issue">Credit Card Issue</SelectItem>
-                      <SelectItem value="Bread Quality">Bread Quality</SelectItem>
-                      <SelectItem value="Out of product">Out of product</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
-                      <SelectItem value="Cleanliness">Cleanliness</SelectItem>
-                      <SelectItem value="Possible Food Poisoning">Possible Food Poisoning</SelectItem>
-                      <SelectItem value="Loyalty Program Issues">Loyalty Program Issues</SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <span className="text-muted-foreground">
-                    {categoryLabels[feedback.complaint_category as keyof typeof categoryLabels] || feedback.complaint_category}
-                  </span>
-                )}
-              </div>
-              {feedback.rating && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Star className="h-4 w-4 fill-current" />
-                  {feedback.rating}/5 Rating
+                Feedback Details
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Date:</span> {new Date(feedback.feedback_date).toLocaleDateString()}
                 </div>
-              )}
-            </div>
+                <div>
+                  <span className="text-muted-foreground">Channel:</span> {feedback.channel}
+                </div>
+                {feedback.rating && (
+                  <div>
+                    <span className="text-muted-foreground">Rating:</span> {feedback.rating}/5
+                  </div>
+                )}
+                <div>
+                  <span className="text-muted-foreground">Created:</span> {new Date(feedback.created_at).toLocaleDateString()}
+                </div>
+              </div>
+            </Card>
           </div>
 
           {/* Feedback Text */}
-          <div className="space-y-2">
-            <Label className="text-base font-semibold">Feedback</Label>
-            <div className="p-4 bg-muted/50 rounded-lg">
-              <p className="text-sm leading-relaxed">{feedback.feedback_text}</p>
-            </div>
-          </div>
+          {feedback.feedback_text && (
+            <Card className="p-4">
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                Customer Feedback
+              </h3>
+              <p className="text-sm whitespace-pre-wrap bg-muted/50 p-3 rounded border">
+                {feedback.feedback_text}
+              </p>
+            </Card>
+          )}
 
-          {/* Edit Fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Admin-only Store Number field */}
-            {!permissionsLoading && permissions.isDirectorOrAbove && (
-              <div className="space-y-2">
-                <Label htmlFor="store-number" className="flex items-center gap-2">
-                  <Store className="h-4 w-4" />
-                  Store Number
-                </Label>
-                <Input
-                  id="store-number"
-                  placeholder="Enter store number"
-                  value={storeNumber}
-                  onChange={(e) => handleStoreNumberChange(e.target.value)}
+          {/* Editable Fields */}
+          <div className="grid gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="status">Resolution Status</Label>
+                <Select value={status} onValueChange={setStatus}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="unopened">Unopened</SelectItem>
+                    <SelectItem value="opened">Opened</SelectItem>
+                    <SelectItem value="responded">Responded</SelectItem>
+                    <SelectItem value="resolved">Resolved</SelectItem>
+                    <SelectItem value="escalated">Escalated</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="priority">Priority</Label>
+                <Select value={priority} onValueChange={setPriority} disabled={!isAdmin}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Praise">Praise</SelectItem>
+                    <SelectItem value="Low">Low</SelectItem>
+                    <SelectItem value="Medium">Medium</SelectItem>
+                    <SelectItem value="High">High</SelectItem>
+                    <SelectItem value="Critical">Critical</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="assignee">Assignee</Label>
+                <Input 
+                  id="assignee"
+                  value={assignee} 
+                  onChange={(e) => setAssignee(e.target.value)}
+                  placeholder="Enter assignee name"
                 />
+              </div>
+
+              {isAdmin && (
+                <div>
+                  <Label htmlFor="category">Category</Label>
+                  <Input 
+                    id="category"
+                    value={category} 
+                    onChange={(e) => handleCategoryChange(e.target.value)}
+                    placeholder="Enter category"
+                  />
+                </div>
+              )}
+            </div>
+
+            {isAdmin && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="storeNumber">Store Number</Label>
+                  <Input 
+                    id="storeNumber"
+                    value={storeNumber} 
+                    onChange={(e) => handleStoreNumberChange(e.target.value)}
+                    placeholder="Enter store number"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="market">Market</Label>
+                  <Input 
+                    id="market"
+                    value={market} 
+                    onChange={(e) => setMarket(e.target.value)}
+                    placeholder="Market (auto-filled)"
+                    disabled
+                  />
+                </div>
               </div>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="status">Resolution Status</Label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="unopened">Unopened</SelectItem>
-                  <SelectItem value="responded">Responded</SelectItem>
-                  <SelectItem value="resolved">Resolved</SelectItem>
-                  <SelectItem value="escalated">Escalated</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="assignee">Assignee</Label>
-              <Input
-                id="assignee"
-                placeholder="Enter assignee name"
-                value={assignee}
-                onChange={(e) => setAssignee(e.target.value)}
+            <div>
+              <Label htmlFor="notes">Resolution Notes</Label>
+              <Textarea 
+                id="notes"
+                value={resolutionNotes} 
+                onChange={(e) => setResolutionNotes(e.target.value)}
+                placeholder="Enter resolution notes..."
+                rows={4}
               />
             </div>
           </div>
-
-
-
-          {/* Resolution Notes */}
-          <div className="space-y-2">
-            <Label htmlFor="notes">Resolution Notes</Label>
-            <Textarea
-              id="notes"
-              placeholder="Add resolution notes..."
-              value={resolutionNotes}
-              onChange={(e) => setResolutionNotes(e.target.value)}
-              rows={4}
-            />
-          </div>
-
-          {/* Actions */}
-          <div className="flex justify-end gap-2 pt-4">
-            <Button variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button onClick={handleSave} disabled={isLoading}>
-              {isLoading ? "Saving..." : "Save Changes"}
-            </Button>
-          </div>
         </div>
+
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={onClose} disabled={isLoading}>
+            Cancel
+          </Button>
+          <Button onClick={handleSave} disabled={isLoading}>
+            {isLoading ? "Saving..." : "Save Changes"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
-}
+};

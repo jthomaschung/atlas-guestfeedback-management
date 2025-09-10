@@ -19,4 +19,9 @@ export interface CustomerFeedback {
   priority: 'Praise' | 'Low' | 'Medium' | 'High' | 'Critical';
   assignee?: string;
   viewed?: boolean;
+  outreach_sent_at?: string;
+  outreach_method?: string;
+  customer_responded_at?: string;
+  customer_response_sentiment?: string;
+  calculated_score?: number;
 }
