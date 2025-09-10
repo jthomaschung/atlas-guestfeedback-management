@@ -26,11 +26,18 @@ export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFee
       onClick: () => onFilterChange?.('status', 'open'),
     },
     {
-      title: 'Needs Attention',
-      value: unopened + opened,
+      title: 'Unopened',
+      value: unopened,
       icon: Clock,
+      color: 'text-red-600',
+      onClick: () => onFilterChange?.('status', 'unopened'),
+    },
+    {
+      title: 'Needs Response',
+      value: opened,
+      icon: AlertTriangle,
       color: 'text-orange-600',
-      onClick: () => onFilterChange?.('status', 'open'),
+      onClick: () => onFilterChange?.('status', 'opened'),
     },
     {
       title: 'Resolved',
@@ -56,7 +63,7 @@ export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFee
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
       {stats.map((stat) => (
         <Card 
           key={stat.title} 
