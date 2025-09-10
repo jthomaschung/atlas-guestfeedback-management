@@ -96,7 +96,7 @@ const handler = async (req: Request): Promise<Response> => {
       `;
 
       const emailResponse = await resend.emails.send({
-        from: 'Customer Service <noreply@atlaswe.com>',
+        from: 'Customer Service <customerservice@atlaswe.com>',
         to: [feedback.customer_email],
         subject: emailSubject,
         html: emailBody,
