@@ -257,12 +257,37 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
         console.log('🔄 CATEGORY CHANGE: New assignee determined:', newAssignee);
         setAssignee(newAssignee);
         
-        toast({
-          title: "Category Updated", 
-          description: `Complaint category changed to "${newCategory}". Assignee updated to ${newAssignee}.`,
-        });
+        // Auto-save the changes to the database
+        const { error } = await supabase
+          .from('customer_feedback')
+          .update({
+            complaint_category: newCategory,
+            assignee: newAssignee || null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', feedback!.id);
+
+        if (error) {
+          console.error('❌ CATEGORY CHANGE: Error saving changes:', error);
+          toast({
+            title: "Error",
+            description: "Failed to save changes. Please try again.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Category Updated", 
+            description: `Complaint category changed to "${newCategory}". Assignee updated to ${newAssignee}.`,
+          });
+          onUpdate(); // Refresh the parent component to show updated data
+        }
       } catch (error) {
         console.error('❌ CATEGORY CHANGE: Error reassigning after category change:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update assignment. Please try again.",
+          variant: "destructive",
+        });
       }
     } else {
       console.log('⚠️ CATEGORY CHANGE: Missing required data', { newCategory, storeNumber, market });
