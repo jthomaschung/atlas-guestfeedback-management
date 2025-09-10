@@ -505,47 +505,59 @@ Customer Service Team`);
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {!showEmailComposer ? (
-                        <Button 
-                          onClick={() => setShowEmailComposer(true)}
-                          disabled={isLoading}
-                          className="w-full"
-                        >
-                          <Mail className="h-4 w-4 mr-2" />
-                          Compose Email to Customer
-                        </Button>
-                      ) : (
-                        <div className="space-y-3">
-                          <div>
-                            <Label htmlFor="emailMessage">Email Message</Label>
-                            <Textarea 
-                              id="emailMessage"
-                              value={emailMessage}
-                              onChange={(e) => setEmailMessage(e.target.value)}
-                              placeholder="Write your message to the customer..."
-                              rows={8}
-                              className="mt-1"
-                            />
-                           </div>
-                           <div className="flex gap-2">
-                             <Button 
-                               onClick={handleSendOutreach}
-                               disabled={isLoading || !emailMessage.trim()}
-                               className="flex-1"
-                             >
-                               <Mail className="h-4 w-4 mr-2" />
-                               {isLoading ? "Sending..." : "Send Email"}
-                             </Button>
-                             <Button 
-                               variant="outline" 
-                               onClick={() => setShowEmailComposer(false)}
-                               disabled={isLoading}
-                             >
-                               Cancel
-                             </Button>
-                           </div>
-                        </div>
-                      )}
+                      <div className="flex gap-2">
+                        {!showEmailComposer ? (
+                          <>
+                            <Button 
+                              onClick={() => setShowEmailComposer(true)}
+                              disabled={isLoading}
+                              className="flex-1"
+                            >
+                              <Mail className="h-4 w-4 mr-2" />
+                              Compose Email to Customer
+                            </Button>
+                            <Button 
+                              onClick={() => setShowEmailConversation(true)}
+                              variant="outline"
+                              disabled={isLoading}
+                            >
+                              <MessageSquare className="h-4 w-4 mr-2" />
+                              View Conversation
+                            </Button>
+                          </>
+                        ) : (
+                          <div className="space-y-3 w-full">
+                            <div>
+                              <Label htmlFor="emailMessage">Email Message</Label>
+                              <Textarea 
+                                id="emailMessage"
+                                value={emailMessage}
+                                onChange={(e) => setEmailMessage(e.target.value)}
+                                placeholder="Write your message to the customer..."
+                                rows={8}
+                                className="mt-1"
+                              />
+                             </div>
+                             <div className="flex gap-2">
+                               <Button 
+                                 onClick={handleSendOutreach}
+                                 disabled={isLoading || !emailMessage.trim()}
+                                 className="flex-1"
+                               >
+                                 <Mail className="h-4 w-4 mr-2" />
+                                 {isLoading ? "Sending..." : "Send Email"}
+                               </Button>
+                               <Button 
+                                 variant="outline" 
+                                 onClick={() => setShowEmailComposer(false)}
+                                 disabled={isLoading}
+                               >
+                                 Cancel
+                               </Button>
+                             </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
