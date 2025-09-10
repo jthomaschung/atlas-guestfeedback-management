@@ -116,6 +116,7 @@ const handler = async (req: Request): Promise<Response> => {
       const emailResponse = await resend.emails.send({
         from: 'Guest Feedback <guestfeedback@atlaswe.com>',
         to: [feedback.customer_email],
+        reply_to: 'guestfeedback@atlaswe.com', // Customer replies will go to this address
         subject: emailSubject,
         html: emailBody,
       });
