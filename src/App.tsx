@@ -23,6 +23,7 @@ import FeedbackArchive from '@/pages/FeedbackArchive';
 import Settings from '@/pages/Settings';
 import PortalSelection from '@/pages/PortalSelection';
 import FeedbackReporting from '@/pages/FeedbackReporting';
+import RedCarpetLeaders from '@/pages/RedCarpetLeaders';
 import { AuthGate } from '@/components/AuthGate';
 
 import { SmartRedirect } from '@/components/SmartRedirect';
@@ -294,8 +295,16 @@ function App() {
                     <FeedbackReporting />
                   </ProtectedRoute>
                 } 
-              />
-              <Route 
+               />
+               <Route 
+                 path="/red-carpet-leaders" 
+                 element={
+                   <ProtectedRoute>
+                     <RedCarpetLeaders />
+                   </ProtectedRoute>
+                 } 
+               />
+               <Route
                 path="/user-hierarchy" 
                 element={
                   <ProtectedRoute>
