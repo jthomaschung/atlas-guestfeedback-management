@@ -185,6 +185,25 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
     }
   }, [isOpen]);
 
+  // Handle category change and auto-assign
+  const handleCategoryChange = async (newCategory: string) => {
+    setCategory(newCategory);
+    
+    if (newCategory && storeNumber && market) {
+      try {
+        const newAssignee = await getAssigneeForFeedback(storeNumber, market, newCategory);
+        setAssignee(newAssignee);
+        
+        toast({
+          title: "Category Updated", 
+          description: `Complaint category changed to "${newCategory}". Assignee updated to ${newAssignee}.`,
+        });
+      } catch (error) {
+        console.error('Error reassigning after category change:', error);
+      }
+    }
+  };
+
   // Handle store number change and auto-assign
   const handleStoreNumberChange = async (newStoreNumber: string) => {
     setStoreNumber(newStoreNumber);
@@ -333,12 +352,12 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
                 <Calendar className="h-4 w-4" />
                 {format(new Date(feedback.feedback_date), 'MMM d, yyyy')}
               </div>
-              <div className="flex items-center gap-2 text-sm">
+                <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4" />
                 {!permissionsLoading && permissions.isAdmin ? (
                   <Select 
                     value={category} 
-                    onValueChange={setCategory}
+                    onValueChange={handleCategoryChange}
                   >
                     <SelectTrigger className="h-8 border-none p-0 bg-transparent hover:bg-muted/50 focus:ring-0">
                       <SelectValue />
