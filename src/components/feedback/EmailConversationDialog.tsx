@@ -38,6 +38,8 @@ export function EmailConversationDialog({
 }: EmailConversationDialogProps) {
   const [messages, setMessages] = useState<EmailMessage[]>([]);
   const [replyContent, setReplyContent] = useState("");
+  const [customerReplyContent, setCustomerReplyContent] = useState("");
+  const [showAddCustomerReply, setShowAddCustomerReply] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -126,6 +128,65 @@ export function EmailConversationDialog({
     }
   };
 
+  const addCustomerReply = async () => {
+    if (!customerReplyContent.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter the customer's reply",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      // Add the customer reply directly to the outreach log
+      const { error } = await supabase
+        .from('customer_outreach_log')
+        .insert({
+          feedback_id: feedbackId,
+          direction: 'inbound',
+          outreach_method: 'email',
+          message_content: customerReplyContent,
+          from_email: customerEmail,
+          to_email: 'guestfeedback@atlaswe.com',
+          subject: `Re: Feedback Response`,
+          delivery_status: 'received',
+          sent_at: new Date().toISOString(),
+        });
+
+      if (error) throw error;
+
+      // Update the feedback record to indicate customer responded
+      await supabase
+        .from('customer_feedback')
+        .update({
+          customer_responded_at: new Date().toISOString(),
+          customer_response_sentiment: 'neutral',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', feedbackId);
+
+      toast({
+        title: "Customer Reply Added",
+        description: "The customer's reply has been added to the conversation",
+      });
+
+      setCustomerReplyContent("");
+      setShowAddCustomerReply(false);
+      loadEmailConversation(); // Reload to show the new message
+    } catch (error) {
+      console.error('Error adding customer reply:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add customer reply",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   const getDirectionIcon = (direction: string) => {
     return direction === 'inbound' ? <Mail className="w-4 h-4" /> : <Send className="w-4 h-4" />;
   };
@@ -196,10 +257,44 @@ export function EmailConversationDialog({
 
           {/* Reply composition */}
           <div className="mt-4 space-y-4">
-            <div className="flex items-center gap-2">
-              <Reply className="w-4 h-4" />
-              <span className="text-sm font-medium">Send Reply</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Reply className="w-4 h-4" />
+                <span className="text-sm font-medium">Send Reply</span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAddCustomerReply(!showAddCustomerReply)}
+              >
+                {showAddCustomerReply ? 'Cancel' : 'Add Customer Reply'}
+              </Button>
             </div>
+
+            {showAddCustomerReply && (
+              <div className="space-y-3 p-4 border rounded-lg bg-blue-50">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-medium text-blue-800">Add Customer's Reply Manually</span>
+                </div>
+                <Textarea
+                  value={customerReplyContent}
+                  onChange={(e) => setCustomerReplyContent(e.target.value)}
+                  placeholder={`Enter the customer's reply here...`}
+                  rows={3}
+                  className="resize-none"
+                />
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setShowAddCustomerReply(false)}>
+                    Cancel
+                  </Button>
+                  <Button size="sm" onClick={addCustomerReply} disabled={isSending || !customerReplyContent.trim()}>
+                    Add Reply
+                  </Button>
+                </div>
+              </div>
+            )}
+
             <Textarea
               value={replyContent}
               onChange={(e) => setReplyContent(e.target.value)}
