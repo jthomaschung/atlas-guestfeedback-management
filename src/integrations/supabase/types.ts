@@ -219,35 +219,56 @@ export type Database = {
         Row: {
           created_at: string
           delivery_status: string | null
+          direction: string | null
+          email_message_id: string | null
+          email_thread_id: string | null
           feedback_id: string
+          from_email: string | null
           id: string
           message_content: string | null
           outreach_method: string
+          replied_to_id: string | null
           response_received: boolean | null
           response_sentiment: string | null
           sent_at: string
+          subject: string | null
+          to_email: string | null
         }
         Insert: {
           created_at?: string
           delivery_status?: string | null
+          direction?: string | null
+          email_message_id?: string | null
+          email_thread_id?: string | null
           feedback_id: string
+          from_email?: string | null
           id?: string
           message_content?: string | null
           outreach_method: string
+          replied_to_id?: string | null
           response_received?: boolean | null
           response_sentiment?: string | null
           sent_at?: string
+          subject?: string | null
+          to_email?: string | null
         }
         Update: {
           created_at?: string
           delivery_status?: string | null
+          direction?: string | null
+          email_message_id?: string | null
+          email_thread_id?: string | null
           feedback_id?: string
+          from_email?: string | null
           id?: string
           message_content?: string | null
           outreach_method?: string
+          replied_to_id?: string | null
           response_received?: boolean | null
           response_sentiment?: string | null
           sent_at?: string
+          subject?: string | null
+          to_email?: string | null
         }
         Relationships: [
           {
@@ -255,6 +276,13 @@ export type Database = {
             columns: ["feedback_id"]
             isOneToOne: false
             referencedRelation: "customer_feedback"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_outreach_log_replied_to_id_fkey"
+            columns: ["replied_to_id"]
+            isOneToOne: false
+            referencedRelation: "customer_outreach_log"
             referencedColumns: ["id"]
           },
         ]
