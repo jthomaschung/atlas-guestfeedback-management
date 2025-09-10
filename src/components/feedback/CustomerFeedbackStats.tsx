@@ -14,7 +14,10 @@ export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFee
   const resolved = feedbacks.filter(fb => fb.resolution_status === 'resolved').length;
   const escalated = feedbacks.filter(fb => fb.resolution_status === 'escalated').length;
   const totalOpen = unopened + opened + responded + escalated; // All non-resolved feedback
-  const critical = feedbacks.filter(fb => fb.priority === 'Critical' && fb.resolution_status !== 'resolved').length;
+  const critical = feedbacks.filter(fb => 
+    fb.resolution_status !== 'resolved' && 
+    (fb.priority === 'Critical' || fb.complaint_category === 'Out of Product' || fb.complaint_category === 'Rude Service')
+  ).length;
   const praise = feedbacks.filter(fb => fb.priority === 'Praise').length;
 
   const stats = [
