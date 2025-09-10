@@ -5,6 +5,7 @@ import { CustomerFeedbackStats } from "@/components/feedback/CustomerFeedbackSta
 import { FeedbackFilters } from "@/components/feedback/FeedbackFilters";
 import { FeedbackDetailsDialog } from "@/components/feedback/FeedbackDetailsDialog";
 import { ComplaintTrendsChart } from "@/components/feedback/ComplaintTrendsChart";
+import { CategoryBreakdownChart } from "@/components/feedback/CategoryBreakdownChart";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -347,6 +348,12 @@ const Index = () => {
         />
 
         <ComplaintTrendsChart className="mb-6" />
+
+        <CategoryBreakdownChart 
+          className="mb-6" 
+          marketFilter={marketFilter}
+          storeFilter={storeFilter}
+        />
 
         <FeedbackFilters
           searchTerm={searchTerm}
