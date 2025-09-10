@@ -33,13 +33,6 @@ export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFee
       onClick: () => onFilterChange?.('status', 'unopened'),
     },
     {
-      title: 'Needs Response',
-      value: totalOpen, // All non-resolved feedback needs response
-      icon: AlertTriangle,
-      color: 'text-orange-600',
-      onClick: () => onFilterChange?.('status', 'open'),
-    },
-    {
       title: 'Resolved',
       value: resolved,
       icon: CheckCircle,
@@ -63,7 +56,7 @@ export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFee
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
       {stats.map((stat) => (
         <Card 
           key={stat.title} 
