@@ -351,8 +351,7 @@ const Index = () => {
 
         <CategoryBreakdownChart 
           className="mb-6" 
-          marketFilter={marketFilter}
-          storeFilter={storeFilter}
+          feedbacks={filteredFeedbacks}
         />
 
         <FeedbackFilters

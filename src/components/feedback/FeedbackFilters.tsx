@@ -102,7 +102,8 @@ export function FeedbackFilters({
   const [isExpanded, setIsExpanded] = useState(false);
 
   const activeFiltersCount = statusFilter.length + priorityFilter.length + categoryFilter.length + 
-    channelFilter.length + storeFilter.length + marketFilter.length + assigneeFilter.length;
+    channelFilter.length + storeFilter.length + marketFilter.length + assigneeFilter.length +
+    (periodFilter && periodFilter !== 'all' ? 1 : 0);
 
   const handleStatusChange = (status: string) => {
     if (statusFilter.includes(status)) {
@@ -408,6 +409,41 @@ export function FeedbackFilters({
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {/* Period Filter */}
+          {availablePeriods && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-between bg-background">
+                  Period
+                  {periodFilter && periodFilter !== 'all' && (
+                    <Badge variant="secondary">1</Badge>
+                  )}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 bg-background z-50">
+                <DropdownMenuLabel>Select Period</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuCheckboxItem
+                  checked={periodFilter === 'all'}
+                  onCheckedChange={() => onPeriodFilterChange?.('all')}
+                >
+                  All Periods
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuSeparator />
+                {availablePeriods.map((period) => (
+                  <DropdownMenuCheckboxItem
+                    key={period.id}
+                    checked={periodFilter === period.id}
+                    onCheckedChange={() => onPeriodFilterChange?.(period.id)}
+                  >
+                    {period.name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       )}
     </Card>
