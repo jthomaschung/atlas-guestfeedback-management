@@ -337,7 +337,19 @@ const Index = () => {
         </div>
 
         <CustomerFeedbackStats 
-          feedbacks={filteredFeedbacks} 
+          feedbacks={filteredFeedbacks}
+          onFilterChange={(type, value) => {
+            if (type === 'status') {
+              if (value === 'open') {
+                // Show all open statuses (unopened + opened + responded + escalated)
+                setStatusFilter(['unopened', 'opened', 'responded', 'escalated']);
+              } else {
+                setStatusFilter([value]);
+              }
+            } else if (type === 'priority') {
+              setPriorityFilter([value]);
+            }
+          }}
         />
 
         <ComplaintTrendsChart className="mb-6" />
