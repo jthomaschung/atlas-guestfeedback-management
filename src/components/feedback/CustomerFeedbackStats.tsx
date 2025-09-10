@@ -9,10 +9,11 @@ interface CustomerFeedbackStatsProps {
 
 export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFeedbackStatsProps) {
   const unopened = feedbacks.filter(fb => fb.resolution_status === 'unopened').length;
+  const opened = feedbacks.filter(fb => fb.resolution_status === 'opened').length;
   const responded = feedbacks.filter(fb => fb.resolution_status === 'responded').length;
   const resolved = feedbacks.filter(fb => fb.resolution_status === 'resolved').length;
   const escalated = feedbacks.filter(fb => fb.resolution_status === 'escalated').length;
-  const totalOpen = unopened + responded + escalated; // All non-resolved feedback
+  const totalOpen = unopened + opened + responded + escalated; // All non-resolved feedback
   const critical = feedbacks.filter(fb => fb.priority === 'Critical' && fb.resolution_status !== 'resolved').length;
   const praise = feedbacks.filter(fb => fb.priority === 'Praise').length;
 
@@ -25,11 +26,11 @@ export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFee
       onClick: () => onFilterChange?.('status', 'open'),
     },
     {
-      title: 'Unopened',
-      value: unopened,
+      title: 'Needs Attention',
+      value: unopened + opened,
       icon: Clock,
       color: 'text-orange-600',
-      onClick: () => onFilterChange?.('status', 'unopened'),
+      onClick: () => onFilterChange?.('status', 'open'),
     },
     {
       title: 'Resolved',
