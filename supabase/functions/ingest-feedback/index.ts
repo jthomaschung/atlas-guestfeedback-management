@@ -170,6 +170,7 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
         
         // If no exact match found, try normalized market names
         if (defaultAssignee === 'Unassigned') {
+          console.log(`No exact market match found, trying normalized matching for market: ${market}`)
           for (const dm of marketDm) {
             const { data: permissions } = await supabase
               .from('user_permissions')
@@ -179,10 +180,11 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
             
             if (permissions?.markets) {
               // Check for variations like "AZ 1" vs "AZ1", "NE 4" vs "NE4", etc.
-              const normalizedMarket = market.replace(/\s+/g, '')
-              console.log(`Trying normalized market: ${normalizedMarket}`)
+              const normalizedMarket = market.replace(/\s+/g, '').toUpperCase()
+              console.log(`Trying normalized market: ${normalizedMarket} for DM: ${dm.profiles.email}`)
+              
               const hasMatchingMarket = permissions.markets.some(m => {
-                const normalizedPermission = m.replace(/\s+/g, '')
+                const normalizedPermission = m.replace(/\s+/g, '').toUpperCase()
                 console.log(`Comparing ${normalizedMarket} with ${normalizedPermission}`)
                 return normalizedPermission === normalizedMarket
               })
