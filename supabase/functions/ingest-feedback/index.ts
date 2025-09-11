@@ -143,27 +143,32 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     try {
       const { data: marketDm } = await supabase
         .from('user_hierarchy')
-        .select(`
-          user_id,
-          profiles!inner(email)
-        `)
+        .select('user_id')
         .eq('role', 'DM')
-        .limit(100) // Get all DMs, then filter by permissions
+        .limit(200) // Get all DMs, then filter by permissions
       
       if (marketDm && marketDm.length > 0) {
         // Check each DM's permissions to find who has access to this market
         console.log(`Looking for DM with access to market: ${market}`)
         for (const dm of marketDm) {
-          const { data: permissions } = await supabase
-            .from('user_permissions')
-            .select('markets')
-            .eq('user_id', dm.user_id)
-            .maybeSingle()
-          
-          console.log(`DM ${dm.profiles.email} has markets:`, permissions?.markets)
+          const [{ data: permissions }, { data: profile }] = await Promise.all([
+            supabase
+              .from('user_permissions')
+              .select('markets')
+              .eq('user_id', dm.user_id)
+              .maybeSingle(),
+            supabase
+              .from('profiles')
+              .select('email')
+              .eq('user_id', dm.user_id)
+              .maybeSingle(),
+          ])
+
+          const dmEmail = profile?.email || 'unknown'
+          console.log(`DM ${dmEmail} has markets:`, permissions?.markets)
           if (permissions?.markets?.includes(market)) {
-            console.log(`Found exact market match for DM: ${dm.profiles.email}`)
-            defaultAssignee = dm.profiles.email
+            console.log(`Found exact market match for DM: ${dmEmail}`)
+            defaultAssignee = dmEmail
             break
           }
         }
@@ -171,27 +176,32 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
         // If no exact match found, try normalized market names
         if (defaultAssignee === 'Unassigned') {
           console.log(`No exact market match found, trying normalized matching for market: ${market}`)
+          const normalizedMarket = market.replace(/\s+/g, '').toUpperCase()
           for (const dm of marketDm) {
-            const { data: permissions } = await supabase
-              .from('user_permissions')
-              .select('markets')
-              .eq('user_id', dm.user_id)
-              .maybeSingle()
-            
+            const [{ data: permissions }, { data: profile }] = await Promise.all([
+              supabase
+                .from('user_permissions')
+                .select('markets')
+                .eq('user_id', dm.user_id)
+                .maybeSingle(),
+              supabase
+                .from('profiles')
+                .select('email')
+                .eq('user_id', dm.user_id)
+                .maybeSingle(),
+            ])
+
+            const dmEmail = profile?.email || 'unknown'
             if (permissions?.markets) {
-              // Check for variations like "AZ 1" vs "AZ1", "NE 4" vs "NE4", etc.
-              const normalizedMarket = market.replace(/\s+/g, '').toUpperCase()
-              console.log(`Trying normalized market: ${normalizedMarket} for DM: ${dm.profiles.email}`)
-              
-              const hasMatchingMarket = permissions.markets.some(m => {
+              const hasMatchingMarket = permissions.markets.some((m: string) => {
                 const normalizedPermission = m.replace(/\s+/g, '').toUpperCase()
-                console.log(`Comparing ${normalizedMarket} with ${normalizedPermission}`)
+                console.log(`Comparing ${normalizedMarket} with ${normalizedPermission} for DM: ${dmEmail}`)
                 return normalizedPermission === normalizedMarket
               })
               
               if (hasMatchingMarket) {
-                console.log(`Found normalized market match for DM: ${dm.profiles.email}`)
-                defaultAssignee = dm.profiles.email
+                console.log(`Found normalized market match for DM: ${dmEmail}`)
+                defaultAssignee = dmEmail
                 break
               }
             }
