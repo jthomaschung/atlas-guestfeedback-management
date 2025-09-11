@@ -28,6 +28,7 @@ import { AuthGate } from '@/components/AuthGate';
 
 import { SmartRedirect } from '@/components/SmartRedirect';
 import { FacilitiesRedirect } from '@/components/FacilitiesRedirect';
+import '@/utils/updateFeedbackAssignee';
 
 const queryClient = new QueryClient();
 
