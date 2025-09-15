@@ -98,7 +98,7 @@ export default function Welcome() {
               </div>
               
               <h1 className="text-6xl md:text-8xl font-black text-white mb-2 tracking-tight animate-fade-in">
-                FACILITIES
+                ATLAS
               </h1>
               <h2 className="text-2xl md:text-4xl font-bold text-atlas-red mb-8 tracking-wide animate-fade-in">
                 GUEST FEEDBACK PORTAL
