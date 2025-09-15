@@ -32,7 +32,8 @@ const Index = () => {
   const [dateTo, setDateTo] = useState<Date | undefined>();
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const { toast } = useToast();
-  const { user, profile } = useAuth();
+  const authContext = useAuth();
+  const { user, profile } = authContext || { user: null, profile: null };
   const { permissions } = useUserPermissions();
 
   useEffect(() => {
