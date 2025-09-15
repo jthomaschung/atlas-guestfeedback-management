@@ -64,11 +64,11 @@ export function SmartRedirect() {
       setIsRedirecting(true);
       const redirectToFacilities = async () => {
         try {
-          const authenticatedUrl = await sessionTokenUtils.createAuthenticatedUrl('https://preview--atlas-facilities-management.lovable.app');
+          const authenticatedUrl = await sessionTokenUtils.createAuthenticatedUrl('https://facilities.lovable.app');
           window.location.href = authenticatedUrl;
         } catch (error) {
           console.error('Error creating authenticated URL:', error);
-          window.location.href = 'https://preview--atlas-facilities-management.lovable.app';
+          window.location.href = 'https://facilities.lovable.app';
         }
       };
       redirectToFacilities();
