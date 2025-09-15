@@ -17,8 +17,20 @@ interface StoreData {
 
 export function StoreCategoryTable({ feedbacks }: StoreCategoryTableProps) {
   const { storeData, categories, categoryTotals, grandTotal } = useMemo(() => {
-    // Get all unique categories
-    const allCategories = [...new Set(feedbacks.map(fb => fb.complaint_category))].sort();
+    // Normalize categories to handle case differences
+    const categoryMap = new Map<string, string>();
+    const allCategoriesRaw = feedbacks.map(fb => fb.complaint_category);
+    
+    // Create a mapping of lowercase to properly formatted category names
+    allCategoriesRaw.forEach(category => {
+      const lowerKey = category.toLowerCase();
+      if (!categoryMap.has(lowerKey)) {
+        categoryMap.set(lowerKey, category);
+      }
+    });
+    
+    // Get unique normalized categories
+    const allCategories = Array.from(categoryMap.values()).sort();
     
     // Group by store and count categories
     const storeMap = new Map<string, StoreData>();
@@ -34,7 +46,9 @@ export function StoreCategoryTable({ feedbacks }: StoreCategoryTableProps) {
       }
       
       const store = storeMap.get(fb.store_number)!;
-      store.categories[fb.complaint_category] = (store.categories[fb.complaint_category] || 0) + 1;
+      // Use the normalized category name
+      const normalizedCategory = categoryMap.get(fb.complaint_category.toLowerCase())!;
+      store.categories[normalizedCategory] = (store.categories[normalizedCategory] || 0) + 1;
       store.total += 1;
     });
     
