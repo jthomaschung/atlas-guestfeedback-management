@@ -382,6 +382,16 @@ Customer Service Team`);
   const handleSave = async () => {
     if (!feedback) return;
 
+    // Validate that resolution notes are required for resolved status
+    if (status === 'resolved' && (!resolutionNotes || resolutionNotes.trim() === '')) {
+      toast({
+        title: "Resolution Notes Required",
+        description: "Please add resolution notes before marking this feedback as resolved.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       const { error } = await supabase
