@@ -25,6 +25,7 @@ import Settings from '@/pages/Settings';
 import PortalSelection from '@/pages/PortalSelection';
 import FeedbackReporting from '@/pages/FeedbackReporting';
 import RedCarpetLeaders from '@/pages/RedCarpetLeaders';
+import Summary from '@/pages/Summary';
 import { AuthGate } from '@/components/AuthGate';
 
 import { SmartRedirect } from '@/components/SmartRedirect';
@@ -267,14 +268,22 @@ function App() {
                   </PublicRoute>
                 } 
               />
-               <Route 
+              <Route 
+                path="/summary" 
+                element={
+                  <ProtectedRoute>
+                    <Summary />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
                 path="/dashboard" 
                 element={
                   <ProtectedRoute>
                     <Index />
                   </ProtectedRoute>
                 } 
-               />
+              />
                <Route 
                 path="/facilities" 
                 element={
