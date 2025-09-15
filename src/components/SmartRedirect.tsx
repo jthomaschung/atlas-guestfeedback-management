@@ -51,9 +51,9 @@ export function SmartRedirect() {
   if (permissions.canAccessHr) accessiblePortals.push('hr');
   if (permissions.canAccessGuestFeedback) accessiblePortals.push('guest-feedback');
 
-  // If user has guest feedback access, stay in this app and go to dashboard
+  // If user has guest feedback access, go to guest feedback management
   if (permissions.canAccessGuestFeedback) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/guest-feedback-management" replace />;
   }
 
   const [isRedirecting, setIsRedirecting] = useState(false);

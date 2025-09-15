@@ -23,6 +23,11 @@ export function FacilitiesRedirect() {
   if (permissions.canAccessHr) accessiblePortals.push('hr');
   if (permissions.canAccessGuestFeedback) accessiblePortals.push('guest-feedback');
 
+  // Check if user has guest feedback access - if so, redirect to guest feedback management
+  if (permissions.canAccessGuestFeedback) {
+    return <Navigate to="/guest-feedback-management" replace />;
+  }
+
   // Check if user has facilities access
   if (!permissions.canAccessFacilities) {
     return (
