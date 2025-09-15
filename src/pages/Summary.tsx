@@ -28,7 +28,7 @@ const Summary = () => {
   const [storeFilter, setStoreFilter] = useState<string[]>([]);
   const [marketFilter, setMarketFilter] = useState<string[]>([]);
   const [assigneeFilter, setAssigneeFilter] = useState<string[]>([]);
-  const [periodFilter, setPeriodFilter] = useState('all');
+  const [periodFilter, setPeriodFilter] = useState<string[]>([]);
   const [dateFrom, setDateFrom] = useState<Date | undefined>();
   const [dateTo, setDateTo] = useState<Date | undefined>();
   const { user } = useAuth();
@@ -53,13 +53,15 @@ const Summary = () => {
 
       // Period filter
       let matchesPeriod = true;
-      if (periodFilter !== 'all') {
-        const selectedPeriod = periods.find(p => p.id === periodFilter);
-        if (selectedPeriod) {
+      if (periodFilter.length > 0) {
+        const selectedPeriods = periods.filter(p => periodFilter.includes(p.id));
+        if (selectedPeriods.length > 0) {
           const feedbackDate = new Date(fb.feedback_date);
-          const periodStart = new Date(selectedPeriod.start_date);
-          const periodEnd = new Date(selectedPeriod.end_date);
-          matchesPeriod = feedbackDate >= periodStart && feedbackDate <= periodEnd;
+          matchesPeriod = selectedPeriods.some(period => {
+            const periodStart = new Date(period.start_date);
+            const periodEnd = new Date(period.end_date);
+            return feedbackDate >= periodStart && feedbackDate <= periodEnd;
+          });
         }
       }
 
@@ -99,7 +101,7 @@ const Summary = () => {
     setStoreFilter([]);
     setMarketFilter([]);
     setAssigneeFilter([]);
-    setPeriodFilter('all');
+    setPeriodFilter([]);
     setDateFrom(undefined);
     setDateTo(undefined);
   };

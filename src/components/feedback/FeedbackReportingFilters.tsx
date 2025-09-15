@@ -1,7 +1,7 @@
 import { CustomerFeedback } from "@/types/feedback";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MultiSelect, Option } from "@/components/ui/multi-select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Search, X, CalendarIcon } from "lucide-react";
@@ -25,8 +25,8 @@ interface FeedbackReportingFiltersProps {
   onMarketFilterChange: (value: string[]) => void;
   assigneeFilter: string[];
   onAssigneeFilterChange: (value: string[]) => void;
-  periodFilter: string;
-  onPeriodFilterChange: (value: string) => void;
+  periodFilter: string[];
+  onPeriodFilterChange: (value: string[]) => void;
   dateFrom: Date | undefined;
   onDateFromChange: (date: Date | undefined) => void;
   dateTo: Date | undefined;
@@ -99,36 +99,32 @@ export function FeedbackReportingFilters({
   availableAssignees,
   availablePeriods,
 }: FeedbackReportingFiltersProps) {
-  const storeOptions = [
-    { value: 'all', label: 'All Stores' },
-    ...(availableStores || []).map(store => ({ value: store, label: `Store ${store}` }))
-  ];
+  const storeOptions: Option[] = (availableStores || []).map(store => ({ 
+    value: store, 
+    label: `Store ${store}` 
+  }));
 
-  const marketOptions = [
-    { value: 'all', label: 'All Markets' },
-    ...(availableMarkets || []).map(market => ({ value: market, label: market }))
-  ];
+  const marketOptions: Option[] = (availableMarkets || []).map(market => ({ 
+    value: market, 
+    label: market 
+  }));
 
-  const assigneeOptions = [
-    { value: 'all', label: 'All Assignees' },
+  const assigneeOptions: Option[] = [
     { value: 'unassigned', label: 'Unassigned' },
     ...(availableAssignees || []).map(assignee => ({ value: assignee, label: assignee }))
   ];
 
-  const periodOptions = [
-    { value: 'all', label: 'All Periods' },
-    ...(availablePeriods || []).map(period => {
-      const startParts = period.start_date.split('-');
-      const endParts = period.end_date.split('-');
-      const startDate = new Date(parseInt(startParts[0]), parseInt(startParts[1]) - 1, parseInt(startParts[2]));
-      const endDate = new Date(parseInt(endParts[0]), parseInt(endParts[1]) - 1, parseInt(endParts[2]));
-      
-      return {
-        value: period.id, 
-        label: `${period.name} (${format(startDate, 'MMM dd, yyyy')} - ${format(endDate, 'MMM dd, yyyy')})` 
-      };
-    })
-  ];
+  const periodOptions: Option[] = (availablePeriods || []).map(period => {
+    const startParts = period.start_date.split('-');
+    const endParts = period.end_date.split('-');
+    const startDate = new Date(parseInt(startParts[0]), parseInt(startParts[1]) - 1, parseInt(startParts[2]));
+    const endDate = new Date(parseInt(endParts[0]), parseInt(endParts[1]) - 1, parseInt(endParts[2]));
+    
+    return {
+      value: period.id, 
+      label: `${period.name} (${format(startDate, 'MMM dd, yyyy')} - ${format(endDate, 'MMM dd, yyyy')})` 
+    };
+  });
 
   const hasActiveFilters = 
     searchTerm !== '' ||
@@ -139,7 +135,7 @@ export function FeedbackReportingFilters({
     storeFilter.length > 0 ||
     marketFilter.length > 0 ||
     assigneeFilter.length > 0 ||
-    periodFilter !== 'all' ||
+    periodFilter.length > 0 ||
     dateFrom ||
     dateTo;
 
@@ -156,169 +152,65 @@ export function FeedbackReportingFilters({
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <Select value={periodFilter} onValueChange={onPeriodFilterChange}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select Period" />
-          </SelectTrigger>
-          <SelectContent className="bg-background border border-border">
-            {periodOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <MultiSelect
+          options={periodOptions}
+          selected={periodFilter}
+          onChange={onPeriodFilterChange}
+          placeholder="Select Periods"
+        />
 
-        <Select 
-          value={statusFilter.length === 1 ? statusFilter[0] : 'multiple'} 
-          onValueChange={(value) => onStatusFilterChange(value === 'all' ? [] : [value])}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Status">
-              {statusFilter.length === 0 ? 'All Status' : 
-               statusFilter.length === 1 ? statusOptions.find(opt => opt.value === statusFilter[0])?.label :
-               `${statusFilter.length} selected`}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent className="bg-background border border-border">
-            <SelectItem value="all">All Status</SelectItem>
-            {statusOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <MultiSelect
+          options={statusOptions}
+          selected={statusFilter}
+          onChange={onStatusFilterChange}
+          placeholder="Select Status"
+        />
         
-        <Select 
-          value={priorityFilter.length === 1 ? priorityFilter[0] : 'multiple'} 
-          onValueChange={(value) => onPriorityFilterChange(value === 'all' ? [] : [value])}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Priority">
-              {priorityFilter.length === 0 ? 'All Priorities' : 
-               priorityFilter.length === 1 ? priorityOptions.find(opt => opt.value === priorityFilter[0])?.label :
-               `${priorityFilter.length} selected`}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent className="bg-background border border-border">
-            <SelectItem value="all">All Priorities</SelectItem>
-            {priorityOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <MultiSelect
+          options={priorityOptions}
+          selected={priorityFilter}
+          onChange={onPriorityFilterChange}
+          placeholder="Select Priority"
+        />
         
-        <Select 
-          value={categoryFilter.length === 1 ? categoryFilter[0] : 'multiple'} 
-          onValueChange={(value) => onCategoryFilterChange(value === 'all' ? [] : [value])}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Category">
-              {categoryFilter.length === 0 ? 'All Categories' : 
-               categoryFilter.length === 1 ? categoryOptions.find(opt => opt.value === categoryFilter[0])?.label :
-               `${categoryFilter.length} selected`}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent className="bg-background border border-border">
-            <SelectItem value="all">All Categories</SelectItem>
-            {categoryOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <MultiSelect
+          options={categoryOptions}
+          selected={categoryFilter}
+          onChange={onCategoryFilterChange}
+          placeholder="Select Categories"
+        />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        <Select 
-          value={channelFilter.length === 1 ? channelFilter[0] : 'multiple'} 
-          onValueChange={(value) => onChannelFilterChange(value === 'all' ? [] : [value])}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Channel">
-              {channelFilter.length === 0 ? 'All Channels' : 
-               channelFilter.length === 1 ? channelOptions.find(opt => opt.value === channelFilter[0])?.label :
-               `${channelFilter.length} selected`}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent className="bg-background border border-border">
-            <SelectItem value="all">All Channels</SelectItem>
-            {channelOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <MultiSelect
+          options={channelOptions}
+          selected={channelFilter}
+          onChange={onChannelFilterChange}
+          placeholder="Select Channels"
+        />
         
-        <Select 
-          value={storeFilter.length === 1 ? storeFilter[0] : 'multiple'} 
-          onValueChange={(value) => onStoreFilterChange(value === 'all' ? [] : [value])}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Store">
-              {storeFilter.length === 0 ? 'All Stores' : 
-               storeFilter.length === 1 ? storeOptions.find(opt => opt.value === storeFilter[0])?.label :
-               `${storeFilter.length} selected`}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent className="bg-background border border-border">
-            <SelectItem value="all">All Stores</SelectItem>
-            {storeOptions.slice(1).map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <MultiSelect
+          options={storeOptions}
+          selected={storeFilter}
+          onChange={onStoreFilterChange}
+          placeholder="Select Stores"
+        />
         
-        <Select 
-          value={marketFilter.length === 1 ? marketFilter[0] : 'multiple'} 
-          onValueChange={(value) => onMarketFilterChange(value === 'all' ? [] : [value])}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Market">
-              {marketFilter.length === 0 ? 'All Markets' : 
-               marketFilter.length === 1 ? marketOptions.find(opt => opt.value === marketFilter[0])?.label :
-               `${marketFilter.length} selected`}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent className="bg-background border border-border">
-            <SelectItem value="all">All Markets</SelectItem>
-            {marketOptions.slice(1).map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <MultiSelect
+          options={marketOptions}
+          selected={marketFilter}
+          onChange={onMarketFilterChange}
+          placeholder="Select Markets"
+        />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        <Select 
-          value={assigneeFilter.length === 1 ? assigneeFilter[0] : 'multiple'} 
-          onValueChange={(value) => onAssigneeFilterChange(value === 'all' ? [] : [value])}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Assignee">
-              {assigneeFilter.length === 0 ? 'All Assignees' : 
-               assigneeFilter.length === 1 ? assigneeOptions.find(opt => opt.value === assigneeFilter[0])?.label :
-               `${assigneeFilter.length} selected`}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent className="bg-background border border-border">
-            <SelectItem value="all">All Assignees</SelectItem>
-            {assigneeOptions.slice(1).map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <MultiSelect
+          options={assigneeOptions}
+          selected={assigneeFilter}
+          onChange={onAssigneeFilterChange}
+          placeholder="Select Assignees"
+        />
 
         <Popover>
           <PopoverTrigger asChild>

@@ -79,10 +79,10 @@ export function MultiSelect({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0" align="start">
+      <PopoverContent className="w-full p-0 bg-background border border-border z-50" align="start">
         <Command>
           <CommandInput placeholder="Search..." />
-          <CommandList>
+          <CommandList className="max-h-64 overflow-y-auto">
             <CommandEmpty>No item found.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => (
