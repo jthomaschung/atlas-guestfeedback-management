@@ -28,7 +28,7 @@ import { AuthGate } from '@/components/AuthGate';
 
 import { SmartRedirect } from '@/components/SmartRedirect';
 import { FacilitiesRedirect } from '@/components/FacilitiesRedirect';
-import '@/utils/updateFeedbackAssignee';
+import { FeedbackUpdater } from '@/components/FeedbackUpdater';
 
 const queryClient = new QueryClient();
 
@@ -255,6 +255,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AuthProvider>
+          <FeedbackUpdater />
             <Router>
             <Routes>
               <Route 
