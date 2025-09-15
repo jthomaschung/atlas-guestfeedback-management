@@ -270,7 +270,7 @@ function App() {
                 path="/dashboard" 
                 element={
                   <ProtectedRoute>
-                    <FacilitiesRedirect />
+                    <Index />
                   </ProtectedRoute>
                 } 
               />
