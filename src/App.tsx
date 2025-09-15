@@ -347,14 +347,14 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
-              <Route 
+               <Route 
                 path="/" 
                 element={
                   <ProtectedRoute>
-                    <SmartRedirect />
+                    <Index />
                   </ProtectedRoute>
                 } 
-              />
+               />
               <Route 
                 path="*" 
                 element={
