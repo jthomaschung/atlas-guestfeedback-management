@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { CustomerFeedback } from "@/types/feedback";
 import { CustomerFeedbackTable } from "@/components/feedback/CustomerFeedbackTable";
 import { CustomerFeedbackStats } from "@/components/feedback/CustomerFeedbackStats";
-import { FeedbackFilters } from "@/components/feedback/FeedbackFilters";
+import { FeedbackReportingFilters } from "@/components/feedback/FeedbackReportingFilters";
 import { FeedbackDetailsDialog } from "@/components/feedback/FeedbackDetailsDialog";
 import { ComplaintTrendsChart } from "@/components/feedback/ComplaintTrendsChart";
 import { CategoryBreakdownChart } from "@/components/feedback/CategoryBreakdownChart";
@@ -27,7 +27,9 @@ const Index = () => {
   const [storeFilter, setStoreFilter] = useState<string[]>([]);
   const [marketFilter, setMarketFilter] = useState<string[]>([]);
   const [assigneeFilter, setAssigneeFilter] = useState<string[]>([]);
-  const [periodFilter, setPeriodFilter] = useState('all');
+  const [periodFilter, setPeriodFilter] = useState<string[]>([]);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>();
+  const [dateTo, setDateTo] = useState<Date | undefined>();
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const { toast } = useToast();
   const { user, profile } = useAuth();
@@ -132,18 +134,20 @@ const Index = () => {
       
       // Period filter
       let matchesPeriod = true;
-      if (periodFilter !== 'all') {
-        const selectedPeriod = periods.find(p => p.id === periodFilter);
-        if (selectedPeriod) {
+      if (periodFilter.length > 0) {
+        const selectedPeriods = periods.filter(p => periodFilter.includes(p.id));
+        if (selectedPeriods.length > 0) {
           const feedbackDate = new Date(fb.feedback_date);
-          const periodStart = new Date(selectedPeriod.start_date);
-          const periodEnd = new Date(selectedPeriod.end_date);
-          matchesPeriod = feedbackDate >= periodStart && feedbackDate <= periodEnd;
+          matchesPeriod = selectedPeriods.some(period => {
+            const periodStart = new Date(period.start_date);
+            const periodEnd = new Date(period.end_date);
+            return feedbackDate >= periodStart && feedbackDate <= periodEnd;
+          });
         }
       }
       
       return matchesSearch && matchesStatus && matchesPriority && matchesCategory && 
-             matchesChannel && matchesStore && matchesMarket && matchesAssignee && matchesPeriod;
+              matchesChannel && matchesStore && matchesMarket && matchesAssignee && matchesPeriod;
     });
 
     // Apply sorting
@@ -152,7 +156,14 @@ const Index = () => {
       const dateB = new Date(b.created_at).getTime();
       return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
     });
-  }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, sortOrder]);
+    
+    // Apply date filters if set
+    return filtered.filter(fb => {
+      if (dateFrom && new Date(fb.feedback_date) < dateFrom) return false;
+      if (dateTo && new Date(fb.feedback_date) > dateTo) return false;
+      return true;
+    });
+  }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, sortOrder, dateFrom, dateTo]);
 
   // Get available filter options
   const availableStores = useMemo(() => {
@@ -273,7 +284,9 @@ const Index = () => {
     setStoreFilter([]);
     setMarketFilter([]);
     setAssigneeFilter([]);
-    setPeriodFilter('all');
+    setPeriodFilter([]);
+    setDateFrom(undefined);
+    setDateTo(undefined);
   };
 
   if (loading) {
@@ -354,7 +367,7 @@ const Index = () => {
           feedbacks={filteredFeedbacks}
         />
 
-        <FeedbackFilters
+        <FeedbackReportingFilters
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
           statusFilter={statusFilter}
@@ -365,27 +378,29 @@ const Index = () => {
           onCategoryFilterChange={setCategoryFilter}
           channelFilter={channelFilter}
           onChannelFilterChange={setChannelFilter}
-          storeFilter={storeFilter}
-          onStoreFilterChange={setStoreFilter}
-          marketFilter={marketFilter}
-          onMarketFilterChange={setMarketFilter}
+          storeFilter={storeFilter} 
+          onStoreFilterChange={setStoreFilter} 
+          marketFilter={marketFilter} 
+          onMarketFilterChange={setMarketFilter} 
           assigneeFilter={assigneeFilter}
           onAssigneeFilterChange={setAssigneeFilter}
-          sortOrder={sortOrder}
-          onSortOrderChange={setSortOrder}
-          availableStores={availableStores}
-          availableMarkets={availableMarkets}
-          availableAssignees={availableAssignees}
-          availablePeriods={periods}
           periodFilter={periodFilter}
           onPeriodFilterChange={setPeriodFilter}
-          onClearAllFilters={handleClearAllFilters}
+          dateFrom={dateFrom}
+          onDateFromChange={setDateFrom}
+          dateTo={dateTo}
+          onDateToChange={setDateTo}
+          onClearFilters={handleClearAllFilters} 
+          availableStores={availableStores} 
+          availableMarkets={availableMarkets} 
+          availableAssignees={availableAssignees}
+          availablePeriods={periods}
         />
 
         {/* Prominent Clear Filters Button */}
         {(searchTerm || statusFilter.length > 0 || priorityFilter.length > 0 || 
           categoryFilter.length > 0 || channelFilter.length > 0 || storeFilter.length > 0 || 
-          marketFilter.length > 0 || assigneeFilter.length > 0 || periodFilter !== 'all') && (
+          marketFilter.length > 0 || assigneeFilter.length > 0 || periodFilter.length > 0 || dateFrom || dateTo) && (
           <div className="flex justify-center">
             <Button 
               variant="outline" 
