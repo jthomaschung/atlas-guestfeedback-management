@@ -271,7 +271,7 @@ function App() {
                 path="/dashboard" 
                 element={
                   <ProtectedRoute>
-                    <FacilitiesDashboard />
+                    <Index />
                   </ProtectedRoute>
                 } 
                />
