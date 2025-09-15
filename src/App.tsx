@@ -18,7 +18,7 @@ import Index from '@/pages/Index';
 import FacilitiesDashboard from '@/pages/FacilitiesDashboard';
 import SubmitWorkOrder from '@/pages/SubmitWorkOrder';
 import UserHierarchy from '@/pages/UserHierarchy';
-import GuestFeedbackManagement from '@/pages/GuestFeedbackManagement';
+
 import GFM from '@/pages/GFM';
 import FeedbackArchive from '@/pages/FeedbackArchive';
 import Settings from '@/pages/Settings';
@@ -312,14 +312,6 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <UserHierarchy />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/guest-feedback-management" 
-                element={
-                  <ProtectedRoute>
-                    <GuestFeedbackManagement />
                   </ProtectedRoute>
                 } 
               />

@@ -16,7 +16,6 @@ import {
 
 const guestFeedbackItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Guest Feedback Management", url: "/guest-feedback-management", icon: MessageSquare },
   { title: "GFM (Guest Feedback Manager)", url: "/gfm", icon: UserCheck },
   { title: "Feedback Reporting", url: "/feedback-reporting", icon: BarChart3 },
   { title: "Red Carpet Leaders", url: "/red-carpet-leaders", icon: Trophy },
