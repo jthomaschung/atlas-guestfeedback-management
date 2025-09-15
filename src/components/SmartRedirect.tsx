@@ -3,6 +3,7 @@ import { useUserPermissions } from '@/hooks/useUserPermissions';
 import { useAuth } from '@/hooks/useAuth';
 import { sessionTokenUtils } from '@/utils/sessionToken';
 import { useEffect, useState } from 'react';
+import Index from '@/pages/Index';
 
 export function SmartRedirect() {
   const { user } = useAuth();
@@ -51,9 +52,9 @@ export function SmartRedirect() {
   if (permissions.canAccessHr) accessiblePortals.push('hr');
   if (permissions.canAccessGuestFeedback) accessiblePortals.push('guest-feedback');
 
-  // If user has guest feedback access, go to guest feedback management
+  // If user has guest feedback access, show the main guest feedback dashboard
   if (permissions.canAccessGuestFeedback) {
-    return <Navigate to="/guest-feedback-management" replace />;
+    return <Index />;
   }
 
   const [isRedirecting, setIsRedirecting] = useState(false);
