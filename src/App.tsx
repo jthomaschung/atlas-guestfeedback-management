@@ -351,7 +351,10 @@ function App() {
                 path="/" 
                 element={
                   <ProtectedRoute>
-                    <Index />
+                    {(() => {
+                      console.log('🏠 ROOT PATH: Rendering Index component for root path');
+                      return <Index />;
+                    })()}
                   </ProtectedRoute>
                 } 
                />
