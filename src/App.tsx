@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import Welcome from '@/pages/Welcome';
 import Index from '@/pages/Index';
+import FacilitiesDashboard from '@/pages/FacilitiesDashboard';
 import SubmitWorkOrder from '@/pages/SubmitWorkOrder';
 import UserHierarchy from '@/pages/UserHierarchy';
 import GuestFeedbackManagement from '@/pages/GuestFeedbackManagement';
@@ -270,10 +271,10 @@ function App() {
                 path="/dashboard" 
                 element={
                   <ProtectedRoute>
-                    <Index />
+                    <FacilitiesDashboard />
                   </ProtectedRoute>
                 } 
-              />
+               />
                <Route 
                 path="/facilities" 
                 element={
