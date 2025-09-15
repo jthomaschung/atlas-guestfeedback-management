@@ -232,7 +232,7 @@ export function FeedbackFilters({
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-background z-50">
+            <DropdownMenuContent className="w-56 bg-background z-50 max-h-60 overflow-y-auto">
               <DropdownMenuLabel>Resolution Status</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {statusOptions.map((option) => (
@@ -258,7 +258,7 @@ export function FeedbackFilters({
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-background z-50">
+            <DropdownMenuContent className="w-56 bg-background z-50 max-h-60 overflow-y-auto">
               <DropdownMenuLabel>Priority Level</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {priorityOptions.map((option) => (
@@ -284,7 +284,7 @@ export function FeedbackFilters({
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-background z-50">
+            <DropdownMenuContent className="w-56 bg-background z-50 max-h-60 overflow-y-auto">
               <DropdownMenuLabel>Feedback Category</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {categoryOptions.map((option) => (
@@ -310,7 +310,7 @@ export function FeedbackFilters({
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-background z-50">
+            <DropdownMenuContent className="w-56 bg-background z-50 max-h-60 overflow-y-auto">
               <DropdownMenuLabel>Feedback Channel</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {channelOptions.map((option) => (
@@ -362,7 +362,7 @@ export function FeedbackFilters({
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-background z-50">
+            <DropdownMenuContent className="w-56 bg-background z-50 max-h-60 overflow-y-auto">
               <DropdownMenuLabel>Market</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {availableMarkets.map((market) => (
@@ -422,7 +422,7 @@ export function FeedbackFilters({
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-background z-50">
+              <DropdownMenuContent className="w-56 bg-background z-50 max-h-60 overflow-y-auto">
                 <DropdownMenuLabel>Select Period</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuCheckboxItem
