@@ -38,6 +38,7 @@ export function MultiSelect({
     } else {
       onChange([...selected, item])
     }
+    // Don't close the popover after selection
   }
 
   return (
@@ -89,9 +90,15 @@ export function MultiSelect({
                 <CommandItem
                   key={option.value}
                   value={option.label}
-                  onSelect={() => handleSelect(option.value)}
+                  onSelect={() => {}}
                 >
-                  <div className="flex items-center space-x-2">
+                  <div 
+                    className="flex items-center space-x-2 cursor-pointer w-full"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSelect(option.value);
+                    }}
+                  >
                     <div
                       className={cn(
                         "h-4 w-4 border border-primary rounded-sm flex items-center justify-center",
