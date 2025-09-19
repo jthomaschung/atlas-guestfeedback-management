@@ -70,8 +70,11 @@ const handler = async (req: Request): Promise<Response> => {
     const emailThreadId = `feedback-${feedbackId}-${Date.now()}`;
 
     console.log('Processing outreach request:', { feedbackId, method });
+    console.log('Environment check - RESEND_API_KEY exists:', !!Deno.env.get('RESEND_API_KEY'));
+    console.log('Environment check - SUPABASE_URL exists:', !!Deno.env.get('SUPABASE_URL'));
 
     // Get feedback details
+    console.log('Fetching feedback details for ID:', feedbackId);
     const { data: feedback, error: feedbackError } = await supabase
       .from('customer_feedback')
       .select('*')
@@ -79,12 +82,19 @@ const handler = async (req: Request): Promise<Response> => {
       .single();
 
     if (feedbackError || !feedback) {
-      console.error('Feedback not found:', feedbackError);
+      console.error('Feedback fetch error:', feedbackError);
+      console.error('Feedback data:', feedback);
       return new Response(
         JSON.stringify({ error: 'Feedback not found' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    console.log('Feedback fetched successfully:', {
+      id: feedback.id,
+      customer_email: feedback.customer_email,
+      complaint_category: feedback.complaint_category
+    });
 
     if (!feedback.customer_email) {
       return new Response(
@@ -134,6 +144,14 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     try {
+      console.log('Attempting to send email with config:', {
+        from: 'Guest Feedback <noreply@atlaswe.com>',
+        to: feedback.customer_email,
+        reply_to: 'jchung@atlaswe.com',
+        subject: emailContent.subject,
+        htmlLength: emailContent.html.length
+      });
+
       const emailResponse = await resend.emails.send({
         from: 'Guest Feedback <noreply@atlaswe.com>',
         to: [feedback.customer_email],
@@ -142,13 +160,15 @@ const handler = async (req: Request): Promise<Response> => {
         html: emailContent.html,
       });
 
-      console.log('Resend API response:', JSON.stringify(emailResponse, null, 2));
+      console.log('Raw Resend API response:', JSON.stringify(emailResponse, null, 2));
       
       if (emailResponse.error) {
+        console.error('Resend API returned error:', emailResponse.error);
         throw new Error(`Resend API error: ${JSON.stringify(emailResponse.error)}`);
       }
       
       if (!emailResponse.data) {
+        console.error('No data in Resend response:', emailResponse);
         throw new Error(`No data returned from Resend: ${JSON.stringify(emailResponse)}`);
       }
 
@@ -186,7 +206,15 @@ const handler = async (req: Request): Promise<Response> => {
       );
 
     } catch (emailError: any) {
-      console.error('Error sending email:', emailError);
+      console.error('Error sending email - Full error object:', emailError);
+      console.error('Error message:', emailError.message);
+      console.error('Error stack:', emailError.stack);
+      console.error('Error type:', typeof emailError);
+      
+      // Log if it's a network/fetch error
+      if (emailError.cause) {
+        console.error('Error cause:', emailError.cause);
+      }
       
       // Update outreach log with failure
       await supabase
@@ -195,7 +223,11 @@ const handler = async (req: Request): Promise<Response> => {
         .eq('id', outreachLog.id);
 
       return new Response(
-        JSON.stringify({ error: 'Failed to send email: ' + emailError.message }),
+        JSON.stringify({ 
+          error: 'Failed to send email: ' + emailError.message,
+          errorType: emailError.constructor.name,
+          details: emailError.toString()
+        }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
