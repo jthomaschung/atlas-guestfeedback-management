@@ -103,7 +103,7 @@ const handler = async (req: Request): Promise<Response> => {
         message_content: messageContent || `Thank you for your feedback regarding your visit to our store #${feedback.store_number}. We take all customer feedback seriously and are working to address your concerns.`,
         delivery_status: 'pending',
         email_thread_id: emailThreadId,
-        from_email: 'guestfeedback@atlaswe.com',
+        from_email: 'onboarding@resend.dev',
         to_email: feedback.customer_email
       })
       .select()
@@ -135,9 +135,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     try {
       const emailResponse = await resend.emails.send({
-        from: 'Guest Feedback <guestfeedback@atlaswe.com>',
+        from: 'Guest Feedback <onboarding@resend.dev>',
         to: [feedback.customer_email],
-        reply_to: 'guestfeedback@atlaswe.com', // Customer replies will go to this address
+        reply_to: 'onboarding@resend.dev', // Customer replies will go to this address
         subject: emailContent.subject,
         html: emailContent.html,
       });
