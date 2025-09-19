@@ -152,8 +152,11 @@ const handler = async (req: Request): Promise<Response> => {
         htmlLength: emailContent.html.length
       });
 
+      // Test Resend API connectivity first
+      console.log('Testing Resend API connectivity...');
+      
       const emailResponse = await resend.emails.send({
-        from: 'Guest Feedback <noreply@atlaswe.com>',
+        from: 'noreply@atlaswe.com',  // Simplified format
         to: [feedback.customer_email],
         reply_to: 'jchung@atlaswe.com',
         subject: emailContent.subject,
