@@ -209,8 +209,6 @@ const handler = async (req: Request): Promise<Response> => {
   }
 };
 
-};
-
 // Helper function to determine template type based on feedback characteristics
 function determineTemplateType(feedback: any): 'acknowledgment' | 'resolution' | 'praise' | 'escalation' {
   // If feedback is praise, use praise template
