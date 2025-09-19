@@ -145,7 +145,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     try {
       console.log('Attempting to send email with config:', {
-        from: 'Guest Feedback <noreply@atlaswe.com>',
+        from: 'noreply@atlaswe.com',
         to: feedback.customer_email,
         reply_to: 'jchung@atlaswe.com',
         subject: emailContent.subject,
@@ -154,13 +154,15 @@ const handler = async (req: Request): Promise<Response> => {
 
       // Test Resend API connectivity first
       console.log('Testing Resend API connectivity...');
+      console.log('Resend API Key (first 10 chars):', Deno.env.get('RESEND_API_KEY')?.substring(0, 10));
       
+      // Try a very basic email send
       const emailResponse = await resend.emails.send({
-        from: 'noreply@atlaswe.com',  // Simplified format
-        to: [feedback.customer_email],
-        reply_to: 'jchung@atlaswe.com',
-        subject: emailContent.subject,
-        html: emailContent.html,
+        from: 'onboarding@resend.dev',  // Use Resend's guaranteed working address for testing
+        to: ['jchung@atlaswe.com'],     // Send to you directly for testing
+        subject: `TEST: ${emailContent.subject}`,
+        text: `This is a test email. Original recipient would have been: ${feedback.customer_email}`,
+        html: `<p>This is a test email.</p><p>Original recipient would have been: ${feedback.customer_email}</p><hr>${emailContent.html}`,
       });
 
       console.log('Raw Resend API response:', JSON.stringify(emailResponse, null, 2));
