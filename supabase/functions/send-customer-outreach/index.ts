@@ -135,7 +135,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     try {
       const emailResponse = await resend.emails.send({
-        from: 'Guest Feedback <guestfeedback@atlaswe.com>',
+        from: 'Guest Feedback <noreply@atlaswe.com>',
         to: [feedback.customer_email],
         reply_to: 'jchung@atlaswe.com',
         subject: emailContent.subject,
