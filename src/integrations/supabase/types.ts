@@ -125,6 +125,66 @@ export type Database = {
         }
         Relationships: []
       }
+      completion_metrics: {
+        Row: {
+          category: string | null
+          class: string | null
+          completed_count: number | null
+          completion_percentage: number | null
+          created_at: string | null
+          id: string
+          import_batch_id: string | null
+          in_progress_count: number | null
+          metric_date: string
+          not_started_count: number | null
+          store_id: number | null
+          total_employees: number | null
+        }
+        Insert: {
+          category?: string | null
+          class?: string | null
+          completed_count?: number | null
+          completion_percentage?: number | null
+          created_at?: string | null
+          id?: string
+          import_batch_id?: string | null
+          in_progress_count?: number | null
+          metric_date: string
+          not_started_count?: number | null
+          store_id?: number | null
+          total_employees?: number | null
+        }
+        Update: {
+          category?: string | null
+          class?: string | null
+          completed_count?: number | null
+          completion_percentage?: number | null
+          created_at?: string | null
+          id?: string
+          import_batch_id?: string | null
+          in_progress_count?: number | null
+          metric_date?: string
+          not_started_count?: number | null
+          store_id?: number | null
+          total_employees?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "completion_metrics_import_batch_id_fkey"
+            columns: ["import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "completion_metrics_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["store_id"]
+          },
+        ]
+      }
       customer_feedback: {
         Row: {
           assignee: string | null
@@ -341,6 +401,60 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_training_completions: {
+        Row: {
+          completed_date: string | null
+          created_at: string | null
+          employee_id: string
+          employee_name: string | null
+          id: string
+          import_batch_id: string | null
+          is_completed: boolean | null
+          market: string | null
+          metric_date: string | null
+          module_view_time: number | null
+          position: string | null
+          status: string | null
+          store_number: string | null
+          training_duration: number | null
+          training_title: string
+        }
+        Insert: {
+          completed_date?: string | null
+          created_at?: string | null
+          employee_id: string
+          employee_name?: string | null
+          id?: string
+          import_batch_id?: string | null
+          is_completed?: boolean | null
+          market?: string | null
+          metric_date?: string | null
+          module_view_time?: number | null
+          position?: string | null
+          status?: string | null
+          store_number?: string | null
+          training_duration?: number | null
+          training_title: string
+        }
+        Update: {
+          completed_date?: string | null
+          created_at?: string | null
+          employee_id?: string
+          employee_name?: string | null
+          id?: string
+          import_batch_id?: string | null
+          is_completed?: boolean | null
+          market?: string | null
+          metric_date?: string | null
+          module_view_time?: number | null
+          position?: string | null
+          status?: string | null
+          store_number?: string | null
+          training_duration?: number | null
+          training_title?: string
+        }
+        Relationships: []
+      }
       employees: {
         Row: {
           created_at: string | null
@@ -398,6 +512,7 @@ export type Database = {
           completed_count: number | null
           completion_rate: number | null
           created_at: string | null
+          file_hash: string | null
           file_name: string | null
           id: string
           imported_by: string | null
@@ -412,6 +527,7 @@ export type Database = {
           completed_count?: number | null
           completion_rate?: number | null
           created_at?: string | null
+          file_hash?: string | null
           file_name?: string | null
           id?: string
           imported_by?: string | null
@@ -426,6 +542,7 @@ export type Database = {
           completed_count?: number | null
           completion_rate?: number | null
           created_at?: string | null
+          file_hash?: string | null
           file_name?: string | null
           id?: string
           imported_by?: string | null
@@ -740,207 +857,113 @@ export type Database = {
         }
         Relationships: []
       }
-      training_completions: {
-        Row: {
-          completed_date: string | null
-          created_at: string | null
-          data_as_of_date: string | null
-          due_date: string | null
-          employee_id: string
-          id: string
-          import_batch_id: string | null
-          module_view_time: number | null
-          percent_complete: number | null
-          percent_of_division: number | null
-          status: string | null
-          store_id: number | null
-          store_number: string | null
-          training_duration: number | null
-          training_module_id: string
-          updated_at: string | null
-        }
-        Insert: {
-          completed_date?: string | null
-          created_at?: string | null
-          data_as_of_date?: string | null
-          due_date?: string | null
-          employee_id: string
-          id?: string
-          import_batch_id?: string | null
-          module_view_time?: number | null
-          percent_complete?: number | null
-          percent_of_division?: number | null
-          status?: string | null
-          store_id?: number | null
-          store_number?: string | null
-          training_duration?: number | null
-          training_module_id: string
-          updated_at?: string | null
-        }
-        Update: {
-          completed_date?: string | null
-          created_at?: string | null
-          data_as_of_date?: string | null
-          due_date?: string | null
-          employee_id?: string
-          id?: string
-          import_batch_id?: string | null
-          module_view_time?: number | null
-          percent_complete?: number | null
-          percent_of_division?: number | null
-          status?: string | null
-          store_id?: number | null
-          store_number?: string | null
-          training_duration?: number | null
-          training_module_id?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "training_completions_employee_id_fkey"
-            columns: ["employee_id"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "training_completions_import_batch_id_fkey"
-            columns: ["import_batch_id"]
-            isOneToOne: false
-            referencedRelation: "import_batches"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "training_completions_store_id_fkey"
-            columns: ["store_id"]
-            isOneToOne: false
-            referencedRelation: "stores"
-            referencedColumns: ["store_id"]
-          },
-          {
-            foreignKeyName: "training_completions_training_module_id_fkey"
-            columns: ["training_module_id"]
-            isOneToOne: false
-            referencedRelation: "training_modules"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      training_completions_history: {
-        Row: {
-          completed_date: string | null
-          data_as_of_date: string
-          data_as_of_utc_day: string | null
-          due_date: string | null
-          employee_id: string
-          id: string
-          import_batch_id: string | null
-          inserted_at: string
-          module_view_time: number | null
-          percent_complete: number | null
-          percent_of_division: number | null
-          status: Database["public"]["Enums"]["training_status"]
-          store_id: number | null
-          training_duration: number | null
-          training_module_id: string
-        }
-        Insert: {
-          completed_date?: string | null
-          data_as_of_date: string
-          data_as_of_utc_day?: string | null
-          due_date?: string | null
-          employee_id: string
-          id?: string
-          import_batch_id?: string | null
-          inserted_at?: string
-          module_view_time?: number | null
-          percent_complete?: number | null
-          percent_of_division?: number | null
-          status: Database["public"]["Enums"]["training_status"]
-          store_id?: number | null
-          training_duration?: number | null
-          training_module_id: string
-        }
-        Update: {
-          completed_date?: string | null
-          data_as_of_date?: string
-          data_as_of_utc_day?: string | null
-          due_date?: string | null
-          employee_id?: string
-          id?: string
-          import_batch_id?: string | null
-          inserted_at?: string
-          module_view_time?: number | null
-          percent_complete?: number | null
-          percent_of_division?: number | null
-          status?: Database["public"]["Enums"]["training_status"]
-          store_id?: number | null
-          training_duration?: number | null
-          training_module_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "training_completions_history_employee_id_fkey"
-            columns: ["employee_id"]
-            isOneToOne: false
-            referencedRelation: "employees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "training_completions_history_import_batch_id_fkey"
-            columns: ["import_batch_id"]
-            isOneToOne: false
-            referencedRelation: "import_batches"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "training_completions_history_store_id_fkey"
-            columns: ["store_id"]
-            isOneToOne: false
-            referencedRelation: "stores"
-            referencedColumns: ["store_id"]
-          },
-          {
-            foreignKeyName: "training_completions_history_training_module_id_fkey"
-            columns: ["training_module_id"]
-            isOneToOne: false
-            referencedRelation: "training_modules"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      training_modules: {
+      training_catalog: {
         Row: {
           category: string | null
+          class: string | null
           created_at: string | null
-          description: string | null
-          external_key: string | null
           id: string
-          is_active: boolean | null
-          module_group: string | null
-          module_name: string
+          is_live: boolean | null
+          last_seen_date: string | null
+          position: string[] | null
+          training_name: string
+          training_provider: string | null
+          training_type: string | null
           updated_at: string | null
         }
         Insert: {
           category?: string | null
+          class?: string | null
           created_at?: string | null
-          description?: string | null
-          external_key?: string | null
           id?: string
-          is_active?: boolean | null
-          module_group?: string | null
-          module_name: string
+          is_live?: boolean | null
+          last_seen_date?: string | null
+          position?: string[] | null
+          training_name: string
+          training_provider?: string | null
+          training_type?: string | null
           updated_at?: string | null
         }
         Update: {
           category?: string | null
+          class?: string | null
           created_at?: string | null
-          description?: string | null
-          external_key?: string | null
           id?: string
-          is_active?: boolean | null
-          module_group?: string | null
-          module_name?: string
+          is_live?: boolean | null
+          last_seen_date?: string | null
+          position?: string[] | null
+          training_name?: string
+          training_provider?: string | null
+          training_type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      training_records: {
+        Row: {
+          assigned_date: string | null
+          completed_date: string | null
+          created_at: string | null
+          due_date: string | null
+          employee_id: string | null
+          employee_name: string | null
+          id: string
+          import_batch_id: string | null
+          module_view_time: number | null
+          registration_date: string | null
+          start_date: string | null
+          status: string | null
+          store_id: string | null
+          store_location: string | null
+          store_number: string | null
+          training_duration: number | null
+          training_hours: number | null
+          training_id: string | null
+          training_title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_date?: string | null
+          completed_date?: string | null
+          created_at?: string | null
+          due_date?: string | null
+          employee_id?: string | null
+          employee_name?: string | null
+          id?: string
+          import_batch_id?: string | null
+          module_view_time?: number | null
+          registration_date?: string | null
+          start_date?: string | null
+          status?: string | null
+          store_id?: string | null
+          store_location?: string | null
+          store_number?: string | null
+          training_duration?: number | null
+          training_hours?: number | null
+          training_id?: string | null
+          training_title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_date?: string | null
+          completed_date?: string | null
+          created_at?: string | null
+          due_date?: string | null
+          employee_id?: string | null
+          employee_name?: string | null
+          id?: string
+          import_batch_id?: string | null
+          module_view_time?: number | null
+          registration_date?: string | null
+          start_date?: string | null
+          status?: string | null
+          store_id?: string | null
+          store_location?: string | null
+          store_number?: string | null
+          training_duration?: number | null
+          training_hours?: number | null
+          training_id?: string | null
+          training_title?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -1159,52 +1182,17 @@ export type Database = {
       }
     }
     Views: {
-      completion_trends: {
-        Row: {
-          as_of_day: string | null
-          completed: number | null
-          in_progress: number | null
-          module_name: string | null
-          not_started: number | null
-          total: number | null
-          training_module_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "training_completions_history_training_module_id_fkey"
-            columns: ["training_module_id"]
-            isOneToOne: false
-            referencedRelation: "training_modules"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      v_training_trend: {
-        Row: {
-          as_of_day: string | null
-          completed: number | null
-          in_progress: number | null
-          module_name: string | null
-          not_started: number | null
-          percent_complete: number | null
-          total: number | null
-        }
-        Relationships: []
-      }
-      v_training_trend_with_store: {
-        Row: {
-          as_of_day: string | null
-          completed: number | null
-          in_progress: number | null
-          module_name: string | null
-          not_started: number | null
-          percent_complete_with_store: number | null
-          total_with_store: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
+      calculate_completion_metrics: {
+        Args: { p_batch_id: string; p_metric_date: string }
+        Returns: undefined
+      }
+      calculate_completion_metrics_with_hierarchy: {
+        Args: { p_batch_id: string; p_metric_date: string }
+        Returns: undefined
+      }
       calculate_feedback_score: {
         Args: {
           complaint_category: string
@@ -1226,9 +1214,72 @@ export type Database = {
         Args: { period_uuid: string; user_uuid: string }
         Returns: boolean
       }
+      create_training_snapshot: {
+        Args: { p_batch_id: string; p_snapshot_date: string }
+        Returns: undefined
+      }
       generate_display_name: {
         Args: { email: string; first_name: string; last_name: string }
         Returns: string
+      }
+      get_all_employees_r2r_progress: {
+        Args: {
+          store_num: string
+          target_category: string
+          target_class: string
+        }
+        Returns: {
+          completed_date: string
+          employee_id: string
+          employee_name: string
+          overall_r2r_completion: number
+          percent_complete: number
+          status: string
+          training_module_name: string
+        }[]
+      }
+      get_class_category_counts: {
+        Args: { target_class: string }
+        Returns: {
+          category: string
+          completed: number
+          completion_rate: number
+          in_progress: number
+          not_started: number
+          total_employees: number
+        }[]
+      }
+      get_class_employee_counts: {
+        Args: { target_class: string }
+        Returns: {
+          completed: number
+          completion_rate: number
+          in_progress: number
+          not_started: number
+          total_employees: number
+        }[]
+      }
+      get_class_market_category_counts: {
+        Args: { target_class: string; target_market: string }
+        Returns: {
+          category: string
+          completed: number
+          completion_rate: number
+          in_progress: number
+          not_started: number
+          total_employees: number
+        }[]
+      }
+      get_class_market_counts: {
+        Args: { target_class: string }
+        Returns: {
+          completed: number
+          completion_rate: number
+          in_progress: number
+          market: string
+          not_started: number
+          total_employees: number
+        }[]
       }
       get_company_completion_trends: {
         Args:
@@ -1244,9 +1295,88 @@ export type Database = {
           total: number
         }[]
       }
+      get_company_employee_counts: {
+        Args: { target_category?: string }
+        Returns: {
+          completed: number
+          completion_rate: number
+          in_progress: number
+          not_started: number
+          total_employees: number
+        }[]
+      }
+      get_company_lto_completion_trends: {
+        Args: { training_title: string }
+        Returns: {
+          completed: number
+          completion_rate: number
+          date_point: string
+          in_progress: number
+          not_started: number
+          total: number
+        }[]
+      }
+      get_company_lto_employee_counts: {
+        Args: { training_title: string }
+        Returns: {
+          completed: number
+          completion_rate: number
+          in_progress: number
+          not_started: number
+          total_employees: number
+        }[]
+      }
+      get_company_position_completion_rates: {
+        Args: { target_class: string }
+        Returns: {
+          completed: number
+          completion_rate: number
+          employee_position: string
+          in_progress: number
+          not_started: number
+          total_employees: number
+        }[]
+      }
       get_current_user_email: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_employee_class_category_completions: {
+        Args: {
+          store_num: string
+          target_category: string
+          target_class: string
+        }
+        Returns: {
+          completed_date: string
+          employee_id: string
+          employee_name: string
+          percent_complete: number
+          status: string
+          training_module_name: string
+        }[]
+      }
+      get_employee_lto_completions: {
+        Args: { store_num: string; training_title: string }
+        Returns: {
+          completed_date: string
+          employee_id: string
+          employee_name: string
+          percent_complete: number
+          status: string
+          training_module_name: string
+        }[]
+      }
+      get_market_class_category_counts: {
+        Args: { target_category: string; target_class: string }
+        Returns: {
+          completed: number
+          completion_rate: number
+          in_progress: number
+          market: string
+          not_started: number
+          total_employees: number
+        }[]
       }
       get_market_completion_trends: {
         Args:
@@ -1263,6 +1393,56 @@ export type Database = {
           total: number
         }[]
       }
+      get_market_employee_counts: {
+        Args: { target_category?: string }
+        Returns: {
+          completed: number
+          completion_rate: number
+          in_progress: number
+          market: string
+          not_started: number
+          total_employees: number
+        }[]
+      }
+      get_market_lto_employee_counts: {
+        Args: { training_title: string }
+        Returns: {
+          completed: number
+          completion_rate: number
+          in_progress: number
+          market: string
+          not_started: number
+          total_employees: number
+        }[]
+      }
+      get_market_position_completion_rates: {
+        Args: { target_class: string; target_market: string }
+        Returns: {
+          completed: number
+          completion_rate: number
+          employee_position: string
+          in_progress: number
+          not_started: number
+          total_employees: number
+        }[]
+      }
+      get_store_class_category_counts: {
+        Args: {
+          target_category: string
+          target_class: string
+          target_market: string
+        }
+        Returns: {
+          completed: number
+          completion_rate: number
+          in_progress: number
+          manager: string
+          not_started: number
+          store_name: string
+          store_number: string
+          total_employees: number
+        }[]
+      }
       get_store_completion_trends: {
         Args:
           | { module_id?: string; target_market: string }
@@ -1277,6 +1457,60 @@ export type Database = {
           store_name: string
           store_number: string
           total: number
+        }[]
+      }
+      get_store_employee_counts: {
+        Args: { target_category?: string; target_market: string }
+        Returns: {
+          completed: number
+          completion_rate: number
+          in_progress: number
+          manager: string
+          not_started: number
+          store_name: string
+          store_number: string
+          total_employees: number
+        }[]
+      }
+      get_store_lto_completion_trends: {
+        Args: { target_market: string; training_title: string }
+        Returns: {
+          completed: number
+          completion_rate: number
+          date_point: string
+          in_progress: number
+          not_started: number
+          store_name: string
+          store_number: string
+          total: number
+        }[]
+      }
+      get_store_lto_employee_counts: {
+        Args: { target_market: string; training_title: string }
+        Returns: {
+          completed: number
+          completion_rate: number
+          in_progress: number
+          manager: string
+          not_started: number
+          store_name: string
+          store_number: string
+          total_employees: number
+        }[]
+      }
+      get_store_position_completion_rates: {
+        Args: {
+          target_class: string
+          target_market: string
+          target_store: string
+        }
+        Returns: {
+          completed: number
+          completion_rate: number
+          employee_position: string
+          in_progress: number
+          not_started: number
+          total_employees: number
         }[]
       }
       get_training_completions_for_store: {
