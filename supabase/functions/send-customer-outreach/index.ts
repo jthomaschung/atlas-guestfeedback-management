@@ -134,11 +134,15 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
     try {
+      // For testing, if using sandbox domain, send to account owner's email
+      const isTestingMode = true; // Set to false when domain is verified
+      const recipientEmail = isTestingMode ? 'ryanmcmurtrie@atlaswe.com' : feedback.customer_email;
+      
       const emailResponse = await resend.emails.send({
         from: 'Guest Feedback <onboarding@resend.dev>',
-        to: [feedback.customer_email],
-        reply_to: 'onboarding@resend.dev', // Customer replies will go to this address
-        subject: emailContent.subject,
+        to: [recipientEmail],
+        reply_to: 'onboarding@resend.dev',
+        subject: `[TEST - Customer: ${feedback.customer_email}] ${emailContent.subject}`,
         html: emailContent.html,
       });
 
