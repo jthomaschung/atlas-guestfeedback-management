@@ -5,7 +5,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Send, Mail, Reply } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Send, Mail, Reply, MessageSquare, AlertTriangle, Heart, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -27,6 +29,7 @@ interface EmailConversationDialogProps {
   customerName: string;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  feedback?: any; // Full feedback object for template selection
 }
 
 export function EmailConversationDialog({
@@ -35,11 +38,15 @@ export function EmailConversationDialog({
   customerName,
   isOpen,
   onOpenChange,
+  feedback,
 }: EmailConversationDialogProps) {
   const [messages, setMessages] = useState<EmailMessage[]>([]);
   const [replyContent, setReplyContent] = useState("");
   const [customerReplyContent, setCustomerReplyContent] = useState("");
   const [showAddCustomerReply, setShowAddCustomerReply] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('acknowledgment');
+  const [resolutionNotes, setResolutionNotes] = useState("");
+  const [actionTaken, setActionTaken] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -87,7 +94,9 @@ export function EmailConversationDialog({
   };
 
   const sendReply = async () => {
-    if (!replyContent.trim()) {
+    if (!replyContent.trim() && selectedTemplate !== 'custom') {
+      // For templates other than custom, we don't require custom content
+    } else if (selectedTemplate === 'custom' && !replyContent.trim()) {
       toast({
         title: "Error",
         description: "Please enter a message",
@@ -98,13 +107,27 @@ export function EmailConversationDialog({
 
     setIsSending(true);
     try {
+      // Prepare the request body based on template selection
+      const requestBody: any = {
+        feedbackId,
+        method: 'email',
+        templateType: selectedTemplate,
+      };
+
+      // Add custom message content if provided
+      if (replyContent.trim()) {
+        requestBody.messageContent = replyContent;
+      }
+
+      // Add template-specific data
+      if (selectedTemplate === 'resolution') {
+        requestBody.resolutionNotes = resolutionNotes;
+        requestBody.actionTaken = actionTaken;
+      }
+
       // Call the send-customer-outreach function
       const { data, error } = await supabase.functions.invoke('send-customer-outreach', {
-        body: {
-          feedbackId,
-          method: 'email',
-          messageContent: replyContent,
-        },
+        body: requestBody,
       });
 
       if (error) throw error;
@@ -115,6 +138,8 @@ export function EmailConversationDialog({
       });
 
       setReplyContent("");
+      setResolutionNotes("");
+      setActionTaken("");
       loadEmailConversation(); // Reload to show the new message
     } catch (error) {
       console.error('Error sending reply:', error);
@@ -187,6 +212,16 @@ export function EmailConversationDialog({
     }
   };
 
+  const getTemplateIcon = (templateType: string) => {
+    switch (templateType) {
+      case 'praise': return <Heart className="w-4 h-4" />;
+      case 'escalation': return <AlertTriangle className="w-4 h-4" />;
+      case 'resolution': return <CheckCircle className="w-4 h-4" />;
+      case 'custom': return <MessageSquare className="w-4 h-4" />;
+      default: return <Mail className="w-4 h-4" />;
+    }
+  };
+
   const getDirectionIcon = (direction: string) => {
     return direction === 'inbound' ? <Mail className="w-4 h-4" /> : <Send className="w-4 h-4" />;
   };
@@ -255,7 +290,7 @@ export function EmailConversationDialog({
             )}
           </ScrollArea>
 
-          {/* Reply composition */}
+          {/* Template Selection and Reply composition */}
           <div className="mt-4 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -295,18 +330,101 @@ export function EmailConversationDialog({
               </div>
             )}
 
-            <Textarea
-              value={replyContent}
-              onChange={(e) => setReplyContent(e.target.value)}
-              placeholder={`Write your reply to ${customerName || customerEmail}...`}
-              rows={4}
-              className="resize-none"
-            />
+            {/* Template Selection */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-gray-50">
+              <div className="space-y-2">
+                <Label htmlFor="template-select">Email Template</Label>
+                <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select template" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="acknowledgment">
+                      <div className="flex items-center gap-2">
+                        {getTemplateIcon('acknowledgment')}
+                        Acknowledgment
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="praise">
+                      <div className="flex items-center gap-2">
+                        {getTemplateIcon('praise')}
+                        Praise Response
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="resolution">
+                      <div className="flex items-center gap-2">
+                        {getTemplateIcon('resolution')}
+                        Resolution Update
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="escalation">
+                      <div className="flex items-center gap-2">
+                        {getTemplateIcon('escalation')}
+                        Escalation Notice
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="custom">
+                      <div className="flex items-center gap-2">
+                        {getTemplateIcon('custom')}
+                        Custom Message
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Template-specific fields */}
+              {selectedTemplate === 'resolution' && (
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="action-taken">Action Taken</Label>
+                    <Textarea
+                      id="action-taken"
+                      value={actionTaken}
+                      onChange={(e) => setActionTaken(e.target.value)}
+                      placeholder="Describe what action was taken..."
+                      rows={2}
+                      className="resize-none text-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="resolution-notes">Resolution Notes</Label>
+                    <Textarea
+                      id="resolution-notes"
+                      value={resolutionNotes}
+                      onChange={(e) => setResolutionNotes(e.target.value)}
+                      placeholder="Additional resolution details..."
+                      rows={2}
+                      className="resize-none text-sm"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Custom message area - only show for custom template or if user wants to add personal note */}
+            <div className="space-y-2">
+              <Label htmlFor="reply-content">
+                {selectedTemplate === 'custom' ? 'Custom Message' : 'Additional Personal Note (Optional)'}
+              </Label>
+              <Textarea
+                id="reply-content"
+                value={replyContent}
+                onChange={(e) => setReplyContent(e.target.value)}
+                placeholder={
+                  selectedTemplate === 'custom' 
+                    ? `Write your custom message to ${customerName || customerEmail}...`
+                    : `Add a personal note to the template message...`
+                }
+                rows={selectedTemplate === 'custom' ? 6 : 3}
+                className="resize-none"
+              />
+            </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 Close
               </Button>
-              <Button onClick={sendReply} disabled={isSending || !replyContent.trim()}>
+              <Button onClick={sendReply} disabled={isSending || (selectedTemplate === 'custom' && !replyContent.trim())}>
                 {isSending ? (
                   <>
                     <Send className="w-4 h-4 mr-2 animate-spin" />
@@ -315,7 +433,7 @@ export function EmailConversationDialog({
                 ) : (
                   <>
                     <Send className="w-4 h-4 mr-2" />
-                    Send Reply
+                    Send {selectedTemplate === 'custom' ? 'Custom Message' : 'Template Email'}
                   </>
                 )}
               </Button>

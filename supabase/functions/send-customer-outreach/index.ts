@@ -1,6 +1,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "npm:resend@2.0.0";
+import React from 'npm:react@18.3.1';
+import { renderAsync } from 'npm:@react-email/components@0.0.22';
+import { AcknowledgmentEmail } from './_templates/acknowledgment-email.tsx';
+import { ResolutionEmail } from './_templates/resolution-email.tsx';
+import { PraiseResponseEmail } from './_templates/praise-response-email.tsx';
+import { EscalationEmail } from './_templates/escalation-email.tsx';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,6 +17,11 @@ interface OutreachRequest {
   feedbackId: string;
   method: 'email';
   messageContent?: string;
+  templateType?: 'acknowledgment' | 'resolution' | 'praise' | 'escalation' | 'custom';
+  resolutionNotes?: string;
+  actionTaken?: string;
+  escalationReason?: string;
+  managerContact?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -27,7 +38,16 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { feedbackId, method, messageContent }: OutreachRequest = await req.json();
+    const { 
+      feedbackId, 
+      method, 
+      messageContent, 
+      templateType,
+      resolutionNotes,
+      actionTaken,
+      escalationReason,
+      managerContact
+    }: OutreachRequest = await req.json();
     
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
     if (!resendApiKey) {
@@ -97,28 +117,29 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Send email
-    try {
-      const emailSubject = `Thank you for your feedback - Case #${feedback.case_number}`;
-      const emailBody = messageContent || `
-        <h2>Thank you for your feedback</h2>
-        <p>Dear ${feedback.customer_name || 'Valued Customer'},</p>
-        <p>Thank you for taking the time to share your feedback regarding your recent visit to our store #${feedback.store_number}.</p>
-        <p>We take all customer feedback seriously and are committed to providing excellent service. Your feedback helps us improve our operations and better serve our customers.</p>
-        <p><strong>Case Number:</strong> ${feedback.case_number}</p>
-        <p><strong>Feedback Date:</strong> ${new Date(feedback.feedback_date).toLocaleDateString()}</p>
-        ${feedback.feedback_text ? `<p><strong>Your Feedback:</strong> ${feedback.feedback_text}</p>` : ''}
-        <p>If you have any questions or would like to discuss this further, please don't hesitate to contact us.</p>
-        <p>Thank you for choosing us!</p>
-        <p>Best regards,<br>Customer Service Team</p>
-      `;
+    // Determine template type based on feedback if not explicitly provided
+    const selectedTemplateType = templateType || determineTemplateType(feedback);
+    
+    // Generate email content using appropriate template
+    const emailContent = await generateEmailContent(
+      selectedTemplateType,
+      feedback,
+      {
+        messageContent,
+        resolutionNotes,
+        actionTaken,
+        escalationReason,
+        managerContact
+      }
+    );
 
+    try {
       const emailResponse = await resend.emails.send({
         from: 'Guest Feedback <guestfeedback@atlaswe.com>',
         to: [feedback.customer_email],
         reply_to: 'guestfeedback@atlaswe.com', // Customer replies will go to this address
-        subject: emailSubject,
-        html: emailBody,
+        subject: emailContent.subject,
+        html: emailContent.html,
       });
 
       console.log('Resend API response:', JSON.stringify(emailResponse, null, 2));
@@ -139,7 +160,7 @@ const handler = async (req: Request): Promise<Response> => {
         .update({ 
           delivery_status: 'delivered',
           email_message_id: emailResponse.data.id,
-          subject: emailSubject
+          subject: emailContent.subject
         })
         .eq('id', outreachLog.id);
 
@@ -187,5 +208,108 @@ const handler = async (req: Request): Promise<Response> => {
     );
   }
 };
+
+};
+
+// Helper function to determine template type based on feedback characteristics
+function determineTemplateType(feedback: any): 'acknowledgment' | 'resolution' | 'praise' | 'escalation' {
+  // If feedback is praise, use praise template
+  if (feedback.complaint_category === 'Praise') {
+    return 'praise';
+  }
+  
+  // If feedback is critical priority, use escalation template
+  if (feedback.priority === 'Critical') {
+    return 'escalation';
+  }
+  
+  // If feedback has resolution notes, use resolution template
+  if (feedback.resolution_status === 'resolved' || feedback.resolution_notes) {
+    return 'resolution';
+  }
+  
+  // Default to acknowledgment template
+  return 'acknowledgment';
+}
+
+// Helper function to generate email content using React Email templates
+async function generateEmailContent(
+  templateType: string,
+  feedback: any,
+  options: {
+    messageContent?: string;
+    resolutionNotes?: string;
+    actionTaken?: string;
+    escalationReason?: string;
+    managerContact?: string;
+  }
+): Promise<{ subject: string; html: string }> {
+  const baseProps = {
+    customerName: feedback.customer_name,
+    caseNumber: feedback.case_number,
+    feedbackDate: feedback.feedback_date,
+    feedbackText: feedback.feedback_text,
+    storeNumber: feedback.store_number,
+    category: feedback.complaint_category,
+  };
+
+  let subject: string;
+  let emailComponent: any;
+
+  switch (templateType) {
+    case 'praise':
+      subject = `Thank you for your kind words! - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(PraiseResponseEmail, {
+        ...baseProps,
+        storeTeam: `the team at Store #${feedback.store_number}`,
+      });
+      break;
+
+    case 'escalation':
+      subject = `URGENT: Your feedback has been escalated - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(EscalationEmail, {
+        ...baseProps,
+        priority: feedback.priority,
+        escalationReason: options.escalationReason || 'High priority feedback requiring immediate management attention',
+        managerContact: options.managerContact,
+      });
+      break;
+
+    case 'resolution':
+      subject = `Update on your feedback - Resolution - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(ResolutionEmail, {
+        ...baseProps,
+        resolutionNotes: options.resolutionNotes || feedback.resolution_notes,
+        actionTaken: options.actionTaken,
+      });
+      break;
+
+    case 'custom':
+      // For custom messages, fall back to simple HTML
+      subject = `Thank you for your feedback - Case #${feedback.case_number}`;
+      return {
+        subject,
+        html: options.messageContent || `
+          <h2>Thank you for your feedback</h2>
+          <p>Dear ${feedback.customer_name || 'Valued Customer'},</p>
+          <p>Thank you for taking the time to share your feedback with us.</p>
+          <p><strong>Case Number:</strong> ${feedback.case_number}</p>
+          <p>Best regards,<br>Customer Service Team</p>
+        `
+      };
+
+    case 'acknowledgment':
+    default:
+      subject = `Thank you for your feedback - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(AcknowledgmentEmail, {
+        ...baseProps,
+        priority: feedback.priority,
+      });
+      break;
+  }
+
+  const html = await renderAsync(emailComponent);
+  return { subject, html };
+}
 
 serve(handler);
