@@ -1,35 +1,43 @@
 # Email Response Capturing Setup
 
-Your customer outreach system is now ready to capture email responses! Here's how to complete the setup:
+Your customer outreach system can send emails, but capturing responses requires additional setup since **Resend doesn't currently support inbound email processing**.
 
 ## Current Status ✅
-- ✅ Email webhook function is fixed and ready
-- ✅ Conversation view component added to feedback details
+- ✅ Email webhook function is ready for when inbound is available
+- ✅ Conversation view component added to feedback details  
 - ✅ Customer response tracking in database
 - ✅ Sentiment analysis for incoming responses
 - ✅ Real-time conversation updates
 
-## To Capture Email Replies
+## ⚠️ Resend Limitation
 
-### 1. Set up Resend Inbound Email Processing
+**Resend does not currently support inbound email processing**, which means you can't automatically capture customer replies yet.
 
-1. **Go to your Resend Dashboard**: https://resend.com/domains
-2. **Select your verified domain** (`atlaswe.com`)
-3. **Configure Inbound Processing**:
-   - Click on "Inbound" or "Email Routing"
-   - Set up a rule to forward emails to your webhook
-   - Use this webhook URL: `https://frmjdxziwwlfpgevszga.supabase.co/functions/v1/email-webhook`
+## Alternative Solutions
 
-### 2. Configure MX Records (if using custom domain)
+### Option 1: Use SendGrid (Recommended)
+SendGrid supports both outbound and inbound email processing:
 
-Add these MX records to your domain DNS:
-```
-MX  10  inbound.resend.com
-```
+1. **Sign up for SendGrid**: https://sendgrid.com/
+2. **Configure inbound parsing**: 
+   - Set up a subdomain for inbound emails (e.g., `inbound.atlaswe.com`)
+   - Configure parse webhook to: `https://frmjdxziwwlfpgevszga.supabase.co/functions/v1/email-webhook`
+3. **Update outbound emails** to use SendGrid API instead of Resend
 
-### 3. Set up Email Forwarding Rules
+### Option 2: Use Mailgun
+Mailgun also supports inbound email processing:
 
-Configure Resend to forward emails sent to `noreply@atlaswe.com` or replies to your outbound emails to your webhook endpoint.
+1. **Sign up for Mailgun**: https://www.mailgun.com/
+2. **Configure Routes** to forward emails to your webhook
+3. **Update email sending** to use Mailgun API
+
+### Option 3: Manual Response Tracking (Current Workaround)
+For now, you can manually add customer responses using the conversation view:
+
+1. **Check your email** for customer replies
+2. **Open the feedback details** dialog
+3. **Use "Add Customer Reply"** to manually log responses
+4. **System will analyze sentiment** automatically
 
 ## How It Works
 
