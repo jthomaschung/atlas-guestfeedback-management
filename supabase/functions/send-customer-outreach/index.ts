@@ -159,7 +159,7 @@ const handler = async (req: Request): Promise<Response> => {
       // Try a very basic email send
       const emailResponse = await resend.emails.send({
         from: 'onboarding@resend.dev',  // Use Resend's guaranteed working address for testing
-        to: ['jchung@atlaswe.com'],     // Send to you directly for testing
+        to: ['ryanmcmurtrie@atlaswe.com'],     // Send to the verified email address for testing
         subject: `TEST: ${emailContent.subject}`,
         text: `This is a test email. Original recipient would have been: ${feedback.customer_email}`,
         html: `<p>This is a test email.</p><p>Original recipient would have been: ${feedback.customer_email}</p><hr>${emailContent.html}`,
