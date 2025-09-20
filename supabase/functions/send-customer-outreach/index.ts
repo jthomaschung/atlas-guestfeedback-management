@@ -156,9 +156,9 @@ const handler = async (req: Request): Promise<Response> => {
       console.log('Testing Resend API connectivity...');
       console.log('Resend API Key (first 10 chars):', Deno.env.get('RESEND_API_KEY')?.substring(0, 10));
       
-      // Send email using verified domain
+      // Send email using working sender for testing
       const emailResponse = await resend.emails.send({
-        from: 'noreply@atlaswe.com',  // Use your verified domain
+        from: 'onboarding@resend.dev',  // Use Resend's working domain for now
         to: [feedback.customer_email],
         reply_to: 'jchung@atlaswe.com',
         subject: emailContent.subject,
