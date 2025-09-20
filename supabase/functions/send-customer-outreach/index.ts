@@ -18,6 +18,7 @@ interface OutreachRequest {
   method: 'email';
   messageContent?: string;
   templateType?: 'acknowledgment' | 'resolution' | 'praise' | 'escalation' | 'custom';
+  customSubject?: string;
   resolutionNotes?: string;
   actionTaken?: string;
   escalationReason?: string;
@@ -43,6 +44,7 @@ const handler = async (req: Request): Promise<Response> => {
       method, 
       messageContent, 
       templateType,
+      customSubject,
       resolutionNotes,
       actionTaken,
       escalationReason,
@@ -288,6 +290,12 @@ async function generateEmailContent(
     category: feedback.complaint_category,
   };
 
+  // Add customSubject to options for custom template
+  const extendedOptions = {
+    ...options,
+    customSubject
+  };
+
   let subject: string;
   let emailComponent: any;
 
@@ -321,10 +329,10 @@ async function generateEmailContent(
 
     case 'custom':
       // For custom messages, fall back to simple HTML
-      subject = `Thank you for your feedback - Case #${feedback.case_number}`;
+      subject = extendedOptions.customSubject || `Thank you for your feedback - Case #${feedback.case_number}`;
       return {
         subject,
-        html: options.messageContent || `
+        html: extendedOptions.messageContent || `
           <h2>Thank you for your feedback</h2>
           <p>Dear ${feedback.customer_name || 'Valued Customer'},</p>
           <p>Thank you for taking the time to share your feedback with us.</p>

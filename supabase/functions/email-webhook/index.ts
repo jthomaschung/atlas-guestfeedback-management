@@ -39,16 +39,51 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Parse the incoming email data
-    const emailData: IncomingEmail = await req.json();
-    console.log('Email data received:', JSON.stringify(emailData, null, 2));
+    // Parse the incoming data
+    const webhookData = await req.json();
+    console.log('Email data received:', JSON.stringify(webhookData, null, 2));
+
+    // Check if this is a Resend webhook event or an actual incoming email
+    if (webhookData.type && webhookData.data) {
+      // This is a Resend webhook event (email.sent, email.delivered, etc.)
+      console.log('Processing Resend webhook event:', webhookData.type);
+      
+      // Update delivery status in outreach log
+      if (webhookData.data.email_id) {
+        await supabase
+          .from('customer_outreach_log')
+          .update({
+            delivery_status: webhookData.type.includes('delivered') ? 'delivered' : 
+                           webhookData.type.includes('bounced') ? 'bounced' :
+                           webhookData.type.includes('complained') ? 'complained' : 'sent'
+          })
+          .eq('email_message_id', webhookData.data.email_id);
+      }
+      
+      return new Response(
+        JSON.stringify({ success: true, message: 'Webhook event processed' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Handle actual incoming email responses
+    const emailData: IncomingEmail = webhookData;
+    
+    // Validate required fields for incoming email
+    if (!emailData.from || !emailData.subject) {
+      console.log('Missing required email fields, treating as webhook event');
+      return new Response(
+        JSON.stringify({ success: true, message: 'Webhook processed' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Extract customer email and try to match with existing feedback
     const customerEmail = emailData.from;
     const replyContent = emailData.text || emailData.html || '';
     
     // Try to extract case number from subject line
-    const caseNumberMatch = emailData.subject.match(/Case #([A-Z0-9-]+)/i);
+    const caseNumberMatch = emailData.subject?.match(/Case #([A-Z0-9-]+)/i);
     const caseNumber = caseNumberMatch ? caseNumberMatch[1] : null;
 
     let feedbackId: string | null = null;
