@@ -156,13 +156,13 @@ const handler = async (req: Request): Promise<Response> => {
       console.log('Testing Resend API connectivity...');
       console.log('Resend API Key (first 10 chars):', Deno.env.get('RESEND_API_KEY')?.substring(0, 10));
       
-      // Try a very basic email send
+      // Send email using verified domain
       const emailResponse = await resend.emails.send({
-        from: 'onboarding@resend.dev',  // Use Resend's guaranteed working address for testing
-        to: ['ryanmcmurtrie@atlaswe.com'],     // Send to the verified email address for testing
-        subject: `TEST: ${emailContent.subject}`,
-        text: `This is a test email. Original recipient would have been: ${feedback.customer_email}`,
-        html: `<p>This is a test email.</p><p>Original recipient would have been: ${feedback.customer_email}</p><hr>${emailContent.html}`,
+        from: 'noreply@atlaswe.com',  // Use your verified domain
+        to: [feedback.customer_email],
+        reply_to: 'jchung@atlaswe.com',
+        subject: emailContent.subject,
+        html: emailContent.html,
       });
 
       console.log('Raw Resend API response:', JSON.stringify(emailResponse, null, 2));
