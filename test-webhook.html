@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Email Webhook</title>
+</head>
+<body>
+    <h1>Test Email Webhook</h1>
+    <button onclick="testWebhook()">Test Inbound Email</button>
+    <div id="result"></div>
+
+    <script>
+        async function testWebhook() {
+            const testEmailData = {
+                from: "jchung@atlaswe.com",
+                to: "guest.feedback@atlaswe.com",
+                subject: "Re: Thank you for your feedback - Case #TEST-1757537321.069700",
+                text: "Thank you for the quick response! This is a test reply to see if the webhook is working.",
+                html: "<p>Thank you for the quick response! This is a test reply to see if the webhook is working.</p>"
+            };
+
+            try {
+                const response = await fetch('https://frmjdxziwwlfpgevszga.supabase.co/functions/v1/email-webhook', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testEmailData)
+                });
+
+                const result = await response.text();
+                document.getElementById('result').innerHTML = `
+                    <h3>Response:</h3>
+                    <p>Status: ${response.status}</p>
+                    <pre>${result}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <h3>Error:</h3>
+                    <pre>${error.message}</pre>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -33,7 +33,12 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    console.log('Received SendGrid webhook');
+    console.log('🔥 EMAIL WEBHOOK TRIGGERED:', {
+      method: req.method,
+      url: req.url,
+      headers: Object.fromEntries(req.headers.entries()),
+      timestamp: new Date().toISOString()
+    });
     
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -41,7 +46,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Parse the incoming data
     const webhookData = await req.json();
-    console.log('SendGrid data received:', JSON.stringify(webhookData, null, 2));
+    console.log('📧 SENDGRID DATA RECEIVED:', JSON.stringify(webhookData, null, 2));
+    console.log('📧 WEBHOOK DATA TYPE:', typeof webhookData, 'IS_ARRAY:', Array.isArray(webhookData));
 
     // Check if this is a SendGrid event webhook (array of events) or inbound parse
     if (Array.isArray(webhookData) && webhookData[0]?.event) {
@@ -71,7 +77,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Handle actual incoming email responses from SendGrid Parse
-    console.log('Processing inbound email from SendGrid Parse');
+    console.log('📨 PROCESSING INBOUND EMAIL FROM SENDGRID PARSE');
     
     // SendGrid Parse sends fields like: from, to, subject, text, html, etc.
     const emailData = {
@@ -83,11 +89,20 @@ const handler = async (req: Request): Promise<Response> => {
       timestamp: new Date().toISOString()
     };
     
+    console.log('📨 PARSED EMAIL DATA:', {
+      from: emailData.from,
+      to: emailData.to, 
+      subject: emailData.subject,
+      hasText: !!emailData.text,
+      hasHtml: !!emailData.html,
+      textLength: emailData.text?.length || 0
+    });
+    
     // Validate required fields for incoming email
     if (!emailData.from || !emailData.subject) {
-      console.log('Missing required email fields, treating as webhook event');
+      console.log('❌ MISSING REQUIRED EMAIL FIELDS - FROM:', !!emailData.from, 'SUBJECT:', !!emailData.subject);
       return new Response(
-        JSON.stringify({ success: true, message: 'Webhook processed' }),
+        JSON.stringify({ success: true, message: 'Webhook processed - missing fields' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -104,6 +119,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // First, try to find feedback by case number if extracted
     if (caseNumber) {
+      console.log('🔍 SEARCHING BY CASE NUMBER:', caseNumber, 'FOR EMAIL:', customerEmail);
       const { data: feedbackByCase } = await supabase
         .from('customer_feedback')
         .select('id')
@@ -113,8 +129,12 @@ const handler = async (req: Request): Promise<Response> => {
       
       if (feedbackByCase) {
         feedbackId = feedbackByCase.id;
-        console.log('Found feedback by case number:', feedbackId);
+        console.log('✅ FOUND FEEDBACK BY CASE NUMBER:', feedbackId);
+      } else {
+        console.log('❌ NO FEEDBACK FOUND BY CASE NUMBER');
       }
+    } else {
+      console.log('❌ NO CASE NUMBER EXTRACTED FROM SUBJECT:', emailData.subject);
     }
 
     // If not found by case number, try to find most recent feedback from this customer
@@ -169,6 +189,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log('Detected sentiment:', sentiment);
 
     // Create an outreach log entry for the inbound message
+    console.log('📝 CREATING OUTREACH LOG FOR FEEDBACK:', feedbackId);
     const { data: outreachLog, error: logError } = await supabase
       .from('customer_outreach_log')
       .insert({
@@ -187,6 +208,8 @@ const handler = async (req: Request): Promise<Response> => {
       })
       .select()
       .single();
+    
+    console.log('📝 OUTREACH LOG RESULT:', { data: outreachLog, error: logError });
 
     if (logError) {
       console.error('Error creating inbound outreach log:', logError);
