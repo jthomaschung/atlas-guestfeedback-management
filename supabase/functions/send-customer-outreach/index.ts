@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { Resend } from "npm:resend@2.0.0";
 import React from 'npm:react@18.3.1';
 import { renderAsync } from 'npm:@react-email/components@0.0.22';
 import { AcknowledgmentEmail } from './_templates/acknowledgment-email.tsx';
@@ -51,20 +50,19 @@ const handler = async (req: Request): Promise<Response> => {
       managerContact
     }: OutreachRequest = await req.json();
     
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
-    if (!resendApiKey) {
-      console.error('RESEND_API_KEY environment variable is not set');
+    const sendGridApiKey = Deno.env.get('SENDGRID_API_KEY');
+    if (!sendGridApiKey) {
+      console.error('SENDGRID_API_KEY environment variable is not set');
       return new Response(
         JSON.stringify({ error: 'Email service not configured' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
     
-    const resend = new Resend(resendApiKey);
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     
-    console.log('Using Resend API key (first 10 chars):', resendApiKey.substring(0, 10));
+    console.log('Using SendGrid API key (first 10 chars):', sendGridApiKey.substring(0, 10));
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
@@ -72,7 +70,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailThreadId = `feedback-${feedbackId}-${Date.now()}`;
 
     console.log('Processing outreach request:', { feedbackId, method });
-    console.log('Environment check - RESEND_API_KEY exists:', !!Deno.env.get('RESEND_API_KEY'));
+    console.log('Environment check - SENDGRID_API_KEY exists:', !!Deno.env.get('SENDGRID_API_KEY'));
     console.log('Environment check - SUPABASE_URL exists:', !!Deno.env.get('SUPABASE_URL'));
 
     // Get feedback details
@@ -115,7 +113,7 @@ const handler = async (req: Request): Promise<Response> => {
         message_content: messageContent || `Thank you for your feedback regarding your visit to our store #${feedback.store_number}. We take all customer feedback seriously and are working to address your concerns.`,
         delivery_status: 'pending',
         email_thread_id: emailThreadId,
-        from_email: 'onboarding@resend.dev',
+        from_email: 'guest.feedback@atlaswe.com',
         to_email: feedback.customer_email
       })
       .select()
@@ -147,46 +145,56 @@ const handler = async (req: Request): Promise<Response> => {
 
     try {
       console.log('Attempting to send email with config:', {
-        from: 'noreply@atlaswe.com',
+        from: 'guest.feedback@atlaswe.com',
         to: feedback.customer_email,
-        reply_to: 'jchung@atlaswe.com',
         subject: emailContent.subject,
         htmlLength: emailContent.html.length
       });
 
-      // Test Resend API connectivity first
-      console.log('Testing Resend API connectivity...');
-      console.log('Resend API Key (first 10 chars):', Deno.env.get('RESEND_API_KEY')?.substring(0, 10));
-      
-      // Send email using verified domain
-      const emailResponse = await resend.emails.send({
-        from: 'noreply@atlaswe.com',  // Use your verified domain
-        to: [feedback.customer_email],
-        reply_to: 'jchung@atlaswe.com',
-        subject: emailContent.subject,
-        html: emailContent.html,
+      // Send email via SendGrid
+      const sendGridResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${sendGridApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: {
+            email: 'guest.feedback@atlaswe.com',
+            name: 'Guest Feedback Team'
+          },
+          to: [{
+            email: feedback.customer_email
+          }],
+          subject: emailContent.subject,
+          content: [{
+            type: 'text/html',
+            value: emailContent.html
+          }],
+          custom_args: {
+            case_number: feedback.case_number,
+            feedback_id: feedbackId
+          },
+          reply_to: {
+            email: 'guest.feedback@atlaswe.com',
+            name: 'Guest Feedback Team'
+          }
+        })
       });
 
-      console.log('Raw Resend API response:', JSON.stringify(emailResponse, null, 2));
-      
-      if (emailResponse.error) {
-        console.error('Resend API returned error:', emailResponse.error);
-        throw new Error(`Resend API error: ${JSON.stringify(emailResponse.error)}`);
-      }
-      
-      if (!emailResponse.data) {
-        console.error('No data in Resend response:', emailResponse);
-        throw new Error(`No data returned from Resend: ${JSON.stringify(emailResponse)}`);
+      if (!sendGridResponse.ok) {
+        const errorText = await sendGridResponse.text();
+        console.error('SendGrid API error:', sendGridResponse.status, errorText);
+        throw new Error(`SendGrid API error: ${sendGridResponse.status} ${errorText}`);
       }
 
-      console.log('Email sent successfully with ID:', emailResponse.data.id);
+      console.log('Email sent successfully via SendGrid');
 
-      // Update outreach log with success and email message ID
+      // Update outreach log with success
       await supabase
         .from('customer_outreach_log')
         .update({ 
-          delivery_status: 'delivered',
-          email_message_id: emailResponse.data.id,
+          delivery_status: 'sent',
           subject: emailContent.subject
         })
         .eq('id', outreachLog.id);

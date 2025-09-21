@@ -3,26 +3,32 @@
 Your customer outreach system can send emails, but capturing responses requires additional setup since **Resend doesn't currently support inbound email processing**.
 
 ## Current Status ✅
-- ✅ Email webhook function is ready for when inbound is available
+- ✅ **SendGrid Integration Complete** - Both outbound and inbound email processing configured
+- ✅ Email webhook function updated for SendGrid format
 - ✅ Conversation view component added to feedback details  
 - ✅ Customer response tracking in database
 - ✅ Sentiment analysis for incoming responses
 - ✅ Real-time conversation updates
 
-## ⚠️ Resend Limitation
+## 🎉 SendGrid Setup Complete!
 
-**Resend does not currently support inbound email processing**, which means you can't automatically capture customer replies yet.
+Your system is now configured to use **SendGrid** for both sending and receiving emails.
 
-## Alternative Solutions
+## Final SendGrid Configuration Steps
 
-### Option 1: Use SendGrid (Recommended)
-SendGrid supports both outbound and inbound email processing:
+To complete the inbound email setup:
 
-1. **Sign up for SendGrid**: https://sendgrid.com/
-2. **Configure inbound parsing**: 
-   - Set up a subdomain for inbound emails (e.g., `inbound.atlaswe.com`)
-   - Configure parse webhook to: `https://frmjdxziwwlfpgevszga.supabase.co/functions/v1/email-webhook`
-3. **Update outbound emails** to use SendGrid API instead of Resend
+1. **Configure SendGrid Inbound Parse**:
+   - Go to your SendGrid dashboard: https://app.sendgrid.com/settings/parse
+   - Add a new hostname: `guest.feedback@atlaswe.com` 
+   - Set the destination URL to: `https://frmjdxziwwlfpgevszga.supabase.co/functions/v1/email-webhook`
+   - Enable "POST the raw, full MIME message"
+
+2. **Set up Event Webhook** (for delivery tracking):
+   - Go to: https://app.sendgrid.com/settings/mail_settings
+   - Enable Event Webhook
+   - Set URL to: `https://frmjdxziwwlfpgevszga.supabase.co/functions/v1/email-webhook`
+   - Select events: Delivered, Opened, Clicked, Bounced, Dropped
 
 ### Option 2: Use Mailgun
 Mailgun also supports inbound email processing:

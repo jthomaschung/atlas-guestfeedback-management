@@ -33,7 +33,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    console.log('Received inbound email webhook');
+    console.log('Received SendGrid webhook');
     
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -41,33 +41,47 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Parse the incoming data
     const webhookData = await req.json();
-    console.log('Email data received:', JSON.stringify(webhookData, null, 2));
+    console.log('SendGrid data received:', JSON.stringify(webhookData, null, 2));
 
-    // Check if this is a Resend webhook event or an actual incoming email
-    if (webhookData.type && webhookData.data) {
-      // This is a Resend webhook event (email.sent, email.delivered, etc.)
-      console.log('Processing Resend webhook event:', webhookData.type);
+    // Check if this is a SendGrid event webhook (array of events) or inbound parse
+    if (Array.isArray(webhookData) && webhookData[0]?.event) {
+      // This is a SendGrid event webhook (delivery status updates)
+      console.log('Processing SendGrid event webhook');
       
-      // Update delivery status in outreach log
-      if (webhookData.data.email_id) {
-        await supabase
-          .from('customer_outreach_log')
-          .update({
-            delivery_status: webhookData.type.includes('delivered') ? 'delivered' : 
-                           webhookData.type.includes('bounced') ? 'bounced' :
-                           webhookData.type.includes('complained') ? 'complained' : 'sent'
-          })
-          .eq('email_message_id', webhookData.data.email_id);
+      for (const event of webhookData) {
+        const { event: eventType, sg_message_id, feedback_id } = event;
+        console.log('Processing event:', eventType, 'for feedback:', feedback_id);
+        
+        // Update delivery status in outreach log using feedback_id from custom args
+        if (feedback_id) {
+          await supabase
+            .from('customer_outreach_log')
+            .update({
+              delivery_status: eventType
+            })
+            .eq('feedback_id', feedback_id)
+            .eq('direction', 'outbound');
+        }
       }
       
       return new Response(
-        JSON.stringify({ success: true, message: 'Webhook event processed' }),
+        JSON.stringify({ success: true, message: 'Event webhook processed' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Handle actual incoming email responses
-    const emailData: IncomingEmail = webhookData;
+    // Handle actual incoming email responses from SendGrid Parse
+    console.log('Processing inbound email from SendGrid Parse');
+    
+    // SendGrid Parse sends fields like: from, to, subject, text, html, etc.
+    const emailData = {
+      from: webhookData.from,
+      to: webhookData.to,
+      subject: webhookData.subject,
+      text: webhookData.text,
+      html: webhookData.html,
+      timestamp: new Date().toISOString()
+    };
     
     // Validate required fields for incoming email
     if (!emailData.from || !emailData.subject) {
@@ -163,7 +177,7 @@ const handler = async (req: Request): Promise<Response> => {
         outreach_method: 'email',
         message_content: replyContent,
         from_email: customerEmail,
-        to_email: 'guestfeedback@atlaswe.com',
+        to_email: 'guest.feedback@atlaswe.com',
         subject: emailData.subject,
         email_message_id: emailData.messageId,
         email_thread_id: emailData.inReplyTo || emailData.messageId,
