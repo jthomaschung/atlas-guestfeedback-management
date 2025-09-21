@@ -160,22 +160,24 @@ const handler = async (req: Request): Promise<Response> => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          personalizations: [{
+            to: [{
+              email: feedback.customer_email
+            }],
+            custom_args: {
+              case_number: feedback.case_number,
+              feedback_id: feedbackId
+            }
+          }],
           from: {
             email: 'guest.feedback@atlaswe.com',
             name: 'Guest Feedback Team'
           },
-          to: [{
-            email: feedback.customer_email
-          }],
           subject: emailContent.subject,
           content: [{
             type: 'text/html',
             value: emailContent.html
           }],
-          custom_args: {
-            case_number: feedback.case_number,
-            feedback_id: feedbackId
-          },
           reply_to: {
             email: 'guest.feedback@atlaswe.com',
             name: 'Guest Feedback Team'
