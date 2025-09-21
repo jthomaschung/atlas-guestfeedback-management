@@ -152,6 +152,31 @@ const handler = async (req: Request): Promise<Response> => {
         htmlLength: emailContent.html.length
       });
 
+      // Test with minimal SendGrid payload exactly like documentation
+      const minimalPayload = {
+        personalizations: [
+          {
+            to: [
+              {
+                email: feedback.customer_email
+              }
+            ]
+          }
+        ],
+        from: {
+          email: 'guest.feedback@atlaswe.com'
+        },
+        subject: emailContent.subject,
+        content: [
+          {
+            type: 'text/html',
+            value: emailContent.html
+          }
+        ]
+      };
+
+      console.log('Minimal SendGrid payload:', JSON.stringify(minimalPayload, null, 2));
+
       // Send email via SendGrid
       const sendGridResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
         method: 'POST',
@@ -159,30 +184,7 @@ const handler = async (req: Request): Promise<Response> => {
           'Authorization': `Bearer ${sendGridApiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          personalizations: [{
-            to: [{
-              email: feedback.customer_email
-            }],
-            custom_args: {
-              case_number: feedback.case_number,
-              feedback_id: feedbackId
-            }
-          }],
-          from: {
-            email: 'guest.feedback@atlaswe.com',
-            name: 'Guest Feedback Team'
-          },
-          subject: emailContent.subject,
-          content: [{
-            type: 'text/html',
-            value: emailContent.html
-          }],
-          reply_to: {
-            email: 'guest.feedback@atlaswe.com',
-            name: 'Guest Feedback Team'
-          }
-        })
+        body: JSON.stringify(minimalPayload)
       });
 
       if (!sendGridResponse.ok) {
