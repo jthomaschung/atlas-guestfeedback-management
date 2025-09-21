@@ -136,6 +136,7 @@ const handler = async (req: Request): Promise<Response> => {
       feedback,
       {
         messageContent,
+        customSubject,
         resolutionNotes,
         actionTaken,
         escalationReason,
@@ -283,6 +284,7 @@ async function generateEmailContent(
   feedback: any,
   options: {
     messageContent?: string;
+    customSubject?: string;
     resolutionNotes?: string;
     actionTaken?: string;
     escalationReason?: string;
@@ -298,11 +300,8 @@ async function generateEmailContent(
     category: feedback.complaint_category,
   };
 
-  // Add customSubject to options for custom template
-  const extendedOptions = {
-    ...options,
-    customSubject
-  };
+  // Use customSubject from options for custom template
+  const customSubject = options.customSubject;
 
   let subject: string;
   let emailComponent: any;
@@ -337,10 +336,10 @@ async function generateEmailContent(
 
     case 'custom':
       // For custom messages, fall back to simple HTML
-      subject = extendedOptions.customSubject || `Thank you for your feedback - Case #${feedback.case_number}`;
+      subject = customSubject || `Thank you for your feedback - Case #${feedback.case_number}`;
       return {
         subject,
-        html: extendedOptions.messageContent || `
+        html: options.messageContent || `
           <h2>Thank you for your feedback</h2>
           <p>Dear ${feedback.customer_name || 'Valued Customer'},</p>
           <p>Thank you for taking the time to share your feedback with us.</p>
