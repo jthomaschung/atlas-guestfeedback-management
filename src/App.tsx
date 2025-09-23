@@ -10,6 +10,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppSidebar } from '@/components/AppSidebar';
 import { NotificationBell } from '@/components/NotificationBell';
+import { FeedbackButton } from '@/components/FeedbackButton';
 import { PortalSwitcher } from '@/components/PortalSwitcher';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
@@ -179,6 +180,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
             </header>
             <main className="flex-1 overflow-auto bg-background p-2 sm:p-4 md:p-6">
               {children}
+              <FeedbackButton />
             </main>
           </div>
         </div>

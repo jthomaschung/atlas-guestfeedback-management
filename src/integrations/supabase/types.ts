@@ -584,6 +584,48 @@ export type Database = {
         }
         Relationships: []
       }
+      internal_feedback: {
+        Row: {
+          browser_info: Json | null
+          category: string
+          created_at: string
+          description: string
+          id: string
+          page_url: string | null
+          priority: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          browser_info?: Json | null
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          page_url?: string | null
+          priority?: string
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          browser_info?: Json | null
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          page_url?: string | null
+          priority?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notification_log: {
         Row: {
           id: string
