@@ -143,13 +143,14 @@ const handler = async (req: Request): Promise<Response> => {
     
     // SendGrid Parse sends data with these field names - extract from webhookData directly
     const emailData = {
-      from: webhookData.from || webhookData.sender,
-      to: webhookData.to || webhookData.recipient,
+      from: webhookData.from,
+      to: webhookData.to,
       subject: webhookData.subject,
-      // SendGrid Parse typically sends plain text in 'text' field
+      // SendGrid Parse sends plain text in 'text' field and HTML in 'html' field
       text: webhookData.text,
-      // SendGrid Parse typically sends HTML in 'html' field  
       html: webhookData.html,
+      // Also check for email field (the raw email content)
+      email: webhookData.email,
       timestamp: new Date().toISOString()
     };
     
@@ -159,8 +160,10 @@ const handler = async (req: Request): Promise<Response> => {
       subject: emailData.subject,
       hasText: !!emailData.text,
       hasHtml: !!emailData.html,
+      hasEmail: !!emailData.email,
       textPreview: emailData.text?.substring(0, 100),
-      htmlPreview: emailData.html?.substring(0, 100)
+      htmlPreview: emailData.html?.substring(0, 100),
+      emailPreview: emailData.email?.substring(0, 200)
     });
     
     console.log('📨 PARSED EMAIL DATA:', {
@@ -184,18 +187,39 @@ const handler = async (req: Request): Promise<Response> => {
     // Extract customer email and email content
     const customerEmail = emailData.from;
     
-    // Use the extracted text or HTML content directly
-    const replyContent = emailData.text || emailData.html || '';
+    // Extract content from text, html, or parse from raw email
+    let replyContent = emailData.text || emailData.html || '';
+    
+    // If no text/html, try to extract from raw email content
+    if (!replyContent && emailData.email) {
+      // Simple extraction from raw email - look for content after headers
+      const emailLines = emailData.email.split('\n');
+      let contentStarted = false;
+      const contentLines = [];
+      
+      for (const line of emailLines) {
+        if (contentStarted) {
+          // Skip empty lines and signature separators
+          if (line.trim() && !line.startsWith('--') && !line.includes('CONFIDENTIAL:')) {
+            contentLines.push(line);
+          }
+        } else if (line.trim() === '' && emailLines.indexOf(line) > 40) {
+          // Content typically starts after headers (around line 40+)
+          contentStarted = true;
+        }
+      }
+      
+      replyContent = contentLines.slice(0, 10).join('\n').trim(); // Take first 10 lines
+    }
     
     console.log('📧 FINAL CONTENT EXTRACTION:', {
       customerEmail,
       contentLength: replyContent.length,
       contentPreview: replyContent.substring(0, 200),
       hasText: !!emailData.text,
-      hasHtml: !!emailData.html
+      hasHtml: !!emailData.html,
+      hasRawEmail: !!emailData.email
     });
-    
-    // Try to extract case number from subject line
     const caseNumberMatch = emailData.subject?.match(/Case #([A-Z0-9-]+)/i);
     const caseNumber = caseNumberMatch ? caseNumberMatch[1] : null;
 
