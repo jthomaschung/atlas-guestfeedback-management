@@ -418,7 +418,27 @@ export default function RedCarpetLeaders() {
     storeLeaders.forEach(store => {
       if (!groupedByMarket[store.market]) {
         groupedByMarket[store.market] = [];
-  }
+      }
+      groupedByMarket[store.market].push(store);
+    });
+
+    return groupedByMarket;
+  }, [storeLeaders]);
+
+  // Helper functions for UI display
+  const getPositionIcon = (index: number) => {
+    if (index === 0) return "🥇";
+    if (index === 1) return "🥈";
+    if (index === 2) return "🥉";
+    return `${index + 1}`;
+  };
+
+  const getPositionColor = (index: number) => {
+    if (index === 0) return "text-yellow-500";
+    if (index === 1) return "text-gray-400";
+    if (index === 2) return "text-amber-600";
+    return "text-muted-foreground";
+  };
 
   // Show single store drill-down view
   if (selectedStore && singleStoreDetails) {
