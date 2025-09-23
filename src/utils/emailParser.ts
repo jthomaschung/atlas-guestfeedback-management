@@ -31,6 +31,7 @@ function parseRawEmailContent(rawContent: string): string {
   let contentType = '';
   let encoding = '';
   let bodyLines: string[] = [];
+  let foundEmptyLine = false;
   
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
@@ -49,6 +50,7 @@ function parseRawEmailContent(rawContent: string): string {
       // Empty line indicates end of headers
       if (line === '') {
         isInHeaders = false;
+        foundEmptyLine = true;
         continue;
       }
     } else {
@@ -57,12 +59,29 @@ function parseRawEmailContent(rawContent: string): string {
     }
   }
   
+  // If we never found an empty line, treat everything after the encoding header as body
+  if (!foundEmptyLine && encoding) {
+    bodyLines = [];
+    let foundEncodingHeader = false;
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].startsWith('Content-Transfer-Encoding:')) {
+        foundEncodingHeader = true;
+        continue;
+      }
+      if (foundEncodingHeader) {
+        bodyLines.push(lines[i]);
+      }
+    }
+  }
+  
   let bodyContent = bodyLines.join('\n').trim();
   
   // Handle base64 encoding
   if (encoding === 'base64') {
     try {
-      bodyContent = atob(bodyContent);
+      // Remove any whitespace and newlines from base64 content
+      const cleanBase64 = bodyContent.replace(/\s/g, '');
+      bodyContent = atob(cleanBase64);
     } catch (error) {
       console.error('Error decoding base64:', error);
       // If base64 decoding fails, return the original content
