@@ -44,8 +44,34 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Parse the incoming data
-    const webhookData = await req.json();
+    // Parse the incoming data - handle both JSON and form data
+    const contentType = req.headers.get('content-type') || '';
+    let webhookData: any;
+    
+    if (contentType.includes('application/json')) {
+      // Handle JSON data (test webhooks, SendGrid event webhooks)
+      webhookData = await req.json();
+    } else if (contentType.includes('multipart/form-data')) {
+      // Handle SendGrid Parse webhook (multipart form data)
+      const formData = await req.formData();
+      webhookData = {};
+      for (const [key, value] of formData.entries()) {
+        webhookData[key] = value;
+      }
+    } else {
+      // Fallback for other content types
+      const text = await req.text();
+      try {
+        webhookData = JSON.parse(text);
+      } catch {
+        // If not JSON, treat as form-encoded
+        const params = new URLSearchParams(text);
+        webhookData = {};
+        for (const [key, value] of params.entries()) {
+          webhookData[key] = value;
+        }
+      }
+    }
     console.log('📧 SENDGRID DATA RECEIVED:', JSON.stringify(webhookData, null, 2));
     console.log('📧 WEBHOOK DATA TYPE:', typeof webhookData, 'IS_ARRAY:', Array.isArray(webhookData));
 
