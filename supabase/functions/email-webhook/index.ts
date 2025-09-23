@@ -122,15 +122,27 @@ const handler = async (req: Request): Promise<Response> => {
     // Handle actual incoming email responses from SendGrid Parse
     console.log('📨 PROCESSING INBOUND EMAIL FROM SENDGRID PARSE');
     
-    // SendGrid Parse sends fields with various possible names
+    // SendGrid Parse sends data with these field names - extract from webhookData directly
     const emailData = {
-      from: webhookData.from || webhookData.sender || webhookData.envelope?.from,
-      to: webhookData.to || webhookData.recipient || webhookData.envelope?.to,
+      from: webhookData.from || webhookData.sender,
+      to: webhookData.to || webhookData.recipient,
       subject: webhookData.subject,
-      text: webhookData.text || webhookData['text/plain'] || webhookData.text_body || webhookData.body_text,
-      html: webhookData.html || webhookData['text/html'] || webhookData.html_body || webhookData.body_html,
+      // SendGrid Parse typically sends plain text in 'text' field
+      text: webhookData.text,
+      // SendGrid Parse typically sends HTML in 'html' field  
+      html: webhookData.html,
       timestamp: new Date().toISOString()
     };
+    
+    console.log('📨 EXTRACTED EMAIL DATA:', {
+      from: emailData.from,
+      to: emailData.to,
+      subject: emailData.subject,
+      hasText: !!emailData.text,
+      hasHtml: !!emailData.html,
+      textPreview: emailData.text?.substring(0, 100),
+      htmlPreview: emailData.html?.substring(0, 100)
+    });
     
     console.log('📨 PARSED EMAIL DATA:', {
       from: emailData.from,
@@ -150,46 +162,18 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Extract customer email and try to match with existing feedback
+    // Extract customer email and email content
     const customerEmail = emailData.from;
     
-    // Try all possible field names for email content from SendGrid Parse
-    const replyContent = 
-      emailData.text || 
-      emailData.html || 
-      webhookData.text || 
-      webhookData.html || 
-      webhookData['text/plain'] || 
-      webhookData['text/html'] || 
-      webhookData.text_body || 
-      webhookData.html_body || 
-      webhookData.body_text || 
-      webhookData.body_html || 
-      webhookData.body || 
-      webhookData.content ||
-      webhookData.message ||
-      webhookData.raw_text ||
-      webhookData.email_body ||
-      '';
+    // Use the extracted text or HTML content directly
+    const replyContent = emailData.text || emailData.html || '';
     
-    console.log('📧 EMAIL CONTENT EXTRACTION:', {
-      hasEmailDataText: !!emailData.text,
-      hasEmailDataHtml: !!emailData.html,
-      hasWebhookText: !!webhookData.text,
-      hasWebhookHtml: !!webhookData.html,
-      hasWebhookTextPlain: !!webhookData['text/plain'],
-      hasWebhookTextHtml: !!webhookData['text/html'],
-      hasTextBody: !!webhookData.text_body,
-      hasHtmlBody: !!webhookData.html_body,
-      hasBodyText: !!webhookData.body_text,
-      hasBodyHtml: !!webhookData.body_html,
-      hasBody: !!webhookData.body,
-      hasContent: !!webhookData.content,
-      hasMessage: !!webhookData.message,
-      hasRawText: !!webhookData.raw_text,
-      hasEmailBody: !!webhookData.email_body,
-      finalContentLength: replyContent.length,
-      contentPreview: replyContent.substring(0, 100)
+    console.log('📧 FINAL CONTENT EXTRACTION:', {
+      customerEmail,
+      contentLength: replyContent.length,
+      contentPreview: replyContent.substring(0, 200),
+      hasText: !!emailData.text,
+      hasHtml: !!emailData.html
     });
     
     // Try to extract case number from subject line
