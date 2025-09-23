@@ -11,7 +11,7 @@ const portals = [
     title: 'Facilities',
     icon: Wrench,
     href: '/facilities',
-    externalUrl: 'https://preview--atlas-facilities-management.lovable.app/'  // Add trailing slash to go directly to root
+    externalUrl: 'https://atlasfacilities.co/'
   },
   {
     key: 'catering',
