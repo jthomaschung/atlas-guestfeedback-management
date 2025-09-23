@@ -150,8 +150,7 @@ const handler = async (req: Request): Promise<Response> => {
         .from('customer_feedback')
         .select('id')
         .eq('case_number', caseNumber)
-        .eq('customer_email', customerEmail)
-        .single();
+        .maybeSingle();
       
       if (feedbackByCase) {
         feedbackId = feedbackByCase.id;
@@ -164,18 +163,28 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // If not found by case number, try to find most recent feedback from this customer
+    // Try multiple email formats to match
     if (!feedbackId) {
-      const { data: recentFeedback } = await supabase
-        .from('customer_feedback')
-        .select('id')
-        .eq('customer_email', customerEmail)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
-      
-      if (recentFeedback) {
-        feedbackId = recentFeedback.id;
-        console.log('Found feedback by customer email:', feedbackId);
+      const emailsToTry = [
+        customerEmail,
+        customerEmail.replace(/.*<(.+)>.*/, '$1'), // Extract email from "Name <email>" format
+        customerEmail.split('<')[0].trim() // Try just the name part
+      ].filter(Boolean);
+
+      for (const emailToTry of emailsToTry) {
+        const { data: recentFeedback } = await supabase
+          .from('customer_feedback')
+          .select('id')
+          .eq('customer_email', emailToTry)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        
+        if (recentFeedback) {
+          feedbackId = recentFeedback.id;
+          console.log('Found feedback by customer email:', emailToTry, 'ID:', feedbackId);
+          break;
+        }
       }
     }
 
