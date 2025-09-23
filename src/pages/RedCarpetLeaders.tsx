@@ -240,19 +240,20 @@ export default function RedCarpetLeaders() {
 
         const store = storeStats[storeNumber];
         store.total_feedback++;
-        store.total_score += feedback.calculated_score || 0;
+        
+        const score = feedback.calculated_score || 0;
+        store.total_score += score;
 
-        // Count feedback types
-        const category = feedback.complaint_category?.toLowerCase();
-        if (category?.includes('praise')) {
+        // Categorize feedback based on calculated score
+        if (score === 5) {
           store.praise_count++;
-        } else if (category?.includes('low')) {
+        } else if (score === -1) {
           store.low_count++;
-        } else if (category?.includes('medium')) {
+        } else if (score === -2) {
           store.medium_count++;
-        } else if (category?.includes('high')) {
+        } else if (score === -3) {
           store.high_count++;
-        } else if (category?.includes('critical')) {
+        } else if (score === -5) {
           store.critical_count++;
         }
 
@@ -414,46 +415,46 @@ export default function RedCarpetLeaders() {
                     <div className="flex justify-between">
                       <span className="flex items-center gap-1">
                         <TrendingUp className="h-3 w-3 text-green-500" />
-                        Praise
+                        Praise (+5)
                       </span>
                       <span className="font-medium text-green-600">
-                        {store.praise_count} (+{store.praise_count * 5})
+                        {store.praise_count}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="flex items-center gap-1">
                         <TrendingDown className="h-3 w-3 text-yellow-500" />
-                        Low
+                        Minor (-1)
                       </span>
                       <span className="font-medium text-yellow-600">
-                        {store.low_count} ({store.low_count * -1})
+                        {store.low_count}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="flex items-center gap-1">
                         <TrendingDown className="h-3 w-3 text-orange-500" />
-                        Medium
+                        Medium (-2)
                       </span>
                       <span className="font-medium text-orange-600">
-                        {store.medium_count} ({store.medium_count * -2})
+                        {store.medium_count}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="flex items-center gap-1">
                         <TrendingDown className="h-3 w-3 text-red-500" />
-                        High
+                        High (-3)
                       </span>
                       <span className="font-medium text-red-600">
-                        {store.high_count} ({store.high_count * -3})
+                        {store.high_count}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="flex items-center gap-1">
                         <TrendingDown className="h-3 w-3 text-red-700" />
-                        Critical
+                        Critical (-5)
                       </span>
                       <span className="font-medium text-red-700">
-                        {store.critical_count} ({store.critical_count * -5})
+                        {store.critical_count}
                       </span>
                     </div>
                   </div>
