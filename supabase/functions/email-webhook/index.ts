@@ -75,6 +75,12 @@ const handler = async (req: Request): Promise<Response> => {
     console.log('📧 SENDGRID DATA RECEIVED:', JSON.stringify(webhookData, null, 2));
     console.log('📧 AVAILABLE FIELDS:', Object.keys(webhookData));
     console.log('📧 WEBHOOK DATA TYPE:', typeof webhookData, 'IS_ARRAY:', Array.isArray(webhookData));
+    
+    // If it's an array, log the first item's keys for easier debugging
+    if (Array.isArray(webhookData) && webhookData.length > 0) {
+      console.log('📧 FIRST ITEM FIELDS:', Object.keys(webhookData[0]));
+      console.log('📧 FIRST ITEM SAMPLE:', JSON.stringify(webhookData[0], null, 2));
+    }
 
     // Check if this is a SendGrid event webhook (array of events) or inbound parse
     if (Array.isArray(webhookData) && webhookData[0]?.event) {
@@ -106,13 +112,13 @@ const handler = async (req: Request): Promise<Response> => {
     // Handle actual incoming email responses from SendGrid Parse
     console.log('📨 PROCESSING INBOUND EMAIL FROM SENDGRID PARSE');
     
-    // SendGrid Parse sends fields like: from, to, subject, text, html, etc.
+    // SendGrid Parse sends fields with various possible names
     const emailData = {
-      from: webhookData.from,
-      to: webhookData.to,
+      from: webhookData.from || webhookData.sender || webhookData.envelope?.from,
+      to: webhookData.to || webhookData.recipient || webhookData.envelope?.to,
       subject: webhookData.subject,
-      text: webhookData.text,
-      html: webhookData.html,
+      text: webhookData.text || webhookData['text/plain'] || webhookData.text_body || webhookData.body_text,
+      html: webhookData.html || webhookData['text/html'] || webhookData.html_body || webhookData.body_html,
       timestamp: new Date().toISOString()
     };
     
@@ -136,10 +142,25 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Extract customer email and try to match with existing feedback
     const customerEmail = emailData.from;
-    // Try multiple possible field names for email content
-    const replyContent = emailData.text || emailData.html || webhookData.text || webhookData.html || 
-                        webhookData['text/plain'] || webhookData['text/html'] || 
-                        webhookData.body || webhookData.content || '';
+    
+    // Try all possible field names for email content from SendGrid Parse
+    const replyContent = 
+      emailData.text || 
+      emailData.html || 
+      webhookData.text || 
+      webhookData.html || 
+      webhookData['text/plain'] || 
+      webhookData['text/html'] || 
+      webhookData.text_body || 
+      webhookData.html_body || 
+      webhookData.body_text || 
+      webhookData.body_html || 
+      webhookData.body || 
+      webhookData.content ||
+      webhookData.message ||
+      webhookData.raw_text ||
+      webhookData.email_body ||
+      '';
     
     console.log('📧 EMAIL CONTENT EXTRACTION:', {
       hasEmailDataText: !!emailData.text,
@@ -148,9 +169,17 @@ const handler = async (req: Request): Promise<Response> => {
       hasWebhookHtml: !!webhookData.html,
       hasWebhookTextPlain: !!webhookData['text/plain'],
       hasWebhookTextHtml: !!webhookData['text/html'],
+      hasTextBody: !!webhookData.text_body,
+      hasHtmlBody: !!webhookData.html_body,
+      hasBodyText: !!webhookData.body_text,
+      hasBodyHtml: !!webhookData.body_html,
       hasBody: !!webhookData.body,
       hasContent: !!webhookData.content,
-      finalContentLength: replyContent.length
+      hasMessage: !!webhookData.message,
+      hasRawText: !!webhookData.raw_text,
+      hasEmailBody: !!webhookData.email_body,
+      finalContentLength: replyContent.length,
+      contentPreview: replyContent.substring(0, 100)
     });
     
     // Try to extract case number from subject line
