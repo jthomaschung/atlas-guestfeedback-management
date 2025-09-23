@@ -258,7 +258,7 @@ export default function RedCarpetLeaders() {
       </div>
 
       {/* Leaderboards Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Top Markets */}
         <Card>
           <CardHeader>
@@ -272,7 +272,7 @@ export default function RedCarpetLeaders() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {marketLeaders.slice(0, 5).map((market, index) => (
+              {marketLeaders.slice(0, 8).map((market, index) => (
                 <div
                   key={market.market}
                   className={`flex items-center justify-between p-3 rounded-lg ${
@@ -297,50 +297,12 @@ export default function RedCarpetLeaders() {
           </CardContent>
         </Card>
 
-        {/* Top Store per Market */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Medal className="h-5 w-5 text-amber-600" />
-              Market Champions
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Best performing store in each market
-            </p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {topStoresByMarket.slice(0, 5).map((store, index) => (
-                <div
-                  key={`${store.store_number}-${store.market}`}
-                  className={`flex items-center justify-between p-3 rounded-lg ${
-                    index < 3 ? getPositionColor(index + 1) : 'bg-muted/50'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    {getPositionIcon(index + 1)}
-                    <div>
-                      <div className="font-medium">Store {store.store_number}</div>
-                      <div className="text-sm opacity-80">
-                        {store.market} • {store.praiseCount} praise
-                      </div>
-                    </div>
-                  </div>
-                  <Badge variant="secondary" className="bg-white/20">
-                    #{index + 1}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Top Stores Overall */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Crown className="h-5 w-5 text-yellow-500" />
-              Overall Champions
+              Top Stores
             </CardTitle>
             <p className="text-sm text-muted-foreground">
               Top performing stores company-wide
@@ -348,7 +310,7 @@ export default function RedCarpetLeaders() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {storeLeaders.slice(0, 5).map((store, index) => (
+              {storeLeaders.slice(0, 8).map((store, index) => (
                 <div
                   key={`${store.store_number}-${store.market}`}
                   className={`flex items-center justify-between p-3 rounded-lg ${
@@ -374,13 +336,79 @@ export default function RedCarpetLeaders() {
         </Card>
       </div>
 
+      {/* How Points Are Calculated */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Star className="h-5 w-5 text-blue-500" />
+            How Points Are Calculated
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Understanding our customer feedback scoring system
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg">
+              <div className="text-2xl font-bold text-green-600 dark:text-green-400">+5</div>
+              <div className="text-sm font-medium">Praise</div>
+              <div className="text-xs text-muted-foreground mt-1">Positive feedback</div>
+            </div>
+            <div className="text-center p-4 bg-yellow-50 dark:bg-yellow-950 rounded-lg">
+              <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">-1</div>
+              <div className="text-sm font-medium">Low</div>
+              <div className="text-xs text-muted-foreground mt-1">Minor issues</div>
+            </div>
+            <div className="text-center p-4 bg-orange-50 dark:bg-orange-950 rounded-lg">
+              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">-2</div>
+              <div className="text-sm font-medium">Medium</div>
+              <div className="text-xs text-muted-foreground mt-1">Moderate concerns</div>
+            </div>
+            <div className="text-center p-4 bg-red-50 dark:bg-red-950 rounded-lg">
+              <div className="text-2xl font-bold text-red-600 dark:text-red-400">-3</div>
+              <div className="text-sm font-medium">High</div>
+              <div className="text-xs text-muted-foreground mt-1">Serious complaints</div>
+            </div>
+            <div className="text-center p-4 bg-red-100 dark:bg-red-900 rounded-lg">
+              <div className="text-2xl font-bold text-red-700 dark:text-red-300">-5</div>
+              <div className="text-sm font-medium">Critical</div>
+              <div className="text-xs text-muted-foreground mt-1">Urgent issues</div>
+            </div>
+          </div>
+          
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sm">Bonus Points</h4>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <div className="flex justify-between">
+                  <span>Quick response (within 2 days)</span>
+                  <span className="text-green-600 dark:text-green-400 font-medium">Halves negative points</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Positive customer response</span>
+                  <span className="text-green-600 dark:text-green-400 font-medium">+3 bonus points</span>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sm">Leadership Rankings</h4>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <div>Rankings are based on total praise count, not calculated scores</div>
+                <div>Markets and stores with the most praise feedback earn top positions</div>
+                <div>Percentage shows positive feedback ratio out of total feedback</div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardContent className="p-6">
             <div className="text-center">
               <div className="text-3xl font-bold text-yellow-500">
-                {marketLeaders[0]?.market || 'N/A'}
+                {marketLeaders[0]?.market || "N/A"}
               </div>
               <div className="text-sm text-muted-foreground">
                 #1 Market Overall
@@ -396,7 +424,7 @@ export default function RedCarpetLeaders() {
           <CardContent className="p-6">
             <div className="text-center">
               <div className="text-3xl font-bold text-amber-600">
-                {storeLeaders[0]?.store_number || 'N/A'}
+                {storeLeaders[0]?.store_number || "N/A"}
               </div>
               <div className="text-sm text-muted-foreground">
                 #1 Store Overall
