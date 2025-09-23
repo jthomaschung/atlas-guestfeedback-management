@@ -247,13 +247,23 @@ const handler = async (req: Request): Promise<Response> => {
     // If not found by case number, try to find most recent feedback from this customer
     // Try multiple email formats to match
     if (!feedbackId) {
+      // Extract just the email address from various formats
+      const extractEmail = (email: string) => {
+        const match = email.match(/<(.+)>/);
+        return match ? match[1] : email;
+      };
+      
+      const cleanCustomerEmail = extractEmail(customerEmail);
+      console.log('🔍 SEARCHING BY CUSTOMER EMAIL:', cleanCustomerEmail);
+      
       const emailsToTry = [
+        cleanCustomerEmail,
         customerEmail,
-        customerEmail.replace(/.*<(.+)>.*/, '$1'), // Extract email from "Name <email>" format
-        customerEmail.split('<')[0].trim() // Try just the name part
+        customerEmail.split('<')[0].trim() // Try the name part
       ].filter(Boolean);
 
       for (const emailToTry of emailsToTry) {
+        console.log('🔍 TRYING EMAIL FORMAT:', emailToTry);
         const { data: recentFeedback } = await supabase
           .from('customer_feedback')
           .select('id')
