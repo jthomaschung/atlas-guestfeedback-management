@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { RefreshCw, Send, ArrowUp, ArrowDown } from 'lucide-react';
 import { format } from 'date-fns';
+import { parseEmailContent } from '@/utils/emailParser';
 
 interface OutreachMessage {
   id: string;
@@ -208,7 +209,7 @@ export function EmailConversationView({
             </CardHeader>
             <CardContent>
               <div className="text-sm whitespace-pre-wrap">
-                {message.message_content}
+                {parseEmailContent(message.message_content, message.direction)}
               </div>
               {message.delivery_status && (
                 <div className="mt-2 text-xs text-muted-foreground">
