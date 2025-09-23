@@ -401,6 +401,36 @@ export type Database = {
         }
         Relationships: []
       }
+      debug_webhooks: {
+        Row: {
+          content_type: string | null
+          created_at: string | null
+          headers: Json | null
+          id: string
+          method: string | null
+          raw_data: Json
+          timestamp: string | null
+        }
+        Insert: {
+          content_type?: string | null
+          created_at?: string | null
+          headers?: Json | null
+          id?: string
+          method?: string | null
+          raw_data: Json
+          timestamp?: string | null
+        }
+        Update: {
+          content_type?: string | null
+          created_at?: string | null
+          headers?: Json | null
+          id?: string
+          method?: string | null
+          raw_data?: Json
+          timestamp?: string | null
+        }
+        Relationships: []
+      }
       employee_training_completions: {
         Row: {
           completed_date: string | null
@@ -1427,6 +1457,23 @@ export type Database = {
         }[]
       }
       get_store_class_category_counts: {
+        Args: {
+          target_category: string
+          target_class: string
+          target_market: string
+        }
+        Returns: {
+          completed: number
+          completion_rate: number
+          in_progress: number
+          manager: string
+          not_started: number
+          store_name: string
+          store_number: string
+          total_employees: number
+        }[]
+      }
+      get_store_class_category_counts_with_employee_average: {
         Args: {
           target_category: string
           target_class: string

@@ -73,8 +73,31 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
     
+    // Store comprehensive debug data AND log everything
+    console.log('🚨 WEBHOOK TRIGGERED - STORING DEBUG DATA');
+    try {
+      const { data: debugData, error: debugError } = await supabase
+        .from('debug_webhooks')
+        .insert({
+          raw_data: webhookData,
+          content_type: contentType,
+          method: req.method,
+          headers: Object.fromEntries(req.headers.entries()),
+          timestamp: new Date().toISOString()
+        })
+        .select()
+        .single();
+      
+      if (debugError) {
+        console.error('❌ DEBUG INSERT ERROR:', debugError);
+      } else {
+        console.log('✅ DEBUG DATA STORED WITH ID:', debugData.id);
+      }
+    } catch (debugErr) {
+      console.error('💥 DEBUG STORAGE EXCEPTION:', debugErr);
+    }
+    
     // IMMEDIATE COMPREHENSIVE LOGGING - before any processing
-    console.log('🚨 WEBHOOK TRIGGERED - RAW DATA ANALYSIS:');
     console.log('📦 typeof webhookData:', typeof webhookData);
     console.log('📦 is Array:', Array.isArray(webhookData));
     console.log('📦 Object.keys:', Object.keys(webhookData || {}));
@@ -84,10 +107,6 @@ const handler = async (req: Request): Promise<Response> => {
       Object.entries(webhookData).forEach(([key, value]) => {
         console.log(`🔑 FIELD "${key}": ${typeof value} = ${JSON.stringify(value)?.substring(0, 100)}...`);
       });
-    }
-    
-    if (Array.isArray(webhookData) && webhookData.length > 0) {
-      console.log('📦 FIRST ARRAY ITEM:', JSON.stringify(webhookData[0], null, 2));
     }
     
     console.log('📦 COMPLETE DATA DUMP:', JSON.stringify(webhookData, null, 2));
