@@ -49,7 +49,9 @@ export default function RedCarpetLeaders() {
   const [marketLeaders, setMarketLeaders] = useState<MarketLeader[]>([]);
   const [storeLeaders, setStoreLeaders] = useState<StoreLeader[]>([]);
   const [selectedMarket, setSelectedMarket] = useState<string | null>(null);
+  const [selectedStore, setSelectedStore] = useState<{ store_number: string; market: string } | null>(null);
   const [marketStoreDetails, setMarketStoreDetails] = useState<StoreDetails[]>([]);
+  const [singleStoreDetails, setSingleStoreDetails] = useState<StoreDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -66,6 +68,12 @@ export default function RedCarpetLeaders() {
       fetchMarketStoreDetails();
     }
   }, [selectedMarket, selectedPeriod, periods]);
+
+  useEffect(() => {
+    if (selectedStore) {
+      fetchSingleStoreDetails();
+    }
+  }, [selectedStore, selectedPeriod, periods]);
 
   const fetchPeriods = async () => {
     try {
@@ -288,11 +296,118 @@ export default function RedCarpetLeaders() {
     }
   };
 
+  const fetchSingleStoreDetails = async () => {
+    if (!selectedStore || periods.length === 0) return;
+
+    try {
+      setLoading(true);
+
+      let query = supabase
+        .from('customer_feedback')
+        .select('store_number, complaint_category, calculated_score, outreach_sent_at, customer_response_sentiment, feedback_date')
+        .eq('market', selectedStore.market)
+        .eq('store_number', selectedStore.store_number);
+
+      // Apply period filtering
+      if (selectedPeriod !== "all") {
+        const period = periods.find(p => p.id === selectedPeriod);
+        if (period) {
+          query = query
+            .gte('feedback_date', period.start_date)
+            .lte('feedback_date', period.end_date);
+        }
+      }
+
+      const { data: feedbacks, error } = await query;
+
+      if (error) {
+        console.error('Error fetching single store details:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load store details"
+        });
+        return;
+      }
+
+      // Process single store details
+      const storeDetails: StoreDetails = {
+        store_number: selectedStore.store_number,
+        market: selectedStore.market,
+        total_score: 0,
+        praise_count: 0,
+        low_count: 0,
+        medium_count: 0,
+        high_count: 0,
+        critical_count: 0,
+        quick_response_bonus: 0,
+        positive_response_bonus: 0,
+        total_feedback: 0
+      };
+
+      feedbacks?.forEach(feedback => {
+        storeDetails.total_feedback++;
+        
+        const score = feedback.calculated_score || 0;
+        storeDetails.total_score += score;
+
+        // Categorize feedback based on calculated score
+        if (score === 5) {
+          storeDetails.praise_count++;
+        } else if (score === -1) {
+          storeDetails.low_count++;
+        } else if (score === -2) {
+          storeDetails.medium_count++;
+        } else if (score === -3) {
+          storeDetails.high_count++;
+        } else if (score === -5) {
+          storeDetails.critical_count++;
+        }
+
+        // Check for quick response bonus
+        if (feedback.outreach_sent_at && feedback.feedback_date) {
+          const responseTime = new Date(feedback.outreach_sent_at).getTime() - new Date(feedback.feedback_date).getTime();
+          const responseTimeDays = responseTime / (1000 * 60 * 60 * 24);
+          if (responseTimeDays <= 2) {
+            storeDetails.quick_response_bonus++;
+          }
+        }
+
+        // Check for positive response bonus
+        if (feedback.customer_response_sentiment === 'positive') {
+          storeDetails.positive_response_bonus++;
+        }
+      });
+
+      setSingleStoreDetails(storeDetails);
+    } catch (error) {
+      console.error('Error fetching single store details:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load store details"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStoreClick = (store_number: string, market: string) => {
+    setSelectedStore({ store_number, market });
+  };
+
   const handleMarketClick = (market: string) => {
     setSelectedMarket(market);
   };
 
   const handleBackToMarkets = () => {
+    setSelectedMarket(null);
+    setMarketStoreDetails([]);
+  };
+
+  const handleBackToMain = () => {
+    setSelectedStore(null);
+    setSingleStoreDetails(null);
     setSelectedMarket(null);
     setMarketStoreDetails([]);
   };
@@ -303,44 +418,156 @@ export default function RedCarpetLeaders() {
     storeLeaders.forEach(store => {
       if (!groupedByMarket[store.market]) {
         groupedByMarket[store.market] = [];
-      }
-      groupedByMarket[store.market].push(store);
-    });
+  }
 
-    // Get top store from each market
-    const topStores: StoreLeader[] = Object.values(groupedByMarket)
-      .map(stores => stores[0]) // First store is already the top due to sorting
-      .filter(store => store) // Remove undefined
-      .sort((a, b) => b.praiseCount - a.praiseCount);
+  // Show single store drill-down view
+  if (selectedStore && singleStoreDetails) {
+    return (
+      <div className="space-y-6 p-6">
+        {/* Header with back button */}
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleBackToMain}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Leaders
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Store {singleStoreDetails.store_number}</h1>
+            <p className="text-muted-foreground">
+              {singleStoreDetails.market} Market • Point breakdown and performance details
+            </p>
+          </div>
+        </div>
 
-    return topStores;
-  }, [storeLeaders]);
+        {/* Store Details Card */}
+        <Card className="p-8">
+          <div className="text-center mb-8">
+            <div className={`text-6xl font-bold mb-2 ${
+              singleStoreDetails.total_score > 0 ? 'text-green-600' : 
+              singleStoreDetails.total_score < 0 ? 'text-red-600' : 'text-gray-600'
+            }`}>
+              {singleStoreDetails.total_score > 0 ? '+' : ''}{singleStoreDetails.total_score.toFixed(1)}
+            </div>
+            <div className="text-xl text-muted-foreground mb-4">Total Points</div>
+            <div className="text-lg">
+              <span className="font-medium">{singleStoreDetails.total_feedback}</span> total feedback items
+            </div>
+          </div>
 
-  const getPositionIcon = (position: number) => {
-    switch (position) {
-      case 1:
-        return <Crown className="h-5 w-5 text-yellow-500" />;
-      case 2:
-        return <Trophy className="h-5 w-5 text-gray-400" />;
-      case 3:
-        return <Medal className="h-5 w-5 text-amber-600" />;
-      default:
-        return <Star className="h-5 w-5 text-muted-foreground" />;
-    }
-  };
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Feedback Breakdown */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold">Feedback Breakdown</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-950 rounded-lg">
+                  <span className="flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-green-500" />
+                    <span className="font-medium">Praise</span>
+                  </span>
+                  <div className="text-right">
+                    <div className="font-bold text-green-600">{singleStoreDetails.praise_count}</div>
+                    <div className="text-sm text-green-600">+{singleStoreDetails.praise_count * 5} pts</div>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-yellow-50 dark:bg-yellow-950 rounded-lg">
+                  <span className="flex items-center gap-2">
+                    <TrendingDown className="h-4 w-4 text-yellow-500" />
+                    <span className="font-medium">Minor Issues</span>
+                  </span>
+                  <div className="text-right">
+                    <div className="font-bold text-yellow-600">{singleStoreDetails.low_count}</div>
+                    <div className="text-sm text-yellow-600">{singleStoreDetails.low_count * -1} pts</div>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-orange-50 dark:bg-orange-950 rounded-lg">
+                  <span className="flex items-center gap-2">
+                    <TrendingDown className="h-4 w-4 text-orange-500" />
+                    <span className="font-medium">Medium Issues</span>
+                  </span>
+                  <div className="text-right">
+                    <div className="font-bold text-orange-600">{singleStoreDetails.medium_count}</div>
+                    <div className="text-sm text-orange-600">{singleStoreDetails.medium_count * -2} pts</div>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-red-50 dark:bg-red-950 rounded-lg">
+                  <span className="flex items-center gap-2">
+                    <TrendingDown className="h-4 w-4 text-red-500" />
+                    <span className="font-medium">High Priority</span>
+                  </span>
+                  <div className="text-right">
+                    <div className="font-bold text-red-600">{singleStoreDetails.high_count}</div>
+                    <div className="text-sm text-red-600">{singleStoreDetails.high_count * -3} pts</div>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-red-100 dark:bg-red-900 rounded-lg">
+                  <span className="flex items-center gap-2">
+                    <TrendingDown className="h-4 w-4 text-red-700" />
+                    <span className="font-medium">Critical Issues</span>
+                  </span>
+                  <div className="text-right">
+                    <div className="font-bold text-red-700">{singleStoreDetails.critical_count}</div>
+                    <div className="text-sm text-red-700">{singleStoreDetails.critical_count * -5} pts</div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-  const getPositionColor = (position: number) => {
-    switch (position) {
-      case 1:
-        return "bg-gradient-to-r from-yellow-400 to-yellow-600 text-white";
-      case 2:
-        return "bg-gradient-to-r from-gray-300 to-gray-500 text-white";
-      case 3:
-        return "bg-gradient-to-r from-amber-400 to-amber-600 text-white";
-      default:
-        return "bg-muted";
-    }
-  };
+            {/* Bonus Points */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold">Bonus Points</h3>
+              <div className="space-y-3">
+                <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-medium">Quick Response Bonus</span>
+                    <span className="font-bold text-blue-600">{singleStoreDetails.quick_response_bonus}</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Responses within 2 days (halves negative points)
+                  </div>
+                </div>
+                <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-medium">Positive Response Bonus</span>
+                    <span className="font-bold text-green-600">+{singleStoreDetails.positive_response_bonus * 3}</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Customers responded positively to outreach
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Performance Metrics */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold">Performance Metrics</h3>
+              <div className="space-y-3">
+                <div className="p-4 bg-muted/30 rounded-lg">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-green-600">
+                      {singleStoreDetails.total_feedback > 0 ? 
+                        Math.round((singleStoreDetails.praise_count / singleStoreDetails.total_feedback) * 100) : 0}%
+                    </div>
+                    <div className="text-sm text-muted-foreground">Praise Rate</div>
+                  </div>
+                </div>
+                <div className="p-4 bg-muted/30 rounded-lg">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-primary">
+                      {(singleStoreDetails.total_score / Math.max(singleStoreDetails.total_feedback, 1)).toFixed(1)}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Avg Points Per Feedback</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -601,9 +828,10 @@ export default function RedCarpetLeaders() {
               {storeLeaders.slice(0, 8).map((store, index) => (
                 <div
                   key={`${store.store_number}-${store.market}`}
-                  className={`flex items-center justify-between p-3 rounded-lg ${
+                  className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors hover:bg-muted/30 ${
                     index < 3 ? getPositionColor(index + 1) : 'bg-muted/50'
                   }`}
+                  onClick={() => handleStoreClick(store.store_number, store.market)}
                 >
                   <div className="flex items-center gap-3">
                     {getPositionIcon(index + 1)}
