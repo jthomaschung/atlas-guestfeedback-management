@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -29,15 +29,31 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Bug, Lightbulb, MessageCircle } from "lucide-react";
+import { Bug, Lightbulb, MessageCircle, Upload, X, Image } from "lucide-react";
 
 const feedbackSchema = z.object({
   category: z.enum(["Bug", "Feedback", "Wishlist"]),
   title: z.string().min(1, "Title is required").max(100, "Title must be less than 100 characters"),
   description: z.string().min(10, "Description must be at least 10 characters").max(1000, "Description must be less than 1000 characters"),
+  pageContext: z.string().optional(),
 });
 
 type FeedbackForm = z.infer<typeof feedbackSchema>;
+
+// Define available pages
+const pageOptions = [
+  { value: "general", label: "General / Not page-specific" },
+  { value: "/", label: "Dashboard / Home" },
+  { value: "/summary", label: "Summary" },
+  { value: "/facilities", label: "Facilities Dashboard" },
+  { value: "/submit", label: "Submit Work Order" },
+  { value: "/gfm", label: "Guest Feedback Management" },
+  { value: "/feedback-reporting", label: "Feedback Reporting" },
+  { value: "/red-carpet-leaders", label: "Red Carpet Leaders" },
+  { value: "/feedback-archive", label: "Feedback Archive" },
+  { value: "/user-hierarchy", label: "User Hierarchy" },
+  { value: "/settings", label: "Settings" },
+];
 
 interface FeedbackDialogProps {
   isOpen: boolean;
@@ -46,6 +62,9 @@ interface FeedbackDialogProps {
 
 export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [screenshot, setScreenshot] = useState<File | null>(null);
+  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
   const form = useForm<FeedbackForm>({
@@ -54,6 +73,7 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
       category: "Feedback",
       title: "",
       description: "",
+      pageContext: window.location.pathname === "/" ? "/" : window.location.pathname,
     },
   });
 
@@ -68,14 +88,41 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
     }
   };
 
-  const getCategoryDescription = (category: string) => {
-    switch (category) {
-      case "Bug":
-        return "Report a bug or technical issue";
-      case "Wishlist":
-        return "Suggest a new feature or improvement";
-      default:
-        return "Share general feedback or thoughts";
+  const handleScreenshotChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select an image file",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please select an image smaller than 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setScreenshot(file);
+      const reader = new FileReader();
+      reader.onload = (e) => setScreenshotPreview(e.target?.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeScreenshot = () => {
+    setScreenshot(null);
+    setScreenshotPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -96,6 +143,30 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
         return;
       }
 
+      // Upload screenshot if provided
+      let screenshotPath = null;
+      if (screenshot) {
+        const fileExt = screenshot.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const filePath = `${user.id}/${fileName}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('feedback-screenshots')
+          .upload(filePath, screenshot);
+
+        if (uploadError) {
+          console.error("Screenshot upload error:", uploadError);
+          toast({
+            title: "Upload failed",
+            description: "Failed to upload screenshot. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        screenshotPath = filePath;
+      }
+
       // Get browser info
       const browserInfo = {
         userAgent: navigator.userAgent,
@@ -113,6 +184,8 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
         title: data.title,
         description: data.description,
         page_url: window.location.href,
+        page_context: data.pageContext || "general",
+        screenshot_path: screenshotPath,
         browser_info: browserInfo,
       });
 
@@ -124,6 +197,7 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
       });
 
       form.reset();
+      removeScreenshot();
       onClose();
     } catch (error) {
       console.error("Error submitting feedback:", error);
@@ -139,7 +213,7 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Submit Feedback</DialogTitle>
           <DialogDescription>
@@ -204,6 +278,31 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
 
             <FormField
               control={form.control}
+              name="pageContext"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Page / Context</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select the page this feedback relates to" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {pageOptions.map((page) => (
+                        <SelectItem key={page.value} value={page.value}>
+                          {page.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem>
@@ -236,6 +335,62 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
                 </FormItem>
               )}
             />
+
+            {/* Screenshot Upload Section */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Screenshot (Optional)</label>
+              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4">
+                {screenshotPreview ? (
+                  <div className="space-y-2">
+                    <div className="relative inline-block">
+                      <img 
+                        src={screenshotPreview} 
+                        alt="Screenshot preview" 
+                        className="max-w-full max-h-48 object-contain rounded border"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                        onClick={removeScreenshot}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {screenshot?.name} ({((screenshot?.size || 0) / 1024 / 1024).toFixed(2)} MB)
+                    </p>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <Image className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Add a screenshot to help explain the issue
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Choose Image
+                    </Button>
+                  </div>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleScreenshotChange}
+                  className="hidden"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Supports PNG, JPG, GIF, WEBP. Max size: 5MB
+              </p>
+            </div>
 
             <div className="flex justify-end gap-2 pt-4">
               <Button type="button" variant="outline" onClick={onClose}>
