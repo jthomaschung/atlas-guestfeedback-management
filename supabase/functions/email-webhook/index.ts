@@ -73,6 +73,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
     console.log('📧 SENDGRID DATA RECEIVED:', JSON.stringify(webhookData, null, 2));
+    console.log('📧 AVAILABLE FIELDS:', Object.keys(webhookData));
     console.log('📧 WEBHOOK DATA TYPE:', typeof webhookData, 'IS_ARRAY:', Array.isArray(webhookData));
 
     // Check if this is a SendGrid event webhook (array of events) or inbound parse
@@ -135,7 +136,22 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Extract customer email and try to match with existing feedback
     const customerEmail = emailData.from;
-    const replyContent = emailData.text || emailData.html || '';
+    // Try multiple possible field names for email content
+    const replyContent = emailData.text || emailData.html || webhookData.text || webhookData.html || 
+                        webhookData['text/plain'] || webhookData['text/html'] || 
+                        webhookData.body || webhookData.content || '';
+    
+    console.log('📧 EMAIL CONTENT EXTRACTION:', {
+      hasEmailDataText: !!emailData.text,
+      hasEmailDataHtml: !!emailData.html,
+      hasWebhookText: !!webhookData.text,
+      hasWebhookHtml: !!webhookData.html,
+      hasWebhookTextPlain: !!webhookData['text/plain'],
+      hasWebhookTextHtml: !!webhookData['text/html'],
+      hasBody: !!webhookData.body,
+      hasContent: !!webhookData.content,
+      finalContentLength: replyContent.length
+    });
     
     // Try to extract case number from subject line
     const caseNumberMatch = emailData.subject?.match(/Case #([A-Z0-9-]+)/i);
