@@ -38,16 +38,16 @@ const priorityColors = {
 };
 
 const categoryLabels = {
-  'Sandwich Made wrong': 'Sandwich Made wrong',
+  'Sandwich Made Wrong': 'Sandwich Made Wrong',
   'Slow Service': 'Slow Service',
   'Rude Service': 'Rude Service',
-  'Product issue': 'Product issue',
+  'Product Issue': 'Product Issue',
   'Closed Early': 'Closed Early',
   'Praise': 'Praise',
-  'Missing Item': 'Missing Item',
+  'Missing Items': 'Missing Items',
   'Credit Card Issue': 'Credit Card Issue',
   'Bread Quality': 'Bread Quality',
-  'Out of product': 'Out of product',
+  'Out of Product': 'Out of Product',
   'Other': 'Other',
   'Cleanliness': 'Cleanliness',
   'Food Quality': 'Food Quality',
@@ -115,8 +115,8 @@ const getAssigneeForFeedback = async (storeNumber: string, market: string, categ
 
     // Categories that should go to DMs
     const dmCategories = [
-      'Product issue', 'Closed Early', 'Credit Card Issue', 'Bread Quality',
-      'Out of product', 'Other', 'Multiple Issues', 'Delivery Service'
+      'Product Issue', 'Closed Early', 'Credit Card Issue', 'Bread Quality',
+      'Out of Product', 'Other', 'Multiple Issues', 'Delivery Service'
     ];
 
     if (dmCategories.includes(category)) {
