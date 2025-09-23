@@ -54,14 +54,22 @@ const priorityOptions = [
 ];
 
 const categoryOptions = [
-  { value: 'Food Quality', label: 'Food Quality' },
-  { value: 'Service Quality', label: 'Service Quality' },
+  { value: 'Bread Quality', label: 'Bread Quality' },
   { value: 'Cleanliness', label: 'Cleanliness' },
-  { value: 'Speed of Service', label: 'Speed of Service' },
-  { value: 'Order Accuracy', label: 'Order Accuracy' },
-  { value: 'Staff Behavior', label: 'Staff Behavior' },
-  { value: 'Facility', label: 'Facility' },
+  { value: 'Closed Early', label: 'Closed Early' },
+  { value: 'Missing Item', label: 'Missing Item' },
+  { value: 'Missing Items', label: 'Missing Items' },
   { value: 'Other', label: 'Other' },
+  { value: 'Out of Product', label: 'Out of Product' },
+  { value: 'Out Of Product', label: 'Out Of Product' },
+  { value: 'Praise', label: 'Praise' },
+  { value: 'Pricing Issue', label: 'Pricing Issue' },
+  { value: 'Product issue', label: 'Product issue' },
+  { value: 'Product Issue', label: 'Product Issue' },
+  { value: 'Rude Service', label: 'Rude Service' },
+  { value: 'Sandwich Made wrong', label: 'Sandwich Made wrong' },
+  { value: 'Sandwich Made Wrong', label: 'Sandwich Made Wrong' },
+  { value: 'Slow Service', label: 'Slow Service' },
 ];
 
 const channelOptions = [

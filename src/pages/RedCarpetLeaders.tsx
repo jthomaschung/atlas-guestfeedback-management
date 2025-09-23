@@ -133,7 +133,7 @@ export default function RedCarpetLeaders() {
       feedbacks?.forEach(feedback => {
         const market = feedback.market;
         const storeKey = `${feedback.store_number}-${market}`;
-        const isPraise = feedback.complaint_category?.toLowerCase().includes('praise');
+        const isPraise = feedback.complaint_category === 'Praise';
 
         // Market stats
         if (!marketStats[market]) {
