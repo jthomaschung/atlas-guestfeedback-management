@@ -73,30 +73,24 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
     
-    // SIMPLE DEBUG: Write raw webhook data to database for analysis
-    try {
-      await supabase
-        .from('customer_outreach_log')
-        .insert({
-          feedback_id: '00000000-0000-0000-0000-000000000000', // Dummy ID for debugging
-          direction: 'inbound',
-          outreach_method: 'email',
-          message_content: `DEBUG_RAW_WEBHOOK: ${JSON.stringify(webhookData)}`,
-          from_email: 'webhook-debug@system.local',
-          to_email: 'debug@system.local',
-          subject: 'WEBHOOK_DEBUG_DATA',
-          delivery_status: 'delivered'
-        });
-      console.log('✅ DEBUG DATA WRITTEN TO DATABASE');
-    } catch (debugError) {
-      console.error('❌ DEBUG WRITE FAILED:', debugError);
+    // IMMEDIATE COMPREHENSIVE LOGGING - before any processing
+    console.log('🚨 WEBHOOK TRIGGERED - RAW DATA ANALYSIS:');
+    console.log('📦 typeof webhookData:', typeof webhookData);
+    console.log('📦 is Array:', Array.isArray(webhookData));
+    console.log('📦 Object.keys:', Object.keys(webhookData || {}));
+    
+    // Log each field for debugging
+    if (webhookData && typeof webhookData === 'object' && !Array.isArray(webhookData)) {
+      Object.entries(webhookData).forEach(([key, value]) => {
+        console.log(`🔑 FIELD "${key}": ${typeof value} = ${JSON.stringify(value)?.substring(0, 100)}...`);
+      });
     }
     
-    // COMPREHENSIVE LOGGING - Log ALL webhook data to identify correct field names
-    console.log('🔍 COMPLETE WEBHOOK ANALYSIS:');
-    console.log('📧 WEBHOOK RAW DATA:', JSON.stringify(webhookData, null, 2));
-    console.log('📧 WEBHOOK DATA TYPE:', typeof webhookData, 'IS_ARRAY:', Array.isArray(webhookData));
-    console.log('📧 TOP-LEVEL FIELDS:', Object.keys(webhookData));
+    if (Array.isArray(webhookData) && webhookData.length > 0) {
+      console.log('📦 FIRST ARRAY ITEM:', JSON.stringify(webhookData[0], null, 2));
+    }
+    
+    console.log('📦 COMPLETE DATA DUMP:', JSON.stringify(webhookData, null, 2));
 
     // Check if this is a SendGrid event webhook (array of events) or inbound parse
     if (Array.isArray(webhookData) && webhookData[0]?.event) {
