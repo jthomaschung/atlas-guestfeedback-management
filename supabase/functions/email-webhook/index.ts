@@ -72,14 +72,25 @@ const handler = async (req: Request): Promise<Response> => {
         }
       }
     }
-    console.log('📧 SENDGRID DATA RECEIVED:', JSON.stringify(webhookData, null, 2));
-    console.log('📧 AVAILABLE FIELDS:', Object.keys(webhookData));
-    console.log('📧 WEBHOOK DATA TYPE:', typeof webhookData, 'IS_ARRAY:', Array.isArray(webhookData));
     
-    // If it's an array, log the first item's keys for easier debugging
+    // COMPREHENSIVE LOGGING - Log ALL webhook data to identify correct field names
+    console.log('🔍 COMPLETE WEBHOOK ANALYSIS:');
+    console.log('📧 WEBHOOK RAW DATA:', JSON.stringify(webhookData, null, 2));
+    console.log('📧 WEBHOOK DATA TYPE:', typeof webhookData, 'IS_ARRAY:', Array.isArray(webhookData));
+    console.log('📧 TOP-LEVEL FIELDS:', Object.keys(webhookData));
+    
+    // If it's an array, analyze the first item
     if (Array.isArray(webhookData) && webhookData.length > 0) {
-      console.log('📧 FIRST ITEM FIELDS:', Object.keys(webhookData[0]));
-      console.log('📧 FIRST ITEM SAMPLE:', JSON.stringify(webhookData[0], null, 2));
+      console.log('📧 ARRAY FIRST ITEM FIELDS:', Object.keys(webhookData[0]));
+      console.log('📧 ARRAY FIRST ITEM DATA:', JSON.stringify(webhookData[0], null, 2));
+    }
+    
+    // Log each top-level field and its value for non-array data
+    if (!Array.isArray(webhookData)) {
+      Object.keys(webhookData).forEach(key => {
+        const value = webhookData[key];
+        console.log(`🔑 FIELD "${key}":`, typeof value, value ? JSON.stringify(value).substring(0, 200) : 'null/undefined');
+      });
     }
 
     // Check if this is a SendGrid event webhook (array of events) or inbound parse
