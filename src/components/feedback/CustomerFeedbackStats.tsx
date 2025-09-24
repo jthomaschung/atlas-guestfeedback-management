@@ -18,7 +18,7 @@ export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFee
     fb.resolution_status !== 'resolved' && 
     (fb.priority === 'Critical' || fb.complaint_category === 'Out of Product' || fb.complaint_category === 'Rude Service')
   ).length;
-  const praise = feedbacks.filter(fb => fb.priority === 'Praise').length;
+  const praise = feedbacks.filter(fb => fb.complaint_category === 'Praise').length;
 
   const stats = [
     {
