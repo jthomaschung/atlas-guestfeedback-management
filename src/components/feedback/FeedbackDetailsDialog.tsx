@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useUserPermissions } from "@/hooks/useUserPermissions";
+import { useFeedbackNotifications } from "@/hooks/useFeedbackNotifications";
 import { EmailConversationDialog } from "./EmailConversationDialog";
 
 interface FeedbackDetailsDialogProps {
@@ -171,6 +172,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const [showEmailConversation, setShowEmailConversation] = useState(false);
   const { toast } = useToast();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
+  const { sendAssignmentNotification } = useFeedbackNotifications();
   const processedFeedbackId = useRef<string | null>(null);
 
   const isAdmin = permissions?.role?.toLowerCase() === 'admin' || permissions?.role?.toLowerCase() === 'dm' || permissions?.isAdmin;
@@ -372,6 +374,37 @@ Customer Service Team`);
       toast({
         title: "Error",
         description: "Failed to send outreach email. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleTestNotifications = async () => {
+    if (!feedback || !assignee || assignee === 'Unassigned') {
+      toast({
+        title: "Error",
+        description: "Please assign this feedback to someone before testing notifications.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Test the notification system
+      await sendAssignmentNotification(feedback.id, assignee);
+      
+      toast({
+        title: "Test Notification Sent",
+        description: `Test notification emails sent for assignee: ${assignee}`,
+      });
+    } catch (error) {
+      console.error('Error testing notifications:', error);
+      toast({
+        title: "Test Failed",
+        description: "Failed to send test notifications. Check console for details.",
         variant: "destructive",
       });
     } finally {
@@ -738,6 +771,15 @@ Customer Service Team`);
           <Button variant="outline" onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>
+          {isAdmin && (
+            <Button 
+              variant="secondary" 
+              onClick={handleTestNotifications} 
+              disabled={isLoading || !assignee || assignee === 'Unassigned'}
+            >
+              {isLoading ? "Testing..." : "🧪 Test Notifications"}
+            </Button>
+          )}
           <Button onClick={handleSave} disabled={isLoading}>
             {isLoading ? "Saving..." : "Save Changes"}
           </Button>
