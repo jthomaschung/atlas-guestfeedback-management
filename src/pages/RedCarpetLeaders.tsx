@@ -429,17 +429,17 @@ export default function RedCarpetLeaders() {
   }, [storeLeaders]);
 
   // Helper functions for UI display
-  const getPositionIcon = (index: number) => {
-    if (index === 0) return "🥇";
-    if (index === 1) return "🥈";
-    if (index === 2) return "🥉";
-    return `${index + 1}`;
+  const getPositionIcon = (position: number) => {
+    if (position === 1) return "🥇";
+    if (position === 2) return "🥈";
+    if (position === 3) return "🥉";
+    return `${position}`;
   };
 
-  const getPositionColor = (index: number) => {
-    if (index === 0) return "text-yellow-500";
-    if (index === 1) return "text-gray-400";
-    if (index === 2) return "text-amber-600";
+  const getPositionColor = (position: number) => {
+    if (position === 1) return "text-yellow-500";
+    if (position === 2) return "text-gray-400";
+    if (position === 3) return "text-amber-600";
     return "text-muted-foreground";
   };
 
