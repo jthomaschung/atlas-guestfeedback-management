@@ -151,8 +151,18 @@ const Index = () => {
       let matchesDateRange = true;
       if (dateFrom || dateTo) {
         const feedbackDate = new Date(fb.feedback_date);
-        if (dateFrom && feedbackDate < dateFrom) matchesDateRange = false;
-        if (dateTo && feedbackDate > dateTo) matchesDateRange = false;
+        
+        if (dateFrom) {
+          const fromDate = new Date(dateFrom);
+          fromDate.setHours(0, 0, 0, 0); // Start of the day
+          if (feedbackDate < fromDate) matchesDateRange = false;
+        }
+        
+        if (dateTo) {
+          const toDate = new Date(dateTo);
+          toDate.setHours(23, 59, 59, 999); // End of the day
+          if (feedbackDate > toDate) matchesDateRange = false;
+        }
       }
       
       return matchesSearch && matchesStatus && matchesPriority && matchesCategory && 
