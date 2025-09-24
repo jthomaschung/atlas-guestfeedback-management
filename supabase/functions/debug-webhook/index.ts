@@ -55,7 +55,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
     } catch (error) {
       console.error('Error parsing webhook data:', error);
-      webhookData = { error: 'Failed to parse webhook data', errorMessage: error.message };
+      webhookData = { error: 'Failed to parse webhook data', errorMessage: (error as Error).message };
     }
 
     // Store EVERYTHING in debug table

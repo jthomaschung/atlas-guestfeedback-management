@@ -328,7 +328,6 @@ async function generateEmailContent(
       subject = `URGENT: Your feedback has been escalated - Case #${feedback.case_number}`;
       emailComponent = React.createElement(EscalationEmail, {
         ...baseProps,
-        priority: feedback.priority,
         escalationReason: options.escalationReason || 'High priority feedback requiring immediate management attention',
         managerContact: options.managerContact,
       });

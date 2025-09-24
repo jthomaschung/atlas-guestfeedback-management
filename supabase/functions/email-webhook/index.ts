@@ -327,8 +327,8 @@ const handler = async (req: Request): Promise<Response> => {
         from_email: customerEmail,
         to_email: 'guest.feedback@atlaswe.com',
         subject: emailData.subject,
-        email_message_id: emailData.messageId,
-        email_thread_id: emailData.inReplyTo || emailData.messageId,
+        email_message_id: (emailData as any).messageId || null,
+        email_thread_id: (emailData as any).inReplyTo || (emailData as any).messageId || null,
         response_received: true,
         response_sentiment: sentiment,
         delivery_status: 'delivered'
@@ -362,7 +362,7 @@ const handler = async (req: Request): Promise<Response> => {
       .eq('id', feedbackId);
 
     // Route the message to appropriate team members based on sentiment and content
-    await routeInboundMessage(supabase, feedbackId, sentiment, replyContent);
+    await routeInboundMessage(supabase, feedbackId!, sentiment, replyContent);
 
     console.log('Successfully processed inbound email');
 
@@ -473,7 +473,7 @@ async function routeInboundMessage(
 
       // In a real implementation, you would send notifications to these managers
       // For now, we just log the routing decision
-      console.log('Would notify managers:', managers?.map(m => m.user_id));
+      console.log('Would notify managers:', managers?.map((m: any) => m.user_id));
     }
 
     // Log the routing decision

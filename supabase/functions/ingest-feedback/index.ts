@@ -242,7 +242,7 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
   console.log('Final complaint category:', complaint_category)
   console.log('Validated data:', JSON.stringify(validatedData, null, 2))
   
-  return validatedData
+  return { ...validatedData, rating: validatedData.rating ?? undefined }
 }
 
 Deno.serve(async (req) => {
@@ -371,7 +371,7 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: 'Failed to parse request body',
-          details: parseError.message,
+          details: (parseError as Error).message,
           contentType,
           bodyLength: rawBody.length
         }),
@@ -456,7 +456,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         error: 'Internal server error',
-        message: error.message
+        message: (error as Error).message
       }),
       { 
         status: 500, 
