@@ -65,6 +65,17 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
+    // Get all email recipients (assignee, supervisor, director)
+    const emailRecipients = await getNotificationRecipients(supabase, assigneeEmail);
+    
+    if (emailRecipients.length === 0) {
+      console.error('No valid email recipients found');
+      return new Response(JSON.stringify({ error: 'No valid email recipients found' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Prepare email content
     const subject = `New Guest Feedback Assignment - Case #${feedback.case_number}`;
     const htmlContent = `
@@ -167,45 +178,56 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
-    // Send email via SendGrid
-    const emailResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${sendGridApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        personalizations: [
-          {
-            to: [{ email: assigneeEmail }],
-            subject: subject,
-          },
-        ],
-        from: {
-          email: 'noreply@guestfeedback.com',
-          name: 'Guest Feedback System',
+    // Send emails to all recipients (assignee, supervisor, director)
+    const emailPromises = emailRecipients.map(async (recipient) => {
+      const roleSpecificSubject = `${subject} - ${recipient.role}`;
+      
+      return fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${sendGridApiKey}`,
+          'Content-Type': 'application/json',
         },
-        content: [
-          {
-            type: 'text/html',
-            value: htmlContent,
+        body: JSON.stringify({
+          personalizations: [
+            {
+              to: [{ email: recipient.email }],
+              subject: roleSpecificSubject,
+            },
+          ],
+          from: {
+            email: 'noreply@guestfeedback.com',
+            name: 'Guest Feedback System',
           },
-        ],
-      }),
+          content: [
+            {
+              type: 'text/html',
+              value: getHtmlContentForRole(htmlContent, recipient.role),
+            },
+          ],
+        }),
+      });
     });
 
-    if (!emailResponse.ok) {
-      const errorText = await emailResponse.text();
-      console.error('SendGrid error:', errorText);
-      throw new Error(`SendGrid API error: ${emailResponse.status}`);
+    const emailResponses = await Promise.allSettled(emailPromises);
+
+    // Check for any failed emails
+    const failedEmails = emailResponses.filter(response => response.status === 'rejected');
+    const successfulEmails = emailResponses.filter(response => response.status === 'fulfilled');
+
+    if (failedEmails.length > 0) {
+      console.error('Some emails failed to send:', failedEmails);
     }
 
-    console.log(`Notification email sent to ${assigneeEmail} for feedback ${feedbackId}`);
+    const emailList = emailRecipients.map(r => `${r.email} (${r.role})`).join(', ');
+    console.log(`Notification emails sent to: ${emailList} for feedback ${feedbackId}`);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Notification email sent successfully' 
+        message: `Notification emails sent to ${successfulEmails.length} recipients`,
+        recipients: emailRecipients.map(r => ({ email: r.email, role: r.role })),
+        failed: failedEmails.length
       }),
       {
         status: 200,
@@ -244,6 +266,100 @@ function getPriorityColor(priority: string): string {
     default:
       return '#6b7280'; // gray-500
   }
+}
+
+// Helper function to get notification recipients (assignee, supervisor, director)
+async function getNotificationRecipients(supabase: any, assigneeEmail: string) {
+  const recipients = [];
+
+  try {
+    // Get the assignee's profile and user_id from email
+    const { data: assigneeProfile } = await supabase
+      .from('profiles')
+      .select('user_id, email, display_name')
+      .eq('email', assigneeEmail)
+      .maybeSingle();
+
+    if (assigneeProfile) {
+      recipients.push({
+        email: assigneeProfile.email,
+        role: 'Assignee',
+        name: assigneeProfile.display_name
+      });
+
+      // Get the user's hierarchy to find supervisor and director
+      const { data: hierarchy } = await supabase
+        .from('user_hierarchy')
+        .select('manager_id, director_id')
+        .eq('user_id', assigneeProfile.user_id)
+        .maybeSingle();
+
+      if (hierarchy) {
+        // Get manager/supervisor details
+        if (hierarchy.manager_id) {
+          const { data: managerProfile } = await supabase
+            .from('profiles')
+            .select('email, display_name')
+            .eq('user_id', hierarchy.manager_id)
+            .maybeSingle();
+
+          if (managerProfile && managerProfile.email) {
+            recipients.push({
+              email: managerProfile.email,
+              role: 'Supervisor',
+              name: managerProfile.display_name
+            });
+          }
+        }
+
+        // Get director details
+        if (hierarchy.director_id) {
+          const { data: directorProfile } = await supabase
+            .from('profiles')
+            .select('email, display_name')
+            .eq('user_id', hierarchy.director_id)
+            .maybeSingle();
+
+          if (directorProfile && directorProfile.email) {
+            recipients.push({
+              email: directorProfile.email,
+              role: 'Director',
+              name: directorProfile.display_name
+            });
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching notification recipients:', error);
+  }
+
+  return recipients;
+}
+
+// Helper function to customize email content based on role
+function getHtmlContentForRole(baseHtmlContent: string, role: string): string {
+  let roleSpecificMessage = '';
+  
+  switch (role) {
+    case 'Assignee':
+      roleSpecificMessage = '<p style="color: #dc2626; font-weight: bold; margin-bottom: 15px;">You have been assigned to handle this guest feedback case.</p>';
+      break;
+    case 'Supervisor':
+      roleSpecificMessage = '<p style="color: #ea580c; font-weight: bold; margin-bottom: 15px;">A guest feedback case has been assigned to one of your team members. Please monitor the progress and provide support as needed.</p>';
+      break;
+    case 'Director':
+      roleSpecificMessage = '<p style="color: #d97706; font-weight: bold; margin-bottom: 15px;">A guest feedback case has been assigned in your area. This is for your awareness and oversight.</p>';
+      break;
+    default:
+      roleSpecificMessage = '<p style="color: #6b7280; font-weight: bold; margin-bottom: 15px;">A guest feedback case notification.</p>';
+  }
+
+  // Insert the role-specific message after the header
+  return baseHtmlContent.replace(
+    '<div style="background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px;">',
+    `${roleSpecificMessage}<div style="background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px;">`
+  );
 }
 
 serve(handler);
