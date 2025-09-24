@@ -232,7 +232,7 @@ export function CustomerFeedbackCard({
             <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
               <div className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
-                <span>{format(new Date(feedback.feedback_date), 'MMM d, yyyy')}</span>
+                <span>{format(new Date(feedback.feedback_date + 'T00:00:00'), 'MMM d, yyyy')}</span>
               </div>
               
               <div className="flex items-center gap-1">

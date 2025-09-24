@@ -150,7 +150,8 @@ const Index = () => {
       // Apply date filters if set
       let matchesDateRange = true;
       if (dateFrom || dateTo) {
-        const feedbackDate = new Date(fb.feedback_date);
+        // Ensure feedback_date is treated as local date, not UTC
+        const feedbackDate = new Date(fb.feedback_date + 'T00:00:00');
         
         if (dateFrom) {
           const fromDate = new Date(dateFrom);
