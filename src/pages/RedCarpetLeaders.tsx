@@ -18,7 +18,7 @@ interface MarketLeader {
   market: string;
   praiseCount: number;
   totalFeedback: number;
-  praisePercentage: number;
+  totalScore: number;
 }
 
 interface StoreLeader {
@@ -26,7 +26,7 @@ interface StoreLeader {
   market: string;
   praiseCount: number;
   totalFeedback: number;
-  praisePercentage: number;
+  totalScore: number;
 }
 
 interface StoreDetails {
@@ -102,7 +102,7 @@ export default function RedCarpetLeaders() {
 
       let query = supabase
         .from('customer_feedback')
-        .select('market, store_number, complaint_category, feedback_date');
+        .select('market, store_number, complaint_category, feedback_date, calculated_score');
 
       // Apply period filtering
       if (selectedPeriod !== "all") {
@@ -127,42 +127,45 @@ export default function RedCarpetLeaders() {
       }
 
       // Process market leaders
-      const marketStats: { [market: string]: { praise: number; total: number } } = {};
-      const storeStats: { [key: string]: { market: string; praise: number; total: number } } = {};
+      const marketStats: { [market: string]: { praise: number; total: number; score: number } } = {};
+      const storeStats: { [key: string]: { market: string; praise: number; total: number; score: number } } = {};
 
       feedbacks?.forEach(feedback => {
         const market = feedback.market;
         const storeKey = `${feedback.store_number}-${market}`;
-        const isPraise = feedback.complaint_category === 'Praise';
+        const category = feedback.complaint_category;
+        const score = feedback.calculated_score || 0;
 
         // Market stats
         if (!marketStats[market]) {
-          marketStats[market] = { praise: 0, total: 0 };
+          marketStats[market] = { praise: 0, total: 0, score: 0 };
         }
         marketStats[market].total++;
-        if (isPraise) {
+        marketStats[market].score += score;
+        if (category === 'Praise') {
           marketStats[market].praise++;
         }
 
         // Store stats
         if (!storeStats[storeKey]) {
-          storeStats[storeKey] = { market, praise: 0, total: 0 };
+          storeStats[storeKey] = { market, praise: 0, total: 0, score: 0 };
         }
         storeStats[storeKey].total++;
-        if (isPraise) {
+        storeStats[storeKey].score += score;
+        if (category === 'Praise') {
           storeStats[storeKey].praise++;
         }
       });
 
-      // Convert to arrays and calculate percentages
+      // Convert to arrays and sort by total score
       const marketLeaderData: MarketLeader[] = Object.entries(marketStats)
         .map(([market, stats]) => ({
           market,
           praiseCount: stats.praise,
           totalFeedback: stats.total,
-          praisePercentage: stats.total > 0 ? Math.round((stats.praise / stats.total) * 100) : 0
+          totalScore: stats.score
         }))
-        .sort((a, b) => b.praiseCount - a.praiseCount);
+        .sort((a, b) => b.totalScore - a.totalScore);
 
       const storeLeaderData: StoreLeader[] = Object.entries(storeStats)
         .map(([storeKey, stats]) => {
@@ -172,10 +175,10 @@ export default function RedCarpetLeaders() {
             market: stats.market,
             praiseCount: stats.praise,
             totalFeedback: stats.total,
-            praisePercentage: stats.total > 0 ? Math.round((stats.praise / stats.total) * 100) : 0
+            totalScore: stats.score
           };
         })
-        .sort((a, b) => b.praiseCount - a.praiseCount);
+        .sort((a, b) => b.totalScore - a.totalScore);
 
       setMarketLeaders(marketLeaderData);
       setStoreLeaders(storeLeaderData);
@@ -801,7 +804,7 @@ export default function RedCarpetLeaders() {
               Top Markets
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              Markets with the most praise feedback
+              Markets with the highest total scores
             </p>
           </CardHeader>
           <CardContent>
@@ -819,7 +822,7 @@ export default function RedCarpetLeaders() {
                     <div>
                       <div className="font-medium">{market.market}</div>
                       <div className="text-sm opacity-80">
-                        {market.praiseCount} praise • {market.praisePercentage}% positive
+                        {market.totalScore > 0 ? '+' : ''}{market.totalScore.toFixed(1)} total points
                       </div>
                     </div>
                   </div>
@@ -840,7 +843,7 @@ export default function RedCarpetLeaders() {
               Top Stores
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              Top performing stores company-wide
+              Stores with the highest total scores
             </p>
           </CardHeader>
           <CardContent>
@@ -858,7 +861,7 @@ export default function RedCarpetLeaders() {
                     <div>
                       <div className="font-medium">Store {store.store_number}</div>
                       <div className="text-sm opacity-80">
-                        {store.market} • {store.praiseCount} praise • {store.praisePercentage}%
+                        {store.market} • {store.totalScore > 0 ? '+' : ''}{store.totalScore.toFixed(1)} total points
                       </div>
                     </div>
                   </div>
