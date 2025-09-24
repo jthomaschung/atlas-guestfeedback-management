@@ -118,7 +118,7 @@ const Index = () => {
 
   // Filter and sort feedbacks
   const filteredFeedbacks = useMemo(() => {
-    const filtered = feedbacks.filter(fb => {
+    let filtered = feedbacks.filter(fb => {
       const matchesSearch = fb.feedback_text?.toLowerCase().includes(searchTerm.toLowerCase()) || 
                            fb.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
                            fb.case_number.includes(searchTerm) ||
@@ -147,8 +147,17 @@ const Index = () => {
         }
       }
       
+      // Apply date filters if set
+      let matchesDateRange = true;
+      if (dateFrom || dateTo) {
+        const feedbackDate = new Date(fb.feedback_date);
+        if (dateFrom && feedbackDate < dateFrom) matchesDateRange = false;
+        if (dateTo && feedbackDate > dateTo) matchesDateRange = false;
+      }
+      
       return matchesSearch && matchesStatus && matchesPriority && matchesCategory && 
-              matchesChannel && matchesStore && matchesMarket && matchesAssignee && matchesPeriod;
+              matchesChannel && matchesStore && matchesMarket && matchesAssignee && 
+              matchesPeriod && matchesDateRange;
     });
 
     // Apply sorting
@@ -156,13 +165,6 @@ const Index = () => {
       const dateA = new Date(a.created_at).getTime();
       const dateB = new Date(b.created_at).getTime();
       return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
-    });
-    
-    // Apply date filters if set
-    return filtered.filter(fb => {
-      if (dateFrom && new Date(fb.feedback_date) < dateFrom) return false;
-      if (dateTo && new Date(fb.feedback_date) > dateTo) return false;
-      return true;
     });
   }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, sortOrder, dateFrom, dateTo]);
 
