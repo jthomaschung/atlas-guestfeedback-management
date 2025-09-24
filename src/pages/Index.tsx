@@ -370,6 +370,13 @@ const Index = () => {
               }
             } else if (type === 'priority') {
               setPriorityFilter([value]);
+            } else if (type === 'category') {
+              setCategoryFilter([value]);
+            } else if (type === 'critical') {
+              // Clear other filters and show critical issues using multiple filters
+              setStatusFilter(['unopened', 'opened', 'responded', 'escalated']); // Exclude resolved
+              setPriorityFilter(['Critical']);
+              setCategoryFilter(['Out of Product', 'Rude Service']);
             }
           }}
         />

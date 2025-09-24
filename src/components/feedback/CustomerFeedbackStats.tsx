@@ -4,7 +4,7 @@ import { MessageSquare, Clock, CheckCircle, AlertTriangle, Star } from "lucide-r
 
 interface CustomerFeedbackStatsProps {
   feedbacks: CustomerFeedback[];
-  onFilterChange?: (type: 'status' | 'priority', value: string) => void;
+  onFilterChange?: (type: 'status' | 'priority' | 'category' | 'critical', value: string) => void;
 }
 
 export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFeedbackStatsProps) {
@@ -47,14 +47,14 @@ export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFee
       value: critical,
       icon: AlertTriangle,
       color: 'text-red-600',
-      onClick: () => onFilterChange?.('priority', 'Critical'),
+      onClick: () => onFilterChange?.('critical', 'critical'),
     },
     {
       title: 'Praise Received',
       value: praise,
       icon: Star,
       color: 'text-emerald-600',
-      onClick: () => onFilterChange?.('priority', 'Praise'),
+      onClick: () => onFilterChange?.('category', 'Praise'),
     },
   ];
 
