@@ -30,7 +30,7 @@ const storeNumbers = [
   '3686', '3972', '4018', '4022', '4024', '4105', '4330', '4358', '4586'
 ].map(num => `#${num}`);
 
-const roles = ['Store Level', 'DM', 'GM/DM', 'Director', 'Admin'];
+const roles = ['Store Level', 'DM', 'GM/DM', 'Director', 'VP', 'CEO', 'Admin'];
 
 interface UserProfile {
   user_id: string;

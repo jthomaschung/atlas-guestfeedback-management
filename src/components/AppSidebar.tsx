@@ -1,4 +1,4 @@
-import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive, UserCheck, Trophy, TrendingUp } from "lucide-react";
+import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive, UserCheck, Trophy, TrendingUp, Shield } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
 import {
@@ -24,6 +24,10 @@ const guestFeedbackItems = [
 
 const archiveItems = [
   { title: "Feedback Archive", url: "/feedback-archive", icon: Archive },
+];
+
+const executiveItems = [
+  { title: "Executive Oversight", url: "/executive-oversight", icon: Shield },
 ];
 
 const adminItems = [
@@ -86,6 +90,24 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {archiveItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink to={item.url} end className={getNavCls}>
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {state !== "collapsed" && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Executive</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {executiveItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} end className={getNavCls}>

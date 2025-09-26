@@ -24,4 +24,10 @@ export interface CustomerFeedback {
   customer_responded_at?: string;
   customer_response_sentiment?: string;
   calculated_score?: number;
+  // New escalation fields
+  escalated_at?: string;
+  escalated_by?: string;
+  executive_notes?: string;
+  sla_deadline?: string;
+  auto_escalated?: boolean;
 }

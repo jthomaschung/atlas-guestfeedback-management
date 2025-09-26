@@ -1352,6 +1352,10 @@ export type Database = {
         Args: { period_uuid: string; user_uuid: string }
         Returns: boolean
       }
+      check_sla_violations: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       check_sniper_badge: {
         Args: { period_uuid: string; user_uuid: string }
         Returns: boolean
@@ -1511,6 +1515,16 @@ export type Database = {
           percent_complete: number
           status: string
           training_module_name: string
+        }[]
+      }
+      get_executive_hierarchy: {
+        Args: { feedback_market: string; feedback_store: string }
+        Returns: {
+          display_name: string
+          email: string
+          notification_level: number
+          role: string
+          user_id: string
         }[]
       }
       get_market_class_category_counts: {

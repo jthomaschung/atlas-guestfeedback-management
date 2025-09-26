@@ -19,6 +19,7 @@ import Index from '@/pages/Index';
 import FacilitiesDashboard from '@/pages/FacilitiesDashboard';
 import SubmitWorkOrder from '@/pages/SubmitWorkOrder';
 import UserHierarchy from '@/pages/UserHierarchy';
+import ExecutiveOversight from '@/pages/ExecutiveOversight';
 
 import GFM from '@/pages/GFM';
 import FeedbackArchive from '@/pages/FeedbackArchive';
@@ -319,13 +320,21 @@ function App() {
                  } 
                />
                <Route
-                path="/user-hierarchy" 
-                element={
-                  <ProtectedRoute>
-                    <UserHierarchy />
-                  </ProtectedRoute>
-                } 
-              />
+                 path="/user-hierarchy" 
+                 element={
+                   <ProtectedRoute>
+                     <UserHierarchy />
+                   </ProtectedRoute>
+                 } 
+               />
+               <Route
+                 path="/executive-oversight" 
+                 element={
+                   <ProtectedRoute>
+                     <ExecutiveOversight />
+                   </ProtectedRoute>
+                 } 
+               />
               <Route 
                 path="/gfm" 
                 element={
