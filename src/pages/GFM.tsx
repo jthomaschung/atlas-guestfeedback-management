@@ -33,7 +33,7 @@ export default function GFM() {
         .from('customer_feedback')
         .select('*')
         .eq('assignee', 'guestfeedback@atlaswe.com')
-        .in('resolution_status', ['opened', 'responded'])
+        .in('resolution_status', ['unopened', 'opened', 'responded'])
         .order('created_at', { ascending: false });
 
       if (error) throw error;
