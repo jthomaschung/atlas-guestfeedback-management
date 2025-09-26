@@ -188,6 +188,7 @@ export type Database = {
       customer_feedback: {
         Row: {
           assignee: string | null
+          auto_escalated: boolean | null
           calculated_score: number | null
           case_number: string
           channel: string
@@ -199,6 +200,9 @@ export type Database = {
           customer_responded_at: string | null
           customer_response_sentiment: string | null
           ee_action: string | null
+          escalated_at: string | null
+          escalated_by: string | null
+          executive_notes: string | null
           feedback_date: string
           feedback_text: string | null
           id: string
@@ -210,6 +214,7 @@ export type Database = {
           rating: number | null
           resolution_notes: string | null
           resolution_status: string | null
+          sla_deadline: string | null
           store_number: string
           updated_at: string
           user_id: string
@@ -217,6 +222,7 @@ export type Database = {
         }
         Insert: {
           assignee?: string | null
+          auto_escalated?: boolean | null
           calculated_score?: number | null
           case_number: string
           channel: string
@@ -228,6 +234,9 @@ export type Database = {
           customer_responded_at?: string | null
           customer_response_sentiment?: string | null
           ee_action?: string | null
+          escalated_at?: string | null
+          escalated_by?: string | null
+          executive_notes?: string | null
           feedback_date: string
           feedback_text?: string | null
           id?: string
@@ -239,6 +248,7 @@ export type Database = {
           rating?: number | null
           resolution_notes?: string | null
           resolution_status?: string | null
+          sla_deadline?: string | null
           store_number: string
           updated_at?: string
           user_id: string
@@ -246,6 +256,7 @@ export type Database = {
         }
         Update: {
           assignee?: string | null
+          auto_escalated?: boolean | null
           calculated_score?: number | null
           case_number?: string
           channel?: string
@@ -257,6 +268,9 @@ export type Database = {
           customer_responded_at?: string | null
           customer_response_sentiment?: string | null
           ee_action?: string | null
+          escalated_at?: string | null
+          escalated_by?: string | null
+          executive_notes?: string | null
           feedback_date?: string
           feedback_text?: string | null
           id?: string
@@ -268,6 +282,7 @@ export type Database = {
           rating?: number | null
           resolution_notes?: string | null
           resolution_status?: string | null
+          sla_deadline?: string | null
           store_number?: string
           updated_at?: string
           user_id?: string
@@ -533,6 +548,53 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "stores"
             referencedColumns: ["store_number"]
+          },
+        ]
+      }
+      escalation_log: {
+        Row: {
+          created_at: string
+          escalated_at: string
+          escalated_by: string | null
+          escalated_from: string
+          escalated_to: string
+          escalation_reason: string
+          executive_notes: string | null
+          feedback_id: string
+          id: string
+          resolved_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          escalated_at?: string
+          escalated_by?: string | null
+          escalated_from: string
+          escalated_to: string
+          escalation_reason: string
+          executive_notes?: string | null
+          feedback_id: string
+          id?: string
+          resolved_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          escalated_at?: string
+          escalated_by?: string | null
+          escalated_from?: string
+          escalated_to?: string
+          escalation_reason?: string
+          executive_notes?: string | null
+          feedback_id?: string
+          id?: string
+          resolved_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escalation_log_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "customer_feedback"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1173,9 +1235,11 @@ export type Database = {
           ecosure: string
           id: string
           image_url: string | null
+          image_urls: Json | null
           is_recurring: boolean | null
           market: string
           notes: string[] | null
+          parts_delivery_date: string | null
           previous_status: string | null
           priority: string
           recurrence_confidence_score: number | null
@@ -1202,9 +1266,11 @@ export type Database = {
           ecosure: string
           id?: string
           image_url?: string | null
+          image_urls?: Json | null
           is_recurring?: boolean | null
           market: string
           notes?: string[] | null
+          parts_delivery_date?: string | null
           previous_status?: string | null
           priority: string
           recurrence_confidence_score?: number | null
@@ -1231,9 +1297,11 @@ export type Database = {
           ecosure?: string
           id?: string
           image_url?: string | null
+          image_urls?: Json | null
           is_recurring?: boolean | null
           market?: string
           notes?: string[] | null
+          parts_delivery_date?: string | null
           previous_status?: string | null
           priority?: string
           recurrence_confidence_score?: number | null
@@ -1653,6 +1721,7 @@ export type Database = {
       }
     }
     Enums: {
+      app_role: "admin" | "director" | "manager" | "user" | "vp" | "ceo"
       complaint_category:
         | "sandwich_made_wrong"
         | "slow_service"
@@ -1797,6 +1866,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "director", "manager", "user", "vp", "ceo"],
       complaint_category: [
         "sandwich_made_wrong",
         "slow_service",
