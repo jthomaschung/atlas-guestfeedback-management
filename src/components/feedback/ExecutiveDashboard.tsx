@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { MentionsTextarea } from '@/components/ui/mentions-textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -50,33 +51,12 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isNotesDialogOpen, setIsNotesDialogOpen] = useState(false);
   
-  // For @mention functionality
-  const [users, setUsers] = useState<any[]>([]);
-  const [userSuggestions, setUserSuggestions] = useState<any[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [mentionStartPos, setMentionStartPos] = useState(-1);
-  
   const { user } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
     loadExecutiveData();
-    loadUsers();
   }, [user]);
-
-  const loadUsers = async () => {
-    try {
-      const { data: profilesData, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('display_name');
-
-      if (error) throw error;
-      setUsers(profilesData || []);
-    } catch (error) {
-      console.error('Error loading users:', error);
-    }
-  };
 
   const loadExecutiveData = async () => {
     if (!user) return;
@@ -121,86 +101,32 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
     }
   };
 
-  // Helper function to get display name for a user
-  const getUserDisplayName = (user: typeof users[0]) => {
-    if (user.display_name) return user.display_name;
-    if (user.first_name && user.last_name) return `${user.first_name} ${user.last_name}`;
-    if (user.first_name) return user.first_name;
-    return user.email || 'Unknown User';
-  };
-
-  // Handle textarea changes and detect @ mentions
-  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    setExecutiveNotes(value);
-
-    const cursorPos = e.target.selectionStart;
-    const textBeforeCursor = value.substring(0, cursorPos);
-    const lastAtIndex = textBeforeCursor.lastIndexOf('@');
-
-    if (lastAtIndex !== -1 && lastAtIndex === cursorPos - 1) {
-      // Just typed @
-      setMentionStartPos(lastAtIndex);
-      setUserSuggestions(users);
-      setShowSuggestions(true);
-    } else if (lastAtIndex !== -1 && cursorPos > lastAtIndex) {
-      // Typing after @
-      const query = textBeforeCursor.substring(lastAtIndex + 1).toLowerCase();
-      const filteredUsers = users.filter(user => {
-        const displayName = getUserDisplayName(user).toLowerCase();
-        return displayName.includes(query);
-      });
-      setUserSuggestions(filteredUsers);
-      setShowSuggestions(filteredUsers.length > 0);
-      setMentionStartPos(lastAtIndex);
-    } else {
-      // Not in mention mode
-      setShowSuggestions(false);
-      setMentionStartPos(-1);
-    }
-  };
-
-  const handleTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Escape') {
-      setShowSuggestions(false);
-      setMentionStartPos(-1);
-    }
-  };
-
-  const selectUser = (user: typeof users[0]) => {
-    const displayName = getUserDisplayName(user);
-    const beforeMention = executiveNotes.substring(0, mentionStartPos);
-    const afterMention = executiveNotes.substring(mentionStartPos + 1);
-    const afterSpace = afterMention.substring(afterMention.indexOf(' ') !== -1 ? afterMention.indexOf(' ') : afterMention.length);
-    
-    const newValue = beforeMention + '@' + displayName + ' ' + afterSpace;
-    setExecutiveNotes(newValue);
-    setShowSuggestions(false);
-    setMentionStartPos(-1);
-  };
 
   const addExecutiveNotes = async () => {
     if (!selectedFeedback || !executiveNotes.trim()) return;
 
     try {
-      // Check for @mentions in the notes - extract display names from known users
+      // Check for @mentions in the notes
       const mentions = [];
       const mentionRegex = /@(\w+(?:\s+\w+)*)/g;
       let match;
       
       while ((match = mentionRegex.exec(executiveNotes)) !== null) {
         const mentionedName = match[1];
-        // Find user by display name
-        for (const user of users) {
-          const displayName = getUserDisplayName(user);
-          if (displayName.toLowerCase().includes(mentionedName.toLowerCase())) {
-            mentions.push({
-              user_id: user.user_id,
-              email: user.email,
-              display_name: displayName
-            });
-            break;
-          }
+        
+        // Look up user by display name in profiles
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('user_id, email, display_name')
+          .ilike('display_name', `%${mentionedName}%`)
+          .limit(1);
+        
+        if (profileData && profileData.length > 0) {
+          mentions.push({
+            user_id: profileData[0].user_id,
+            email: profileData[0].email,
+            display_name: profileData[0].display_name
+          });
         }
       }
 
@@ -587,32 +513,15 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="relative">
+            <div>
               <label className="text-sm font-medium text-gray-700">Executive Notes:</label>
-              <Textarea
+              <MentionsTextarea
                 value={executiveNotes}
-                onChange={handleTextareaChange}
-                onKeyDown={handleTextareaKeyDown}
+                onChange={setExecutiveNotes}
                 placeholder={`As ${userRole.toUpperCase()}, provide your assessment, directives, or oversight notes... (Use @ to mention users)`}
                 rows={6}
                 className="mt-1"
               />
-              
-              {/* User suggestions dropdown */}
-              {showSuggestions && userSuggestions.length > 0 && (
-                <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto mt-1">
-                  {userSuggestions.map((user) => (
-                    <div
-                      key={user.user_id}
-                      className="px-3 py-2 cursor-pointer hover:bg-gray-100 border-b border-gray-100 last:border-b-0"
-                      onClick={() => selectUser(user)}
-                    >
-                      <div className="font-medium">{getUserDisplayName(user)}</div>
-                      <div className="text-xs text-muted-foreground">{user.email}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
             <div className="flex justify-end space-x-2">
               <Button variant="outline" onClick={() => setIsNotesDialogOpen(false)}>

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { MentionsTextarea } from "@/components/ui/mentions-textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -756,11 +757,11 @@ Customer Service Team`);
 
             <div>
               <Label htmlFor="notes">Resolution Notes</Label>
-              <Textarea 
+              <MentionsTextarea 
                 id="notes"
                 value={resolutionNotes} 
-                onChange={(e) => setResolutionNotes(e.target.value)}
-                placeholder="Enter resolution notes..."
+                onChange={setResolutionNotes}
+                placeholder="Enter resolution notes... Use @username to mention someone"
                 rows={4}
               />
             </div>
