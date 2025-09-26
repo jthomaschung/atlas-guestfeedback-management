@@ -185,12 +185,52 @@ export type Database = {
           },
         ]
       }
+      critical_feedback_approvals: {
+        Row: {
+          approved_at: string
+          approver_role: string
+          approver_user_id: string
+          created_at: string
+          executive_notes: string | null
+          feedback_id: string
+          id: string
+        }
+        Insert: {
+          approved_at?: string
+          approver_role: string
+          approver_user_id: string
+          created_at?: string
+          executive_notes?: string | null
+          feedback_id: string
+          id?: string
+        }
+        Update: {
+          approved_at?: string
+          approver_role?: string
+          approver_user_id?: string
+          created_at?: string
+          executive_notes?: string | null
+          feedback_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "critical_feedback_approvals_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "customer_feedback"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_feedback: {
         Row: {
+          approval_status: string | null
           assignee: string | null
           auto_escalated: boolean | null
           calculated_score: number | null
           case_number: string
+          ceo_approved_at: string | null
           channel: string
           complaint_category: string
           created_at: string
@@ -199,6 +239,7 @@ export type Database = {
           customer_phone: string | null
           customer_responded_at: string | null
           customer_response_sentiment: string | null
+          director_approved_at: string | null
           ee_action: string | null
           escalated_at: string | null
           escalated_by: string | null
@@ -212,6 +253,7 @@ export type Database = {
           period: string | null
           priority: string | null
           rating: number | null
+          ready_for_dm_resolution: boolean | null
           resolution_notes: string | null
           resolution_status: string | null
           sla_deadline: string | null
@@ -219,12 +261,15 @@ export type Database = {
           updated_at: string
           user_id: string
           viewed: boolean | null
+          vp_approved_at: string | null
         }
         Insert: {
+          approval_status?: string | null
           assignee?: string | null
           auto_escalated?: boolean | null
           calculated_score?: number | null
           case_number: string
+          ceo_approved_at?: string | null
           channel: string
           complaint_category: string
           created_at?: string
@@ -233,6 +278,7 @@ export type Database = {
           customer_phone?: string | null
           customer_responded_at?: string | null
           customer_response_sentiment?: string | null
+          director_approved_at?: string | null
           ee_action?: string | null
           escalated_at?: string | null
           escalated_by?: string | null
@@ -246,6 +292,7 @@ export type Database = {
           period?: string | null
           priority?: string | null
           rating?: number | null
+          ready_for_dm_resolution?: boolean | null
           resolution_notes?: string | null
           resolution_status?: string | null
           sla_deadline?: string | null
@@ -253,12 +300,15 @@ export type Database = {
           updated_at?: string
           user_id: string
           viewed?: boolean | null
+          vp_approved_at?: string | null
         }
         Update: {
+          approval_status?: string | null
           assignee?: string | null
           auto_escalated?: boolean | null
           calculated_score?: number | null
           case_number?: string
+          ceo_approved_at?: string | null
           channel?: string
           complaint_category?: string
           created_at?: string
@@ -267,6 +317,7 @@ export type Database = {
           customer_phone?: string | null
           customer_responded_at?: string | null
           customer_response_sentiment?: string | null
+          director_approved_at?: string | null
           ee_action?: string | null
           escalated_at?: string | null
           escalated_by?: string | null
@@ -280,6 +331,7 @@ export type Database = {
           period?: string | null
           priority?: string | null
           rating?: number | null
+          ready_for_dm_resolution?: boolean | null
           resolution_notes?: string | null
           resolution_status?: string | null
           sla_deadline?: string | null
@@ -287,6 +339,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           viewed?: boolean | null
+          vp_approved_at?: string | null
         }
         Relationships: []
       }
@@ -443,6 +496,33 @@ export type Database = {
           method?: string | null
           raw_data?: Json
           timestamp?: string | null
+        }
+        Relationships: []
+      }
+      departments: {
+        Row: {
+          code: string | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          manager_name: string | null
+          name: string
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          manager_name?: string | null
+          name: string
+        }
+        Update: {
+          code?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          manager_name?: string | null
+          name?: string
         }
         Relationships: []
       }
@@ -840,6 +920,189 @@ export type Database = {
             referencedColumns: ["store_id"]
           },
         ]
+      }
+      payroll_ticket_comments: {
+        Row: {
+          attachments: Json | null
+          content: string
+          created_at: string
+          id: string
+          is_internal: boolean
+          parent_id: string | null
+          ticket_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attachments?: Json | null
+          content: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean
+          parent_id?: string | null
+          ticket_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attachments?: Json | null
+          content?: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean
+          parent_id?: string | null
+          ticket_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_ticket_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_ticket_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payroll_ticket_comments_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_tickets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payroll_ticket_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      payroll_ticket_history: {
+        Row: {
+          action: string
+          changed_at: string
+          changed_by: string | null
+          field_changed: string | null
+          id: string
+          new_value: string | null
+          notes: string | null
+          old_value: string | null
+          ticket_id: string
+        }
+        Insert: {
+          action: string
+          changed_at?: string
+          changed_by?: string | null
+          field_changed?: string | null
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+          ticket_id: string
+        }
+        Update: {
+          action?: string
+          changed_at?: string
+          changed_by?: string | null
+          field_changed?: string | null
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_ticket_history_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payroll_tickets: {
+        Row: {
+          affected_employee_id: string | null
+          affected_employee_name: string | null
+          assigned_to: string | null
+          attachments: Json | null
+          closed_at: string | null
+          created_at: string
+          department: string | null
+          description: string
+          employee_visible_notes: string | null
+          expected_resolution_date: string | null
+          hr_specialist: string | null
+          id: string
+          internal_notes: string[] | null
+          issue_type: Database["public"]["Enums"]["payroll_issue_type"]
+          pay_period_end: string | null
+          pay_period_start: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["ticket_status"]
+          submitted_by: string
+          ticket_number: string
+          title: string
+          updated_at: string
+          urgency_level: Database["public"]["Enums"]["ticket_urgency"]
+        }
+        Insert: {
+          affected_employee_id?: string | null
+          affected_employee_name?: string | null
+          assigned_to?: string | null
+          attachments?: Json | null
+          closed_at?: string | null
+          created_at?: string
+          department?: string | null
+          description: string
+          employee_visible_notes?: string | null
+          expected_resolution_date?: string | null
+          hr_specialist?: string | null
+          id?: string
+          internal_notes?: string[] | null
+          issue_type: Database["public"]["Enums"]["payroll_issue_type"]
+          pay_period_end?: string | null
+          pay_period_start?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["ticket_status"]
+          submitted_by: string
+          ticket_number?: string
+          title: string
+          updated_at?: string
+          urgency_level?: Database["public"]["Enums"]["ticket_urgency"]
+        }
+        Update: {
+          affected_employee_id?: string | null
+          affected_employee_name?: string | null
+          assigned_to?: string | null
+          attachments?: Json | null
+          closed_at?: string | null
+          created_at?: string
+          department?: string | null
+          description?: string
+          employee_visible_notes?: string | null
+          expected_resolution_date?: string | null
+          hr_specialist?: string | null
+          id?: string
+          internal_notes?: string[] | null
+          issue_type?: Database["public"]["Enums"]["payroll_issue_type"]
+          pay_period_end?: string | null
+          pay_period_start?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["ticket_status"]
+          submitted_by?: string
+          ticket_number?: string
+          title?: string
+          updated_at?: string
+          urgency_level?: Database["public"]["Enums"]["ticket_urgency"]
+        }
+        Relationships: []
       }
       pending_work_order_redirects: {
         Row: {
@@ -1348,6 +1611,10 @@ export type Database = {
         }
         Returns: number
       }
+      check_critical_feedback_approvals: {
+        Args: { feedback_id_param: string }
+        Returns: boolean
+      }
       check_red_carpet_badge: {
         Args: { period_uuid: string; user_uuid: string }
         Returns: boolean
@@ -1586,6 +1853,16 @@ export type Database = {
           total_employees: number
         }[]
       }
+      get_required_approvers_for_feedback: {
+        Args: { feedback_market: string; feedback_store: string }
+        Returns: {
+          approval_order: number
+          display_name: string
+          email: string
+          role: string
+          user_id: string
+        }[]
+      }
       get_store_class_category_counts: {
         Args: {
           target_category: string
@@ -1752,6 +2029,24 @@ export type Database = {
         | "possible_food_poisoning"
         | "loyalty_program_issues"
       feedback_channel: "yelp" | "qualtrics" | "jimmy_johns"
+      payroll_issue_type:
+        | "pay_discrepancy"
+        | "missing_hours"
+        | "overtime_issues"
+        | "benefits_inquiry"
+        | "time_off_request"
+        | "tax_withholding"
+        | "direct_deposit"
+        | "paystub_access"
+        | "other"
+      ticket_status:
+        | "submitted"
+        | "under_review"
+        | "in_progress"
+        | "pending_employee"
+        | "resolved"
+        | "closed"
+      ticket_urgency: "critical" | "high" | "medium" | "low"
       training_status: "Completed" | "In Progress" | "Not Started"
     }
     CompositeTypes: {
@@ -1898,6 +2193,26 @@ export const Constants = {
         "loyalty_program_issues",
       ],
       feedback_channel: ["yelp", "qualtrics", "jimmy_johns"],
+      payroll_issue_type: [
+        "pay_discrepancy",
+        "missing_hours",
+        "overtime_issues",
+        "benefits_inquiry",
+        "time_off_request",
+        "tax_withholding",
+        "direct_deposit",
+        "paystub_access",
+        "other",
+      ],
+      ticket_status: [
+        "submitted",
+        "under_review",
+        "in_progress",
+        "pending_employee",
+        "resolved",
+        "closed",
+      ],
+      ticket_urgency: ["critical", "high", "medium", "low"],
       training_status: ["Completed", "In Progress", "Not Started"],
     },
   },

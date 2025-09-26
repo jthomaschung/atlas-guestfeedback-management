@@ -26,6 +26,22 @@ interface ExecutiveDashboardProps {
   userRole: string;
 }
 
+interface ApprovalStatus {
+  ceo_approved_at?: string;
+  vp_approved_at?: string;
+  director_approved_at?: string;
+  approval_status: string;
+  ready_for_dm_resolution: boolean;
+}
+
+interface RequiredApprover {
+  user_id: string;
+  email: string;
+  display_name: string;
+  role: string;
+  approval_order: number;
+}
+
 export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
   const [criticalFeedbacks, setCriticalFeedbacks] = useState<CustomerFeedback[]>([]);
   const [escalationLogs, setEscalationLogs] = useState<EscalationLog[]>([]);
@@ -46,10 +62,13 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
     
     setIsLoading(true);
     try {
-      // Load critical/escalated feedback
+      // Load critical/escalated feedback with approval status
       const { data: feedbacks, error: feedbackError } = await supabase
         .from('customer_feedback')
-        .select('*')
+        .select(`
+          *,
+          critical_feedback_approvals(*)
+        `)
         .eq('resolution_status', 'escalated')
         .order('created_at', { ascending: false });
 
@@ -128,34 +147,75 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
     }
   };
 
-  const markAsReviewed = async (feedbackId: string) => {
+  const approveCriticalFeedback = async (feedbackId: string) => {
     try {
+      // Get user's role from hierarchy
+      const { data: userHierarchy } = await supabase
+        .from('user_hierarchy')
+        .select('role')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (!userHierarchy) {
+        throw new Error('User role not found');
+      }
+
+      // Insert approval record
       const { error } = await supabase
-        .from('escalation_log')
+        .from('critical_feedback_approvals')
         .insert({
           feedback_id: feedbackId,
-          escalated_from: 'escalated',
-          escalated_to: 'executive_reviewed',
-          escalation_reason: `Reviewed by ${userRole}: ${user?.email}`,
-          escalated_by: user?.id
+          approver_user_id: user?.id,
+          approver_role: userHierarchy.role,
+          executive_notes: executiveNotes || null
         });
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Marked as reviewed by executive leadership",
+        description: `Critical feedback approved by ${userHierarchy.role.toUpperCase()}`,
       });
 
+      setExecutiveNotes('');
       loadExecutiveData();
     } catch (error: any) {
-      console.error('Error marking as reviewed:', error);
+      console.error('Error approving critical feedback:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to mark as reviewed",
+        description: "Failed to approve critical feedback",
       });
     }
+  };
+
+  const getApprovalStatus = (feedback: CustomerFeedback) => {
+    const approvals = (feedback as any).critical_feedback_approvals || [];
+    const ceoApproved = approvals.some((a: any) => a.approver_role === 'ceo');
+    const vpApproved = approvals.some((a: any) => a.approver_role === 'vp');
+    const directorApproved = approvals.some((a: any) => a.approver_role === 'director');
+    
+    return { ceoApproved, vpApproved, directorApproved };
+  };
+
+  const canUserApprove = (feedback: CustomerFeedback, userRole: string) => {
+    const approvals = (feedback as any).critical_feedback_approvals || [];
+    const hasUserApproved = approvals.some((a: any) => a.approver_user_id === user?.id);
+    
+    if (hasUserApproved) return false;
+    
+    const { ceoApproved, vpApproved, directorApproved } = getApprovalStatus(feedback);
+    
+    // CEO can always approve first
+    if (userRole === 'ceo') return true;
+    
+    // VP can approve after CEO
+    if (userRole === 'vp') return ceoApproved;
+    
+    // Director can approve after CEO and VP
+    if (userRole === 'director') return ceoApproved && vpApproved;
+    
+    return false;
   };
 
   const getSlaStatus = (feedback: CustomerFeedback) => {
@@ -324,26 +384,53 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
                           <strong>Escalated:</strong> {timeSinceEscalation}h ago
                         </p>
                       </div>
-                      <div className="flex space-x-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedFeedback(feedback);
-                            setExecutiveNotes(feedback.executive_notes || '');
-                            setIsNotesDialogOpen(true);
-                          }}
-                        >
-                          <FileText className="h-4 w-4 mr-1" />
-                          Add Notes
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => markAsReviewed(feedback.id)}
-                        >
-                          <Eye className="h-4 w-4 mr-1" />
-                          Mark Reviewed
-                        </Button>
+                      <div className="flex flex-col space-y-2">
+                        <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedFeedback(feedback);
+                              setExecutiveNotes(feedback.executive_notes || '');
+                              setIsNotesDialogOpen(true);
+                            }}
+                          >
+                            <FileText className="h-4 w-4 mr-1" />
+                            Add Notes
+                          </Button>
+                          {canUserApprove(feedback, userRole) && (
+                            <Button
+                              size="sm"
+                              onClick={() => approveCriticalFeedback(feedback.id)}
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              Approve ({userRole.toUpperCase()})
+                            </Button>
+                          )}
+                        </div>
+                        
+                        {/* Approval Status Display */}
+                        <div className="flex space-x-2 text-xs">
+                          {(() => {
+                            const { ceoApproved, vpApproved, directorApproved } = getApprovalStatus(feedback);
+                            return (
+                              <>
+                                <Badge variant={ceoApproved ? "default" : "outline"}>
+                                  CEO {ceoApproved ? "✓" : "⏳"}
+                                </Badge>
+                                <Badge variant={vpApproved ? "default" : "outline"}>
+                                  VP {vpApproved ? "✓" : "⏳"}
+                                </Badge>
+                                <Badge variant={directorApproved ? "default" : "outline"}>
+                                  DIR {directorApproved ? "✓" : "⏳"}
+                                </Badge>
+                                {(feedback as any).ready_for_dm_resolution && (
+                                  <Badge variant="secondary">Ready for DM Resolution</Badge>
+                                )}
+                              </>
+                            );
+                          })()}
+                        </div>
                       </div>
                     </div>
                     

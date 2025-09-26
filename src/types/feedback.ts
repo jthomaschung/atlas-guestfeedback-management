@@ -30,4 +30,10 @@ export interface CustomerFeedback {
   executive_notes?: string;
   sla_deadline?: string;
   auto_escalated?: boolean;
+  // Approval workflow fields
+  approval_status?: string;
+  ceo_approved_at?: string;
+  vp_approved_at?: string;
+  director_approved_at?: string;
+  ready_for_dm_resolution?: boolean;
 }
