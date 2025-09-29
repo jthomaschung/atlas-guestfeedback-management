@@ -1025,11 +1025,14 @@ export type Database = {
       }
       payroll_tickets: {
         Row: {
+          acknowledgment_confirmed: boolean | null
           affected_employee_id: string | null
           affected_employee_name: string | null
           assigned_to: string | null
           attachments: Json | null
           closed_at: string | null
+          contact_email: string | null
+          contact_phone: string | null
           created_at: string
           department: string | null
           description: string
@@ -1039,6 +1042,8 @@ export type Database = {
           id: string
           internal_notes: string[] | null
           issue_type: Database["public"]["Enums"]["payroll_issue_type"]
+          manager_email: string | null
+          manager_name: string | null
           pay_period_end: string | null
           pay_period_start: string | null
           resolution_notes: string | null
@@ -1051,11 +1056,14 @@ export type Database = {
           urgency_level: Database["public"]["Enums"]["ticket_urgency"]
         }
         Insert: {
+          acknowledgment_confirmed?: boolean | null
           affected_employee_id?: string | null
           affected_employee_name?: string | null
           assigned_to?: string | null
           attachments?: Json | null
           closed_at?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           department?: string | null
           description: string
@@ -1065,6 +1073,8 @@ export type Database = {
           id?: string
           internal_notes?: string[] | null
           issue_type: Database["public"]["Enums"]["payroll_issue_type"]
+          manager_email?: string | null
+          manager_name?: string | null
           pay_period_end?: string | null
           pay_period_start?: string | null
           resolution_notes?: string | null
@@ -1077,11 +1087,14 @@ export type Database = {
           urgency_level?: Database["public"]["Enums"]["ticket_urgency"]
         }
         Update: {
+          acknowledgment_confirmed?: boolean | null
           affected_employee_id?: string | null
           affected_employee_name?: string | null
           assigned_to?: string | null
           attachments?: Json | null
           closed_at?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           department?: string | null
           description?: string
@@ -1091,6 +1104,8 @@ export type Database = {
           id?: string
           internal_notes?: string[] | null
           issue_type?: Database["public"]["Enums"]["payroll_issue_type"]
+          manager_email?: string | null
+          manager_name?: string | null
           pay_period_end?: string | null
           pay_period_start?: string | null
           resolution_notes?: string | null
@@ -2039,6 +2054,10 @@ export type Database = {
         | "direct_deposit"
         | "paystub_access"
         | "other"
+        | "overtime"
+        | "bonus_commission"
+        | "benefits_deduction"
+        | "general_inquiry"
       ticket_status:
         | "submitted"
         | "under_review"
@@ -2203,6 +2222,10 @@ export const Constants = {
         "direct_deposit",
         "paystub_access",
         "other",
+        "overtime",
+        "bonus_commission",
+        "benefits_deduction",
+        "general_inquiry",
       ],
       ticket_status: [
         "submitted",
