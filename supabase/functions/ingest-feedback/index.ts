@@ -3,6 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.55.0'
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
 // Initialize Supabase client with service role key for server-side operations
@@ -250,11 +251,16 @@ Deno.serve(async (req) => {
   console.log('Method:', req.method)
   console.log('URL:', req.url)
   console.log('Headers:', Object.fromEntries(req.headers.entries()))
+  console.log('Auth header present:', req.headers.has('authorization'))
+  console.log('Function should be public (verify_jwt=false)')
   
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    console.log('CORS preflight request')
-    return new Response(null, { headers: corsHeaders })
+    console.log('CORS preflight request handled')
+    return new Response(null, { 
+      status: 200,
+      headers: corsHeaders 
+    })
   }
 
   try {
