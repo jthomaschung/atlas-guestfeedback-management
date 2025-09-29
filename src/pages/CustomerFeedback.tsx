@@ -22,6 +22,7 @@ export default function CustomerFeedbackPage() {
       const { data, error } = await supabase
         .from('customer_feedback')
         .select('*')
+        .order('feedback_date', { ascending: false })
         .order('created_at', { ascending: false });
 
       if (error) {
