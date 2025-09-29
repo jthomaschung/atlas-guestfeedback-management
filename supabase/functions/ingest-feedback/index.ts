@@ -72,57 +72,58 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
   // Set priority based on exact complaint category mapping
   let defaultPriority: 'Praise' | 'Low' | 'Medium' | 'High' | 'Critical' = 'Low'
   
-  // Hardcoded priority mapping per user requirements
+  // Hardcoded priority mapping per user requirements - using case-insensitive matching
   const priorityMapping: Record<string, 'Praise' | 'Low' | 'Medium' | 'High' | 'Critical'> = {
-    'Sandwich Made wrong': 'High',
-    'Slow Service': 'Medium',
-    'Rude Service': 'Critical',
-    'Product issue': 'Low',
-    'Closed Early': 'High',
-    'Praise': 'High',
-    'Missing Item': 'High',
-    'Credit Card Issue': 'Low',
-    'Bread Quality': 'Medium',
-    'Out of product': 'Critical',
-    'Other': 'Low',
-    'Cleanliness': 'Medium',
-    'Possible Food Poisoning': 'Critical',
-    'Loyalty Program Issues': 'Low'
+    'sandwich made wrong': 'High',
+    'slow service': 'Medium',
+    'rude service': 'Critical',
+    'product issue': 'Low',
+    'closed early': 'High',
+    'praise': 'High',
+    'missing item': 'High',
+    'credit card issue': 'Low',
+    'bread quality': 'Medium',
+    'out of product': 'Critical',
+    'other': 'Low',
+    'cleanliness': 'Medium',
+    'possible food poisoning': 'Critical',
+    'loyalty program issues': 'Low'
   }
   
-  // Use exact category match for priority assignment
-  defaultPriority = priorityMapping[complaint_category] || 'Low'
+  // Use case-insensitive category match for priority assignment
+  const categoryLower = complaint_category.toLowerCase()
+  defaultPriority = priorityMapping[categoryLower] || 'Low'
   
   // Determine assignee based on complaint category
   let defaultAssignee = 'Unassigned'
   
-  // Store level assignment
+  // Store level assignment - using case-insensitive matching
   const storeLevelCategories = [
-    'Sandwich Made wrong', 
-    'Praise', 
-    'Missing Item', 
-    'Cleanliness'
+    'sandwich made wrong', 
+    'praise', 
+    'missing item', 
+    'cleanliness'
   ]
   
-  // DM level assignment
+  // DM level assignment - using case-insensitive matching
   const dmLevelCategories = [
-    'Rude Service', 
-    'Out of product', 
-    'Possible Food Poisoning',
-    'Closed Early'
+    'rude service', 
+    'out of product', 
+    'possible food poisoning',
+    'closed early'
   ]
   
-  // Guest feedback manager level assignment
+  // Guest feedback manager level assignment - using case-insensitive matching
   const guestFeedbackCategories = [
-    'Slow Service',
-    'Product issue',
-    'Credit Card Issue', 
-    'Bread Quality',
-    'Other',
-    'Loyalty Program Issues'
+    'slow service',
+    'product issue',
+    'credit card issue', 
+    'bread quality',
+    'other',
+    'loyalty program issues'
   ]
   
-  if (storeLevelCategories.includes(complaint_category)) {
+  if (storeLevelCategories.includes(categoryLower)) {
     // Query for actual store user email from profiles
     try {
       console.log(`Looking for store email: store${store_number}@atlaswe.com`)
@@ -139,7 +140,7 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
       console.error('Error fetching store user:', error)
       defaultAssignee = 'Unassigned'
     }
-  } else if (dmLevelCategories.includes(complaint_category)) {
+  } else if (dmLevelCategories.includes(categoryLower)) {
     // Find district manager who has access to this market
     try {
       const { data: marketDm } = await supabase
@@ -213,7 +214,7 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
       console.error('Error fetching district manager:', error)
       defaultAssignee = 'Unassigned'
     }
-  } else if (guestFeedbackCategories.includes(complaint_category)) {
+  } else if (guestFeedbackCategories.includes(categoryLower)) {
     // Assign to guest feedback manager
     defaultAssignee = 'guestfeedback@atlaswe.com'
   } else {

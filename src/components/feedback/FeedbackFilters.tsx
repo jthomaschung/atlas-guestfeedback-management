@@ -53,15 +53,18 @@ const categoryOptions = [
   { value: 'Bread Quality', label: 'Bread Quality' },
   { value: 'Cleanliness', label: 'Cleanliness' },
   { value: 'Closed Early', label: 'Closed Early' },
-  { value: 'Missing Items', label: 'Missing Items' },
+  { value: 'Missing Item', label: 'Missing Item' },
   { value: 'Other', label: 'Other' },
-  { value: 'Out of Product', label: 'Out of Product' },
+  { value: 'Out Of Product', label: 'Out Of Product' },
   { value: 'Praise', label: 'Praise' },
   { value: 'Pricing Issue', label: 'Pricing Issue' },
-  { value: 'Product Issue', label: 'Product Issue' },
+  { value: 'Product issue', label: 'Product Issue' },
   { value: 'Rude Service', label: 'Rude Service' },
-  { value: 'Sandwich Made Wrong', label: 'Sandwich Made Wrong' },
+  { value: 'Sandwich Made wrong', label: 'Sandwich Made Wrong' },
   { value: 'Slow Service', label: 'Slow Service' },
+  { value: 'Credit Card Issue', label: 'Credit Card Issue' },
+  { value: 'Possible Food Poisoning', label: 'Possible Food Poisoning' },
+  { value: 'Loyalty Program Issues', label: 'Loyalty Program Issues' },
 ];
 
 const channelOptions = [
