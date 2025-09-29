@@ -10,6 +10,7 @@ interface TrendData {
   rudeService: number;
   sandwichMadeWrong: number;
   missingItem: number;
+  praise: number;
   periodId: string;
   startDate: string;
   endDate: string;
@@ -31,6 +32,10 @@ const chartConfig = {
   missingItem: {
     label: "Missing Item", 
     color: "#3b82f6",
+  },
+  praise: {
+    label: "Praise",
+    color: "#10b981",
   },
 };
 
@@ -72,11 +77,11 @@ export function ComplaintTrendsChart({ className }: ComplaintTrendsChartProps) {
         return;
       }
 
-      // Get complaint data for the target categories (case insensitive)
+      // Get complaint data for the target categories including praise (case insensitive)
       const { data: complaints, error: complaintsError } = await supabase
         .from('customer_feedback')
         .select('feedback_date, complaint_category')
-        .or('complaint_category.ilike.%rude service%,complaint_category.ilike.%sandwich made wrong%,complaint_category.ilike.%missing item%');
+        .or('complaint_category.ilike.%rude service%,complaint_category.ilike.%sandwich made wrong%,complaint_category.ilike.%missing item%,complaint_category.ilike.%praise%');
 
       if (complaintsError) {
         console.error('Error fetching complaints:', complaintsError);
@@ -102,12 +107,14 @@ export function ComplaintTrendsChart({ className }: ComplaintTrendsChartProps) {
         const rudeService = periodComplaints.filter(c => c.complaint_category?.toLowerCase().includes('rude service')).length;
         const sandwichMadeWrong = periodComplaints.filter(c => c.complaint_category?.toLowerCase().includes('sandwich made wrong')).length;
         const missingItem = periodComplaints.filter(c => c.complaint_category?.toLowerCase().includes('missing item')).length;
+        const praise = periodComplaints.filter(c => c.complaint_category?.toLowerCase().includes('praise')).length;
 
         return {
           periodName: period.name,
           rudeService,
           sandwichMadeWrong,
           missingItem,
+          praise,
           periodId: period.id,
           startDate: period.start_date,
           endDate: period.end_date
@@ -191,6 +198,14 @@ export function ComplaintTrendsChart({ className }: ComplaintTrendsChartProps) {
                 stroke="var(--color-missingItem)"
                 strokeWidth={2}
                 dot={{ fill: "var(--color-missingItem)", strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="praise"
+                stroke="var(--color-praise)"
+                strokeWidth={2}
+                dot={{ fill: "var(--color-praise)", strokeWidth: 2, r: 4 }}
                 activeDot={{ r: 6 }}
               />
             </LineChart>
