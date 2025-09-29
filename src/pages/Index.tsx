@@ -173,8 +173,8 @@ const Index = () => {
 
     // Apply sorting
     return [...filtered].sort((a, b) => {
-      const dateA = new Date(a.created_at).getTime();
-      const dateB = new Date(b.created_at).getTime();
+      const dateA = new Date(a.feedback_date).getTime();
+      const dateB = new Date(b.feedback_date).getTime();
       return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
     });
   }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, sortOrder, dateFrom, dateTo]);
