@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 import { Calendar, User, Star, MapPin, Phone, Mail, MessageSquare, Clock, AlertTriangle, Store, Edit, Save, X, Heart, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -737,6 +738,102 @@ Customer Service Team`);
                               </div>
                             )}
                           </div>
+
+                          {/* Email Preview */}
+                          <Card className="p-4 bg-muted/30 border-2">
+                            <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                              <Mail className="h-4 w-4" />
+                              Email Preview
+                            </h4>
+                            <div className="space-y-3 text-sm">
+                              <div>
+                                <span className="font-medium">Subject: </span>
+                                <span className="text-muted-foreground">
+                                  {selectedTemplate === 'acknowledgment' && `Thank you for your feedback - Case #${feedback.case_number}`}
+                                  {selectedTemplate === 'praise' && `Thank you for your kind words! - Case #${feedback.case_number}`}
+                                  {selectedTemplate === 'resolution' && `Resolution Update for Case #${feedback.case_number}`}
+                                  {selectedTemplate === 'escalation' && `URGENT: Your feedback has been escalated - Case #${feedback.case_number}`}
+                                  {selectedTemplate === 'custom' && `Regarding your feedback - Case #${feedback.case_number}`}
+                                </span>
+                              </div>
+                              <Separator />
+                              <div className="space-y-2 text-muted-foreground max-h-60 overflow-y-auto">
+                                <p>Dear {feedback.customer_name || 'Valued Customer'},</p>
+                                
+                                {selectedTemplate === 'acknowledgment' && (
+                                  <>
+                                    <p>Thank you for taking the time to share your feedback with us. We have received your message and want to assure you that we take all customer feedback seriously.</p>
+                                    <div className="bg-background/50 p-3 rounded border my-2">
+                                      <p className="font-medium mb-1">Feedback Details:</p>
+                                      <p className="text-xs">Case Number: {feedback.case_number}</p>
+                                      <p className="text-xs">Store Number: {feedback.store_number}</p>
+                                      <p className="text-xs">Date: {new Date(feedback.feedback_date).toLocaleDateString()}</p>
+                                      <p className="text-xs">Category: {feedback.complaint_category}</p>
+                                    </div>
+                                    <p>{feedback.priority === 'Critical' || feedback.priority === 'High' 
+                                      ? 'Your feedback has been marked as high priority and will be reviewed by our management team within 24 hours.'
+                                      : 'We will review your feedback and respond appropriately based on the nature of your concerns.'
+                                    }</p>
+                                  </>
+                                )}
+                                
+                                {selectedTemplate === 'praise' && (
+                                  <>
+                                    <p>Thank you so much for taking the time to share your positive experience with us! Feedback like yours truly makes our day and motivates our team to continue providing excellent service.</p>
+                                    <p>We've shared your kind words with the team at Store #{feedback.store_number}. They will be thrilled to hear that their hard work made a positive impact on your visit.</p>
+                                    <p>We look forward to serving you again soon!</p>
+                                  </>
+                                )}
+                                
+                                {selectedTemplate === 'resolution' && (
+                                  <>
+                                    <p>Thank you for bringing this matter to our attention. I wanted to update you on the resolution of your concern regarding your visit on {new Date(feedback.feedback_date).toLocaleDateString()}.</p>
+                                    {emailActionTaken && (
+                                      <div className="bg-background/50 p-3 rounded border my-2">
+                                        <p className="font-medium mb-1">Action Taken:</p>
+                                        <p className="text-xs">{emailActionTaken}</p>
+                                      </div>
+                                    )}
+                                    {emailResolutionNotes && (
+                                      <div className="bg-background/50 p-3 rounded border my-2">
+                                        <p className="font-medium mb-1">Resolution Details:</p>
+                                        <p className="text-xs">{emailResolutionNotes}</p>
+                                      </div>
+                                    )}
+                                    <p>We appreciate your patience and understanding as we worked to address your concerns. If you have any questions about this resolution, please don't hesitate to reach out.</p>
+                                  </>
+                                )}
+                                
+                                {selectedTemplate === 'escalation' && (
+                                  <>
+                                    <p className="font-medium text-orange-600">This message requires immediate attention.</p>
+                                    <p>Your feedback regarding your visit on {new Date(feedback.feedback_date).toLocaleDateString()} has been escalated to our management team for immediate review and action.</p>
+                                    <div className="bg-background/50 p-3 rounded border my-2">
+                                      <p className="font-medium mb-1">Escalation Details:</p>
+                                      <p className="text-xs">Case Number: {feedback.case_number}</p>
+                                      <p className="text-xs">Store: #{feedback.store_number}</p>
+                                      <p className="text-xs">Priority: {feedback.priority}</p>
+                                    </div>
+                                    <p>A member of our management team will contact you within 24 hours to discuss this matter and work towards a resolution.</p>
+                                  </>
+                                )}
+                                
+                                {selectedTemplate === 'custom' && emailMessage && (
+                                  <p className="whitespace-pre-wrap">{emailMessage}</p>
+                                )}
+                                
+                                {selectedTemplate === 'custom' && !emailMessage && (
+                                  <p className="italic text-muted-foreground/60">Enter your custom message above to see the preview...</p>
+                                )}
+                                
+                                <p className="pt-2 border-t mt-4">
+                                  Best regards,<br />
+                                  Customer Service Team<br />
+                                  <a href="mailto:guestfeedback@atlaswe.com" className="text-primary underline">guestfeedback@atlaswe.com</a>
+                                </p>
+                              </div>
+                            </div>
+                          </Card>
 
                           {/* Custom Message (only for custom template) */}
                           {selectedTemplate === 'custom' && (
