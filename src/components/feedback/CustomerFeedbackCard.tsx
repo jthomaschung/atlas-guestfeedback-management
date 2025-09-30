@@ -3,7 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Edit, Calendar, Eye, User, Clock, AlertTriangle, Trash2, Star } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Edit, Calendar, Eye, User, Clock, AlertTriangle, Trash2, Star, Phone, Hash } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -77,8 +78,28 @@ export function CustomerFeedbackCard({
   canEditCategory = false 
 }: CustomerFeedbackCardProps) {
   const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
+  const [isUpdatingCalled, setIsUpdatingCalled] = useState(false);
   const PriorityIcon = priorityIcons[feedback.priority as keyof typeof priorityIcons];
   const isUrgent = feedback.priority === 'Critical';
+
+  const handleCalledChange = async (checked: boolean) => {
+    setIsUpdatingCalled(true);
+    try {
+      const { error } = await supabase
+        .from('customer_feedback')
+        .update({ customer_called: checked })
+        .eq('id', feedback.id);
+
+      if (error) throw error;
+
+      toast.success(checked ? 'Marked as called' : 'Unmarked as called');
+    } catch (error) {
+      console.error('Error updating called status:', error);
+      toast.error('Failed to update called status');
+    } finally {
+      setIsUpdatingCalled(false);
+    }
+  };
 
   const handleCategoryChange = async (newCategory: string) => {
     if (!canEditCategory || isUpdatingCategory) return;
@@ -111,7 +132,7 @@ export function CustomerFeedbackCard({
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
               <Badge variant="outline" className="font-medium">
                 Store #{feedback.store_number}
               </Badge>
@@ -121,6 +142,12 @@ export function CustomerFeedbackCard({
               <Badge variant="outline" className="text-xs">
                 {channelLabels[feedback.channel as keyof typeof channelLabels] || feedback.channel}
               </Badge>
+              {feedback.case_number && (
+                <Badge variant="outline" className="text-xs flex items-center gap-1">
+                  <Hash className="h-3 w-3" />
+                  {feedback.case_number}
+                </Badge>
+              )}
             </div>
             
             {canEditCategory ? (
@@ -228,7 +255,7 @@ export function CustomerFeedbackCard({
           </div>
           
           {/* Meta Information */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-muted-foreground">
+          <div className="flex flex-col gap-2 text-xs text-muted-foreground">
             <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
               <div className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
@@ -239,17 +266,40 @@ export function CustomerFeedbackCard({
                 <Clock className="h-3 w-3" />
                 <span className="truncate">{formatDistanceToNow(new Date(feedback.created_at), { addSuffix: true })}</span>
               </div>
+              
+              <div className="flex items-center gap-1">
+                <User className="h-3 w-3" />
+                <span className="truncate max-w-32">
+                  {feedback.assignee && feedback.assignee !== 'unassigned' 
+                    ? feedback.assignee 
+                    : 'Unassigned'
+                  }
+                </span>
+              </div>
             </div>
             
-            <div className="flex items-center gap-1">
-              <User className="h-3 w-3" />
-              <span className="truncate max-w-32">
-                {feedback.assignee && feedback.assignee !== 'unassigned' 
-                  ? feedback.assignee 
-                  : 'Unassigned'
-                }
-              </span>
-            </div>
+            {/* Phone Number and Called Checkbox */}
+            {feedback.customer_phone && (
+              <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                <Phone className="h-3 w-3" />
+                <span className="truncate">{feedback.customer_phone}</span>
+                <div className="flex items-center gap-1 ml-2">
+                  <Checkbox
+                    id={`called-${feedback.id}`}
+                    checked={feedback.customer_called || false}
+                    onCheckedChange={handleCalledChange}
+                    disabled={isUpdatingCalled}
+                    className="h-3 w-3"
+                  />
+                  <label
+                    htmlFor={`called-${feedback.id}`}
+                    className="text-xs cursor-pointer select-none"
+                  >
+                    Called Customer
+                  </label>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>

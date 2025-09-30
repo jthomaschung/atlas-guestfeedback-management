@@ -36,4 +36,5 @@ export interface CustomerFeedback {
   vp_approved_at?: string;
   director_approved_at?: string;
   ready_for_dm_resolution?: boolean;
+  customer_called?: boolean;
 }

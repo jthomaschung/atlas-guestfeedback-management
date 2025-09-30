@@ -234,6 +234,7 @@ export type Database = {
           channel: string
           complaint_category: string
           created_at: string
+          customer_called: boolean | null
           customer_email: string | null
           customer_name: string | null
           customer_phone: string | null
@@ -273,6 +274,7 @@ export type Database = {
           channel: string
           complaint_category: string
           created_at?: string
+          customer_called?: boolean | null
           customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
@@ -312,6 +314,7 @@ export type Database = {
           channel?: string
           complaint_category?: string
           created_at?: string
+          customer_called?: boolean | null
           customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
@@ -1034,7 +1037,6 @@ export type Database = {
           contact_email: string | null
           contact_phone: string | null
           created_at: string
-          department: string | null
           description: string
           employee_visible_notes: string | null
           expected_resolution_date: string | null
@@ -1044,15 +1046,16 @@ export type Database = {
           main_category: string | null
           manager_email: string | null
           manager_name: string | null
+          market: string
           pay_period_end: string | null
           pay_period_start: string | null
           resolution_notes: string | null
           resolved_at: string | null
           status: Database["public"]["Enums"]["ticket_status"]
+          store_number: string
           sub_category: string | null
           submitted_by: string
           ticket_number: string
-          title: string
           updated_at: string
           urgency_level: Database["public"]["Enums"]["ticket_urgency"]
         }
@@ -1066,7 +1069,6 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string
-          department?: string | null
           description: string
           employee_visible_notes?: string | null
           expected_resolution_date?: string | null
@@ -1076,15 +1078,16 @@ export type Database = {
           main_category?: string | null
           manager_email?: string | null
           manager_name?: string | null
+          market: string
           pay_period_end?: string | null
           pay_period_start?: string | null
           resolution_notes?: string | null
           resolved_at?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
+          store_number: string
           sub_category?: string | null
           submitted_by: string
           ticket_number?: string
-          title: string
           updated_at?: string
           urgency_level?: Database["public"]["Enums"]["ticket_urgency"]
         }
@@ -1098,7 +1101,6 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string
-          department?: string | null
           description?: string
           employee_visible_notes?: string | null
           expected_resolution_date?: string | null
@@ -1108,15 +1110,16 @@ export type Database = {
           main_category?: string | null
           manager_email?: string | null
           manager_name?: string | null
+          market?: string
           pay_period_end?: string | null
           pay_period_start?: string | null
           resolution_notes?: string | null
           resolved_at?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
+          store_number?: string
           sub_category?: string | null
           submitted_by?: string
           ticket_number?: string
-          title?: string
           updated_at?: string
           urgency_level?: Database["public"]["Enums"]["ticket_urgency"]
         }
