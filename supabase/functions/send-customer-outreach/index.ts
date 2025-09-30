@@ -168,7 +168,7 @@ const handler = async (req: Request): Promise<Response> => {
           name: 'Guest Feedback Team'
         },
         reply_to: {
-          email: 'guest.feedback@atlaswe.com',
+          email: 'guestfeedback@feedback.atlaswe.com',
           name: 'Guest Feedback Team'
         },
         subject: emailContent.subject,
