@@ -21,6 +21,10 @@ export default function GuestFeedbackManagement() {
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
 
   useEffect(() => {
+    document.title = 'Guest Feedback Management - Atlas';
+  }, []);
+
+  useEffect(() => {
     if (user?.email) {
       loadGuestFeedbackManagerFeedback();
     }

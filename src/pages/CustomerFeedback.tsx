@@ -12,6 +12,10 @@ export default function CustomerFeedbackPage() {
   const { permissions } = useUserPermissions();
 
   useEffect(() => {
+    document.title = 'Customer Feedback - Atlas';
+  }, []);
+
+  useEffect(() => {
     fetchFeedbacks();
   }, []);
 

@@ -256,6 +256,10 @@ const FeedbackReporting = () => {
   };
 
   useEffect(() => {
+    document.title = 'Guest Feedback Reporting - Atlas';
+  }, []);
+
+  useEffect(() => {
     if (user) {
       fetchReportingData();
     }
