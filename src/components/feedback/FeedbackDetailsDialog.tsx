@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar, User, Star, MapPin, Phone, Mail, MessageSquare, Clock, AlertTriangle, Store, Edit, Save, X } from "lucide-react";
+import { Calendar, User, Star, MapPin, Phone, Mail, MessageSquare, Clock, AlertTriangle, Store, Edit, Save, X, Heart, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -172,6 +172,9 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const [showEmailComposer, setShowEmailComposer] = useState(false);
   const [emailMessage, setEmailMessage] = useState('');
   const [showEmailConversation, setShowEmailConversation] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('acknowledgment');
+  const [emailResolutionNotes, setEmailResolutionNotes] = useState("");
+  const [emailActionTaken, setEmailActionTaken] = useState("");
   const [customerCalled, setCustomerCalled] = useState<boolean>(false);
   const [isUpdatingCalled, setIsUpdatingCalled] = useState(false);
   const [isEditingFeedbackText, setIsEditingFeedbackText] = useState(false);
@@ -350,7 +353,7 @@ Customer Service Team`);
       return;
     }
 
-    if (!emailMessage.trim()) {
+    if (selectedTemplate === 'custom' && !emailMessage.trim()) {
       toast({
         title: "Error",
         description: "Please enter an email message before sending.",
@@ -361,12 +364,25 @@ Customer Service Team`);
 
     setIsLoading(true);
     try {
+      const requestBody: any = {
+        feedbackId: feedback.id,
+        method: 'email',
+        templateType: selectedTemplate,
+      };
+
+      // Add custom message for custom template
+      if (selectedTemplate === 'custom') {
+        requestBody.messageContent = emailMessage;
+      }
+
+      // Add resolution-specific fields
+      if (selectedTemplate === 'resolution') {
+        requestBody.actionTaken = emailActionTaken;
+        requestBody.resolutionNotes = emailResolutionNotes;
+      }
+
       const { error } = await supabase.functions.invoke('send-customer-outreach', {
-        body: {
-          feedbackId: feedback.id,
-          method: 'email',
-          messageContent: emailMessage
-        }
+        body: requestBody
       });
 
       if (error) throw error;
@@ -377,6 +393,9 @@ Customer Service Team`);
       });
 
       setShowEmailComposer(false);
+      setEmailMessage("");
+      setEmailActionTaken("");
+      setEmailResolutionNotes("");
       onUpdate();
     } catch (error) {
       console.error('Error sending outreach:', error);
@@ -647,34 +666,110 @@ Customer Service Team`);
                         </>
                       ) : (
                         <div className="space-y-3 w-full">
-                          <div>
-                            <Label htmlFor="emailMessage">Email Message</Label>
-                            <Textarea 
-                              id="emailMessage"
-                              value={emailMessage}
-                              onChange={(e) => setEmailMessage(e.target.value)}
-                              placeholder="Write your message to the customer..."
-                              rows={8}
-                              className="mt-1"
-                            />
-                           </div>
-                           <div className="flex gap-2">
-                             <Button 
-                               onClick={handleSendOutreach}
-                               disabled={isLoading || !emailMessage.trim()}
-                               className="flex-1"
-                             >
-                               <Mail className="h-4 w-4 mr-2" />
-                               {isLoading ? "Sending..." : "Send Email"}
-                             </Button>
-                             <Button 
-                               variant="outline" 
-                               onClick={() => setShowEmailComposer(false)}
-                               disabled={isLoading}
-                             >
-                               Cancel
-                             </Button>
-                           </div>
+                          {/* Template Selection */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-muted/50">
+                            <div className="space-y-2">
+                              <Label htmlFor="template-select">Email Template</Label>
+                              <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select template" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="acknowledgment">
+                                    <div className="flex items-center gap-2">
+                                      <MessageSquare className="h-3 w-3" />
+                                      Acknowledgment
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem value="praise">
+                                    <div className="flex items-center gap-2">
+                                      <Heart className="h-3 w-3" />
+                                      Praise Response
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem value="resolution">
+                                    <div className="flex items-center gap-2">
+                                      <CheckCircle className="h-3 w-3" />
+                                      Resolution Update
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem value="escalation">
+                                    <div className="flex items-center gap-2">
+                                      <AlertTriangle className="h-3 w-3" />
+                                      Escalation Notice
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem value="custom">
+                                    <div className="flex items-center gap-2">
+                                      <Mail className="h-3 w-3" />
+                                      Custom Message
+                                    </div>
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            {/* Template-specific fields */}
+                            {selectedTemplate === 'resolution' && (
+                              <div className="space-y-3">
+                                <div className="space-y-2">
+                                  <Label htmlFor="action-taken">Action Taken</Label>
+                                  <Textarea
+                                    id="action-taken"
+                                    value={emailActionTaken}
+                                    onChange={(e) => setEmailActionTaken(e.target.value)}
+                                    placeholder="Describe what action was taken..."
+                                    rows={2}
+                                    className="resize-none text-sm"
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor="resolution-notes">Resolution Notes</Label>
+                                  <Textarea
+                                    id="resolution-notes"
+                                    value={emailResolutionNotes}
+                                    onChange={(e) => setEmailResolutionNotes(e.target.value)}
+                                    placeholder="Additional resolution details..."
+                                    rows={2}
+                                    className="resize-none text-sm"
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Custom Message (only for custom template) */}
+                          {selectedTemplate === 'custom' && (
+                            <div>
+                              <Label htmlFor="emailMessage">Email Message</Label>
+                              <Textarea 
+                                id="emailMessage"
+                                value={emailMessage}
+                                onChange={(e) => setEmailMessage(e.target.value)}
+                                placeholder="Write your message to the customer..."
+                                rows={8}
+                                className="mt-1"
+                              />
+                            </div>
+                          )}
+
+                          <div className="flex gap-2">
+                            <Button 
+                              onClick={handleSendOutreach}
+                              disabled={isLoading || (selectedTemplate === 'custom' && !emailMessage.trim())}
+                              className="flex-1"
+                            >
+                              <Mail className="h-4 w-4 mr-2" />
+                              {isLoading ? "Sending..." : "Send Email"}
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              onClick={() => setShowEmailComposer(false)}
+                              disabled={isLoading}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
                         </div>
                       )}
                     </div>
