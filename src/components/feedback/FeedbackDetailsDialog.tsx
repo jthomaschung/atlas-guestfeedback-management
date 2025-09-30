@@ -507,109 +507,107 @@ Customer Service Team`);
           </div>
 
           {/* Customer Outreach Section */}
-          {isAdmin && (
-            <div className="border rounded-lg p-4 bg-muted/20">
-              <h3 className="font-semibold mb-3 flex items-center gap-2">
-                <Mail className="h-4 w-4" />
-                Customer Outreach
-              </h3>
-              
-              {feedback.customer_email ? (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="text-muted-foreground">Email:</span>
-                    <span>{feedback.customer_email}</span>
-                  </div>
-                  
-                  {feedback.outreach_sent_at ? (
-                    <div className="space-y-3">
+          <div className="border rounded-lg p-4 bg-muted/20">
+            <h3 className="font-semibold mb-3 flex items-center gap-2">
+              <Mail className="h-4 w-4" />
+              Customer Outreach
+            </h3>
+            
+            {feedback.customer_email ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-muted-foreground">Email:</span>
+                  <span>{feedback.customer_email}</span>
+                </div>
+                
+                {feedback.outreach_sent_at ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="text-muted-foreground">Outreach sent:</span>
+                      <span>{new Date(feedback.outreach_sent_at).toLocaleDateString()} at {new Date(feedback.outreach_sent_at).toLocaleTimeString()}</span>
+                    </div>
+                    {feedback.customer_response_sentiment && (
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="text-muted-foreground">Outreach sent:</span>
-                        <span>{new Date(feedback.outreach_sent_at).toLocaleDateString()} at {new Date(feedback.outreach_sent_at).toLocaleTimeString()}</span>
+                        <span className="text-muted-foreground">Response sentiment:</span>
+                        <Badge variant={
+                          feedback.customer_response_sentiment === 'positive' ? 'default' :
+                          feedback.customer_response_sentiment === 'negative' ? 'destructive' : 'secondary'
+                        }>
+                          {feedback.customer_response_sentiment}
+                        </Badge>
                       </div>
-                      {feedback.customer_response_sentiment && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <span className="text-muted-foreground">Response sentiment:</span>
-                          <Badge variant={
-                            feedback.customer_response_sentiment === 'positive' ? 'default' :
-                            feedback.customer_response_sentiment === 'negative' ? 'destructive' : 'secondary'
-                          }>
-                            {feedback.customer_response_sentiment}
-                          </Badge>
+                    )}
+                    <Button 
+                      onClick={() => setShowEmailConversation(true)}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      View Email Conversation
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      {!showEmailComposer ? (
+                        <>
+                          <Button 
+                            onClick={() => setShowEmailComposer(true)}
+                            disabled={isLoading}
+                            className="flex-1"
+                          >
+                            <Mail className="h-4 w-4 mr-2" />
+                            Compose Email to Customer
+                          </Button>
+                          <Button 
+                            onClick={() => setShowEmailConversation(true)}
+                            variant="outline"
+                            disabled={isLoading}
+                          >
+                            <MessageSquare className="h-4 w-4 mr-2" />
+                            View Conversation
+                          </Button>
+                        </>
+                      ) : (
+                        <div className="space-y-3 w-full">
+                          <div>
+                            <Label htmlFor="emailMessage">Email Message</Label>
+                            <Textarea 
+                              id="emailMessage"
+                              value={emailMessage}
+                              onChange={(e) => setEmailMessage(e.target.value)}
+                              placeholder="Write your message to the customer..."
+                              rows={8}
+                              className="mt-1"
+                            />
+                           </div>
+                           <div className="flex gap-2">
+                             <Button 
+                               onClick={handleSendOutreach}
+                               disabled={isLoading || !emailMessage.trim()}
+                               className="flex-1"
+                             >
+                               <Mail className="h-4 w-4 mr-2" />
+                               {isLoading ? "Sending..." : "Send Email"}
+                             </Button>
+                             <Button 
+                               variant="outline" 
+                               onClick={() => setShowEmailComposer(false)}
+                               disabled={isLoading}
+                             >
+                               Cancel
+                             </Button>
+                           </div>
                         </div>
                       )}
-                      <Button 
-                        onClick={() => setShowEmailConversation(true)}
-                        variant="outline"
-                        className="w-full"
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        View Email Conversation
-                      </Button>
                     </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <div className="flex gap-2">
-                        {!showEmailComposer ? (
-                          <>
-                            <Button 
-                              onClick={() => setShowEmailComposer(true)}
-                              disabled={isLoading}
-                              className="flex-1"
-                            >
-                              <Mail className="h-4 w-4 mr-2" />
-                              Compose Email to Customer
-                            </Button>
-                            <Button 
-                              onClick={() => setShowEmailConversation(true)}
-                              variant="outline"
-                              disabled={isLoading}
-                            >
-                              <MessageSquare className="h-4 w-4 mr-2" />
-                              View Conversation
-                            </Button>
-                          </>
-                        ) : (
-                          <div className="space-y-3 w-full">
-                            <div>
-                              <Label htmlFor="emailMessage">Email Message</Label>
-                              <Textarea 
-                                id="emailMessage"
-                                value={emailMessage}
-                                onChange={(e) => setEmailMessage(e.target.value)}
-                                placeholder="Write your message to the customer..."
-                                rows={8}
-                                className="mt-1"
-                              />
-                             </div>
-                             <div className="flex gap-2">
-                               <Button 
-                                 onClick={handleSendOutreach}
-                                 disabled={isLoading || !emailMessage.trim()}
-                                 className="flex-1"
-                               >
-                                 <Mail className="h-4 w-4 mr-2" />
-                                 {isLoading ? "Sending..." : "Send Email"}
-                               </Button>
-                               <Button 
-                                 variant="outline" 
-                                 onClick={() => setShowEmailComposer(false)}
-                                 disabled={isLoading}
-                               >
-                                 Cancel
-                               </Button>
-                             </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">No customer email available for outreach.</p>
-              )}
-            </div>
-          )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No customer email available for outreach.</p>
+            )}
+          </div>
 
           {/* Customer Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
