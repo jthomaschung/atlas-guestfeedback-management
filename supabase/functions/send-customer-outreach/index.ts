@@ -146,7 +146,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     try {
       console.log('Attempting to send email with config:', {
-        from: 'guest.feedback@feedback.atlaswe.com',
+        from: 'guest.feedback@atlaswe.com',
         to: feedback.customer_email,
         subject: emailContent.subject,
         htmlLength: emailContent.html.length
