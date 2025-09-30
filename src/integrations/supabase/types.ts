@@ -1041,7 +1041,7 @@ export type Database = {
           hr_specialist: string | null
           id: string
           internal_notes: string[] | null
-          issue_type: Database["public"]["Enums"]["payroll_issue_type"]
+          main_category: string | null
           manager_email: string | null
           manager_name: string | null
           pay_period_end: string | null
@@ -1049,6 +1049,7 @@ export type Database = {
           resolution_notes: string | null
           resolved_at: string | null
           status: Database["public"]["Enums"]["ticket_status"]
+          sub_category: string | null
           submitted_by: string
           ticket_number: string
           title: string
@@ -1072,7 +1073,7 @@ export type Database = {
           hr_specialist?: string | null
           id?: string
           internal_notes?: string[] | null
-          issue_type: Database["public"]["Enums"]["payroll_issue_type"]
+          main_category?: string | null
           manager_email?: string | null
           manager_name?: string | null
           pay_period_end?: string | null
@@ -1080,6 +1081,7 @@ export type Database = {
           resolution_notes?: string | null
           resolved_at?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
+          sub_category?: string | null
           submitted_by: string
           ticket_number?: string
           title: string
@@ -1103,7 +1105,7 @@ export type Database = {
           hr_specialist?: string | null
           id?: string
           internal_notes?: string[] | null
-          issue_type?: Database["public"]["Enums"]["payroll_issue_type"]
+          main_category?: string | null
           manager_email?: string | null
           manager_name?: string | null
           pay_period_end?: string | null
@@ -1111,6 +1113,7 @@ export type Database = {
           resolution_notes?: string | null
           resolved_at?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
+          sub_category?: string | null
           submitted_by?: string
           ticket_number?: string
           title?: string
@@ -2306,20 +2309,6 @@ export type Database = {
         | "possible_food_poisoning"
         | "loyalty_program_issues"
       feedback_channel: "yelp" | "qualtrics" | "jimmy_johns"
-      payroll_issue_type:
-        | "pay_discrepancy"
-        | "missing_hours"
-        | "overtime_issues"
-        | "benefits_inquiry"
-        | "time_off_request"
-        | "tax_withholding"
-        | "direct_deposit"
-        | "paystub_access"
-        | "other"
-        | "overtime"
-        | "bonus_commission"
-        | "benefits_deduction"
-        | "general_inquiry"
       ticket_status:
         | "submitted"
         | "under_review"
@@ -2474,21 +2463,6 @@ export const Constants = {
         "loyalty_program_issues",
       ],
       feedback_channel: ["yelp", "qualtrics", "jimmy_johns"],
-      payroll_issue_type: [
-        "pay_discrepancy",
-        "missing_hours",
-        "overtime_issues",
-        "benefits_inquiry",
-        "time_off_request",
-        "tax_withholding",
-        "direct_deposit",
-        "paystub_access",
-        "other",
-        "overtime",
-        "bonus_commission",
-        "benefits_deduction",
-        "general_inquiry",
-      ],
       ticket_status: [
         "submitted",
         "under_review",
