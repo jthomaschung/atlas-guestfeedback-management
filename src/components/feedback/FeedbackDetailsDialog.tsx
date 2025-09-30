@@ -725,19 +725,18 @@ Customer Service Team`);
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent className="bg-background z-50 max-h-60 overflow-y-auto">
-                      <SelectItem value="Bread Quality">Bread Quality</SelectItem>
-                      <SelectItem value="Cleanliness">Cleanliness</SelectItem>
-                      <SelectItem value="Closed Early">Closed Early</SelectItem>
-                      <SelectItem value="Missing Item">Missing Item</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
-                      <SelectItem value="Out of Product">Out of Product</SelectItem>
-                      <SelectItem value="Praise">Praise</SelectItem>
-                      <SelectItem value="Pricing Issue">Pricing Issue</SelectItem>
-                      <SelectItem value="Product Issue">Product Issue</SelectItem>
-                      <SelectItem value="Rude Service">Rude Service</SelectItem>
                       <SelectItem value="Sandwich Made Wrong">Sandwich Made Wrong</SelectItem>
                       <SelectItem value="Slow Service">Slow Service</SelectItem>
+                      <SelectItem value="Rude Service">Rude Service</SelectItem>
+                      <SelectItem value="Product Issue">Product Issue</SelectItem>
+                      <SelectItem value="Closed Early">Closed Early</SelectItem>
+                      <SelectItem value="Praise">Praise</SelectItem>
+                      <SelectItem value="Missing Item">Missing Item</SelectItem>
                       <SelectItem value="Credit Card Issue">Credit Card Issue</SelectItem>
+                      <SelectItem value="Bread Quality">Bread Quality</SelectItem>
+                      <SelectItem value="Out of Product">Out of Product</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                      <SelectItem value="Cleanliness">Cleanliness</SelectItem>
                       <SelectItem value="Possible Food Poisoning">Possible Food Poisoning</SelectItem>
                       <SelectItem value="Loyalty Program Issues">Loyalty Program Issues</SelectItem>
                     </SelectContent>
