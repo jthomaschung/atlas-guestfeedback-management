@@ -719,12 +719,41 @@ Customer Service Team`);
               {isAdmin && (
                 <div>
                   <Label htmlFor="category">Category</Label>
-                  <Input 
-                    id="category"
-                    value={category} 
-                    onChange={(e) => handleCategoryChange(e.target.value)}
-                    placeholder="Enter category"
-                  />
+                  <Select value={category} onValueChange={handleCategoryChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background z-50 max-h-60 overflow-y-auto">
+                      <SelectItem value="Bread Quality">Bread Quality</SelectItem>
+                      <SelectItem value="Cleanliness">Cleanliness</SelectItem>
+                      <SelectItem value="Closed Early">Closed Early</SelectItem>
+                      <SelectItem value="Missing Item">Missing Item</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                      <SelectItem value="Out of Product">Out of Product</SelectItem>
+                      <SelectItem value="Praise">Praise</SelectItem>
+                      <SelectItem value="Pricing Issue">Pricing Issue</SelectItem>
+                      <SelectItem value="Product Issue">Product Issue</SelectItem>
+                      <SelectItem value="Rude Service">Rude Service</SelectItem>
+                      <SelectItem value="Sandwich Made Wrong">Sandwich Made Wrong</SelectItem>
+                      <SelectItem value="Slow Service">Slow Service</SelectItem>
+                      <SelectItem value="Credit Card Issue">Credit Card Issue</SelectItem>
+                      <SelectItem value="Possible Food Poisoning">Possible Food Poisoning</SelectItem>
+                      <SelectItem value="Loyalty Program Issues">Loyalty Program Issues</SelectItem>
+                      <SelectItem value="Food Quality">Food Quality</SelectItem>
+                      <SelectItem value="Staff Service">Staff Service</SelectItem>
+                      <SelectItem value="Delivery Service">Delivery Service</SelectItem>
+                      <SelectItem value="Store Appearance">Store Appearance</SelectItem>
+                      <SelectItem value="Wait Time">Wait Time</SelectItem>
+                      <SelectItem value="Order Accuracy">Order Accuracy</SelectItem>
+                      <SelectItem value="Temperature">Temperature</SelectItem>
+                      <SelectItem value="Quantity">Quantity</SelectItem>
+                      <SelectItem value="Experience">Experience</SelectItem>
+                      <SelectItem value="Multiple Issues">Multiple Issues</SelectItem>
+                      <SelectItem value="Manager/Supervisor Contact Request">Manager/Supervisor Contact Request</SelectItem>
+                      <SelectItem value="Training">Training</SelectItem>
+                      <SelectItem value="Appreciation">Appreciation</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               )}
             </div>
