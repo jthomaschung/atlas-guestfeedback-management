@@ -176,7 +176,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const { sendAssignmentNotification } = useFeedbackNotifications();
   const processedFeedbackId = useRef<string | null>(null);
 
-  const isAdmin = permissions?.role?.toLowerCase() === 'admin' || permissions?.role?.toLowerCase() === 'dm' || permissions?.isAdmin;
+  const isAdmin = permissions?.role?.toLowerCase() === 'admin' || permissions?.role?.toLowerCase() === 'dm' || permissions?.isAdmin || permissions?.isDirectorOrAbove;
 
   // Update local state when feedback changes
   useEffect(() => {
