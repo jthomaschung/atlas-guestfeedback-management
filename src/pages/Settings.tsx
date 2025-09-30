@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, EyeOff, Key } from 'lucide-react';
+import { Eye, EyeOff, Key, Plus, Store } from 'lucide-react';
+import { MarketOverview } from '@/components/settings/MarketOverview';
+import { StoreTable } from '@/components/settings/StoreTable';
+import { StoreFilters } from '@/components/settings/StoreFilters';
+import { StoreManagementDialog } from '@/components/settings/StoreManagementDialog';
+import { ManageMarketsDialog } from '@/components/settings/ManageMarketsDialog';
 
 const Settings = () => {
   const { user } = useAuth();
@@ -22,12 +28,90 @@ const Settings = () => {
     confirmPassword: ''
   });
 
+  // Store management state
+  const [stores, setStores] = useState<any[]>([]);
+  const [filteredStores, setFilteredStores] = useState<any[]>([]);
+  const [markets, setMarkets] = useState<{ market: string; count: number }[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedMarket, setSelectedMarket] = useState('all');
+  const [storeDialogOpen, setStoreDialogOpen] = useState(false);
+  const [marketDialogOpen, setMarketDialogOpen] = useState(false);
+  const [selectedStore, setSelectedStore] = useState<any>(null);
+  const [storesLoading, setStoresLoading] = useState(false);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
+
+  // Fetch stores
+  const fetchStores = async () => {
+    setStoresLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('stores')
+        .select('*')
+        .order('store_number');
+
+      if (error) throw error;
+
+      setStores(data || []);
+      
+      // Calculate market statistics
+      const marketStats = (data || []).reduce((acc: any, store: any) => {
+        const market = store.region || 'Unassigned';
+        if (!acc[market]) {
+          acc[market] = 0;
+        }
+        if (store.is_active) {
+          acc[market]++;
+        }
+        return acc;
+      }, {});
+
+      const marketArray = Object.entries(marketStats).map(([market, count]) => ({
+        market,
+        count: count as number
+      }));
+
+      setMarkets(marketArray);
+    } catch (error: any) {
+      console.error('Error fetching stores:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load stores',
+        variant: 'destructive'
+      });
+    } finally {
+      setStoresLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStores();
+  }, []);
+
+  // Filter stores
+  useEffect(() => {
+    let filtered = stores;
+
+    if (selectedMarket !== 'all') {
+      filtered = filtered.filter(store => store.region === selectedMarket);
+    }
+
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(store =>
+        store.store_number?.toLowerCase().includes(query) ||
+        store.store_name?.toLowerCase().includes(query) ||
+        store.manager?.toLowerCase().includes(query)
+      );
+    }
+
+    setFilteredStores(filtered);
+  }, [stores, selectedMarket, searchQuery]);
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +159,6 @@ const Settings = () => {
         description: "Password updated successfully"
       });
 
-      // Clear form
       setFormData({
         currentPassword: '',
         newPassword: '',
@@ -94,106 +177,215 @@ const Settings = () => {
     }
   };
 
+  const handleEditStore = (store: any) => {
+    setSelectedStore(store);
+    setStoreDialogOpen(true);
+  };
+
+  const handleDeleteStore = async (storeId: number) => {
+    try {
+      const { error } = await supabase
+        .from('stores')
+        .delete()
+        .eq('store_id', storeId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Success',
+        description: 'Store deleted successfully'
+      });
+
+      fetchStores();
+    } catch (error: any) {
+      console.error('Error deleting store:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to delete store',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleViewDetails = (store: any) => {
+    setSelectedStore(store);
+    setStoreDialogOpen(true);
+  };
+
+  const handleAddStore = () => {
+    setSelectedStore(null);
+    setStoreDialogOpen(true);
+  };
+
   return (
-    <div className="container mx-auto p-6 max-w-2xl">
+    <div className="container mx-auto p-6 max-w-7xl">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-foreground">Settings</h1>
         <p className="text-muted-foreground mt-1">
-          Manage your account settings and preferences
+          Manage your account settings and system configuration
         </p>
       </div>
 
-      <div className="space-y-6">
-        {/* User Info Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Account Information</CardTitle>
-            <CardDescription>Your current account details</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>Email Address</Label>
-              <Input value={user?.email || ''} disabled className="mt-1" />
-            </div>
-          </CardContent>
-        </Card>
+      <Tabs defaultValue="account" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="stores">Store Management</TabsTrigger>
+        </TabsList>
 
-        {/* Change Password Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Key className="h-5 w-5" />
-              Change Password
-            </CardTitle>
-            <CardDescription>Update your account password</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handlePasswordChange} className="space-y-4">
+        <TabsContent value="account" className="space-y-6">
+          {/* User Info Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Account Information</CardTitle>
+              <CardDescription>Your current account details</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="newPassword">New Password</Label>
-                <div className="relative mt-1">
-                  <Input
-                    id="newPassword"
-                    type={showNewPassword ? "text" : "password"}
-                    value={formData.newPassword}
-                    onChange={(e) => handleInputChange('newPassword', e.target.value)}
-                    placeholder="Enter new password"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                  >
-                    {showNewPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
+                <Label>Email Address</Label>
+                <Input value={user?.email || ''} disabled className="mt-1" />
               </div>
+            </CardContent>
+          </Card>
 
-              <div>
-                <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                <div className="relative mt-1">
-                  <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={formData.confirmPassword}
-                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                    placeholder="Confirm new password"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
+          {/* Change Password Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Key className="h-5 w-5" />
+                Change Password
+              </CardTitle>
+              <CardDescription>Update your account password</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handlePasswordChange} className="space-y-4">
+                <div>
+                  <Label htmlFor="newPassword">New Password</Label>
+                  <div className="relative mt-1">
+                    <Input
+                      id="newPassword"
+                      type={showNewPassword ? "text" : "password"}
+                      value={formData.newPassword}
+                      onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                      placeholder="Enter new password"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                    >
+                      {showNewPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
-              </div>
 
-              <Button 
-                type="submit" 
-                disabled={isLoading}
-                className="w-full"
-              >
-                {isLoading ? "Updating..." : "Update Password"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+                <div>
+                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                  <div className="relative mt-1">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      placeholder="Confirm new password"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                <Button 
+                  type="submit" 
+                  disabled={isLoading}
+                  className="w-full"
+                >
+                  {isLoading ? "Updating..." : "Update Password"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="stores" className="space-y-6">
+          <MarketOverview 
+            markets={markets} 
+            onManageMarkets={() => setMarketDialogOpen(true)} 
+          />
+
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Store className="h-5 w-5" />
+                    Store Management
+                  </CardTitle>
+                  <CardDescription>Manage stores across all markets</CardDescription>
+                </div>
+                <Button onClick={handleAddStore}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Store
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <StoreFilters
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                selectedMarket={selectedMarket}
+                onMarketChange={setSelectedMarket}
+                markets={markets.map(m => m.market)}
+              />
+
+              {storesLoading ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Loading stores...
+                </div>
+              ) : (
+                <StoreTable
+                  stores={filteredStores}
+                  onEdit={handleEditStore}
+                  onDelete={handleDeleteStore}
+                  onViewDetails={handleViewDetails}
+                />
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      <StoreManagementDialog
+        open={storeDialogOpen}
+        onOpenChange={setStoreDialogOpen}
+        store={selectedStore}
+        markets={markets.map(m => m.market)}
+        onSave={fetchStores}
+      />
+
+      <ManageMarketsDialog
+        open={marketDialogOpen}
+        onOpenChange={setMarketDialogOpen}
+        markets={markets}
+        onRefresh={fetchStores}
+      />
     </div>
   );
 };
