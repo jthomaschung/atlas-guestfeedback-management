@@ -81,8 +81,8 @@ export function useUserPermissions() {
 
       if (hierarchyData?.role) {
         userPermissions.role = hierarchyData.role;
-        // Set director or above flag - include CEO and VP
-        userPermissions.isDirectorOrAbove = ['Admin', 'Director', 'VP', 'CEO'].includes(hierarchyData.role) || adminCheck;
+        // Set director or above flag - include CEO and VP (case-insensitive)
+        userPermissions.isDirectorOrAbove = ['admin', 'director', 'vp', 'ceo'].includes(hierarchyData.role?.toLowerCase()) || adminCheck;
       } else {
         userPermissions.isDirectorOrAbove = adminCheck || false;
       }
