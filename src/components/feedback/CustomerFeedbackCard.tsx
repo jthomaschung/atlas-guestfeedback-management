@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Edit, Calendar, Eye, User, Clock, AlertTriangle, Trash2, Star, Phone, Hash } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Edit, Calendar, Eye, User, Clock, AlertTriangle, Trash2, Star, Phone, Hash, Save, X } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -79,6 +80,9 @@ export function CustomerFeedbackCard({
 }: CustomerFeedbackCardProps) {
   const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
   const [isUpdatingCalled, setIsUpdatingCalled] = useState(false);
+  const [isEditingFeedback, setIsEditingFeedback] = useState(false);
+  const [editedFeedbackText, setEditedFeedbackText] = useState(feedback.feedback_text || '');
+  const [isUpdatingFeedback, setIsUpdatingFeedback] = useState(false);
   const PriorityIcon = priorityIcons[feedback.priority as keyof typeof priorityIcons];
   const isUrgent = feedback.priority === 'Critical';
 
@@ -99,6 +103,34 @@ export function CustomerFeedbackCard({
     } finally {
       setIsUpdatingCalled(false);
     }
+  };
+
+  const handleSaveFeedback = async () => {
+    setIsUpdatingFeedback(true);
+    try {
+      const { error } = await supabase
+        .from('customer_feedback')
+        .update({ 
+          feedback_text: editedFeedbackText,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', feedback.id);
+
+      if (error) throw error;
+
+      toast.success('Feedback updated successfully');
+      setIsEditingFeedback(false);
+    } catch (error) {
+      console.error('Error updating feedback:', error);
+      toast.error('Failed to update feedback');
+    } finally {
+      setIsUpdatingFeedback(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditedFeedbackText(feedback.feedback_text || '');
+    setIsEditingFeedback(false);
   };
 
   const handleCategoryChange = async (newCategory: string) => {
@@ -175,9 +207,58 @@ export function CustomerFeedbackCard({
               </h3>
             )}
             
-            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-              {feedback.feedback_text}
-            </p>
+            {/* Feedback Text with Inline Edit */}
+            {isEditingFeedback ? (
+              <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
+                <Textarea
+                  value={editedFeedbackText}
+                  onChange={(e) => setEditedFeedbackText(e.target.value)}
+                  className="text-sm min-h-[80px] resize-none"
+                  disabled={isUpdatingFeedback}
+                />
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={handleSaveFeedback}
+                    disabled={isUpdatingFeedback}
+                    className="h-7"
+                  >
+                    <Save className="h-3 w-3 mr-1" />
+                    Save
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleCancelEdit}
+                    disabled={isUpdatingFeedback}
+                    className="h-7"
+                  >
+                    <X className="h-3 w-3 mr-1" />
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="relative group/feedback">
+                <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                  {feedback.feedback_text}
+                </p>
+                {isAdmin && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute -right-1 -top-1 h-6 w-6 p-0 opacity-0 group-hover/feedback:opacity-100 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsEditingFeedback(true);
+                    }}
+                    title="Edit Feedback Text (Admin Only)"
+                  >
+                    <Edit className="h-3 w-3" />
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
           
           <div className="flex items-center gap-1 ml-2 sm:ml-4">
