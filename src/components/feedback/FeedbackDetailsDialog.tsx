@@ -9,6 +9,7 @@ import { MentionsTextarea } from "@/components/ui/mentions-textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar, User, Star, MapPin, Phone, Mail, MessageSquare, Clock, AlertTriangle, Store } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -171,6 +172,8 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const [showEmailComposer, setShowEmailComposer] = useState(false);
   const [emailMessage, setEmailMessage] = useState('');
   const [showEmailConversation, setShowEmailConversation] = useState(false);
+  const [customerCalled, setCustomerCalled] = useState<boolean>(false);
+  const [isUpdatingCalled, setIsUpdatingCalled] = useState(false);
   const { toast } = useToast();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
   const { sendAssignmentNotification } = useFeedbackNotifications();
@@ -188,6 +191,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
       setResolutionNotes(feedback.resolution_notes || '');
       setStoreNumber(feedback.store_number || '');
       setMarket(feedback.market || '');
+      setCustomerCalled(feedback.customer_called || false);
       
       // Set default email message
       setEmailMessage(`Dear ${feedback.customer_name || 'Valued Customer'},
@@ -413,6 +417,35 @@ Customer Service Team`);
     }
   };
 
+  const handleCalledChange = async (checked: boolean) => {
+    if (!feedback) return;
+    
+    setIsUpdatingCalled(true);
+    try {
+      const { error } = await supabase
+        .from('customer_feedback')
+        .update({ customer_called: checked })
+        .eq('id', feedback.id);
+
+      if (error) throw error;
+
+      setCustomerCalled(checked);
+      toast({
+        title: checked ? "Marked as Called" : "Unmarked as Called",
+        description: checked ? "Customer has been marked as called." : "Customer call status cleared.",
+      });
+    } catch (error) {
+      console.error('Error updating called status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update called status.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdatingCalled(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!feedback) return;
 
@@ -624,8 +657,26 @@ Customer Service Team`);
                 <div>
                   <span className="text-muted-foreground">Email:</span> {feedback.customer_email || 'Not provided'}
                 </div>
-                <div>
-                  <span className="text-muted-foreground">Phone:</span> {feedback.customer_phone || 'Not provided'}
+                <div className="flex items-center gap-3">
+                  <div>
+                    <span className="text-muted-foreground">Phone:</span> {feedback.customer_phone || 'Not provided'}
+                  </div>
+                  {feedback.customer_phone && (
+                    <div className="flex items-center gap-2 ml-auto">
+                      <Checkbox
+                        id="customer-called"
+                        checked={customerCalled}
+                        onCheckedChange={handleCalledChange}
+                        disabled={isUpdatingCalled}
+                      />
+                      <label
+                        htmlFor="customer-called"
+                        className="text-sm font-medium cursor-pointer select-none"
+                      >
+                        Called Customer
+                      </label>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <span className="text-muted-foreground">Case Number:</span> {feedback.case_number}
