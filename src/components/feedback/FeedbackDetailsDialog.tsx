@@ -432,6 +432,7 @@ Customer Service Team`);
         .from('customer_feedback')
         .update({
           resolution_status: status,
+          priority: priority,
           assignee: assignee || null,
           complaint_category: category,
           resolution_notes: resolutionNotes || null,
