@@ -32,6 +32,7 @@ const executiveItems = [
 
 const adminItems = [
   { title: "User Management", url: "/user-hierarchy", icon: Users },
+  { title: "Internal Feedback", url: "/internal-feedback", icon: MessageSquare },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 

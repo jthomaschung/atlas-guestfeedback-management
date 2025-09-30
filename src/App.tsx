@@ -28,6 +28,7 @@ import PortalSelection from '@/pages/PortalSelection';
 import FeedbackReporting from '@/pages/FeedbackReporting';
 import RedCarpetLeaders from '@/pages/RedCarpetLeaders';
 import Summary from '@/pages/Summary';
+import InternalFeedback from '@/pages/InternalFeedback';
 import { AuthGate } from '@/components/AuthGate';
 
 import { SmartRedirect } from '@/components/SmartRedirect';
@@ -359,7 +360,15 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
-               <Route 
+              <Route 
+                path="/internal-feedback" 
+                element={
+                  <ProtectedRoute>
+                    <InternalFeedback />
+                  </ProtectedRoute>
+                } 
+              />
+               <Route
                 path="/" 
                 element={
                   <ProtectedRoute>
