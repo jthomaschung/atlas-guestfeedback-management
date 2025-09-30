@@ -192,24 +192,74 @@ const handler = async (req: Request): Promise<Response> => {
     
     // If no text/html, try to extract from raw email content
     if (!replyContent && emailData.email) {
-      // Simple extraction from raw email - look for content after headers
-      const emailLines = emailData.email.split('\n');
-      let contentStarted = false;
-      const contentLines = [];
+      // Parse the raw email - it might be base64 encoded
+      let rawEmail = emailData.email;
       
-      for (const line of emailLines) {
-        if (contentStarted) {
-          // Skip empty lines and signature separators
-          if (line.trim() && !line.startsWith('--') && !line.includes('CONFIDENTIAL:')) {
-            contentLines.push(line);
+      // Check if it's base64 encoded by looking for Content-Transfer-Encoding header
+      if (rawEmail.includes('Content-Transfer-Encoding: base64')) {
+        console.log('📧 DETECTED BASE64 ENCODED EMAIL, DECODING...');
+        
+        // Split by lines and find the base64 content
+        const emailLines = rawEmail.split('\n');
+        let base64Content = '';
+        let inBase64Section = false;
+        
+        for (const line of emailLines) {
+          if (line.trim().startsWith('Content-Transfer-Encoding: base64')) {
+            inBase64Section = true;
+            continue;
           }
-        } else if (line.trim() === '' && emailLines.indexOf(line) > 40) {
-          // Content typically starts after headers (around line 40+)
-          contentStarted = true;
+          
+          if (inBase64Section && line.trim() === '') {
+            continue; // Skip empty lines
+          }
+          
+          if (inBase64Section && line.trim()) {
+            // Check if this line looks like base64
+            if (/^[A-Za-z0-9+/=]+$/.test(line.trim())) {
+              base64Content += line.trim();
+            } else {
+              // End of base64 section
+              break;
+            }
+          }
+        }
+        
+        if (base64Content) {
+          try {
+            // Decode base64 content
+            const decodedBytes = atob(base64Content);
+            const decodedText = new TextDecoder('utf-8').decode(
+              new Uint8Array([...decodedBytes].map(char => char.charCodeAt(0)))
+            );
+            console.log('📧 DECODED EMAIL CONTENT:', decodedText.substring(0, 200));
+            replyContent = decodedText;
+          } catch (error) {
+            console.error('❌ ERROR DECODING BASE64:', error);
+          }
         }
       }
       
-      replyContent = contentLines.slice(0, 10).join('\n').trim(); // Take first 10 lines
+      // If still no content, try simple extraction from raw email
+      if (!replyContent) {
+        const emailLines = rawEmail.split('\n');
+        let contentStarted = false;
+        const contentLines = [];
+        
+        for (const line of emailLines) {
+          if (contentStarted) {
+            // Skip empty lines and signature separators
+            if (line.trim() && !line.startsWith('--') && !line.includes('CONFIDENTIAL:')) {
+              contentLines.push(line);
+            }
+          } else if (line.trim() === '' && emailLines.indexOf(line) > 40) {
+            // Content typically starts after headers (around line 40+)
+            contentStarted = true;
+          }
+        }
+        
+        replyContent = contentLines.slice(0, 10).join('\n').trim(); // Take first 10 lines
+      }
     }
     
     console.log('📧 FINAL CONTENT EXTRACTION:', {
