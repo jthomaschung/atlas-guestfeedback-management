@@ -740,19 +740,6 @@ Customer Service Team`);
                       <SelectItem value="Credit Card Issue">Credit Card Issue</SelectItem>
                       <SelectItem value="Possible Food Poisoning">Possible Food Poisoning</SelectItem>
                       <SelectItem value="Loyalty Program Issues">Loyalty Program Issues</SelectItem>
-                      <SelectItem value="Food Quality">Food Quality</SelectItem>
-                      <SelectItem value="Staff Service">Staff Service</SelectItem>
-                      <SelectItem value="Delivery Service">Delivery Service</SelectItem>
-                      <SelectItem value="Store Appearance">Store Appearance</SelectItem>
-                      <SelectItem value="Wait Time">Wait Time</SelectItem>
-                      <SelectItem value="Order Accuracy">Order Accuracy</SelectItem>
-                      <SelectItem value="Temperature">Temperature</SelectItem>
-                      <SelectItem value="Quantity">Quantity</SelectItem>
-                      <SelectItem value="Experience">Experience</SelectItem>
-                      <SelectItem value="Multiple Issues">Multiple Issues</SelectItem>
-                      <SelectItem value="Manager/Supervisor Contact Request">Manager/Supervisor Contact Request</SelectItem>
-                      <SelectItem value="Training">Training</SelectItem>
-                      <SelectItem value="Appreciation">Appreciation</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
