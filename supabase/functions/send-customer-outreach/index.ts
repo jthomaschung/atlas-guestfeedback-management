@@ -113,7 +113,7 @@ const handler = async (req: Request): Promise<Response> => {
         message_content: messageContent || `Thank you for your feedback regarding your visit to our store #${feedback.store_number}. We take all customer feedback seriously and are working to address your concerns.`,
         delivery_status: 'pending',
         email_thread_id: emailThreadId,
-        from_email: 'guest.feedback@atlaswe.com',
+        from_email: 'onboarding@resend.dev',
         to_email: feedback.customer_email
       })
       .select()
@@ -146,7 +146,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     try {
       console.log('Attempting to send email with config:', {
-        from: 'guest.feedback@feedback.atlaswe.com',
+        from: 'onboarding@resend.dev',
         to: feedback.customer_email,
         subject: emailContent.subject,
         htmlLength: emailContent.html.length
@@ -164,11 +164,11 @@ const handler = async (req: Request): Promise<Response> => {
           }
         ],
         from: {
-          email: 'guest.feedback@atlaswe.com',
+          email: 'onboarding@resend.dev',
           name: 'Guest Feedback Team'
         },
         reply_to: {
-          email: 'guestfeedback@feedback.atlaswe.com',
+          email: 'onboarding@resend.dev',
           name: 'Guest Feedback Team'
         },
         subject: emailContent.subject,
