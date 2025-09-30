@@ -1604,9 +1604,256 @@ export type Database = {
           },
         ]
       }
+      wsr_daypart_sales: {
+        Row: {
+          created_at: string | null
+          date: string
+          daypart: string
+          id: string
+          sales: number | null
+          sales_item: string
+          store_number: string
+          updated_at: string | null
+          week_ending: string
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          daypart: string
+          id?: string
+          sales?: number | null
+          sales_item: string
+          store_number: string
+          updated_at?: string | null
+          week_ending: string
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          daypart?: string
+          id?: string
+          sales?: number | null
+          sales_item?: string
+          store_number?: string
+          updated_at?: string | null
+          week_ending?: string
+        }
+        Relationships: []
+      }
+      wsr_headers: {
+        Row: {
+          adjusted_sales: number | null
+          average_check: number | null
+          cash_over_under: number | null
+          check_count: number | null
+          city: string | null
+          created_at: string | null
+          employee_freebies: number | null
+          general_manager: string | null
+          gift_cards_total: number | null
+          id: string
+          loyalty_coupon: number | null
+          manager_freebies: number | null
+          net_sales: number | null
+          online_cash: number | null
+          online_orders_total: number | null
+          other_promo: number | null
+          pdq_sales: number | null
+          pdq_tax: number | null
+          processed_at: string | null
+          royalty_sales: number | null
+          sales_count: number | null
+          sales_tax: number | null
+          state: string | null
+          store_location: string | null
+          store_number: string
+          total_deposit: number | null
+          updated_at: string | null
+          week_ending: string
+          week_number: number | null
+          year: number | null
+        }
+        Insert: {
+          adjusted_sales?: number | null
+          average_check?: number | null
+          cash_over_under?: number | null
+          check_count?: number | null
+          city?: string | null
+          created_at?: string | null
+          employee_freebies?: number | null
+          general_manager?: string | null
+          gift_cards_total?: number | null
+          id?: string
+          loyalty_coupon?: number | null
+          manager_freebies?: number | null
+          net_sales?: number | null
+          online_cash?: number | null
+          online_orders_total?: number | null
+          other_promo?: number | null
+          pdq_sales?: number | null
+          pdq_tax?: number | null
+          processed_at?: string | null
+          royalty_sales?: number | null
+          sales_count?: number | null
+          sales_tax?: number | null
+          state?: string | null
+          store_location?: string | null
+          store_number: string
+          total_deposit?: number | null
+          updated_at?: string | null
+          week_ending: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Update: {
+          adjusted_sales?: number | null
+          average_check?: number | null
+          cash_over_under?: number | null
+          check_count?: number | null
+          city?: string | null
+          created_at?: string | null
+          employee_freebies?: number | null
+          general_manager?: string | null
+          gift_cards_total?: number | null
+          id?: string
+          loyalty_coupon?: number | null
+          manager_freebies?: number | null
+          net_sales?: number | null
+          online_cash?: number | null
+          online_orders_total?: number | null
+          other_promo?: number | null
+          pdq_sales?: number | null
+          pdq_tax?: number | null
+          processed_at?: string | null
+          royalty_sales?: number | null
+          sales_count?: number | null
+          sales_tax?: number | null
+          state?: string | null
+          store_location?: string | null
+          store_number?: string
+          total_deposit?: number | null
+          updated_at?: string | null
+          week_ending?: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Relationships: []
+      }
+      wsr_labor: {
+        Row: {
+          created_at: string | null
+          date: string
+          daypart: string
+          id: string
+          metric: string
+          store_number: string
+          total: number | null
+          updated_at: string | null
+          value: number | null
+          week_ending: string
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          daypart: string
+          id?: string
+          metric: string
+          store_number: string
+          total?: number | null
+          updated_at?: string | null
+          value?: number | null
+          week_ending: string
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          daypart?: string
+          id?: string
+          metric?: string
+          store_number?: string
+          total?: number | null
+          updated_at?: string | null
+          value?: number | null
+          week_ending?: string
+        }
+        Relationships: []
+      }
+      wsr_sales_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          quantity: number | null
+          sales_item: string
+          store_number: string
+          summary_total: number | null
+          updated_at: string | null
+          week_ending: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          quantity?: number | null
+          sales_item: string
+          store_number: string
+          summary_total?: number | null
+          updated_at?: string | null
+          week_ending: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          quantity?: number | null
+          sales_item?: string
+          store_number?: string
+          summary_total?: number | null
+          updated_at?: string | null
+          week_ending?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      wsr_daily_sales: {
+        Row: {
+          date: string | null
+          daypart: string | null
+          items_sold: number | null
+          store_number: string | null
+          total_sales: number | null
+        }
+        Relationships: []
+      }
+      wsr_labor_efficiency: {
+        Row: {
+          date: string | null
+          daypart: string | null
+          daypart_sales: number | null
+          labor_dollars: number | null
+          labor_percent: number | null
+          overtime_dollars: number | null
+          store_number: string | null
+        }
+        Relationships: []
+      }
+      wsr_weekly_summary: {
+        Row: {
+          adjusted_sales: number | null
+          city: string | null
+          general_manager: string | null
+          online_percent: number | null
+          online_sales: number | null
+          product_categories: number | null
+          royalty_sales: number | null
+          sales_tax: number | null
+          state: string | null
+          store_number: string | null
+          total_items_sold: number | null
+          week_ending: string | null
+          week_number: number | null
+          year: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       calculate_completion_metrics: {
@@ -1645,6 +1892,10 @@ export type Database = {
       check_speed_demon_badge: {
         Args: { period_uuid: string; user_uuid: string }
         Returns: boolean
+      }
+      cleanup_old_wsr_data: {
+        Args: Record<PropertyKey, never>
+        Returns: number
       }
       create_training_snapshot: {
         Args: { p_batch_id: string; p_snapshot_date: string }
@@ -1980,6 +2231,17 @@ export type Database = {
           in_progress: number
           not_started: number
           total_employees: number
+        }[]
+      }
+      get_store_rankings: {
+        Args: { p_state?: string; p_week_ending?: string }
+        Returns: {
+          city: string
+          labor_percent: number
+          rank: number
+          state: string
+          store_number: string
+          weekly_sales: number
         }[]
       }
       get_training_completions_for_store: {
