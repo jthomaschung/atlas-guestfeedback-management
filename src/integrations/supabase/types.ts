@@ -41,6 +41,164 @@ export type Database = {
         }
         Relationships: []
       }
+      campaign_recipients: {
+        Row: {
+          bounced_at: string | null
+          campaign_id: string
+          clicked_at: string | null
+          created_at: string
+          delivered_at: string | null
+          email: string
+          id: string
+          name: string | null
+          opened_at: string | null
+          sent_at: string | null
+          status: string | null
+          unsubscribed_at: string | null
+        }
+        Insert: {
+          bounced_at?: string | null
+          campaign_id: string
+          clicked_at?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          email: string
+          id?: string
+          name?: string | null
+          opened_at?: string | null
+          sent_at?: string | null
+          status?: string | null
+          unsubscribed_at?: string | null
+        }
+        Update: {
+          bounced_at?: string | null
+          campaign_id?: string
+          clicked_at?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          email?: string
+          id?: string
+          name?: string | null
+          opened_at?: string | null
+          sent_at?: string | null
+          status?: string | null
+          unsubscribed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_recipients_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "email_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      catering_customers: {
+        Row: {
+          address: string | null
+          city: string | null
+          company_name: string | null
+          created_at: string | null
+          customer_name: string | null
+          email: Json | null
+          first_order_date: string | null
+          id: string
+          last_order_date: string | null
+          phone: string | null
+          state: string | null
+          total_orders: number | null
+          total_spent: number | null
+          updated_at: string | null
+          zip: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          customer_name?: string | null
+          email?: Json | null
+          first_order_date?: string | null
+          id?: string
+          last_order_date?: string | null
+          phone?: string | null
+          state?: string | null
+          total_orders?: number | null
+          total_spent?: number | null
+          updated_at?: string | null
+          zip?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          customer_name?: string | null
+          email?: Json | null
+          first_order_date?: string | null
+          id?: string
+          last_order_date?: string | null
+          phone?: string | null
+          state?: string | null
+          total_orders?: number | null
+          total_spent?: number | null
+          updated_at?: string | null
+          zip?: string | null
+        }
+        Relationships: []
+      }
+      catering_locations: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          is_active: boolean | null
+          manager_name: string | null
+          phone: string | null
+          region: string | null
+          state: string | null
+          store_name: string | null
+          store_number: string
+          updated_at: string | null
+          zip: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          manager_name?: string | null
+          phone?: string | null
+          region?: string | null
+          state?: string | null
+          store_name?: string | null
+          store_number: string
+          updated_at?: string | null
+          zip?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          manager_name?: string | null
+          phone?: string | null
+          region?: string | null
+          state?: string | null
+          store_name?: string | null
+          store_number?: string
+          updated_at?: string | null
+          zip?: string | null
+        }
+        Relationships: []
+      }
       catering_orders: {
         Row: {
           address: string | null
@@ -122,6 +280,48 @@ export type Database = {
           tax?: number | null
           total_delivery_fees?: number | null
           zip?: string | null
+        }
+        Relationships: []
+      }
+      catering_reports: {
+        Row: {
+          created_at: string | null
+          email_received_date: string | null
+          filename: string
+          id: string
+          processed_at: string | null
+          report_date: string
+          report_end_date: string | null
+          report_start_date: string | null
+          store_number: string
+          total_orders: number | null
+          total_revenue: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          email_received_date?: string | null
+          filename: string
+          id?: string
+          processed_at?: string | null
+          report_date: string
+          report_end_date?: string | null
+          report_start_date?: string | null
+          store_number: string
+          total_orders?: number | null
+          total_revenue?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          email_received_date?: string | null
+          filename?: string
+          id?: string
+          processed_at?: string | null
+          report_date?: string
+          report_end_date?: string | null
+          report_start_date?: string | null
+          store_number?: string
+          total_orders?: number | null
+          total_revenue?: number | null
         }
         Relationships: []
       }
@@ -529,6 +729,45 @@ export type Database = {
         }
         Relationships: []
       }
+      email_campaigns: {
+        Row: {
+          content: Json
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          recipient_count: number | null
+          sent_at: string | null
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          content: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          recipient_count?: number | null
+          sent_at?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          recipient_count?: number | null
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       employee_training_completions: {
         Row: {
           completed_date: string | null
@@ -681,6 +920,50 @@ export type Database = {
           },
         ]
       }
+      hr_notification_log: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          notification_type: string
+          read_at: string | null
+          recipient_email: string
+          sent_at: string
+          status: string
+          ticket_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          notification_type: string
+          read_at?: string | null
+          recipient_email: string
+          sent_at?: string
+          status?: string
+          ticket_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          notification_type?: string
+          read_at?: string | null
+          recipient_email?: string
+          sent_at?: string
+          status?: string
+          ticket_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_notification_log_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       import_batches: {
         Row: {
           batch_name: string
@@ -777,8 +1060,163 @@ export type Database = {
         }
         Relationships: []
       }
+      manager_review_log: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          manager_id: string
+          notes: string | null
+          reviewed_at: string
+          ticket_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          manager_id: string
+          notes?: string | null
+          reviewed_at?: string
+          ticket_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          manager_id?: string
+          notes?: string | null
+          reviewed_at?: string
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manager_review_log_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "manager_review_log_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      market_sales_by_period: {
+        Row: {
+          avg_order_value: number | null
+          created_at: string | null
+          id: string
+          market_code: string
+          market_name: string
+          period_id: string | null
+          store_count: number | null
+          total_orders: number | null
+          total_sales: number | null
+        }
+        Insert: {
+          avg_order_value?: number | null
+          created_at?: string | null
+          id?: string
+          market_code: string
+          market_name: string
+          period_id?: string | null
+          store_count?: number | null
+          total_orders?: number | null
+          total_sales?: number | null
+        }
+        Update: {
+          avg_order_value?: number | null
+          created_at?: string | null
+          id?: string
+          market_code?: string
+          market_name?: string
+          period_id?: string | null
+          store_count?: number | null
+          total_orders?: number | null
+          total_sales?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_sales_by_period_period_id_fkey"
+            columns: ["period_id"]
+            isOneToOne: false
+            referencedRelation: "sales_periods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      market_sales_data: {
+        Row: {
+          area_manager: string | null
+          created_at: string
+          id: string
+          market_code: string
+          market_name: string
+          period_id: string | null
+          total_orders: number | null
+          total_sales: number | null
+        }
+        Insert: {
+          area_manager?: string | null
+          created_at?: string
+          id?: string
+          market_code: string
+          market_name: string
+          period_id?: string | null
+          total_orders?: number | null
+          total_sales?: number | null
+        }
+        Update: {
+          area_manager?: string | null
+          created_at?: string
+          id?: string
+          market_code?: string
+          market_name?: string
+          period_id?: string | null
+          total_orders?: number | null
+          total_sales?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_sales_data_period_id_fkey"
+            columns: ["period_id"]
+            isOneToOne: false
+            referencedRelation: "sales_periods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      markets: {
+        Row: {
+          created_at: string | null
+          display_name: string
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_name: string
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_name?: string
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       notification_log: {
         Row: {
+          error_message: string | null
           id: string
           notification_type: string
           read_at: string | null
@@ -788,6 +1226,7 @@ export type Database = {
           work_order_id: string | null
         }
         Insert: {
+          error_message?: string | null
           id?: string
           notification_type: string
           read_at?: string | null
@@ -797,6 +1236,7 @@ export type Database = {
           work_order_id?: string | null
         }
         Update: {
+          error_message?: string | null
           id?: string
           notification_type?: string
           read_at?: string | null
@@ -1045,7 +1485,11 @@ export type Database = {
           internal_notes: string[] | null
           main_category: string | null
           manager_email: string | null
+          manager_id: string | null
           manager_name: string | null
+          manager_review_action: string | null
+          manager_review_notes: string | null
+          manager_reviewed_at: string | null
           market: string
           pay_period_end: string | null
           pay_period_start: string | null
@@ -1054,7 +1498,8 @@ export type Database = {
           status: Database["public"]["Enums"]["ticket_status"]
           store_number: string
           sub_category: string | null
-          submitted_by: string
+          submitted_by: string | null
+          submitter_type: string
           ticket_number: string
           updated_at: string
           urgency_level: Database["public"]["Enums"]["ticket_urgency"]
@@ -1077,7 +1522,11 @@ export type Database = {
           internal_notes?: string[] | null
           main_category?: string | null
           manager_email?: string | null
+          manager_id?: string | null
           manager_name?: string | null
+          manager_review_action?: string | null
+          manager_review_notes?: string | null
+          manager_reviewed_at?: string | null
           market: string
           pay_period_end?: string | null
           pay_period_start?: string | null
@@ -1086,7 +1535,8 @@ export type Database = {
           status?: Database["public"]["Enums"]["ticket_status"]
           store_number: string
           sub_category?: string | null
-          submitted_by: string
+          submitted_by?: string | null
+          submitter_type: string
           ticket_number?: string
           updated_at?: string
           urgency_level?: Database["public"]["Enums"]["ticket_urgency"]
@@ -1109,7 +1559,11 @@ export type Database = {
           internal_notes?: string[] | null
           main_category?: string | null
           manager_email?: string | null
+          manager_id?: string | null
           manager_name?: string | null
+          manager_review_action?: string | null
+          manager_review_notes?: string | null
+          manager_reviewed_at?: string | null
           market?: string
           pay_period_end?: string | null
           pay_period_start?: string | null
@@ -1118,12 +1572,59 @@ export type Database = {
           status?: Database["public"]["Enums"]["ticket_status"]
           store_number?: string
           sub_category?: string | null
-          submitted_by?: string
+          submitted_by?: string | null
+          submitter_type?: string
           ticket_number?: string
           updated_at?: string
           urgency_level?: Database["public"]["Enums"]["ticket_urgency"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "payroll_tickets_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      pending_ticket_reviews: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          manager_email: string
+          session_token: string
+          ticket_id: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          manager_email: string
+          session_token: string
+          ticket_id: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          manager_email?: string
+          session_token?: string
+          ticket_id?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pending_ticket_reviews_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pending_work_order_redirects: {
         Row: {
@@ -1230,6 +1731,135 @@ export type Database = {
           last_name?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      rewards_transactions: {
+        Row: {
+          created_at: string | null
+          customer_id: string | null
+          description: string | null
+          id: string
+          order_id: number | null
+          points_amount: number
+          transaction_date: string
+          transaction_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          customer_id?: string | null
+          description?: string | null
+          id?: string
+          order_id?: number | null
+          points_amount: number
+          transaction_date?: string
+          transaction_type: string
+        }
+        Update: {
+          created_at?: string | null
+          customer_id?: string | null
+          description?: string | null
+          id?: string
+          order_id?: number | null
+          points_amount?: number
+          transaction_date?: string
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rewards_transactions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "rewards_transactions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["order_id"]
+          },
+        ]
+      }
+      sales_funnel_activities: {
+        Row: {
+          activity_date: string
+          activity_type: string
+          created_at: string | null
+          created_by: string | null
+          customer_id: string | null
+          id: string
+          notes: string | null
+          stage: string
+          store_id: number | null
+          value: number | null
+        }
+        Insert: {
+          activity_date?: string
+          activity_type: string
+          created_at?: string | null
+          created_by?: string | null
+          customer_id?: string | null
+          id?: string
+          notes?: string | null
+          stage: string
+          store_id?: number | null
+          value?: number | null
+        }
+        Update: {
+          activity_date?: string
+          activity_type?: string
+          created_at?: string | null
+          created_by?: string | null
+          customer_id?: string | null
+          id?: string
+          notes?: string | null
+          stage?: string
+          store_id?: number | null
+          value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_funnel_activities_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "sales_funnel_activities_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["store_id"]
+          },
+        ]
+      }
+      sales_periods: {
+        Row: {
+          created_at: string
+          end_date: string
+          id: string
+          period_number: number
+          start_date: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          end_date: string
+          id?: string
+          period_number: number
+          start_date: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          end_date?: string
+          id?: string
+          period_number?: number
+          start_date?: string
+          year?: number
         }
         Relationships: []
       }
@@ -1461,6 +2091,35 @@ export type Database = {
         }
         Relationships: []
       }
+      user_market_permissions: {
+        Row: {
+          created_at: string | null
+          id: string
+          market_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          market_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          market_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_market_permissions_market_id_fkey"
+            columns: ["market_id"]
+            isOneToOne: false
+            referencedRelation: "markets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_permissions: {
         Row: {
           can_access_catering_dev: boolean | null
@@ -1505,6 +2164,35 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_store_permissions: {
+        Row: {
+          created_at: string | null
+          id: string
+          store_id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          store_id: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          store_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_store_permissions_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["store_id"]
+          },
+        ]
       }
       work_orders: {
         Row: {
@@ -1610,134 +2298,176 @@ export type Database = {
           },
         ]
       }
-      wsr_daypart_sales: {
+      work_orders_backup_migration: {
         Row: {
+          assignee: string | null
+          completed_at: string | null
+          cost: number | null
           created_at: string | null
-          date: string
-          daypart: string
-          id: string
-          sales: number | null
-          sales_item: string
-          store_number: string
+          defer_reason: string | null
+          deferred_at: string | null
+          deferred_by: string | null
+          description: string | null
+          ecosure: string | null
+          id: string | null
+          image_url: string | null
+          image_urls: Json | null
+          is_recurring: boolean | null
+          market: string | null
+          notes: string[] | null
+          parts_delivery_date: string | null
+          previous_status: string | null
+          priority: string | null
+          recurrence_confidence_score: number | null
+          recurrence_reason: string | null
+          recurrence_source_id: string | null
+          repair_type: string | null
+          status: string | null
+          store_number: string | null
           updated_at: string | null
-          week_ending: string
+          user_id: string | null
+          vendor_scheduled_date: string | null
+          vendor_scheduled_timeframe: string | null
+          viewed: boolean | null
         }
         Insert: {
+          assignee?: string | null
+          completed_at?: string | null
+          cost?: number | null
           created_at?: string | null
-          date: string
-          daypart: string
-          id?: string
-          sales?: number | null
-          sales_item: string
-          store_number: string
+          defer_reason?: string | null
+          deferred_at?: string | null
+          deferred_by?: string | null
+          description?: string | null
+          ecosure?: string | null
+          id?: string | null
+          image_url?: string | null
+          image_urls?: Json | null
+          is_recurring?: boolean | null
+          market?: string | null
+          notes?: string[] | null
+          parts_delivery_date?: string | null
+          previous_status?: string | null
+          priority?: string | null
+          recurrence_confidence_score?: number | null
+          recurrence_reason?: string | null
+          recurrence_source_id?: string | null
+          repair_type?: string | null
+          status?: string | null
+          store_number?: string | null
           updated_at?: string | null
-          week_ending: string
+          user_id?: string | null
+          vendor_scheduled_date?: string | null
+          vendor_scheduled_timeframe?: string | null
+          viewed?: boolean | null
         }
         Update: {
+          assignee?: string | null
+          completed_at?: string | null
+          cost?: number | null
           created_at?: string | null
-          date?: string
-          daypart?: string
-          id?: string
-          sales?: number | null
-          sales_item?: string
-          store_number?: string
+          defer_reason?: string | null
+          deferred_at?: string | null
+          deferred_by?: string | null
+          description?: string | null
+          ecosure?: string | null
+          id?: string | null
+          image_url?: string | null
+          image_urls?: Json | null
+          is_recurring?: boolean | null
+          market?: string | null
+          notes?: string[] | null
+          parts_delivery_date?: string | null
+          previous_status?: string | null
+          priority?: string | null
+          recurrence_confidence_score?: number | null
+          recurrence_reason?: string | null
+          recurrence_source_id?: string | null
+          repair_type?: string | null
+          status?: string | null
+          store_number?: string | null
           updated_at?: string | null
-          week_ending?: string
+          user_id?: string | null
+          vendor_scheduled_date?: string | null
+          vendor_scheduled_timeframe?: string | null
+          viewed?: boolean | null
         }
         Relationships: []
       }
       wsr_headers: {
         Row: {
-          adjusted_sales: number | null
-          average_check: number | null
-          cash_over_under: number | null
-          check_count: number | null
           city: string | null
           created_at: string | null
-          employee_freebies: number | null
           general_manager: string | null
-          gift_cards_total: number | null
-          id: string
-          loyalty_coupon: number | null
-          manager_freebies: number | null
-          net_sales: number | null
-          online_cash: number | null
-          online_orders_total: number | null
-          other_promo: number | null
-          pdq_sales: number | null
-          pdq_tax: number | null
+          id: number
           processed_at: string | null
-          royalty_sales: number | null
-          sales_count: number | null
-          sales_tax: number | null
           state: string | null
           store_location: string | null
           store_number: string
-          total_deposit: number | null
           updated_at: string | null
           week_ending: string
           week_number: number | null
           year: number | null
         }
         Insert: {
-          adjusted_sales?: number | null
-          average_check?: number | null
-          cash_over_under?: number | null
-          check_count?: number | null
           city?: string | null
           created_at?: string | null
-          employee_freebies?: number | null
           general_manager?: string | null
-          gift_cards_total?: number | null
-          id?: string
-          loyalty_coupon?: number | null
-          manager_freebies?: number | null
-          net_sales?: number | null
-          online_cash?: number | null
-          online_orders_total?: number | null
-          other_promo?: number | null
-          pdq_sales?: number | null
-          pdq_tax?: number | null
+          id?: number
           processed_at?: string | null
-          royalty_sales?: number | null
-          sales_count?: number | null
-          sales_tax?: number | null
           state?: string | null
           store_location?: string | null
           store_number: string
-          total_deposit?: number | null
           updated_at?: string | null
           week_ending: string
           week_number?: number | null
           year?: number | null
         }
         Update: {
-          adjusted_sales?: number | null
-          average_check?: number | null
-          cash_over_under?: number | null
-          check_count?: number | null
           city?: string | null
           created_at?: string | null
-          employee_freebies?: number | null
           general_manager?: string | null
-          gift_cards_total?: number | null
-          id?: string
-          loyalty_coupon?: number | null
-          manager_freebies?: number | null
-          net_sales?: number | null
-          online_cash?: number | null
-          online_orders_total?: number | null
-          other_promo?: number | null
-          pdq_sales?: number | null
-          pdq_tax?: number | null
+          id?: number
           processed_at?: string | null
-          royalty_sales?: number | null
-          sales_count?: number | null
-          sales_tax?: number | null
           state?: string | null
           store_location?: string | null
           store_number?: string
-          total_deposit?: number | null
+          updated_at?: string | null
+          week_ending?: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Relationships: []
+      }
+      wsr_inventory: {
+        Row: {
+          category: string
+          cos_percent: number | null
+          created_at: string | null
+          id: number
+          store_number: string
+          updated_at: string | null
+          week_ending: string
+          week_number: number | null
+          year: number | null
+        }
+        Insert: {
+          category: string
+          cos_percent?: number | null
+          created_at?: string | null
+          id?: number
+          store_number: string
+          updated_at?: string | null
+          week_ending: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Update: {
+          category?: string
+          cos_percent?: number | null
+          created_at?: string | null
+          id?: number
+          store_number?: string
           updated_at?: string | null
           week_ending?: string
           week_number?: number | null
@@ -1749,119 +2479,117 @@ export type Database = {
         Row: {
           created_at: string | null
           date: string
-          daypart: string
-          id: string
-          metric: string
+          dmr_expense: number | null
+          id: number
+          labor_dollars: number | null
+          labor_type: string
+          ot_pay: number | null
+          penalty_pay: number | null
+          shift: string
           store_number: string
-          total: number | null
+          straight_pay: number | null
+          total_miles: number | null
           updated_at: string | null
-          value: number | null
           week_ending: string
+          week_number: number | null
+          year: number | null
         }
         Insert: {
           created_at?: string | null
           date: string
-          daypart: string
-          id?: string
-          metric: string
+          dmr_expense?: number | null
+          id?: number
+          labor_dollars?: number | null
+          labor_type: string
+          ot_pay?: number | null
+          penalty_pay?: number | null
+          shift: string
           store_number: string
-          total?: number | null
+          straight_pay?: number | null
+          total_miles?: number | null
           updated_at?: string | null
-          value?: number | null
           week_ending: string
+          week_number?: number | null
+          year?: number | null
         }
         Update: {
           created_at?: string | null
           date?: string
-          daypart?: string
-          id?: string
-          metric?: string
+          dmr_expense?: number | null
+          id?: number
+          labor_dollars?: number | null
+          labor_type?: string
+          ot_pay?: number | null
+          penalty_pay?: number | null
+          shift?: string
           store_number?: string
-          total?: number | null
+          straight_pay?: number | null
+          total_miles?: number | null
           updated_at?: string | null
-          value?: number | null
           week_ending?: string
+          week_number?: number | null
+          year?: number | null
         }
         Relationships: []
       }
-      wsr_sales_items: {
+      wsr_sales: {
         Row: {
+          category: string
           created_at: string | null
-          id: string
+          date: string
+          id: number
           quantity: number | null
-          sales_item: string
+          sales_amount: number | null
+          shift: string
           store_number: string
-          summary_total: number | null
           updated_at: string | null
           week_ending: string
+          week_number: number | null
+          year: number | null
         }
         Insert: {
+          category: string
           created_at?: string | null
-          id?: string
+          date: string
+          id?: number
           quantity?: number | null
-          sales_item: string
+          sales_amount?: number | null
+          shift: string
           store_number: string
-          summary_total?: number | null
           updated_at?: string | null
           week_ending: string
+          week_number?: number | null
+          year?: number | null
         }
         Update: {
+          category?: string
           created_at?: string | null
-          id?: string
+          date?: string
+          id?: number
           quantity?: number | null
-          sales_item?: string
+          sales_amount?: number | null
+          shift?: string
           store_number?: string
-          summary_total?: number | null
           updated_at?: string | null
           week_ending?: string
+          week_number?: number | null
+          year?: number | null
         }
         Relationships: []
       }
     }
     Views: {
-      wsr_daily_sales: {
-        Row: {
-          date: string | null
-          daypart: string | null
-          items_sold: number | null
-          store_number: string | null
-          total_sales: number | null
-        }
-        Relationships: []
-      }
-      wsr_labor_efficiency: {
-        Row: {
-          date: string | null
-          daypart: string | null
-          daypart_sales: number | null
-          labor_dollars: number | null
-          labor_percent: number | null
-          overtime_dollars: number | null
-          store_number: string | null
-        }
-        Relationships: []
-      }
-      wsr_weekly_summary: {
-        Row: {
-          adjusted_sales: number | null
-          city: string | null
-          general_manager: string | null
-          online_percent: number | null
-          online_sales: number | null
-          product_categories: number | null
-          royalty_sales: number | null
-          sales_tax: number | null
-          state: string | null
-          store_number: string | null
-          total_items_sold: number | null
-          week_ending: string | null
-          week_number: number | null
-          year: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
+      add_user_market_permission: {
+        Args: { target_market_name: string; target_user_id: string }
+        Returns: undefined
+      }
+      add_user_store_permission: {
+        Args: { target_store_number: string; target_user_id: string }
+        Returns: undefined
+      }
       calculate_completion_metrics: {
         Args: { p_batch_id: string; p_metric_date: string }
         Returns: undefined
@@ -1906,6 +2634,24 @@ export type Database = {
       create_training_snapshot: {
         Args: { p_batch_id: string; p_snapshot_date: string }
         Returns: undefined
+      }
+      distinct_states: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          state: string
+        }[]
+      }
+      find_critical_orders_without_notifications: {
+        Args: { days_back?: number }
+        Returns: {
+          created_at: string
+          description: string
+          market: string
+          missing_notification_count: number
+          priority: string
+          store_number: string
+          work_order_id: string
+        }[]
       }
       generate_display_name: {
         Args: { email: string; first_name: string; last_name: string }
@@ -2264,6 +3010,23 @@ export type Database = {
           training_module_name: string
         }[]
       }
+      get_user_accessible_markets: {
+        Args: { user_uuid: string }
+        Returns: {
+          display_name: string
+          id: string
+          name: string
+        }[]
+      }
+      get_user_accessible_stores: {
+        Args: { market_filter?: string; user_uuid: string }
+        Returns: {
+          region: string
+          store_id: number
+          store_name: string
+          store_number: string
+        }[]
+      }
       get_user_display_info: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -2289,9 +3052,37 @@ export type Database = {
         Args: { market_name: string }
         Returns: string
       }
+      remove_user_market_permission: {
+        Args: { target_market_name: string; target_user_id: string }
+        Returns: undefined
+      }
+      remove_user_store_permission: {
+        Args: { target_store_number: string; target_user_id: string }
+        Returns: undefined
+      }
+      rollback_work_orders_migration: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       user_has_market_access: {
         Args: { target_market: string; user_id: string }
         Returns: boolean
+      }
+      user_has_market_access_v2: {
+        Args: { target_market_name: string; user_uuid: string }
+        Returns: boolean
+      }
+      user_has_store_access: {
+        Args: { target_store_number: string; user_uuid: string }
+        Returns: boolean
+      }
+      validate_work_orders_migration: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          check_name: string
+          details: string
+          status: string
+        }[]
       }
     }
     Enums: {
@@ -2314,10 +3105,11 @@ export type Database = {
       feedback_channel: "yelp" | "qualtrics" | "jimmy_johns"
       ticket_status:
         | "submitted"
+        | "pending_manager"
         | "under_review"
         | "in_progress"
-        | "pending_employee"
         | "resolved"
+        | "rejected_by_manager"
         | "closed"
       ticket_urgency: "critical" | "high" | "medium" | "low"
       training_status: "Completed" | "In Progress" | "Not Started"
@@ -2468,10 +3260,11 @@ export const Constants = {
       feedback_channel: ["yelp", "qualtrics", "jimmy_johns"],
       ticket_status: [
         "submitted",
+        "pending_manager",
         "under_review",
         "in_progress",
-        "pending_employee",
         "resolved",
+        "rejected_by_manager",
         "closed",
       ],
       ticket_urgency: ["critical", "high", "medium", "low"],
