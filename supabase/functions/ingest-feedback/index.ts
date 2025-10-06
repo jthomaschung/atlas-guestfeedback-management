@@ -248,12 +248,14 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
 }
 
 Deno.serve(async (req) => {
-  console.log('=== WEBHOOK CALLED ===')
+  const timestamp = new Date().toISOString()
+  console.log('=== WEBHOOK RECEIVED ===', timestamp)
   console.log('Method:', req.method)
   console.log('URL:', req.url)
   console.log('Headers:', Object.fromEntries(req.headers.entries()))
   console.log('Auth header present:', req.headers.has('authorization'))
-  console.log('Function should be public (verify_jwt=false)')
+  console.log('Function configured as PUBLIC (verify_jwt=false)')
+  console.log('Request timestamp:', timestamp)
   
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
