@@ -410,10 +410,6 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
                         <div className="flex items-center space-x-3">
                           <h3 className="font-semibold text-lg">Case {feedback.case_number}</h3>
                           <Badge variant="destructive">{feedback.priority}</Badge>
-                          <Badge className={slaStatus.color}>
-                            {slaStatus.status === 'violated' ? 'SLA VIOLATED' : 
-                             slaStatus.status === 'critical' ? 'SLA CRITICAL' : 'ON TIME'}
-                          </Badge>
                           {feedback.auto_escalated && (
                             <Badge variant="outline">Auto-Escalated</Badge>
                           )}
