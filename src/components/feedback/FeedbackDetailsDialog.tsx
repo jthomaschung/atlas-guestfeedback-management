@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { CustomerFeedback } from "@/types/feedback";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -191,29 +191,34 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
 
   const isAdmin = permissions?.role?.toLowerCase() === 'admin' || permissions?.role?.toLowerCase() === 'dm' || permissions?.isAdmin || permissions?.isDirectorOrAbove;
 
-  // Check acknowledgment status
-  const checkAcknowledgmentStatus = async () => {
-    if (!feedback || !user) return;
+  // Check acknowledgment status - use useCallback to memoize
+  const checkAcknowledgmentStatus = useCallback(async () => {
+    if (!feedback?.id || !user?.id) {
+      console.log('❌ ACK CHECK: Missing data', { feedbackId: feedback?.id, userId: user?.id });
+      return;
+    }
     
     try {
+      console.log('🔍 ACK CHECK: Starting check...', { feedbackId: feedback.id, userId: user.id });
+      
       const { data, error } = await supabase
         .from('critical_feedback_approvals')
-        .select('id')
+        .select('*')
         .eq('feedback_id', feedback.id)
         .eq('approver_user_id', user.id)
         .maybeSingle();
       
       if (error) {
-        console.error('Error checking acknowledgment:', error);
+        console.error('❌ ACK CHECK: Error', error);
         return;
       }
       
-      console.log('Acknowledgment check:', { feedbackId: feedback.id, userId: user.id, hasData: !!data });
+      console.log('✅ ACK CHECK: Result', { hasData: !!data, data });
       setHasAcknowledged(!!data);
     } catch (error) {
-      console.error('Error checking acknowledgment status:', error);
+      console.error('❌ ACK CHECK: Exception', error);
     }
-  };
+  }, [feedback?.id, user?.id]);
 
   // Update local state when feedback changes
   useEffect(() => {
@@ -248,13 +253,11 @@ Customer Service Team`);
 
   // Check acknowledgment when feedback or user changes
   useEffect(() => {
-    if (feedback && user && isOpen) {
+    console.log('🔄 ACK EFFECT: Triggered', { isOpen, feedbackId: feedback?.id, userId: user?.id, hasAcknowledged });
+    if (feedback?.id && user?.id && isOpen) {
       checkAcknowledgmentStatus();
-    } else if (!isOpen) {
-      // Reset when dialog closes
-      setHasAcknowledged(false);
     }
-  }, [feedback?.id, user?.id, isOpen]);
+  }, [feedback?.id, user?.id, isOpen, checkAcknowledgmentStatus]);
 
   // Auto-mark as viewed and change status when dialog opens
   useEffect(() => {
