@@ -75,6 +75,12 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
 
       if (feedbackError) throw feedbackError;
 
+      // Debug: Log the feedbacks with approvals
+      console.log('Loaded feedbacks with approvals:', feedbacks);
+      feedbacks?.forEach(f => {
+        console.log(`Case ${f.case_number}:`, (f as any).critical_feedback_approvals);
+      });
+
       // Load escalation logs with feedback details
       const { data: logs, error: logsError } = await supabase
         .from('escalation_log')
