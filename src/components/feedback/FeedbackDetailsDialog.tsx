@@ -527,6 +527,8 @@ Customer Service Team`);
         return;
       }
 
+      console.log('💾 ACK SAVE: Inserting acknowledgment...', { feedbackId: feedback.id, userId: user?.id, role: userRole });
+
       // Insert approval record
       const { error } = await supabase
         .from('critical_feedback_approvals')
@@ -537,10 +539,11 @@ Customer Service Team`);
         });
 
       if (error) {
-        console.error('Insert error:', error);
+        console.error('❌ ACK SAVE: Insert error:', error);
         throw error;
       }
 
+      console.log('✅ ACK SAVE: Successfully inserted, setting state to true');
       setHasAcknowledged(true);
       
       toast({
@@ -548,8 +551,7 @@ Customer Service Team`);
         description: `You have acknowledged this critical feedback as ${userRole.toUpperCase()}.`,
       });
       
-      // Re-check acknowledgment status after successful insert
-      await checkAcknowledgmentStatus();
+      // Don't re-check - we already know it succeeded
       onUpdate();
     } catch (error) {
       console.error('Error acknowledging critical feedback:', error);
