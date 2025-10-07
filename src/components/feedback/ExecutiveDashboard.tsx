@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { MentionsTextarea } from '@/components/ui/mentions-textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -50,9 +51,18 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
   const [executiveNotes, setExecutiveNotes] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isNotesDialogOpen, setIsNotesDialogOpen] = useState(false);
+  const [selectedRegion, setSelectedRegion] = useState<string>('all');
   
   const { user } = useAuth();
   const { toast } = useToast();
+
+  // Regional groupings
+  const regionalGroups = {
+    'west-coast': ['AZ 1', 'AZ 2', 'AZ 3', 'AZ 4', 'AZ 5', 'IE/LA', 'OC'],
+    'mid-west': ['NE 1', 'NE 2', 'NE 3', 'NE 4'],
+    'south-east': ['FL 1', 'FL 2'],
+    'north-east': ['MN 1', 'MN 2', 'PA 1']
+  };
 
   useEffect(() => {
     loadExecutiveData();
@@ -345,14 +355,42 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
     f.complaint_category === 'Rude Service'
   ).length;
 
+  // Filter feedbacks based on selected region
+  const filteredFeedbacks = selectedRegion === 'all' 
+    ? criticalFeedbacks 
+    : criticalFeedbacks.filter(f => {
+        const markets = regionalGroups[selectedRegion as keyof typeof regionalGroups] || [];
+        return markets.includes(f.market);
+      });
+
   return (
     <div className="p-6 space-y-6">
       {/* Executive Header */}
       <div className="border-b pb-4">
-        <h1 className="text-3xl font-bold text-gray-900">Executive Dashboard</h1>
-        <p className="text-gray-600 mt-1">
-          Critical customer feedback requiring {userRole.toUpperCase()} oversight
-        </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Executive Dashboard</h1>
+            <p className="text-gray-600 mt-1">
+              Critical customer feedback requiring {userRole.toUpperCase()} oversight
+            </p>
+          </div>
+          
+          {/* Regional Filter */}
+          <div className="w-64">
+            <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Regions" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Regions</SelectItem>
+                <SelectItem value="west-coast">West Coast (Tanner)</SelectItem>
+                <SelectItem value="mid-west">Mid West (Michelle)</SelectItem>
+                <SelectItem value="south-east">South East (Don)</SelectItem>
+                <SelectItem value="north-east">North East</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </div>
 
       {/* Key Metrics */}
@@ -426,12 +464,14 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {criticalFeedbacks.length === 0 ? (
+            {filteredFeedbacks.length === 0 ? (
               <p className="text-center text-gray-500 py-8">
-                No critical issues currently require executive attention
+                {selectedRegion === 'all' 
+                  ? 'No critical issues currently require executive attention'
+                  : 'No critical issues in this region'}
               </p>
             ) : (
-              criticalFeedbacks.map((feedback) => {
+              filteredFeedbacks.map((feedback) => {
                 const slaStatus = getSlaStatus(feedback);
                 const timeSinceEscalation = feedback.escalated_at 
                   ? Math.floor((new Date().getTime() - new Date(feedback.escalated_at).getTime()) / (1000 * 60 * 60))
