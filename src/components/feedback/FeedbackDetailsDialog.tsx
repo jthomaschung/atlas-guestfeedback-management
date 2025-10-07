@@ -519,7 +519,10 @@ Customer Service Team`);
           approver_role: userRole,
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Insert error:', error);
+        throw error;
+      }
 
       setHasAcknowledged(true);
       
@@ -528,6 +531,8 @@ Customer Service Team`);
         description: `You have acknowledged this critical feedback as ${userRole.toUpperCase()}.`,
       });
       
+      // Re-check acknowledgment status after successful insert
+      await checkAcknowledgmentStatus();
       onUpdate();
     } catch (error) {
       console.error('Error acknowledging critical feedback:', error);
