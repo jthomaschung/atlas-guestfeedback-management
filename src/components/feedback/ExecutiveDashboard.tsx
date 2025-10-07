@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { AlertTriangle, Clock, Users, TrendingUp, FileText, Eye } from 'lucide-react';
+import { AlertTriangle, Clock, Users, TrendingUp, FileText, Eye, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { MentionsTextarea } from '@/components/ui/mentions-textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -51,6 +52,8 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
   const [executiveNotes, setExecutiveNotes] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isNotesDialogOpen, setIsNotesDialogOpen] = useState(false);
+  const [isArchiveConfirmOpen, setIsArchiveConfirmOpen] = useState(false);
+  const [pendingArchiveFeedbackId, setPendingArchiveFeedbackId] = useState<string | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string>('all');
   
   const { user } = useAuth();
@@ -247,27 +250,22 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
       const approvedRoles = new Set(allApprovals?.map(a => a.approver_role.toLowerCase()) || []);
       const allFourApproved = approvedRoles.has('ceo') && approvedRoles.has('vp') && approvedRoles.has('director') && approvedRoles.has('dm');
 
-      // If all 4 roles approved, archive the feedback
+      console.log('Approval check:', {
+        feedbackId,
+        approvedRoles: Array.from(approvedRoles),
+        allFourApproved,
+        totalApprovals: allApprovals?.length
+      });
+
+      // If all 4 roles approved, show confirmation dialog before archiving
       if (allFourApproved) {
-        const { error: updateError } = await supabase
-          .from('customer_feedback')
-          .update({
-            resolution_status: 'resolved',
-            ready_for_dm_resolution: false,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', feedbackId);
-
-        if (updateError) throw updateError;
-
-        toast({
-          title: "Success",
-          description: `Approved by ${userHierarchy.role.toUpperCase()}. All 4 approvals complete - Feedback archived!`,
-        });
+        setPendingArchiveFeedbackId(feedbackId);
+        setIsArchiveConfirmOpen(true);
       } else {
+        const pending = ['ceo', 'vp', 'director', 'dm'].filter(role => !approvedRoles.has(role));
         toast({
           title: "Success",
-          description: `Critical feedback approved by ${userHierarchy.role.toUpperCase()}`,
+          description: `Critical feedback approved by ${userHierarchy.role.toUpperCase()}. Pending: ${pending.map(r => r.toUpperCase()).join(', ')}`,
         });
       }
 
@@ -279,6 +277,39 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
         variant: "destructive",
         title: "Error",
         description: "Failed to approve critical feedback",
+      });
+    }
+  };
+
+  const confirmArchiveFeedback = async () => {
+    if (!pendingArchiveFeedbackId) return;
+
+    try {
+      const { error: updateError } = await supabase
+        .from('customer_feedback')
+        .update({
+          resolution_status: 'resolved',
+          ready_for_dm_resolution: false,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', pendingArchiveFeedbackId);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Success",
+        description: "All 4 approvals complete - Feedback archived!",
+      });
+
+      setIsArchiveConfirmOpen(false);
+      setPendingArchiveFeedbackId(null);
+      loadExecutiveData();
+    } catch (error: any) {
+      console.error('Error archiving feedback:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to archive feedback",
       });
     }
   };
@@ -649,6 +680,41 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Archive Confirmation Dialog */}
+      <AlertDialog open={isArchiveConfirmOpen} onOpenChange={setIsArchiveConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-green-600" />
+              Archive Escalated Feedback?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>All 4 required approvals have been received:</p>
+              <ul className="list-disc list-inside space-y-1 ml-2">
+                <li>✓ CEO Approval</li>
+                <li>✓ VP Approval</li>
+                <li>✓ Director Approval</li>
+                <li>✓ DM Approval</li>
+              </ul>
+              <p className="font-medium text-gray-900 mt-3">
+                This will move the feedback to "Resolved" status and archive it from the executive dashboard.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setIsArchiveConfirmOpen(false);
+              setPendingArchiveFeedbackId(null);
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmArchiveFeedback} className="bg-green-600 hover:bg-green-700">
+              Archive Feedback
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
