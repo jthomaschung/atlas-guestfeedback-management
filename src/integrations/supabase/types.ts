@@ -3174,6 +3174,10 @@ export type Database = {
         Args: { user_id: string }
         Returns: boolean
       }
+      is_executive: {
+        Args: { user_uuid: string }
+        Returns: boolean
+      }
       is_jsonb_array_of_strings: {
         Args: { j: Json }
         Returns: boolean
