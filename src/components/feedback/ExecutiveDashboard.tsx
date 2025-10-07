@@ -269,9 +269,9 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
 
   const getApprovalStatus = (feedback: CustomerFeedback) => {
     const approvals = (feedback as any).critical_feedback_approvals || [];
-    const ceoApproved = approvals.some((a: any) => a.approver_role === 'ceo');
-    const vpApproved = approvals.some((a: any) => a.approver_role === 'vp');
-    const directorApproved = approvals.some((a: any) => a.approver_role === 'director');
+    const ceoApproved = approvals.some((a: any) => a.approver_role?.toLowerCase() === 'ceo');
+    const vpApproved = approvals.some((a: any) => a.approver_role?.toLowerCase() === 'vp');
+    const directorApproved = approvals.some((a: any) => a.approver_role?.toLowerCase() === 'director');
     
     return { ceoApproved, vpApproved, directorApproved };
   };
