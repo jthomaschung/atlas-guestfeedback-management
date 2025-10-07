@@ -94,6 +94,59 @@ export type Database = {
           },
         ]
       }
+      catering_campaign_recipients: {
+        Row: {
+          bounced_at: string | null
+          campaign_id: string | null
+          clicked_at: string | null
+          created_at: string | null
+          customer_email: string
+          customer_name: string | null
+          delivered_at: string | null
+          id: string
+          opened_at: string | null
+          sent_at: string | null
+          status: string | null
+          unsubscribed_at: string | null
+        }
+        Insert: {
+          bounced_at?: string | null
+          campaign_id?: string | null
+          clicked_at?: string | null
+          created_at?: string | null
+          customer_email: string
+          customer_name?: string | null
+          delivered_at?: string | null
+          id?: string
+          opened_at?: string | null
+          sent_at?: string | null
+          status?: string | null
+          unsubscribed_at?: string | null
+        }
+        Update: {
+          bounced_at?: string | null
+          campaign_id?: string | null
+          clicked_at?: string | null
+          created_at?: string | null
+          customer_email?: string
+          customer_name?: string | null
+          delivered_at?: string | null
+          id?: string
+          opened_at?: string | null
+          sent_at?: string | null
+          status?: string | null
+          unsubscribed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catering_campaign_recipients_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "catering_email_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       catering_customers: {
         Row: {
           address: string | null
@@ -145,6 +198,87 @@ export type Database = {
           total_spent?: number | null
           updated_at?: string | null
           zip?: string | null
+        }
+        Relationships: []
+      }
+      catering_email_campaigns: {
+        Row: {
+          campaign_name: string
+          content: Json
+          created_at: string | null
+          created_by: string | null
+          design_json: Json | null
+          from_email: string
+          from_name: string
+          id: string
+          recipient_count: number | null
+          sent_at: string | null
+          status: string
+          subject: string
+          updated_at: string | null
+        }
+        Insert: {
+          campaign_name: string
+          content: Json
+          created_at?: string | null
+          created_by?: string | null
+          design_json?: Json | null
+          from_email: string
+          from_name: string
+          id?: string
+          recipient_count?: number | null
+          sent_at?: string | null
+          status?: string
+          subject: string
+          updated_at?: string | null
+        }
+        Update: {
+          campaign_name?: string
+          content?: Json
+          created_at?: string | null
+          created_by?: string | null
+          design_json?: Json | null
+          from_email?: string
+          from_name?: string
+          id?: string
+          recipient_count?: number | null
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      catering_email_templates: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          design_json: Json
+          id: string
+          is_public: boolean | null
+          name: string
+          thumbnail_url: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          design_json: Json
+          id?: string
+          is_public?: boolean | null
+          name: string
+          thumbnail_url?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          design_json?: Json
+          id?: string
+          is_public?: boolean | null
+          name?: string
+          thumbnail_url?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
