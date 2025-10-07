@@ -2000,6 +2000,38 @@ export type Database = {
         }
         Relationships: []
       }
+      sla_notifications: {
+        Row: {
+          created_at: string
+          feedback_id: string
+          id: string
+          notification_type: string
+          sent_at: string
+        }
+        Insert: {
+          created_at?: string
+          feedback_id: string
+          id?: string
+          notification_type: string
+          sent_at?: string
+        }
+        Update: {
+          created_at?: string
+          feedback_id?: string
+          id?: string
+          notification_type?: string
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sla_notifications_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "customer_feedback"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stores: {
         Row: {
           address: string | null

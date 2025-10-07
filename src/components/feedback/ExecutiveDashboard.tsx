@@ -321,11 +321,31 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
 
     if (hoursLeft < 0) {
       return { status: 'violated', color: 'bg-red-100 text-red-800 border-red-200' };
-    } else if (hoursLeft < 1) {
+    } else if (hoursLeft < 4) {
       return { status: 'critical', color: 'bg-orange-100 text-orange-800 border-orange-200' };
+    } else if (hoursLeft < 12) {
+      return { status: 'warning', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' };
     } else {
       return { status: 'normal', color: 'bg-green-100 text-green-800 border-green-200' };
     }
+  };
+
+  const getSlaTimeRemaining = (slaDeadline: string | null | undefined): string => {
+    if (!slaDeadline) return 'No deadline';
+    
+    const now = new Date();
+    const deadline = new Date(slaDeadline);
+    const totalMinutes = Math.floor((deadline.getTime() - now.getTime()) / (1000 * 60));
+    
+    if (totalMinutes < 0) {
+      const hoursOverdue = Math.abs(Math.floor(totalMinutes / 60));
+      const minutesOverdue = Math.abs(totalMinutes % 60);
+      return `${hoursOverdue}h ${minutesOverdue}m OVERDUE`;
+    }
+    
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${hours}h ${minutes}m remaining`;
   };
 
   if (isLoading) {
@@ -459,8 +479,9 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
             <AlertTriangle className="h-5 w-5 text-red-600" />
             <span>Critical Issues Requiring Executive Attention</span>
           </CardTitle>
-          <CardDescription>
-            Issues that have been escalated to executive level due to severity or SLA violations
+          <CardDescription className="space-y-1">
+            <p>Issues that have been escalated to executive level due to severity or SLA violations</p>
+            <p className="text-sm font-medium text-orange-600">⏰ All critical feedback must be resolved within 48 hours of escalation</p>
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -495,9 +516,32 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
                           <strong> Customer:</strong> {feedback.customer_name || 'Not provided'}
                         </p>
                         {feedback.sla_deadline && (
-                          <p className="text-sm text-gray-500">
-                            <strong>SLA Deadline:</strong> {new Date(feedback.sla_deadline).toLocaleString()}
-                          </p>
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="font-semibold text-gray-600">SLA Status:</span>
+                            {slaStatus.status === 'violated' && (
+                              <Badge variant="destructive" className="whitespace-nowrap">
+                                🚨 {getSlaTimeRemaining(feedback.sla_deadline)}
+                              </Badge>
+                            )}
+                            {slaStatus.status === 'critical' && (
+                              <Badge variant="destructive" className="whitespace-nowrap bg-orange-500 hover:bg-orange-600">
+                                🔥 {getSlaTimeRemaining(feedback.sla_deadline)}
+                              </Badge>
+                            )}
+                            {slaStatus.status === 'warning' && (
+                              <Badge variant="outline" className="whitespace-nowrap border-yellow-500 text-yellow-600">
+                                ⚠️ {getSlaTimeRemaining(feedback.sla_deadline)}
+                              </Badge>
+                            )}
+                            {slaStatus.status === 'normal' && (
+                              <span className="text-green-600 font-medium">
+                                ✓ {getSlaTimeRemaining(feedback.sla_deadline)}
+                              </span>
+                            )}
+                            <span className="text-xs text-muted-foreground">
+                              (Due: {new Date(feedback.sla_deadline).toLocaleString()})
+                            </span>
+                          </div>
                         )}
                         <p className="text-sm text-orange-600">
                           <strong>Escalated:</strong> {timeSinceEscalation}h ago
