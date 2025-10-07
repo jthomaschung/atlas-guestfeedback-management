@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { useUserPermissions } from "@/hooks/useUserPermissions";
 import { useFeedbackNotifications } from "@/hooks/useFeedbackNotifications";
 import { EmailConversationDialog } from "./EmailConversationDialog";
@@ -182,6 +183,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const [editedFeedbackText, setEditedFeedbackText] = useState<string>('');
   const [isUpdatingFeedbackText, setIsUpdatingFeedbackText] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
   const { sendAssignmentNotification } = useFeedbackNotifications();
   const processedFeedbackId = useRef<string | null>(null);
@@ -467,6 +469,52 @@ Customer Service Team`);
       });
     } finally {
       setIsUpdatingCalled(false);
+    }
+  };
+
+  const handleAcknowledgeCritical = async () => {
+    if (!feedback) return;
+    
+    setIsLoading(true);
+    try {
+      // Get user role
+      const userRole = permissions?.role?.toLowerCase();
+      
+      if (!userRole || !['dm', 'director', 'vp', 'ceo', 'admin'].includes(userRole)) {
+        toast({
+          title: "Error",
+          description: "You don't have permission to acknowledge critical feedback.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Insert approval record
+      const { error } = await supabase
+        .from('critical_feedback_approvals')
+        .insert({
+          feedback_id: feedback.id,
+          approver_user_id: user?.id,
+          approver_role: userRole,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Critical Feedback Acknowledged",
+        description: `You have acknowledged this critical feedback as ${userRole.toUpperCase()}.`,
+      });
+      
+      onUpdate();
+    } catch (error) {
+      console.error('Error acknowledging critical feedback:', error);
+      toast({
+        title: "Error",
+        description: "Failed to acknowledge critical feedback.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -1114,6 +1162,17 @@ Customer Service Team`);
           <Button variant="outline" onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>
+          {feedback?.priority === 'Critical' && ['dm', 'director', 'vp', 'ceo', 'admin'].includes(permissions?.role?.toLowerCase() || '') && (
+            <Button 
+              variant="default"
+              onClick={handleAcknowledgeCritical} 
+              disabled={isLoading}
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              {isLoading ? "Acknowledging..." : "Acknowledge Critical Feedback"}
+            </Button>
+          )}
           {isAdmin && (
             <Button 
               variant="secondary" 
