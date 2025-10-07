@@ -182,6 +182,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const [isEditingFeedbackText, setIsEditingFeedbackText] = useState(false);
   const [editedFeedbackText, setEditedFeedbackText] = useState<string>('');
   const [isUpdatingFeedbackText, setIsUpdatingFeedbackText] = useState(false);
+  const [hasAcknowledged, setHasAcknowledged] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
@@ -203,6 +204,9 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
       setCustomerCalled(feedback.customer_called || false);
       setEditedFeedbackText(feedback.feedback_text || '');
       
+      // Check if current user has acknowledged
+      checkAcknowledgmentStatus();
+      
       // Set default email message
       setEmailMessage(`Dear ${feedback.customer_name || 'Valued Customer'},
 
@@ -220,6 +224,23 @@ Best regards,
 Customer Service Team`);
     }
   }, [feedback]);
+
+  const checkAcknowledgmentStatus = async () => {
+    if (!feedback || !user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('critical_feedback_approvals')
+        .select('id')
+        .eq('feedback_id', feedback.id)
+        .eq('approver_user_id', user.id)
+        .maybeSingle();
+      
+      setHasAcknowledged(!!data);
+    } catch (error) {
+      console.error('Error checking acknowledgment status:', error);
+    }
+  };
 
   // Auto-mark as viewed and change status when dialog opens
   useEffect(() => {
@@ -500,6 +521,8 @@ Customer Service Team`);
 
       if (error) throw error;
 
+      setHasAcknowledged(true);
+      
       toast({
         title: "Critical Feedback Acknowledged",
         description: `You have acknowledged this critical feedback as ${userRole.toUpperCase()}.`,
@@ -1166,11 +1189,11 @@ Customer Service Team`);
             <Button 
               variant="default"
               onClick={handleAcknowledgeCritical} 
-              disabled={isLoading}
-              className="bg-orange-600 hover:bg-orange-700"
+              disabled={isLoading || hasAcknowledged}
+              className={hasAcknowledged ? "bg-green-600 hover:bg-green-700" : "bg-orange-600 hover:bg-orange-700"}
             >
               <CheckCircle className="h-4 w-4 mr-2" />
-              {isLoading ? "Acknowledging..." : "Acknowledge Critical Feedback"}
+              {hasAcknowledged ? "Acknowledged" : (isLoading ? "Acknowledging..." : "Acknowledge Critical Feedback")}
             </Button>
           )}
           {isAdmin && (
