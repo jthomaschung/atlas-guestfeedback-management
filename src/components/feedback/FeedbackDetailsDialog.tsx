@@ -208,6 +208,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
         return;
       }
       
+      console.log('Acknowledgment check:', { feedbackId: feedback.id, userId: user.id, hasData: !!data });
       setHasAcknowledged(!!data);
     } catch (error) {
       console.error('Error checking acknowledgment status:', error);
@@ -247,10 +248,13 @@ Customer Service Team`);
 
   // Check acknowledgment when feedback or user changes
   useEffect(() => {
-    if (feedback && user) {
+    if (feedback && user && isOpen) {
       checkAcknowledgmentStatus();
+    } else if (!isOpen) {
+      // Reset when dialog closes
+      setHasAcknowledged(false);
     }
-  }, [feedback?.id, user?.id]);
+  }, [feedback?.id, user?.id, isOpen]);
 
   // Auto-mark as viewed and change status when dialog opens
   useEffect(() => {
