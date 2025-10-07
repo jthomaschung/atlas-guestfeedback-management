@@ -316,10 +316,12 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
 
   const getApprovalStatus = (feedback: CustomerFeedback) => {
     const approvals = (feedback as any).critical_feedback_approvals || [];
-    const ceoApproved = approvals.some((a: any) => a.approver_role?.toLowerCase() === 'ceo');
-    const vpApproved = approvals.some((a: any) => a.approver_role?.toLowerCase() === 'vp');
-    const directorApproved = approvals.some((a: any) => a.approver_role?.toLowerCase() === 'director');
-    const dmApproved = approvals.some((a: any) => a.approver_role?.toLowerCase() === 'dm');
+    
+    // Check both new approval records AND legacy timestamp columns for each role
+    const ceoApproved = approvals.some((a: any) => a.approver_role?.toLowerCase() === 'ceo') || !!feedback.ceo_approved_at;
+    const vpApproved = approvals.some((a: any) => a.approver_role?.toLowerCase() === 'vp') || !!feedback.vp_approved_at;
+    const directorApproved = approvals.some((a: any) => a.approver_role?.toLowerCase() === 'director') || !!feedback.director_approved_at;
+    const dmApproved = approvals.some((a: any) => a.approver_role?.toLowerCase() === 'dm') || !!feedback.dm_approved_at;
     
     return { ceoApproved, vpApproved, directorApproved, dmApproved };
   };
