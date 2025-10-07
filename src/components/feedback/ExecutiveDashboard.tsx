@@ -254,14 +254,20 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
     
     const { ceoApproved, vpApproved, directorApproved } = getApprovalStatus(feedback);
     
+    // Normalize the role to lowercase for comparison
+    const normalizedRole = userRole.toLowerCase();
+    
     // CEO can always approve first
-    if (userRole === 'ceo') return true;
+    if (normalizedRole === 'ceo') return true;
     
     // VP can approve after CEO
-    if (userRole === 'vp') return ceoApproved;
+    if (normalizedRole === 'vp') return ceoApproved;
     
     // Director can approve after CEO and VP
-    if (userRole === 'director') return ceoApproved && vpApproved;
+    if (normalizedRole === 'director') return ceoApproved && vpApproved;
+    
+    // Admin can approve at any time
+    if (normalizedRole === 'admin') return true;
     
     return false;
   };
