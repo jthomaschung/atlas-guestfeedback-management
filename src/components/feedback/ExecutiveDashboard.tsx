@@ -209,21 +209,51 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
       }
 
       // Insert approval record
-      const { error } = await supabase
+      const { error: approvalError } = await supabase
         .from('critical_feedback_approvals')
         .insert({
           feedback_id: feedbackId,
           approver_user_id: user?.id,
-          approver_role: userHierarchy.role,
+          approver_role: userHierarchy.role.toLowerCase(),
           executive_notes: executiveNotes || null
         });
 
-      if (error) throw error;
+      if (approvalError) throw approvalError;
 
-      toast({
-        title: "Success",
-        description: `Critical feedback approved by ${userHierarchy.role.toUpperCase()}`,
-      });
+      // Check if all 3 roles have now approved
+      const { data: allApprovals, error: checkError } = await supabase
+        .from('critical_feedback_approvals')
+        .select('approver_role')
+        .eq('feedback_id', feedbackId);
+
+      if (checkError) throw checkError;
+
+      const approvedRoles = new Set(allApprovals?.map(a => a.approver_role.toLowerCase()) || []);
+      const allThreeApproved = approvedRoles.has('ceo') && approvedRoles.has('vp') && approvedRoles.has('director');
+
+      // If all 3 roles approved, archive the feedback
+      if (allThreeApproved) {
+        const { error: updateError } = await supabase
+          .from('customer_feedback')
+          .update({
+            resolution_status: 'resolved',
+            ready_for_dm_resolution: true,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', feedbackId);
+
+        if (updateError) throw updateError;
+
+        toast({
+          title: "Success",
+          description: `Approved by ${userHierarchy.role.toUpperCase()}. All approvals complete - Issue archived!`,
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: `Critical feedback approved by ${userHierarchy.role.toUpperCase()}`,
+        });
+      }
 
       setExecutiveNotes('');
       loadExecutiveData();
@@ -250,59 +280,18 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
     const approvals = (feedback as any).critical_feedback_approvals || [];
     const hasUserApproved = approvals.some((a: any) => a.approver_user_id === user?.id);
     
-    console.log('🔍 canUserApprove check:', {
-      userRole,
-      userId: user?.id,
-      hasUserApproved,
-      approvals,
-      feedbackId: feedback.id
-    });
-    
-    if (hasUserApproved) {
-      console.log('❌ User has already approved');
-      return false;
-    }
-    
-    const { ceoApproved, vpApproved, directorApproved } = getApprovalStatus(feedback);
-    
     // Normalize the role to lowercase for comparison
     const normalizedRole = userRole.toLowerCase().trim();
     
-    console.log('👤 Role check:', {
-      normalizedRole,
-      ceoApproved,
-      vpApproved,
-      directorApproved
-    });
-    
-    // CEO can always approve first
-    if (normalizedRole === 'ceo') {
-      console.log('✅ CEO can approve');
-      return true;
+    // Check if user already approved
+    if (hasUserApproved) {
+      return false;
     }
     
-    // VP can approve after CEO
-    if (normalizedRole === 'vp') {
-      const canApprove = ceoApproved;
-      console.log('✅ VP can approve:', canApprove);
-      return canApprove;
-    }
+    // Allow any executive role (CEO, VP, Director, Admin) to approve at any time
+    const isExecutive = ['ceo', 'vp', 'director', 'admin'].includes(normalizedRole);
     
-    // Director can approve after CEO and VP
-    if (normalizedRole === 'director') {
-      const canApprove = ceoApproved && vpApproved;
-      console.log('✅ Director can approve:', canApprove);
-      return canApprove;
-    }
-    
-    // Admin can approve at any time
-    if (normalizedRole === 'admin') {
-      console.log('✅ Admin can approve');
-      return true;
-    }
-    
-    console.log('❌ No approval permission for role:', normalizedRole);
-    return false;
+    return isExecutive;
   };
 
   const getSlaStatus = (feedback: CustomerFeedback) => {
