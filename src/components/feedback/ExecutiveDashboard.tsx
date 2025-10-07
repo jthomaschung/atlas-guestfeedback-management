@@ -236,7 +236,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
 
       if (approvalError) throw approvalError;
 
-      // Check if all 3 roles have now approved
+      // Check if all 4 roles have now approved (CEO, VP, Director, DM)
       const { data: allApprovals, error: checkError } = await supabase
         .from('critical_feedback_approvals')
         .select('approver_role')
@@ -245,15 +245,15 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
       if (checkError) throw checkError;
 
       const approvedRoles = new Set(allApprovals?.map(a => a.approver_role.toLowerCase()) || []);
-      const allThreeApproved = approvedRoles.has('ceo') && approvedRoles.has('vp') && approvedRoles.has('director');
+      const allFourApproved = approvedRoles.has('ceo') && approvedRoles.has('vp') && approvedRoles.has('director') && approvedRoles.has('dm');
 
-      // If all 3 roles approved, archive the feedback
-      if (allThreeApproved) {
+      // If all 4 roles approved, archive the feedback
+      if (allFourApproved) {
         const { error: updateError } = await supabase
           .from('customer_feedback')
           .update({
             resolution_status: 'resolved',
-            ready_for_dm_resolution: true,
+            ready_for_dm_resolution: false,
             updated_at: new Date().toISOString()
           })
           .eq('id', feedbackId);
@@ -262,7 +262,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
 
         toast({
           title: "Success",
-          description: `Approved by ${userHierarchy.role.toUpperCase()}. All approvals complete - Issue archived!`,
+          description: `Approved by ${userHierarchy.role.toUpperCase()}. All 4 approvals complete - Feedback archived!`,
         });
       } else {
         toast({
@@ -288,8 +288,9 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
     const ceoApproved = approvals.some((a: any) => a.approver_role?.toLowerCase() === 'ceo');
     const vpApproved = approvals.some((a: any) => a.approver_role?.toLowerCase() === 'vp');
     const directorApproved = approvals.some((a: any) => a.approver_role?.toLowerCase() === 'director');
+    const dmApproved = approvals.some((a: any) => a.approver_role?.toLowerCase() === 'dm');
     
-    return { ceoApproved, vpApproved, directorApproved };
+    return { ceoApproved, vpApproved, directorApproved, dmApproved };
   };
 
   const canUserApprove = (feedback: CustomerFeedback, userRole: string) => {
@@ -304,8 +305,8 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
       return false;
     }
     
-    // Allow any executive role (CEO, VP, Director, Admin) to approve at any time
-    const isExecutive = ['ceo', 'vp', 'director', 'admin'].includes(normalizedRole);
+    // Allow any executive role (CEO, VP, Director, DM, Admin) to approve at any time
+    const isExecutive = ['ceo', 'vp', 'director', 'dm', 'admin'].includes(normalizedRole);
     
     return isExecutive;
   };
@@ -530,8 +531,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
                         {/* Approval Status Display */}
                         <div className="flex space-x-2 text-xs">
                           {(() => {
-                            const { ceoApproved, vpApproved, directorApproved } = getApprovalStatus(feedback);
-                            const allThreeApproved = ceoApproved && vpApproved && directorApproved;
+                            const { ceoApproved, vpApproved, directorApproved, dmApproved } = getApprovalStatus(feedback);
                             return (
                               <>
                                 <Badge variant={ceoApproved ? "default" : "outline"}>
@@ -543,9 +543,9 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
                                 <Badge variant={directorApproved ? "default" : "outline"}>
                                   DIR {directorApproved ? "✓" : "⏳"}
                                 </Badge>
-                                {allThreeApproved && (
-                                  <Badge variant="secondary">Ready for DM Resolution</Badge>
-                                )}
+                                <Badge variant={dmApproved ? "default" : "outline"}>
+                                  DM {dmApproved ? "✓" : "⏳"}
+                                </Badge>
                               </>
                             );
                           })()}

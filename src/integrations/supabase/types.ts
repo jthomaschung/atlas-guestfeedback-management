@@ -575,6 +575,7 @@ export type Database = {
           customer_responded_at: string | null
           customer_response_sentiment: string | null
           director_approved_at: string | null
+          dm_approved_at: string | null
           ee_action: string | null
           escalated_at: string | null
           escalated_by: string | null
@@ -615,6 +616,7 @@ export type Database = {
           customer_responded_at?: string | null
           customer_response_sentiment?: string | null
           director_approved_at?: string | null
+          dm_approved_at?: string | null
           ee_action?: string | null
           escalated_at?: string | null
           escalated_by?: string | null
@@ -655,6 +657,7 @@ export type Database = {
           customer_responded_at?: string | null
           customer_response_sentiment?: string | null
           director_approved_at?: string | null
+          dm_approved_at?: string | null
           ee_action?: string | null
           escalated_at?: string | null
           escalated_by?: string | null
@@ -3171,6 +3174,10 @@ export type Database = {
         }[]
       }
       is_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
+      is_dm: {
         Args: { user_id: string }
         Returns: boolean
       }
