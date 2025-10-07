@@ -529,13 +529,16 @@ Customer Service Team`);
 
       console.log('💾 ACK SAVE: Inserting acknowledgment...', { feedbackId: feedback.id, userId: user?.id, role: userRole });
 
-      // Insert approval record
+      // Insert approval record (ignore if already exists)
       const { error } = await supabase
         .from('critical_feedback_approvals')
-        .insert({
+        .upsert({
           feedback_id: feedback.id,
           approver_user_id: user?.id,
           approver_role: userRole,
+        }, {
+          onConflict: 'feedback_id,approver_user_id',
+          ignoreDuplicates: true
         });
 
       if (error) {
