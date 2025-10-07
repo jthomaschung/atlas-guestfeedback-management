@@ -29,6 +29,7 @@ import FeedbackReporting from '@/pages/FeedbackReporting';
 import RedCarpetLeaders from '@/pages/RedCarpetLeaders';
 import Summary from '@/pages/Summary';
 import InternalFeedback from '@/pages/InternalFeedback';
+import Accuracy from '@/pages/Accuracy';
 import { AuthGate } from '@/components/AuthGate';
 
 import { SmartRedirect } from '@/components/SmartRedirect';
@@ -365,6 +366,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <InternalFeedback />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/accuracy" 
+                element={
+                  <ProtectedRoute>
+                    <Accuracy />
                   </ProtectedRoute>
                 } 
               />

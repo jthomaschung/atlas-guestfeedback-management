@@ -1,4 +1,4 @@
-import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive, UserCheck, Trophy, TrendingUp, Shield } from "lucide-react";
+import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive, UserCheck, Trophy, TrendingUp, Shield, Target } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
 import {
@@ -19,6 +19,7 @@ const guestFeedbackItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "GFM (Guest Feedback Manager)", url: "/gfm", icon: UserCheck },
   { title: "Feedback Reporting", url: "/feedback-reporting", icon: TrendingUp },
+  { title: "Accuracy", url: "/accuracy", icon: Target },
   { title: "Red Carpet Leaders", url: "/red-carpet-leaders", icon: Trophy },
 ];
 
