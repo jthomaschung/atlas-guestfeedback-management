@@ -30,6 +30,11 @@ export default function ExecutiveOversight() {
         }
 
         const role = hierarchy?.role?.toLowerCase() || '';
+        console.log('🎯 Executive Oversight - User Role:', {
+          rawRole: hierarchy?.role,
+          normalizedRole: role,
+          userId: user.id
+        });
         setUserRole(role);
         
         // Check if user has executive privileges
@@ -141,7 +146,12 @@ export default function ExecutiveOversight() {
 
       {/* Dashboard Content */}
       <div className="max-w-7xl mx-auto">
-        <ExecutiveDashboard userRole={userRole} />
+        {userRole && <ExecutiveDashboard userRole={userRole} />}
+        {!userRole && (
+          <div className="p-6 text-center text-gray-500">
+            Loading user role...
+          </div>
+        )}
       </div>
 
       {/* Footer Info */}
