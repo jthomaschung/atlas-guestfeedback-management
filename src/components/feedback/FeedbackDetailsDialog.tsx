@@ -191,6 +191,29 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
 
   const isAdmin = permissions?.role?.toLowerCase() === 'admin' || permissions?.role?.toLowerCase() === 'dm' || permissions?.isAdmin || permissions?.isDirectorOrAbove;
 
+  // Check acknowledgment status
+  const checkAcknowledgmentStatus = async () => {
+    if (!feedback || !user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('critical_feedback_approvals')
+        .select('id')
+        .eq('feedback_id', feedback.id)
+        .eq('approver_user_id', user.id)
+        .maybeSingle();
+      
+      if (error) {
+        console.error('Error checking acknowledgment:', error);
+        return;
+      }
+      
+      setHasAcknowledged(!!data);
+    } catch (error) {
+      console.error('Error checking acknowledgment status:', error);
+    }
+  };
+
   // Update local state when feedback changes
   useEffect(() => {
     if (feedback) {
@@ -203,9 +226,6 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
       setMarket(feedback.market || '');
       setCustomerCalled(feedback.customer_called || false);
       setEditedFeedbackText(feedback.feedback_text || '');
-      
-      // Check if current user has acknowledged
-      checkAcknowledgmentStatus();
       
       // Set default email message
       setEmailMessage(`Dear ${feedback.customer_name || 'Valued Customer'},
@@ -225,22 +245,12 @@ Customer Service Team`);
     }
   }, [feedback]);
 
-  const checkAcknowledgmentStatus = async () => {
-    if (!feedback || !user) return;
-    
-    try {
-      const { data, error } = await supabase
-        .from('critical_feedback_approvals')
-        .select('id')
-        .eq('feedback_id', feedback.id)
-        .eq('approver_user_id', user.id)
-        .maybeSingle();
-      
-      setHasAcknowledged(!!data);
-    } catch (error) {
-      console.error('Error checking acknowledgment status:', error);
+  // Check acknowledgment when feedback or user changes
+  useEffect(() => {
+    if (feedback && user) {
+      checkAcknowledgmentStatus();
     }
-  };
+  }, [feedback?.id, user?.id]);
 
   // Auto-mark as viewed and change status when dialog opens
   useEffect(() => {
