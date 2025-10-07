@@ -531,6 +531,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
                         <div className="flex space-x-2 text-xs">
                           {(() => {
                             const { ceoApproved, vpApproved, directorApproved } = getApprovalStatus(feedback);
+                            const allThreeApproved = ceoApproved && vpApproved && directorApproved;
                             return (
                               <>
                                 <Badge variant={ceoApproved ? "default" : "outline"}>
@@ -542,7 +543,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
                                 <Badge variant={directorApproved ? "default" : "outline"}>
                                   DIR {directorApproved ? "✓" : "⏳"}
                                 </Badge>
-                                {(feedback as any).ready_for_dm_resolution && (
+                                {allThreeApproved && (
                                   <Badge variant="secondary">Ready for DM Resolution</Badge>
                                 )}
                               </>
