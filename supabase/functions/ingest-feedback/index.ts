@@ -409,6 +409,16 @@ Deno.serve(async (req) => {
 
     // Try to insert into database
     console.log('Inserting into database...')
+    
+    // Auto-escalate Critical priority feedback
+    const initialStatus = validatedData.priority === 'Critical' ? 'escalated' : 'unopened'
+    const escalatedAt = validatedData.priority === 'Critical' ? new Date().toISOString() : null
+    const slaDeadline = validatedData.priority === 'Critical' 
+      ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString() // 48 hours from now
+      : null
+    
+    console.log(`Priority: ${validatedData.priority}, Status: ${initialStatus}, Auto-escalated: ${validatedData.priority === 'Critical'}`)
+    
     const { data: insertedData, error: insertError } = await supabase
       .from('customer_feedback')
       .insert({
@@ -416,7 +426,7 @@ Deno.serve(async (req) => {
         complaint_category: validatedData.complaint_category,
         channel: validatedData.channel,
         rating: validatedData.rating,
-        resolution_status: 'unopened',
+        resolution_status: initialStatus,
         store_number: validatedData.store_number,
         market: validatedData.market,
         case_number: validatedData.case_number,
@@ -426,7 +436,10 @@ Deno.serve(async (req) => {
         feedback_text: validatedData.feedback_text,
         priority: validatedData.priority,
         assignee: validatedData.assignee,
-        user_id: '00000000-0000-0000-0000-000000000000' // System user
+        user_id: '00000000-0000-0000-0000-000000000000', // System user
+        escalated_at: escalatedAt,
+        sla_deadline: slaDeadline,
+        auto_escalated: validatedData.priority === 'Critical'
       })
       .select()
       .single()
