@@ -250,25 +250,58 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
     const approvals = (feedback as any).critical_feedback_approvals || [];
     const hasUserApproved = approvals.some((a: any) => a.approver_user_id === user?.id);
     
-    if (hasUserApproved) return false;
+    console.log('🔍 canUserApprove check:', {
+      userRole,
+      userId: user?.id,
+      hasUserApproved,
+      approvals,
+      feedbackId: feedback.id
+    });
+    
+    if (hasUserApproved) {
+      console.log('❌ User has already approved');
+      return false;
+    }
     
     const { ceoApproved, vpApproved, directorApproved } = getApprovalStatus(feedback);
     
     // Normalize the role to lowercase for comparison
-    const normalizedRole = userRole.toLowerCase();
+    const normalizedRole = userRole.toLowerCase().trim();
+    
+    console.log('👤 Role check:', {
+      normalizedRole,
+      ceoApproved,
+      vpApproved,
+      directorApproved
+    });
     
     // CEO can always approve first
-    if (normalizedRole === 'ceo') return true;
+    if (normalizedRole === 'ceo') {
+      console.log('✅ CEO can approve');
+      return true;
+    }
     
     // VP can approve after CEO
-    if (normalizedRole === 'vp') return ceoApproved;
+    if (normalizedRole === 'vp') {
+      const canApprove = ceoApproved;
+      console.log('✅ VP can approve:', canApprove);
+      return canApprove;
+    }
     
     // Director can approve after CEO and VP
-    if (normalizedRole === 'director') return ceoApproved && vpApproved;
+    if (normalizedRole === 'director') {
+      const canApprove = ceoApproved && vpApproved;
+      console.log('✅ Director can approve:', canApprove);
+      return canApprove;
+    }
     
     // Admin can approve at any time
-    if (normalizedRole === 'admin') return true;
+    if (normalizedRole === 'admin') {
+      console.log('✅ Admin can approve');
+      return true;
+    }
     
+    console.log('❌ No approval permission for role:', normalizedRole);
     return false;
   };
 
