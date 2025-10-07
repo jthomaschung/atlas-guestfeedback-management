@@ -83,7 +83,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
           *,
           critical_feedback_approvals(*)
         `)
-        .eq('resolution_status', 'escalated')
+        .eq('priority', 'Critical')
         .order('created_at', { ascending: false });
 
       if (feedbackError) throw feedbackError;
