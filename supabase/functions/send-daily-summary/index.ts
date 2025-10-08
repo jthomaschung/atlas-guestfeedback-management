@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { Resend } from "npm:resend@2.0.0";
 
 // Slack formatting helper functions
-function buildSlackCompanySummary(summary: FeedbackSummary, date: Date): any {
+function buildSlackCompanySummary(summary: FeedbackSummary, date: Date, scope: string = "Company Wide"): any {
   const dateStr = date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   
   const blocks = [
@@ -14,6 +14,15 @@ function buildSlackCompanySummary(summary: FeedbackSummary, date: Date): any {
         text: `📊 Daily Feedback Summary - ${dateStr}`,
         emoji: true
       }
+    },
+    {
+      type: "context",
+      elements: [
+        {
+          type: "mrkdwn",
+          text: `📍 *Scope:* ${scope} | 📅 *Period:* ${dateStr}`
+        }
+      ]
     },
     {
       type: "divider"
@@ -104,14 +113,14 @@ function buildSlackCompanySummary(summary: FeedbackSummary, date: Date): any {
     type: "section",
     text: {
       type: "mrkdwn",
-      text: `*📊 Resolution Status*\n• Open: ${summary.openCount}\n• Resolved: ${summary.resolvedCount}`
+      text: `*📊 Resolution Status*\n• Unopened: ${summary.unopenedCount || 0}\n• Open: ${summary.openCount}\n• Resolved: ${summary.resolvedCount}`
     }
   });
 
   return { blocks };
 }
 
-async function sendSlackSummary(summary: FeedbackSummary, date: Date): Promise<void> {
+async function sendSlackSummary(summary: FeedbackSummary, date: Date, scope: string = "Company Wide"): Promise<void> {
   const webhookUrl = Deno.env.get("SLACK_WEBHOOK_URL");
   if (!webhookUrl) {
     console.log("Slack webhook URL not configured, skipping Slack notification");
@@ -119,7 +128,7 @@ async function sendSlackSummary(summary: FeedbackSummary, date: Date): Promise<v
   }
 
   try {
-    const payload = buildSlackCompanySummary(summary, date);
+    const payload = buildSlackCompanySummary(summary, date, scope);
     
     const response = await fetch(webhookUrl, {
       method: "POST",
@@ -159,6 +168,7 @@ interface FeedbackSummary {
   };
   topComplaints: Array<{ category: string; count: number }>;
   slaViolations: number;
+  unopenedCount?: number;
   openCount: number;
   resolvedCount: number;
   avgResponseTime: number;
@@ -273,7 +283,7 @@ serve(async (req) => {
       
       // Send to Slack first
       try {
-        await sendSlackSummary(companySummary, yesterday);
+        await sendSlackSummary(companySummary, yesterday, "Company Wide");
       } catch (slackError) {
         console.error("Failed to send Slack summary, continuing with emails:", slackError);
       }
@@ -392,6 +402,7 @@ async function generateCompanySummary(
   ).length;
 
   // Open vs resolved
+  const unopenedCount = feedback.filter((f) => !f.viewed).length;
   const openCount = feedback.filter((f) => f.resolution_status !== "resolved").length;
   const resolvedCount = feedback.filter((f) => f.resolution_status === "resolved").length;
 
@@ -438,6 +449,7 @@ async function generateCompanySummary(
     },
     topComplaints,
     slaViolations,
+    unopenedCount,
     openCount,
     resolvedCount,
     avgResponseTime: 0, // Can calculate if needed
