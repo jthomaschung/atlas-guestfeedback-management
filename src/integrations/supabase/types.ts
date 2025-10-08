@@ -282,6 +282,59 @@ export type Database = {
         }
         Relationships: []
       }
+      catering_leads: {
+        Row: {
+          campaign_id: string | null
+          campaign_slug: string | null
+          contacted_at: string | null
+          created_at: string | null
+          email: string
+          id: string
+          marketing_consent: boolean | null
+          message: string | null
+          name: string
+          phone: string
+          source: string | null
+          status: string | null
+        }
+        Insert: {
+          campaign_id?: string | null
+          campaign_slug?: string | null
+          contacted_at?: string | null
+          created_at?: string | null
+          email: string
+          id?: string
+          marketing_consent?: boolean | null
+          message?: string | null
+          name: string
+          phone: string
+          source?: string | null
+          status?: string | null
+        }
+        Update: {
+          campaign_id?: string | null
+          campaign_slug?: string | null
+          contacted_at?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          marketing_consent?: boolean | null
+          message?: string | null
+          name?: string
+          phone?: string
+          source?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catering_leads_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "catering_email_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       catering_locations: {
         Row: {
           address: string | null
@@ -806,6 +859,39 @@ export type Database = {
           total_orders?: number | null
           total_spent?: number | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      daily_summary_log: {
+        Row: {
+          created_at: string
+          id: string
+          metrics: Json | null
+          recipient_email: string
+          region: string | null
+          sent_at: string
+          summary_date: string
+          summary_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metrics?: Json | null
+          recipient_email: string
+          region?: string | null
+          sent_at?: string
+          summary_date: string
+          summary_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metrics?: Json | null
+          recipient_email?: string
+          region?: string | null
+          sent_at?: string
+          summary_date?: string
+          summary_type?: string
         }
         Relationships: []
       }
@@ -1820,6 +1906,146 @@ export type Database = {
         }
         Relationships: []
       }
+      portal_access_audit_log: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          portal_id: string
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          portal_id: string
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          portal_id?: string
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      portal_access_definitions: {
+        Row: {
+          access_scope: Database["public"]["Enums"]["access_scope_type"] | null
+          can_edit: boolean | null
+          can_manage: boolean | null
+          can_view: boolean | null
+          created_at: string
+          id: string
+          portal_id: string
+          portal_role_id: string
+        }
+        Insert: {
+          access_scope?: Database["public"]["Enums"]["access_scope_type"] | null
+          can_edit?: boolean | null
+          can_manage?: boolean | null
+          can_view?: boolean | null
+          created_at?: string
+          id?: string
+          portal_id: string
+          portal_role_id: string
+        }
+        Update: {
+          access_scope?: Database["public"]["Enums"]["access_scope_type"] | null
+          can_edit?: boolean | null
+          can_manage?: boolean | null
+          can_view?: boolean | null
+          created_at?: string
+          id?: string
+          portal_id?: string
+          portal_role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portal_access_definitions_portal_role_id_fkey"
+            columns: ["portal_role_id"]
+            isOneToOne: false
+            referencedRelation: "portal_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portal_roles: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          role_display_name: string
+          role_name: Database["public"]["Enums"]["portal_role_type"]
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          role_display_name: string
+          role_name: Database["public"]["Enums"]["portal_role_type"]
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          role_display_name?: string
+          role_name?: Database["public"]["Enums"]["portal_role_type"]
+        }
+        Relationships: []
+      }
+      portal_scope_assignments: {
+        Row: {
+          created_at: string | null
+          id: string
+          market: string | null
+          portal_id: string
+          region: string | null
+          scope_level: Database["public"]["Enums"]["access_scope_type"]
+          store_number: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          market?: string | null
+          portal_id: string
+          region?: string | null
+          scope_level: Database["public"]["Enums"]["access_scope_type"]
+          store_number?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          market?: string | null
+          portal_id?: string
+          region?: string | null
+          scope_level?: Database["public"]["Enums"]["access_scope_type"]
+          store_number?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       positions: {
         Row: {
           created_at: string | null
@@ -2333,6 +2559,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_portal_roles: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          id: string
+          portal_role_id: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          portal_role_id: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          portal_role_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_portal_roles_portal_role_id_fkey"
+            columns: ["portal_role_id"]
+            isOneToOne: false
+            referencedRelation: "portal_roles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_store_permissions: {
         Row: {
@@ -3040,6 +3298,16 @@ export type Database = {
           total_employees: number
         }[]
       }
+      get_portal_access: {
+        Args: { _portal_id: string; _user_id: string }
+        Returns: {
+          access_scope: string
+          can_edit: boolean
+          can_manage: boolean
+          can_view: boolean
+          role_names: string
+        }[]
+      }
       get_required_approvers_for_feedback: {
         Args: { feedback_market: string; feedback_store: string }
         Returns: {
@@ -3205,6 +3473,19 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_user_scope_for_portal: {
+        Args: { _portal_id: string; _user_id: string }
+        Returns: {
+          markets: string[]
+          regions: string[]
+          scope_level: string
+          store_numbers: string[]
+        }[]
+      }
+      has_portal_role: {
+        Args: { _role_name: string; _user_id: string }
+        Returns: boolean
+      }
       is_admin: {
         Args: { user_id: string }
         Returns: boolean
@@ -3219,6 +3500,10 @@ export type Database = {
       }
       is_jsonb_array_of_strings: {
         Args: { j: Json }
+        Returns: boolean
+      }
+      is_portal_master_admin: {
+        Args: { _user_id: string }
         Returns: boolean
       }
       jsonb_try_parse: {
@@ -3263,6 +3548,7 @@ export type Database = {
       }
     }
     Enums: {
+      access_scope_type: "none" | "store" | "region" | "all"
       app_role: "admin" | "director" | "manager" | "user" | "vp" | "ceo"
       complaint_category:
         | "sandwich_made_wrong"
@@ -3280,6 +3566,14 @@ export type Database = {
         | "possible_food_poisoning"
         | "loyalty_program_issues"
       feedback_channel: "yelp" | "qualtrics" | "jimmy_johns"
+      portal_role_type:
+        | "master_admin"
+        | "corporate"
+        | "hr_restricted"
+        | "regional_director"
+        | "district_manager"
+        | "gm"
+        | "store_user"
       ticket_status:
         | "submitted"
         | "pending_manager"
@@ -3417,6 +3711,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      access_scope_type: ["none", "store", "region", "all"],
       app_role: ["admin", "director", "manager", "user", "vp", "ceo"],
       complaint_category: [
         "sandwich_made_wrong",
@@ -3435,6 +3730,15 @@ export const Constants = {
         "loyalty_program_issues",
       ],
       feedback_channel: ["yelp", "qualtrics", "jimmy_johns"],
+      portal_role_type: [
+        "master_admin",
+        "corporate",
+        "hr_restricted",
+        "regional_director",
+        "district_manager",
+        "gm",
+        "store_user",
+      ],
       ticket_status: [
         "submitted",
         "pending_manager",

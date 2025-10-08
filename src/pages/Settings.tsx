@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, EyeOff, Key, Plus, Store } from 'lucide-react';
+import { Eye, EyeOff, Key, Plus, Store, Mail } from 'lucide-react';
 import { MarketOverview } from '@/components/settings/MarketOverview';
 import { StoreTable } from '@/components/settings/StoreTable';
 import { StoreFilters } from '@/components/settings/StoreFilters';
@@ -38,6 +38,7 @@ const Settings = () => {
   const [marketDialogOpen, setMarketDialogOpen] = useState(false);
   const [selectedStore, setSelectedStore] = useState<any>(null);
   const [storesLoading, setStoresLoading] = useState(false);
+  const [sendingSummary, setSendingSummary] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -217,6 +218,31 @@ const Settings = () => {
     setStoreDialogOpen(true);
   };
 
+  const handleTestDailySummary = async () => {
+    setSendingSummary(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-daily-summary', {
+        body: { test: true }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Success',
+        description: 'Test daily summary emails sent successfully'
+      });
+    } catch (error: any) {
+      console.error('Error sending test summary:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to send test summary',
+        variant: 'destructive'
+      });
+    } finally {
+      setSendingSummary(false);
+    }
+  };
+
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       <div className="mb-6">
@@ -230,6 +256,7 @@ const Settings = () => {
         <TabsList>
           <TabsTrigger value="account">Account</TabsTrigger>
           <TabsTrigger value="stores">Store Management</TabsTrigger>
+          <TabsTrigger value="system">System</TabsTrigger>
         </TabsList>
 
         <TabsContent value="account" className="space-y-6">
@@ -367,6 +394,42 @@ const Settings = () => {
                   onViewDetails={handleViewDetails}
                 />
               )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="system" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Mail className="h-5 w-5" />
+                Daily Summary Emails
+              </CardTitle>
+              <CardDescription>
+                Test the automated daily summary email system
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-muted p-4 rounded-lg space-y-2">
+                <h4 className="font-medium">Email Recipients:</h4>
+                <ul className="text-sm space-y-1 text-muted-foreground">
+                  <li>• CEO and VP: Company-wide summary</li>
+                  <li>• Directors: Regional summaries for their markets</li>
+                </ul>
+              </div>
+              <div className="bg-muted p-4 rounded-lg space-y-2">
+                <h4 className="font-medium">Schedule:</h4>
+                <p className="text-sm text-muted-foreground">
+                  Automated emails sent daily at 6:00 AM
+                </p>
+              </div>
+              <Button 
+                onClick={handleTestDailySummary} 
+                disabled={sendingSummary}
+                className="w-full"
+              >
+                {sendingSummary ? "Sending..." : "Send Test Summary Now"}
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
