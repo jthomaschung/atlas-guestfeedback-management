@@ -2,6 +2,144 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { Resend } from "npm:resend@2.0.0";
 
+// Slack formatting helper functions
+function buildSlackCompanySummary(summary: FeedbackSummary, date: Date): any {
+  const dateStr = date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  
+  const blocks = [
+    {
+      type: "header",
+      text: {
+        type: "plain_text",
+        text: `📊 Daily Feedback Summary - ${dateStr}`,
+        emoji: true
+      }
+    },
+    {
+      type: "divider"
+    }
+  ];
+
+  // Critical alert if needed
+  if (summary.critical > 0) {
+    blocks.push({
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `🚨 *Critical Alerts*\n*${summary.critical}* critical issues require immediate attention${summary.slaViolations > 0 ? `\n⚠️ *${summary.slaViolations}* SLA violations detected` : ''}`
+      }
+    });
+  }
+
+  // Key metrics
+  blocks.push({
+    type: "section",
+    fields: [
+      {
+        type: "mrkdwn",
+        text: `*Total Feedback:*\n${summary.totalNew}`
+      },
+      {
+        type: "mrkdwn",
+        text: `*Critical:*\n${summary.critical}`
+      },
+      {
+        type: "mrkdwn",
+        text: `*Praise:*\n${summary.praise}`
+      },
+      {
+        type: "mrkdwn",
+        text: `*Accuracy Issues:*\n${summary.accuracy.total}`
+      }
+    ]
+  });
+
+  // Accuracy breakdown
+  blocks.push({
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: `*🎯 Accuracy Breakdown*\n• Missing Items: ${summary.accuracy.missingItems}\n• Sandwich Made Wrong: ${summary.accuracy.sandwichMadeWrong}`
+    }
+  });
+
+  // Top complaints
+  if (summary.topComplaints.length > 0) {
+    const complaintsText = summary.topComplaints.map(c => `• ${c.category}: ${c.count}`).join('\n');
+    blocks.push({
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*📈 Top Complaint Categories*\n${complaintsText}`
+      }
+    });
+  }
+
+  // Top performing stores
+  if (summary.topStores.length > 0) {
+    const storesText = summary.topStores.map(s => `• ${s.store}: ${s.praiseCount} ⭐`).join('\n');
+    blocks.push({
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*🏆 Top Performing Stores (Praise)*\n${storesText}`
+      }
+    });
+  }
+
+  // Critical stores
+  if (summary.criticalStores.length > 0) {
+    const criticalText = summary.criticalStores.map(s => `• ${s.store}: ${s.criticalCount} 🚨`).join('\n');
+    blocks.push({
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*⚠️ Stores Needing Attention*\n${criticalText}`
+      }
+    });
+  }
+
+  // Resolution status
+  blocks.push({
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: `*📊 Resolution Status*\n• Open: ${summary.openCount}\n• Resolved: ${summary.resolvedCount}`
+    }
+  });
+
+  return { blocks };
+}
+
+async function sendSlackSummary(summary: FeedbackSummary, date: Date): Promise<void> {
+  const webhookUrl = Deno.env.get("SLACK_WEBHOOK_URL");
+  if (!webhookUrl) {
+    console.log("Slack webhook URL not configured, skipping Slack notification");
+    return;
+  }
+
+  try {
+    const payload = buildSlackCompanySummary(summary, date);
+    
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Slack webhook failed: ${response.status} ${response.statusText}`);
+    }
+
+    console.log("Successfully sent summary to Slack");
+  } catch (error) {
+    console.error("Error sending to Slack:", error);
+    throw error;
+  }
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -109,6 +247,14 @@ serve(async (req) => {
     if (executives && executives.length > 0) {
       const companySummary = await generateCompanySummary(yesterdayFeedback || [], supabase);
       
+      // Send to Slack first
+      try {
+        await sendSlackSummary(companySummary, yesterday);
+      } catch (slackError) {
+        console.error("Failed to send Slack summary, continuing with emails:", slackError);
+      }
+      
+      // Send emails to executives
       for (const exec of executives) {
         const profile = exec.profiles as any;
         const html = buildCompanyEmail(companySummary, profile.display_name, yesterday);
