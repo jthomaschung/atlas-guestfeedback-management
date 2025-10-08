@@ -218,33 +218,57 @@ serve(async (req) => {
     // Get CEO and VP for company-wide summary
     const { data: executives, error: execError } = await supabase
       .from("user_hierarchy")
-      .select(`
-        user_id,
-        role,
-        profiles!inner(email, display_name)
-      `)
+      .select("user_id, role")
       .in("role", ["ceo", "vp"]);
 
     if (execError) {
       console.error("Error fetching executives:", execError);
     }
 
+    // Fetch profiles separately for executives
+    let executivesWithProfiles = [];
+    if (executives && executives.length > 0) {
+      const execIds = executives.map(e => e.user_id);
+      const { data: execProfiles } = await supabase
+        .from("profiles")
+        .select("user_id, email, display_name")
+        .in("user_id", execIds);
+      
+      executivesWithProfiles = executives.map(exec => ({
+        ...exec,
+        profiles: execProfiles?.find(p => p.user_id === exec.user_id)
+      }));
+      console.log(`Found ${executivesWithProfiles.length} executives with profiles`);
+    }
+
     // Get Directors with their markets
     const { data: directors, error: dirError } = await supabase
       .from("user_hierarchy")
-      .select(`
-        user_id,
-        role,
-        profiles!inner(email, display_name)
-      `)
+      .select("user_id, role")
       .eq("role", "director");
 
     if (dirError) {
       console.error("Error fetching directors:", dirError);
     }
 
+    // Fetch profiles separately for directors
+    let directorsWithProfiles = [];
+    if (directors && directors.length > 0) {
+      const dirIds = directors.map(d => d.user_id);
+      const { data: dirProfiles } = await supabase
+        .from("profiles")
+        .select("user_id, email, display_name")
+        .in("user_id", dirIds);
+      
+      directorsWithProfiles = directors.map(dir => ({
+        ...dir,
+        profiles: dirProfiles?.find(p => p.user_id === dir.user_id)
+      }));
+      console.log(`Found ${directorsWithProfiles.length} directors with profiles`);
+    }
+
     // Send company-wide summary
-    if (executives && executives.length > 0) {
+    if (executivesWithProfiles && executivesWithProfiles.length > 0) {
       const companySummary = await generateCompanySummary(yesterdayFeedback || [], supabase);
       
       // Send to Slack first
@@ -255,7 +279,7 @@ serve(async (req) => {
       }
       
       // Send emails to executives
-      for (const exec of executives) {
+      for (const exec of executivesWithProfiles) {
         const profile = exec.profiles as any;
         const html = buildCompanyEmail(companySummary, profile.display_name, yesterday);
         
@@ -279,8 +303,8 @@ serve(async (req) => {
     }
 
     // Send regional summaries to directors
-    if (directors && directors.length > 0) {
-      for (const director of directors) {
+    if (directorsWithProfiles && directorsWithProfiles.length > 0) {
+      for (const director of directorsWithProfiles) {
         const profile = director.profiles as any;
 
         // Get director's markets
