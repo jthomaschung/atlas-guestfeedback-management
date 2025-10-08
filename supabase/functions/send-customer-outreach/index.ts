@@ -6,6 +6,7 @@ import { AcknowledgmentEmail } from './_templates/acknowledgment-email.tsx';
 import { ResolutionEmail } from './_templates/resolution-email.tsx';
 import { PraiseResponseEmail } from './_templates/praise-response-email.tsx';
 import { EscalationEmail } from './_templates/escalation-email.tsx';
+import { LoyaltyRewardEmail } from './_templates/loyalty-reward-email.tsx';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -16,12 +17,13 @@ interface OutreachRequest {
   feedbackId: string;
   method: 'email';
   messageContent?: string;
-  templateType?: 'acknowledgment' | 'resolution' | 'praise' | 'escalation' | 'custom';
+  templateType?: 'acknowledgment' | 'resolution' | 'praise' | 'escalation' | 'loyalty_reward' | 'custom';
   customSubject?: string;
   resolutionNotes?: string;
   actionTaken?: string;
   escalationReason?: string;
   managerContact?: string;
+  rewardDetails?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -339,6 +341,14 @@ async function generateEmailContent(
         ...baseProps,
         resolutionNotes: options.resolutionNotes || feedback.resolution_notes,
         actionTaken: options.actionTaken,
+      });
+      break;
+
+    case 'loyalty_reward':
+      subject = `We're sorry - Here's a free sub on us! - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(LoyaltyRewardEmail, {
+        ...baseProps,
+        rewardDetails: options.rewardDetails || '1 Free Regular Sub',
       });
       break;
 
