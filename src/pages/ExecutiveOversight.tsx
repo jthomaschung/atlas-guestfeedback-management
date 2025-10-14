@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ExecutiveDashboard } from '@/components/feedback/ExecutiveDashboard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, Shield, Users, Clock } from 'lucide-react';
+import { TestDailySummary } from '@/components/TestDailySummary';
 
 export default function ExecutiveOversight() {
   const { user } = useAuth();
@@ -118,6 +119,7 @@ export default function ExecutiveOversight() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
+              <TestDailySummary />
               <div className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
                 {userRole.toUpperCase()} Level Access
               </div>
