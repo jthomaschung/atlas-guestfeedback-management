@@ -1,4 +1,4 @@
-import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive, UserCheck, Trophy, TrendingUp, Shield, Target, BookOpen } from "lucide-react";
+import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive, UserCheck, TrendingUp, Shield, Target, BookOpen } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
 import {
@@ -16,10 +16,9 @@ import {
 
 const guestFeedbackItems = [
   { title: "Accuracy", url: "/accuracy", icon: Target },
-  { title: "Red Carpet Leaders", url: "/red-carpet-leaders", icon: Trophy },
-  { title: "Summary", url: "/summary", icon: BarChart3 },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Feedback Reporting", url: "/feedback-reporting", icon: TrendingUp },
+  { title: "Summary", url: "/summary", icon: BarChart3 },
 ];
 
 const executiveItems = [
