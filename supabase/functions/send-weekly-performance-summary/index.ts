@@ -199,11 +199,11 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('Generating weekly summary for:', targetMonday.toDateString(), '-', targetSunday.toDateString());
 
-    // Get all directors and DMs
+    // Get all executives, directors and DMs
     const { data: managers, error: managersError } = await supabase
       .from('user_hierarchy')
       .select('user_id, role')
-      .in('role', ['DIRECTOR', 'DM']);
+      .in('role', ['CEO', 'VP', 'DIRECTOR', 'DM']);
 
     if (managersError) {
       console.error('Error fetching managers:', managersError);
