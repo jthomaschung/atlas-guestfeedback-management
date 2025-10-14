@@ -41,6 +41,381 @@ export type Database = {
         }
         Relationships: []
       }
+      backlog_activity_log: {
+        Row: {
+          action_details: Json | null
+          action_type: string
+          backlog_item_id: string
+          created_at: string | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          action_details?: Json | null
+          action_type: string
+          backlog_item_id: string
+          created_at?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          action_details?: Json | null
+          action_type?: string
+          backlog_item_id?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backlog_activity_log_backlog_item_id_fkey"
+            columns: ["backlog_item_id"]
+            isOneToOne: false
+            referencedRelation: "backlog_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "backlog_activity_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      backlog_approvals: {
+        Row: {
+          approval_notes: string | null
+          approval_status: string
+          approver_role: string
+          approver_user_id: string
+          backlog_item_id: string
+          created_at: string | null
+          id: string
+          requested_at: string | null
+          responded_at: string | null
+        }
+        Insert: {
+          approval_notes?: string | null
+          approval_status?: string
+          approver_role: string
+          approver_user_id: string
+          backlog_item_id: string
+          created_at?: string | null
+          id?: string
+          requested_at?: string | null
+          responded_at?: string | null
+        }
+        Update: {
+          approval_notes?: string | null
+          approval_status?: string
+          approver_role?: string
+          approver_user_id?: string
+          backlog_item_id?: string
+          created_at?: string | null
+          id?: string
+          requested_at?: string | null
+          responded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backlog_approvals_backlog_item_id_fkey"
+            columns: ["backlog_item_id"]
+            isOneToOne: false
+            referencedRelation: "backlog_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      backlog_comments: {
+        Row: {
+          backlog_item_id: string
+          comment_text: string
+          comment_type: string | null
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          backlog_item_id: string
+          comment_text: string
+          comment_type?: string | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          backlog_item_id?: string
+          comment_text?: string
+          comment_type?: string | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backlog_comments_backlog_item_id_fkey"
+            columns: ["backlog_item_id"]
+            isOneToOne: false
+            referencedRelation: "backlog_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "backlog_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      backlog_items: {
+        Row: {
+          ai_priority_factors: Json | null
+          ai_recommendation: string | null
+          backlog_category: string
+          backlog_status: string | null
+          budget_allocation_id: string | null
+          business_impact: string | null
+          created_at: string | null
+          deferral_justification: string | null
+          deferred_at: string | null
+          deferred_by: string | null
+          dependent_on_project: string | null
+          estimated_cost: number | null
+          estimated_fix_timing: string | null
+          id: string
+          justification: string
+          priority_score: number | null
+          region: string
+          regional_notes: string | null
+          regional_priority: number | null
+          reviewed_at: string | null
+          reviewed_by_regional_lead: string | null
+          roi_potential: string | null
+          similar_issue_cluster_id: string | null
+          target_completion_date: string | null
+          updated_at: string | null
+          work_order_id: string | null
+        }
+        Insert: {
+          ai_priority_factors?: Json | null
+          ai_recommendation?: string | null
+          backlog_category: string
+          backlog_status?: string | null
+          budget_allocation_id?: string | null
+          business_impact?: string | null
+          created_at?: string | null
+          deferral_justification?: string | null
+          deferred_at?: string | null
+          deferred_by?: string | null
+          dependent_on_project?: string | null
+          estimated_cost?: number | null
+          estimated_fix_timing?: string | null
+          id?: string
+          justification: string
+          priority_score?: number | null
+          region: string
+          regional_notes?: string | null
+          regional_priority?: number | null
+          reviewed_at?: string | null
+          reviewed_by_regional_lead?: string | null
+          roi_potential?: string | null
+          similar_issue_cluster_id?: string | null
+          target_completion_date?: string | null
+          updated_at?: string | null
+          work_order_id?: string | null
+        }
+        Update: {
+          ai_priority_factors?: Json | null
+          ai_recommendation?: string | null
+          backlog_category?: string
+          backlog_status?: string | null
+          budget_allocation_id?: string | null
+          business_impact?: string | null
+          created_at?: string | null
+          deferral_justification?: string | null
+          deferred_at?: string | null
+          deferred_by?: string | null
+          dependent_on_project?: string | null
+          estimated_cost?: number | null
+          estimated_fix_timing?: string | null
+          id?: string
+          justification?: string
+          priority_score?: number | null
+          region?: string
+          regional_notes?: string | null
+          regional_priority?: number | null
+          reviewed_at?: string | null
+          reviewed_by_regional_lead?: string | null
+          roi_potential?: string | null
+          similar_issue_cluster_id?: string | null
+          target_completion_date?: string | null
+          updated_at?: string | null
+          work_order_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backlog_items_deferred_by_fkey"
+            columns: ["deferred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "backlog_items_reviewed_by_regional_lead_fkey"
+            columns: ["reviewed_by_regional_lead"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "backlog_items_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: true
+            referencedRelation: "work_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      backlog_regional_assignments: {
+        Row: {
+          assigned_at: string | null
+          assigned_by_user_id: string | null
+          assigned_role: string
+          assigned_user_id: string
+          backlog_item_id: string
+          id: string
+          notes: string | null
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by_user_id?: string | null
+          assigned_role: string
+          assigned_user_id: string
+          backlog_item_id: string
+          id?: string
+          notes?: string | null
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by_user_id?: string | null
+          assigned_role?: string
+          assigned_user_id?: string
+          backlog_item_id?: string
+          id?: string
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backlog_regional_assignments_assigned_by_user_id_fkey"
+            columns: ["assigned_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "backlog_regional_assignments_assigned_user_id_fkey"
+            columns: ["assigned_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "backlog_regional_assignments_backlog_item_id_fkey"
+            columns: ["backlog_item_id"]
+            isOneToOne: false
+            referencedRelation: "backlog_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      backlog_votes: {
+        Row: {
+          backlog_item_id: string
+          created_at: string | null
+          id: string
+          notes: string | null
+          user_id: string
+          vote_type: string
+          vote_weight: number | null
+        }
+        Insert: {
+          backlog_item_id: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          user_id: string
+          vote_type: string
+          vote_weight?: number | null
+        }
+        Update: {
+          backlog_item_id?: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          user_id?: string
+          vote_type?: string
+          vote_weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backlog_votes_backlog_item_id_fkey"
+            columns: ["backlog_item_id"]
+            isOneToOne: false
+            referencedRelation: "backlog_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "backlog_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      backlog_workflow_history: {
+        Row: {
+          backlog_item_id: string
+          change_reason: string | null
+          changed_by_user_id: string | null
+          created_at: string | null
+          from_status: string
+          id: string
+          to_status: string
+        }
+        Insert: {
+          backlog_item_id: string
+          change_reason?: string | null
+          changed_by_user_id?: string | null
+          created_at?: string | null
+          from_status: string
+          id?: string
+          to_status: string
+        }
+        Update: {
+          backlog_item_id?: string
+          change_reason?: string | null
+          changed_by_user_id?: string | null
+          created_at?: string | null
+          from_status?: string
+          id?: string
+          to_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backlog_workflow_history_backlog_item_id_fkey"
+            columns: ["backlog_item_id"]
+            isOneToOne: false
+            referencedRelation: "backlog_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaign_recipients: {
         Row: {
           bounced_at: string | null
@@ -4009,6 +4384,21 @@ export type Database = {
       get_market_r2r_completion_rate: {
         Args: { target_market: string }
         Returns: number
+      }
+      get_pending_approvals_for_user: {
+        Args: { user_uuid: string }
+        Returns: {
+          approval_id: string
+          approver_role: string
+          backlog_category: string
+          backlog_item_id: string
+          description: string
+          estimated_cost: number
+          market: string
+          requested_at: string
+          store_number: string
+          work_order_id: string
+        }[]
       }
       get_portal_access: {
         Args: { _portal_id: string; _user_id: string }
