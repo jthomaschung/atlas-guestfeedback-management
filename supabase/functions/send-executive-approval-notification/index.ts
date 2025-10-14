@@ -239,41 +239,67 @@ const handler = async (req: Request): Promise<Response> => {
           console.log('✅ Email notification sent to:', exec.email);
         }
         
-        // Send Slack DM if user has Slack ID and token is configured
-        if (slackBotToken && exec.slack_user_id) {
+        // Send Slack DM if token is configured
+        if (slackBotToken) {
           try {
-            const slackMessage = `🚨 *Critical Feedback Approval*\n\n` +
-              `*${approverName} (${approverRole.toUpperCase()})* has approved case *${feedback.case_number}*\n\n` +
-              `*Case Details:*\n` +
-              `• Store: #${feedback.store_number} (${feedback.market})\n` +
-              `• Category: ${feedback.complaint_category}\n` +
-              `• Priority: ${feedback.priority}\n` +
-              `• Customer: ${feedback.customer_name || 'Not provided'}\n` +
-              `• Date: ${new Date(feedback.feedback_date).toLocaleDateString()}\n\n` +
-              `*Approval Status:*\n` +
-              `${ceoApproved ? '✅' : '⏳'} CEO\n` +
-              `${vpApproved ? '✅' : '⏳'} VP\n` +
-              `${directorApproved ? '✅' : '⏳'} Director\n` +
-              `${dmApproved ? '✅' : '⏳'} DM\n\n` +
-              `<https://59a1a4a4-5107-4cbe-87fb-e1dcf4b1823a.lovableproject.com/executive-oversight|View Executive Dashboard>`;
+            let slackUserId = exec.slack_user_id;
+            
+            // If no Slack user ID is stored, look it up by email
+            if (!slackUserId && exec.email) {
+              try {
+                const lookupResponse = await fetch(`https://slack.com/api/users.lookupByEmail?email=${encodeURIComponent(exec.email)}`, {
+                  headers: {
+                    'Authorization': `Bearer ${slackBotToken}`,
+                  },
+                });
+                
+                const lookupData = await lookupResponse.json();
+                if (lookupData.ok && lookupData.user) {
+                  slackUserId = lookupData.user.id;
+                  console.log(`📧 Looked up Slack ID for ${exec.email}: ${slackUserId}`);
+                } else {
+                  console.log(`⚠️ Could not find Slack user for ${exec.email}: ${lookupData.error || 'User not found'}`);
+                }
+              } catch (lookupError) {
+                console.error(`Error looking up Slack user for ${exec.email}:`, lookupError);
+              }
+            }
+            
+            // Send Slack DM if we have a user ID
+            if (slackUserId) {
+              const slackMessage = `🚨 *Critical Feedback Approval*\n\n` +
+                `*${approverName} (${approverRole.toUpperCase()})* has approved case *${feedback.case_number}*\n\n` +
+                `*Case Details:*\n` +
+                `• Store: #${feedback.store_number} (${feedback.market})\n` +
+                `• Category: ${feedback.complaint_category}\n` +
+                `• Priority: ${feedback.priority}\n` +
+                `• Customer: ${feedback.customer_name || 'Not provided'}\n` +
+                `• Date: ${new Date(feedback.feedback_date).toLocaleDateString()}\n\n` +
+                `*Approval Status:*\n` +
+                `${ceoApproved ? '✅' : '⏳'} CEO\n` +
+                `${vpApproved ? '✅' : '⏳'} VP\n` +
+                `${directorApproved ? '✅' : '⏳'} Director\n` +
+                `${dmApproved ? '✅' : '⏳'} DM\n\n` +
+                `<https://59a1a4a4-5107-4cbe-87fb-e1dcf4b1823a.lovableproject.com/executive-oversight|View Executive Dashboard>`;
 
-            const slackResponse = await fetch('https://slack.com/api/chat.postMessage', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${slackBotToken}`,
-              },
-              body: JSON.stringify({
-                channel: exec.slack_user_id,
-                text: slackMessage,
-              }),
-            });
+              const slackResponse = await fetch('https://slack.com/api/chat.postMessage', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${slackBotToken}`,
+                },
+                body: JSON.stringify({
+                  channel: slackUserId,
+                  text: slackMessage,
+                }),
+              });
 
-            const slackData = await slackResponse.json();
-            if (!slackData.ok) {
-              console.error(`❌ Failed to send Slack DM to ${exec.display_name || exec.email}:`, slackData.error);
-            } else {
-              console.log(`✅ Slack DM sent to ${exec.display_name || exec.email}`);
+              const slackData = await slackResponse.json();
+              if (!slackData.ok) {
+                console.error(`❌ Failed to send Slack DM to ${exec.display_name || exec.email}:`, slackData.error);
+              } else {
+                console.log(`✅ Slack DM sent to ${exec.display_name || exec.email}`);
+              }
             }
           } catch (slackError) {
             console.error(`Error sending Slack DM to ${exec.display_name || exec.email}:`, slackError);
