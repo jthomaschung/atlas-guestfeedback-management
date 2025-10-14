@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { CustomerFeedback } from '@/types/feedback';
+import { FeedbackDetailsDialog } from '@/components/feedback/FeedbackDetailsDialog';
 
 interface EscalationLog {
   id: string;
@@ -55,6 +56,8 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
   const [isArchiveConfirmOpen, setIsArchiveConfirmOpen] = useState(false);
   const [pendingArchiveFeedbackId, setPendingArchiveFeedbackId] = useState<string | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string>('all');
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [detailsFeedback, setDetailsFeedback] = useState<CustomerFeedback | null>(null);
   
   const { user } = useAuth();
   const { toast } = useToast();
@@ -533,7 +536,14 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
                   : 0;
 
                 return (
-                  <div key={feedback.id} className="border rounded-lg p-4 space-y-3">
+                  <div 
+                    key={feedback.id} 
+                    className="border rounded-lg p-4 space-y-3 cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => {
+                      setDetailsFeedback(feedback);
+                      setIsDetailsDialogOpen(true);
+                    }}
+                  >
                     <div className="flex justify-between items-start">
                       <div className="space-y-2">
                         <div className="flex items-center space-x-3">
@@ -585,7 +595,8 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setSelectedFeedback(feedback);
                               setExecutiveNotes(feedback.executive_notes || '');
                               setIsNotesDialogOpen(true);
@@ -597,7 +608,10 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
                           {canUserApprove(feedback, userRole) && (
                             <Button
                               size="sm"
-                              onClick={() => approveCriticalFeedback(feedback.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                approveCriticalFeedback(feedback.id);
+                              }}
                             >
                               <Eye className="h-4 w-4 mr-1" />
                               Approve ({userRole.toUpperCase()})
@@ -717,6 +731,14 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Feedback Details Dialog */}
+      <FeedbackDetailsDialog
+        feedback={detailsFeedback}
+        isOpen={isDetailsDialogOpen}
+        onClose={() => setIsDetailsDialogOpen(false)}
+        onUpdate={loadExecutiveData}
+      />
     </div>
   );
 }
