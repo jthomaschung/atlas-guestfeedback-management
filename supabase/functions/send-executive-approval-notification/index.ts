@@ -279,8 +279,7 @@ const handler = async (req: Request): Promise<Response> => {
                 `${ceoApproved ? '✅' : '⏳'} CEO\n` +
                 `${vpApproved ? '✅' : '⏳'} VP\n` +
                 `${directorApproved ? '✅' : '⏳'} Director\n` +
-                `${dmApproved ? '✅' : '⏳'} DM\n\n` +
-                `<https://59a1a4a4-5107-4cbe-87fb-e1dcf4b1823a.lovableproject.com/executive-oversight|View Executive Dashboard>`;
+                `${dmApproved ? '✅' : '⏳'} DM`;
 
               const slackResponse = await fetch('https://slack.com/api/chat.postMessage', {
                 method: 'POST',
