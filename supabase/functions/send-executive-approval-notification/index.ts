@@ -80,12 +80,13 @@ const handler = async (req: Request): Promise<Response> => {
     console.log('Found executives to notify:', executives?.length);
 
     // Ensure the approver is always included in the notification list
-    const executiveEmails = new Set((executives || []).map(e => e.email));
+    let executivesList = executives || [];
+    const executiveEmails = new Set(executivesList.map(e => e.email));
     
     if (approverEmail && !executiveEmails.has(approverEmail)) {
       console.log('Adding approver to notification list:', approverEmail);
-      executives = [
-        ...(executives || []),
+      executivesList = [
+        ...executivesList,
         {
           user_id: approverUserId,
           email: approverEmail,
@@ -109,7 +110,7 @@ const handler = async (req: Request): Promise<Response> => {
     const dmApproved = approvedRoles.has('dm');
 
     // Send email to each executive
-    for (const exec of executives || []) {
+    for (const exec of executivesList) {
       try {
         const emailResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
           method: 'POST',
@@ -220,7 +221,7 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: `Notifications sent to ${executives?.length || 0} executives` 
+        message: `Notifications sent to ${executivesList.length} executives` 
       }),
       { 
         status: 200, 
