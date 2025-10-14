@@ -183,6 +183,12 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const [editedFeedbackText, setEditedFeedbackText] = useState<string>('');
   const [isUpdatingFeedbackText, setIsUpdatingFeedbackText] = useState(false);
   const [hasAcknowledged, setHasAcknowledged] = useState(false);
+  const [emailPlaceholders, setEmailPlaceholders] = useState({
+    managerName: '',
+    managerPosition: '',
+    productName: '',
+    storeManager: ''
+  });
   const { toast } = useToast();
   const { user } = useAuth();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
@@ -894,6 +900,55 @@ Customer Service Team`);
                               <div className="space-y-2 text-muted-foreground max-h-60 overflow-y-auto">
                                 <p>Dear {feedback.customer_name || 'Valued Customer'},</p>
                                 
+                                {/* Editable placeholders section */}
+                                {(selectedTemplate === 'sandwich_wrong' || selectedTemplate === 'missing_item' || 
+                                  selectedTemplate === 'out_of_bread' || selectedTemplate === 'out_of_product' || 
+                                  selectedTemplate === 'closed_early' || selectedTemplate === 'cleanliness' || 
+                                  selectedTemplate === 'food_poisoning') && (
+                                  <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded space-y-2">
+                                    <p className="text-xs font-semibold text-amber-900 dark:text-amber-400 mb-2">Edit Template Placeholders:</p>
+                                    {(selectedTemplate === 'sandwich_wrong' || selectedTemplate === 'missing_item' || 
+                                      selectedTemplate === 'out_of_bread' || selectedTemplate === 'out_of_product' || 
+                                      selectedTemplate === 'closed_early' || selectedTemplate === 'cleanliness' || 
+                                      selectedTemplate === 'food_poisoning') && (
+                                      <div className="space-y-1.5">
+                                        <div className="flex gap-2 items-center">
+                                          <Label className="text-xs min-w-[80px]">Manager Name:</Label>
+                                          <Input
+                                            value={emailPlaceholders.managerName}
+                                            onChange={(e) => setEmailPlaceholders({...emailPlaceholders, managerName: e.target.value})}
+                                            placeholder="Enter manager name"
+                                            className="h-7 text-xs"
+                                          />
+                                        </div>
+                                        {(selectedTemplate === 'out_of_bread' || selectedTemplate === 'out_of_product' || 
+                                          selectedTemplate === 'closed_early' || selectedTemplate === 'food_poisoning') && (
+                                          <div className="flex gap-2 items-center">
+                                            <Label className="text-xs min-w-[80px]">Position:</Label>
+                                            <Input
+                                              value={emailPlaceholders.managerPosition}
+                                              onChange={(e) => setEmailPlaceholders({...emailPlaceholders, managerPosition: e.target.value})}
+                                              placeholder="e.g., Store Manager, District Manager"
+                                              className="h-7 text-xs"
+                                            />
+                                          </div>
+                                        )}
+                                        {selectedTemplate === 'out_of_product' && (
+                                          <div className="flex gap-2 items-center">
+                                            <Label className="text-xs min-w-[80px]">Product:</Label>
+                                            <Input
+                                              value={emailPlaceholders.productName}
+                                              onChange={(e) => setEmailPlaceholders({...emailPlaceholders, productName: e.target.value})}
+                                              placeholder="e.g., lettuce, tomatoes"
+                                              className="h-7 text-xs"
+                                            />
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+
                                 {selectedTemplate === 'slow_service' && (
                                   <>
                                     <p>Thank you for taking the time to complete our survey and share your experience. My name is Karine, and I'm the Guest Feedback Manager for Jimmy John's.</p>
@@ -906,7 +961,7 @@ Customer Service Team`);
                                 {selectedTemplate === 'sandwich_wrong' && (
                                   <>
                                     <p>Hi {feedback.customer_name || 'Valued Customer'},</p>
-                                    <p>My name is [Manager Name], and I help manage the Jimmy John's you recently visited.</p>
+                                    <p>My name is <span className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded font-semibold">{emailPlaceholders.managerName || '[Manager Name]'}</span>, and I help manage the Jimmy John's you recently visited.</p>
                                     <p>I'm truly sorry that we did not prepare your sandwich correctly. Serving Freaky Fast® sandwiches is only meaningful if your sandwich is made perfectly every single time! I completely understand your frustration, and I want to make it right.</p>
                                     <p>I'll add a credit to your account for a free original sandwich on your next visit. This credit is store-specific, so please call in your order or visit us in-store to redeem it.</p>
                                     <p>If you have any other questions or concerns, please don't hesitate to reply to this email. I hope we'll see you again soon and can show you the Jimmy John's experience you deserve.</p>
@@ -916,7 +971,7 @@ Customer Service Team`);
                                 {selectedTemplate === 'missing_item' && (
                                   <>
                                     <p>Thank you for taking the time to complete our survey and share your experience.</p>
-                                    <p>My name is [Store Manager], and I manage the Jimmy John's that you visited. I sincerely apologize for missing items from your order. Missing items are unacceptable, and I understand how frustrating that must have been.</p>
+                                    <p>My name is <span className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded font-semibold">{emailPlaceholders.managerName || '[Store Manager]'}</span>, and I manage the Jimmy John's that you visited. I sincerely apologize for missing items from your order. Missing items are unacceptable, and I understand how frustrating that must have been.</p>
                                     <p>I'd like to make it up to you by adding a credit to your account for a free original sandwich. This credit is store-specific, so you'll want to call in your order or visit us in-store to redeem it.</p>
                                     <p>If you have any additional questions or concerns, feel free to reply to this email—I'd be happy to help. I hope we can regain your trust and see you again soon.</p>
                                   </>
@@ -943,7 +998,7 @@ Customer Service Team`);
                                 {selectedTemplate === 'out_of_bread' && (
                                   <>
                                     <p>Thank you for sharing your experience.</p>
-                                    <p>My name is [Name], and I'm the [Position] at the Jimmy John's that you attempted to order from.</p>
+                                    <p>My name is <span className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded font-semibold">{emailPlaceholders.managerName || '[Name]'}</span>, and I'm the <span className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded font-semibold">{emailPlaceholders.managerPosition || '[Position]'}</span> at the Jimmy John's that you attempted to order from.</p>
                                     <p>Perfect Bread® is our #1 rule at Jimmy John's, and not having any available is completely unacceptable. I would like to personally apologize for this failure. This should never happen, and I'm taking immediate steps to address it with our team.</p>
                                     <p>I'll add a credit to your account for a free original sandwich. This credit is store-specific, so please call in your order or visit us in-store to redeem it.</p>
                                     <p>If you have any additional questions or concerns, please reply to this email—I'd be happy to discuss this further. I genuinely hope we can earn another chance to serve you.</p>
@@ -953,8 +1008,8 @@ Customer Service Team`);
                                 {selectedTemplate === 'out_of_product' && (
                                   <>
                                     <p>Thank you for sharing your experience.</p>
-                                    <p>My name is [Name], and I'm the [Position] at the Jimmy John's that you attempted to order from.</p>
-                                    <p>Not having [Product] available is unacceptable, and I sincerely apologize for the inconvenience. Our customers should be able to count on us to have what they need, and we let you down.</p>
+                                    <p>My name is <span className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded font-semibold">{emailPlaceholders.managerName || '[Name]'}</span>, and I'm the <span className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded font-semibold">{emailPlaceholders.managerPosition || '[Position]'}</span> at the Jimmy John's that you attempted to order from.</p>
+                                    <p>Not having <span className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded font-semibold">{emailPlaceholders.productName || '[Product]'}</span> available is unacceptable, and I sincerely apologize for the inconvenience. Our customers should be able to count on us to have what they need, and we let you down.</p>
                                     <p>I'll add a credit to your account for a free original sandwich. This credit is store-specific, so please call in your order or visit us in-store to redeem it.</p>
                                     <p>If you have any additional questions or concerns, please reply to this email—I'm here to help. We hope to see you again soon.</p>
                                   </>
@@ -963,7 +1018,7 @@ Customer Service Team`);
                                 {selectedTemplate === 'closed_early' && (
                                   <>
                                     <p>Thank you for sharing your experience.</p>
-                                    <p>My name is [Name], and I'm the [Position] at the Jimmy John's that you attempted to visit.</p>
+                                    <p>My name is <span className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded font-semibold">{emailPlaceholders.managerName || '[Name]'}</span>, and I'm the <span className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded font-semibold">{emailPlaceholders.managerPosition || '[Position]'}</span> at the Jimmy John's that you attempted to visit.</p>
                                     <p>Closing early is completely unacceptable and goes against everything we stand for. I sincerely apologize that you made the trip to see us, only to find us closed. This should never have happened, and I'm addressing it with my team immediately.</p>
                                     <p>I'll add a credit to your account for a free original sandwich to make it right. This credit is store-specific, so please call in your order or visit us in-store to redeem it.</p>
                                     <p>If you have any additional questions or concerns, please reply to this email. I hope we can earn back your trust and serve you again soon.</p>
@@ -983,7 +1038,7 @@ Customer Service Team`);
                                 {selectedTemplate === 'cleanliness' && (
                                   <>
                                     <p>Thank you for sharing your experience.</p>
-                                    <p>My name is [Name], and I'm the Manager of the Jimmy John's that you visited.</p>
+                                    <p>My name is <span className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded font-semibold">{emailPlaceholders.managerName || '[Name]'}</span>, and I'm the Manager of the Jimmy John's that you visited.</p>
                                     <p>We pride ourselves on being Hospital Clean®—cleanliness is one of our core values, and an unclean store is absolutely unacceptable. I sincerely apologize for failing to meet this standard during your visit.</p>
                                     <p>I'll be working with my team immediately to address this issue and ensure we exceed our cleanliness standards moving forward. I'd also like to make it up to you by adding a credit to your account for a free original sandwich. This credit is store-specific, so please call in your order or visit us in-store to redeem it.</p>
                                     <p>If you have any additional questions or concerns, please reply to this email—I'd be happy to discuss this further. I hope we can earn back your trust and see you again soon.</p>
@@ -1003,7 +1058,7 @@ Customer Service Team`);
                                 {selectedTemplate === 'food_poisoning' && (
                                   <>
                                     <p>Thank you for reaching out.</p>
-                                    <p>My name is [Name], and I'm the [Position] for [Market/Region]. We take any feedback regarding possible food poisoning extremely seriously, and I'm very sorry to hear about your experience.</p>
+                                    <p>My name is <span className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded font-semibold">{emailPlaceholders.managerName || '[Name]'}</span>, and I'm the <span className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded font-semibold">{emailPlaceholders.managerPosition || '[Position]'}</span> for {feedback.market || '[Market/Region]'}. We take any feedback regarding possible food poisoning extremely seriously, and I'm very sorry to hear about your experience.</p>
                                     <p>I'd like to speak with you directly to learn more about what happened so we can conduct a thorough investigation on our end. Your health and safety are our top priority, and we need to understand the situation fully to prevent this from happening to anyone else.</p>
                                     <p>Please provide a good phone number where I can reach you at your earliest convenience. I'll personally follow up to discuss this matter further.</p>
                                     <p>Thank you for bringing this to our attention.</p>
