@@ -10,6 +10,8 @@ interface ApprovalNotificationRequest {
   feedbackId: string;
   approverRole: string;
   approverName: string;
+  approverUserId: string;
+  approverEmail: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -42,8 +44,8 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
-    const { feedbackId, approverRole, approverName }: ApprovalNotificationRequest = await req.json();
-    console.log('Approval notification request:', { feedbackId, approverRole, approverName });
+    const { feedbackId, approverRole, approverName, approverUserId, approverEmail }: ApprovalNotificationRequest = await req.json();
+    console.log('Approval notification request:', { feedbackId, approverRole, approverName, approverUserId, approverEmail });
 
     // Get feedback details
     const { data: feedback, error: feedbackError } = await supabase
@@ -76,6 +78,23 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     console.log('Found executives to notify:', executives?.length);
+
+    // Ensure the approver is always included in the notification list
+    const executiveEmails = new Set((executives || []).map(e => e.email));
+    
+    if (approverEmail && !executiveEmails.has(approverEmail)) {
+      console.log('Adding approver to notification list:', approverEmail);
+      executives = [
+        ...(executives || []),
+        {
+          user_id: approverUserId,
+          email: approverEmail,
+          display_name: approverName,
+          role: approverRole,
+          notification_level: 999 // For sorting purposes
+        }
+      ];
+    }
 
     // Get approval status to show in email
     const { data: approvals } = await supabase

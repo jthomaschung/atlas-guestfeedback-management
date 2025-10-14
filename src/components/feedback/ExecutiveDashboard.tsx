@@ -251,13 +251,15 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
 
       // Send notification to executives about this approval
       try {
-        await supabase.functions.invoke('send-executive-approval-notification', {
-          body: {
-            feedbackId: feedbackId,
-            approverRole: userHierarchy.role,
-            approverName: userProfile?.display_name || user?.email || 'Executive'
-          }
-        });
+      await supabase.functions.invoke('send-executive-approval-notification', {
+        body: {
+          feedbackId: feedbackId,
+          approverRole: userHierarchy.role,
+          approverName: userProfile?.display_name || user?.email || 'Executive',
+          approverUserId: user?.id,
+          approverEmail: user?.email
+        }
+      });
         console.log('Executive approval notifications sent');
       } catch (notifError) {
         console.error('Failed to send approval notifications:', notifError);
