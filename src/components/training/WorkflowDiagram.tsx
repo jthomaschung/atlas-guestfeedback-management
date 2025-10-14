@@ -1,11 +1,27 @@
+import { useEffect, useRef } from "react";
+import mermaid from "mermaid";
+
 interface WorkflowDiagramProps {
   type: "feedback-handling" | "escalation" | "customer-outreach" | "sla-management";
 }
 
+// Initialize mermaid
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'default',
+  securityLevel: 'loose',
+  flowchart: {
+    useMaxWidth: true,
+    htmlLabels: true,
+    curve: 'basis'
+  }
+});
+
 export function WorkflowDiagram({ type }: WorkflowDiagramProps) {
+  const mermaidRef = useRef<HTMLDivElement>(null);
+
   const diagrams = {
-    "feedback-handling": `
-graph TD
+    "feedback-handling": `graph TD
     A[New Feedback Received] --> B{Priority Level?}
     B -->|Critical| C[Auto-Escalate to Executives]
     B -->|High/Medium/Low| D[Notify Assigned Manager]
@@ -21,10 +37,9 @@ graph TD
     K --> N[Update Status to Resolved]
     L --> N
     M --> N
-    J --> N
-`,
-    "escalation": `
-graph TD
+    J --> N`,
+
+    "escalation": `graph TD
     A[Manager Identifies Issue] --> B{Escalation Criteria?}
     B -->|Food Safety| C[Mark as Critical]
     B -->|Legal Threat| C
@@ -41,10 +56,9 @@ graph TD
     H --> L[Manager Implements Solution]
     K --> G
     J --> M[Close Escalation]
-    L --> M
-`,
-    "customer-outreach": `
-graph TD
+    L --> M`,
+
+    "customer-outreach": `graph TD
     A[Open Feedback Item] --> B[Click Send Customer Outreach]
     B --> C{Customer Email Available?}
     C -->|No| D[Skip Outreach / Add Note]
@@ -65,10 +79,9 @@ graph TD
     O --> Q{Response Received?}
     Q -->|Yes| N
     Q -->|No| R[Mark Outreach Complete]
-    P --> S[Continue Conversation or Close]
-`,
-    "sla-management": `
-graph TD
+    P --> S[Continue Conversation or Close]`,
+
+    "sla-management": `graph TD
     A[Feedback Created] --> B{Priority Level}
     B -->|Critical| C[Set SLA: 48 hours]
     B -->|High| D[Set SLA: TBD]
@@ -90,8 +103,7 @@ graph TD
     O --> P[Escalate to Director]
     P --> Q[Director Reviews & Resolves]
     L --> R[Update Metrics]
-    Q --> R
-`,
+    Q --> R`,
   };
 
   const titles = {
@@ -101,21 +113,23 @@ graph TD
     "sla-management": "SLA Management Process",
   };
 
+  useEffect(() => {
+    if (mermaidRef.current) {
+      const diagram = diagrams[type];
+      const uniqueId = `mermaid-${type}-${Date.now()}`;
+      
+      mermaidRef.current.innerHTML = `<div class="mermaid" id="${uniqueId}">${diagram}</div>`;
+      
+      mermaid.contentLoaded();
+    }
+  }, [type]);
+
   return (
     <div className="space-y-3">
       <h4 className="text-md font-semibold">{titles[type]}</h4>
       <div className="bg-muted/30 p-4 rounded-lg overflow-x-auto">
-        <div className="min-w-[600px]">
-          <pre className="text-xs text-muted-foreground whitespace-pre">
-{`Mermaid diagram visualization:
-(In production, this would render as an interactive flowchart)
-
-${diagrams[type]}
-`}
-          </pre>
-          <p className="text-xs text-muted-foreground mt-2 italic">
-            Note: This is a text representation. The production version will display as an interactive diagram.
-          </p>
+        <div className="min-w-[600px]" ref={mermaidRef}>
+          {/* Mermaid diagram will be rendered here */}
         </div>
       </div>
     </div>
