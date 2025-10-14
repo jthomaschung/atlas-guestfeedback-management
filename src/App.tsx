@@ -30,6 +30,7 @@ import RedCarpetLeaders from '@/pages/RedCarpetLeaders';
 import Summary from '@/pages/Summary';
 import InternalFeedback from '@/pages/InternalFeedback';
 import Accuracy from '@/pages/Accuracy';
+import Training from '@/pages/Training';
 import { AuthGate } from '@/components/AuthGate';
 
 import { SmartRedirect } from '@/components/SmartRedirect';
@@ -374,6 +375,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Accuracy />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/training" 
+                element={
+                  <ProtectedRoute>
+                    <Training />
                   </ProtectedRoute>
                 } 
               />
