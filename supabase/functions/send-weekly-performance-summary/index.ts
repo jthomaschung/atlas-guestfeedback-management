@@ -199,11 +199,11 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('Generating weekly summary for:', targetMonday.toDateString(), '-', targetSunday.toDateString());
 
-    // Get all executives, directors and DMs
+    // Get all executives, directors and DMs (case-insensitive role match)
     const { data: managers, error: managersError } = await supabase
       .from('user_hierarchy')
       .select('user_id, role')
-      .in('role', ['CEO', 'VP', 'DIRECTOR', 'DM']);
+      .or('role.ilike.ceo,role.ilike.vp,role.ilike.director,role.ilike.dm');
 
     if (managersError) {
       console.error('Error fetching managers:', managersError);
@@ -238,8 +238,8 @@ const handler = async (req: Request): Promise<Response> => {
       try {
         let markets: string[] = [];
         
-        // CEO and VP get company-wide summary (all markets)
-        if (manager.role === 'CEO' || manager.role === 'VP') {
+        // CEO and VP get company-wide summary (all markets) - case insensitive
+        if (manager.role.toUpperCase() === 'CEO' || manager.role.toUpperCase() === 'VP') {
           const { data: allMarkets } = await supabase
             .from('markets')
             .select('name');
