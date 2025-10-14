@@ -328,14 +328,14 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
-    // Log to database
+    // Log to database (use 'company' as valid summary_type)
     await supabase
       .from('daily_summary_log')
       .insert({
         summary_date: targetSunday.toISOString().split('T')[0],
-        summary_type: 'weekly_performance',
-        recipient_email: 'system',
-        metrics: { managers_notified: managersWithProfiles.length }
+        summary_type: 'company', // Changed from 'weekly_performance' to match constraint
+        recipient_email: 'weekly_performance_summary',
+        metrics: { managers_notified: managersWithProfiles.length, summary_period: 'weekly' }
       });
 
     return new Response(
