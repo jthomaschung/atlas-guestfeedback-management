@@ -71,8 +71,8 @@ const handler = async (req: Request): Promise<Response> => {
     // Get the executive hierarchy for this feedback (CEO, VP, Director for region, DM)
     const { data: hierarchyData, error: execError } = await supabase
       .rpc('get_executive_hierarchy', {
-        feedback_market: feedback.market,
-        feedback_store: feedback.store_number
+        p_market: feedback.market,
+        p_store_number: feedback.store_number
       });
 
     if (execError) {
