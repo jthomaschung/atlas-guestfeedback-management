@@ -896,9 +896,118 @@ Customer Service Team`);
                                 
                                 {selectedTemplate === 'slow_service' && (
                                   <>
-                                    <p>Thank you for taking the time to complete a survey and share your experience. My name is Karine and I am the Guest Feedback Manager for the Jimmy John's team.</p>
-                                    <p>I am sorry that your order was not delivered in a timely manner. We strive to get deliveries out to customers as fast as we can, but sometimes we fall short.</p>
-                                    <p className="font-medium text-blue-600">If you have a rewards account, I can add a free original sandwich to your account.</p>
+                                    <p>Thank you for sharing your experience. My name is Karine, and I am the Guest Feedback Manager of the Jimmy John's that you recently visited.</p>
+                                    <p>I'm sorry your order was not delivered as quickly as you expected. We aim to be freaky fast, and we clearly fell short this time.</p>
+                                    <p className="font-semibold bg-blue-50 dark:bg-blue-950 p-2 rounded">As an apology, I'd like to offer you a free sandwich on your next visit!</p>
+                                    <p>Just mention case #{feedback.case_number} when you order.</p>
+                                    <p>We hope to serve you again soon!</p>
+                                  </>
+                                )}
+                                
+                                {selectedTemplate === 'sandwich_wrong' && (
+                                  <>
+                                    <p>Thank you for sharing your experience. My name is Karine, and I am the Guest Feedback Manager of the Jimmy John's that you recently visited.</p>
+                                    <p>I'm so sorry we got your order wrong. We pride ourselves on getting every sandwich right, and we clearly missed the mark this time.</p>
+                                    <p className="font-semibold bg-blue-50 dark:bg-blue-950 p-2 rounded">As an apology, I'd like to offer you a free sandwich on your next visit!</p>
+                                    <p>Just mention case #{feedback.case_number} when you order, and we'll make it right.</p>
+                                    <p>We hope to serve you again soon!</p>
+                                  </>
+                                )}
+                                
+                                {selectedTemplate === 'missing_item' && (
+                                  <>
+                                    <p>Thank you for sharing your experience. My name is Karine, and I am the Guest Feedback Manager of the Jimmy John's that you recently visited.</p>
+                                    <p>I'm so sorry an item was missing from your order. That's not the experience we want you to have.</p>
+                                    <p className="font-semibold bg-blue-50 dark:bg-blue-950 p-2 rounded">As an apology, I'd like to offer you a free sandwich on your next visit!</p>
+                                    <p>Just mention case #{feedback.case_number} when you order.</p>
+                                    <p>We hope to serve you again soon!</p>
+                                  </>
+                                )}
+                                
+                                {selectedTemplate === 'bread_quality' && (
+                                  <>
+                                    <p>Thank you for sharing your experience. My name is Karine, and I am the Guest Feedback Manager of the Jimmy John's that you recently visited.</p>
+                                    <p>I'm so sorry the bread wasn't up to our usual standards. Fresh-baked bread is our foundation, and we clearly fell short this time.</p>
+                                    <p className="font-semibold bg-blue-50 dark:bg-blue-950 p-2 rounded">As an apology, I'd like to offer you a free sandwich on your next visit!</p>
+                                    <p>Just mention case #{feedback.case_number} when you order.</p>
+                                    <p>We hope to serve you again soon!</p>
+                                  </>
+                                )}
+                                
+                                {selectedTemplate === 'product_quality' && (
+                                  <>
+                                    <p>Thank you for sharing your experience. My name is Karine, and I am the Guest Feedback Manager of the Jimmy John's that you recently visited.</p>
+                                    <p>I'm so sorry the quality wasn't up to our usual standards. We pride ourselves on using fresh, high-quality ingredients, and we clearly fell short this time.</p>
+                                    <p className="font-semibold bg-blue-50 dark:bg-blue-950 p-2 rounded">As an apology, I'd like to offer you a free sandwich on your next visit!</p>
+                                    <p>Just mention case #{feedback.case_number} when you order.</p>
+                                    <p>We hope to serve you again soon!</p>
+                                  </>
+                                )}
+                                
+                                {selectedTemplate === 'out_of_bread' && (
+                                  <>
+                                    <p>Thank you for sharing your experience. My name is Karine, and I am the Guest Feedback Manager of the Jimmy John's that you recently visited.</p>
+                                    <p>I'm so sorry we ran out of bread. We bake fresh bread throughout the day, but sometimes we misjudge demand.</p>
+                                    <p className="font-semibold bg-blue-50 dark:bg-blue-950 p-2 rounded">As an apology, I'd like to offer you a free sandwich on your next visit!</p>
+                                    <p>Just mention case #{feedback.case_number} when you order.</p>
+                                    <p>We hope to serve you again soon!</p>
+                                  </>
+                                )}
+                                
+                                {selectedTemplate === 'out_of_product' && (
+                                  <>
+                                    <p>Thank you for sharing your experience. My name is Karine, and I am the Guest Feedback Manager of the Jimmy John's that you recently visited.</p>
+                                    <p>I'm so sorry we were out of the item you wanted. We work hard to keep everything in stock, but sometimes we run out.</p>
+                                    <p className="font-semibold bg-blue-50 dark:bg-blue-950 p-2 rounded">As an apology, I'd like to offer you a free sandwich on your next visit!</p>
+                                    <p>Just mention case #{feedback.case_number} when you order.</p>
+                                    <p>We hope to serve you again soon!</p>
+                                  </>
+                                )}
+                                
+                                {selectedTemplate === 'closed_early' && (
+                                  <>
+                                    <p>Thank you for sharing your experience. My name is Karine, and I am the Guest Feedback Manager of the Jimmy John's that you tried to visit.</p>
+                                    <p>I'm so sorry we were closed when you arrived. That's incredibly frustrating, and I completely understand your disappointment.</p>
+                                    <p className="font-semibold bg-blue-50 dark:bg-blue-950 p-2 rounded">As an apology, I'd like to offer you a free sandwich on your next visit!</p>
+                                    <p>Just mention case #{feedback.case_number} when you order.</p>
+                                    <p>We hope to serve you soon!</p>
+                                  </>
+                                )}
+                                
+                                {selectedTemplate === 'credit_card' && (
+                                  <>
+                                    <p>Thank you for bringing this to our attention. My name is Karine, and I am the Guest Feedback Manager of the Jimmy John's that you visited.</p>
+                                    <p>I'm sorry you experienced an issue with your payment. We take these matters seriously and will investigate what happened.</p>
+                                    <p>If you have any questions or concerns, please don't hesitate to reach out.</p>
+                                    <p>We appreciate your patience!</p>
+                                  </>
+                                )}
+                                
+                                {selectedTemplate === 'cleanliness' && (
+                                  <>
+                                    <p>Thank you for sharing your experience. My name is Karine, and I am the Guest Feedback Manager of the Jimmy John's that you recently visited.</p>
+                                    <p>I'm so sorry we didn't meet your cleanliness expectations. We take pride in maintaining a clean environment, and we clearly fell short this time.</p>
+                                    <p className="font-semibold bg-blue-50 dark:bg-blue-950 p-2 rounded">As an apology, I'd like to offer you a free sandwich on your next visit!</p>
+                                    <p>Just mention case #{feedback.case_number} when you order.</p>
+                                    <p>We hope to serve you again soon!</p>
+                                  </>
+                                )}
+                                
+                                {selectedTemplate === 'loyalty_issues' && (
+                                  <>
+                                    <p>Thank you for bringing this to our attention. My name is Karine, and I am the Guest Feedback Manager of the Jimmy John's.</p>
+                                    <p>I'm sorry you experienced an issue with our loyalty program. We value your loyalty and want to make this right.</p>
+                                    <p>Our team is looking into this matter and will work to resolve it as quickly as possible.</p>
+                                    <p>Thank you for your patience!</p>
+                                  </>
+                                )}
+                                
+                                {selectedTemplate === 'food_poisoning' && (
+                                  <>
+                                    <p className="font-semibold text-red-600">Thank you for bringing this to our immediate attention.</p>
+                                    <p>My name is Karine, and I am the Guest Feedback Manager of the Jimmy John's that you visited. I'm extremely sorry to hear about your experience.</p>
+                                    <p>We take food safety very seriously. Our team is investigating this matter thoroughly, and we will be in touch with you directly within 24 hours.</p>
+                                    <p>Your health and safety are our top priorities.</p>
                                   </>
                                 )}
                                 
