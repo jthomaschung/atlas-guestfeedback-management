@@ -35,30 +35,23 @@ export const CleanlinessEmail = ({
         <Heading style={h1}>We're Sorry About the Cleanliness</Heading>
         
         <Text style={text}>
-          Dear {customerName || 'Valued Customer'},
+          Thank you for sharing your experience.
         </Text>
         
         <Text style={text}>
-          Thank you for sharing your experience. My name is {managerName}, and I am the Manager of the Jimmy John's at {storeAddress} that you visited.
+          My name is {managerName}, and I'm the Manager of the Jimmy John's at {storeAddress} that you visited.
         </Text>
 
         <Text style={text}>
-          We pride ourselves on being Hospital Clean - and an unclean store is unacceptable. I'll work with my team to improve cleanliness and exceed our standards.
-        </Text>
-
-        <Section style={rewardBox}>
-          <Text style={rewardTitle}>Your Free Sandwich is Ready</Text>
-          <Text style={rewardText}>
-            I would like to personally apologize for your experience. I'll add a credit to your account at the store for a <strong>free original sandwich</strong>. The credit is store-specific, so you will want to call in your order or visit us in-store to redeem.
-          </Text>
-        </Section>
-
-        <Text style={text}>
-          If you have any additional questions or concerns, feel free to reply to this email and I would be happy to chat more.
+          We pride ourselves on being Hospital Clean®—cleanliness is one of our core values, and an unclean store is absolutely unacceptable. I sincerely apologize for failing to meet this standard during your visit.
         </Text>
 
         <Text style={text}>
-          I hope we see you again soon.
+          I'll be working with my team immediately to address this issue and ensure we exceed our cleanliness standards moving forward. I'd also like to make it up to you by adding a credit to your account for a free original sandwich. This credit is store-specific, so please call in your order or visit us in-store to redeem it.
+        </Text>
+
+        <Text style={text}>
+          If you have any additional questions or concerns, please reply to this email—I'd be happy to discuss this further. I hope we can earn back your trust and see you again soon.
         </Text>
 
         <Hr style={hr} />

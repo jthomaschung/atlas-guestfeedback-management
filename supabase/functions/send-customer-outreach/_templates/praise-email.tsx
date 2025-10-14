@@ -37,15 +37,15 @@ export const PraiseEmail = ({
         <Heading style={h1}>Thank You for Your Kind Words!</Heading>
         
         <Text style={text}>
-          Dear {customerName || 'Valued Customer'},
+          Thank you for sharing your wonderful feedback!
         </Text>
         
         <Text style={text}>
-          Thank you for sharing your experience. My name is {guestFeedbackManager}, and I am the Guest Feedback Manager of the Jimmy John's at {storeAddress} that you gave the praise for.
+          My name is {guestFeedbackManager}, and I'm the Guest Feedback Manager for Jimmy John's at {storeAddress}.
         </Text>
 
         <Text style={text}>
-          Thanks for giving the team a shout out! I'll make sure the kind words are shared with the entire team!
+          It absolutely made our day to hear about your positive experience! I'll make sure your kind words are shared with the entire team—they work hard every day to deliver Freaky Fast® service and perfect sandwiches, and your recognition means the world to them.
         </Text>
 
         {feedbackText && (
@@ -55,7 +55,7 @@ export const PraiseEmail = ({
         )}
 
         <Text style={text}>
-          We look forward to seeing you again!
+          Thank you for being such a loyal customer. We look forward to serving you again soon!
         </Text>
 
         <Hr style={hr} />

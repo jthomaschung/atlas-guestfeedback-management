@@ -35,30 +35,19 @@ export const SlowServiceEmail = ({
         <Heading style={h1}>We're Sorry About Your Experience</Heading>
         
         <Text style={text}>
-          Dear {customerName || 'Valued Customer'},
-        </Text>
-        
-        <Text style={text}>
-          Thank you for taking the time to complete a survey and share your experience. My name is {guestFeedbackManager} and I am the Guest Feedback Manager for the Jimmy John's team located on {storeAddress}.
+          Thank you for taking the time to complete our survey and share your experience. My name is {guestFeedbackManager}, and I'm the Guest Feedback Manager for Jimmy John's located at {storeAddress}.
         </Text>
 
         <Text style={text}>
-          I am sorry that your order was not delivered in a timely manner. We strive to get deliveries out to customers as fast as we can, but sometimes we fall short.
-        </Text>
-
-        <Section style={rewardBox}>
-          <Text style={rewardTitle}>Let Us Make It Right</Text>
-          <Text style={rewardText}>
-            If you have a rewards account, I can add a <strong>free original sandwich</strong> to your account. I just need you to confirm the number associated with your loyalty account.
-          </Text>
-        </Section>
-
-        <Text style={text}>
-          If you have any additional questions or concerns, feel free to reply to this email and I would be happy to chat more.
+          I sincerely apologize that your order wasn't delivered as quickly as it should have been. At Jimmy John's, we're known for Freaky Fast® service, and we fell short of that promise to you. Whether it was traffic, a rush of orders, or something else, there's no excuse for not meeting your expectations.
         </Text>
 
         <Text style={text}>
-          I hope we see you again soon.
+          I'd love to make it right. If you have a Freaky Fast Rewards® account, I'll add a free original sandwich to your account right away. Just confirm the phone number associated with your rewards account, and it's yours.
+        </Text>
+
+        <Text style={text}>
+          If you have any additional questions or concerns, feel free to reply to this email—I'd be happy to chat more. We hope to earn back your trust and see you again soon.
         </Text>
 
         <Hr style={hr} />

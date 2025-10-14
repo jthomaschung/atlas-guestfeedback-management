@@ -35,26 +35,23 @@ export const LoyaltyIssuesEmail = ({
         <Heading style={h1}>Thank You for Letting Us Know</Heading>
         
         <Text style={text}>
-          Dear {customerName || 'Valued Customer'},
+          Thank you for sharing your experience.
         </Text>
         
         <Text style={text}>
-          Thank you for sharing your experience. My name is {guestFeedbackManager}, and I am the Guest Feedback Manager of the Jimmy John's at {storeAddress}.
+          My name is {guestFeedbackManager}, and I'm the Guest Feedback Manager for Jimmy John's at {storeAddress}.
         </Text>
 
         <Text style={text}>
-          Thanks for letting us know about the loyalty issue you encountered. We'll be sure to address this with JJ's and the team!
+          Thank you for letting us know about the loyalty program issue you encountered. Our Freaky Fast Rewards® program should make your experience better, not frustrating, and I apologize for the inconvenience.
         </Text>
 
-        <Section style={infoBox}>
-          <Text style={infoTitle}>What We're Doing</Text>
-          <Text style={infoText}>
-            We're working with our loyalty program team to investigate and resolve this issue to ensure you get the rewards you deserve.
-          </Text>
-        </Section>
+        <Text style={text}>
+          I'll escalate this to our rewards support team and our corporate office to get this resolved for you. If you'd like, please reply with your rewards account information (phone number or email), and I'll personally follow up to ensure the issue is fixed.
+        </Text>
 
         <Text style={text}>
-          If you have any additional questions or concerns, feel free to reply to this email and I would be happy to chat more.
+          Thank you for your patience, and we appreciate your loyalty!
         </Text>
 
         <Hr style={hr} />

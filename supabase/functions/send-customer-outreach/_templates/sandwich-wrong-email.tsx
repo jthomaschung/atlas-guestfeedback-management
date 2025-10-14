@@ -41,26 +41,19 @@ export const SandwichWrongEmail = ({
         </Text>
         
         <Text style={text}>
-          My name is {managerName} and I help manage the local Jimmy John's located on {storeAddress}.
+          My name is {managerName}, and I help manage the Jimmy John's located at {storeAddress}.
         </Text>
 
         <Text style={text}>
-          I am sorry the team {whatWeMissed}. Serving fast sandwiches is only great if your sandwich is made perfect every time! I understand your frustration and I want to make up for our mistake with a free sandwich at your next visit.
-        </Text>
-
-        <Section style={rewardBox}>
-          <Text style={rewardTitle}>Your Free Sandwich is Ready</Text>
-          <Text style={rewardText}>
-            I'll add a credit to your account at the store for a <strong>free original sandwich</strong>. The credit is store-specific, so you will want to call in your order or visit us in-store to redeem.
-          </Text>
-        </Section>
-
-        <Text style={text}>
-          If you have any additional questions or concerns, feel free to reply to this email and I would be happy to chat more.
+          I'm truly sorry that we {whatWeMissed}. Serving Freaky Fast® sandwiches is only meaningful if your sandwich is made perfectly every single time! I completely understand your frustration, and I want to make it right.
         </Text>
 
         <Text style={text}>
-          I hope we see you again soon.
+          I'll add a credit to your account for a free original sandwich on your next visit. This credit is store-specific, so please call in your order or visit us in-store to redeem it.
+        </Text>
+
+        <Text style={text}>
+          If you have any other questions or concerns, please don't hesitate to reply to this email. I hope we'll see you again soon and can show you the Jimmy John's experience you deserve.
         </Text>
 
         <Hr style={hr} />

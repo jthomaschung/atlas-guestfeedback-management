@@ -35,30 +35,19 @@ export const BreadQualityEmail = ({
         <Heading style={h1}>We're Sorry About the Bread Quality</Heading>
         
         <Text style={text}>
-          Dear {customerName || 'Valued Customer'},
+          Thank you for submitting our survey and sharing your experience.
         </Text>
         
         <Text style={text}>
-          Thank you for submitting our survey and sharing your experience. My name is {guestFeedbackManager} and I am the Guest Feedback Manager for the Jimmy John's team located on {storeAddress}.
+          My name is {guestFeedbackManager}, and I'm the Guest Feedback Manager for Jimmy John's at {storeAddress}. Perfect Bread® is one of the cornerstones of our brand—we bake it fresh throughout the day to ensure every bite is perfect. I understand that stale or hard bread can quickly ruin your meal, and I'm truly sorry we didn't meet that standard.
         </Text>
 
         <Text style={text}>
-          Perfect Bread is one of the cornerstones of our brand and I understand that hard bread can quickly ruin your lunch. I hope that you will give us an opportunity to re-earn your business soon.
-        </Text>
-
-        <Section style={rewardBox}>
-          <Text style={rewardTitle}>Let Us Make It Right</Text>
-          <Text style={rewardText}>
-            If you have Rewards, I can add a <strong>free original sandwich</strong> to your account. I just need you to confirm the number associated with your loyalty account.
-          </Text>
-        </Section>
-
-        <Text style={text}>
-          If you have any additional questions or concerns, feel free to reply to this email and I would be happy to chat more.
+          I hope you'll give us another opportunity to earn back your business. If you have a Freaky Fast Rewards® account, I'd be happy to add a free original sandwich to your account. Just confirm the phone number associated with your loyalty account.
         </Text>
 
         <Text style={text}>
-          I hope we see you again soon.
+          If you have any additional questions or concerns, please reply to this email—I'd love to chat more. We hope to see you again soon.
         </Text>
 
         <Hr style={hr} />

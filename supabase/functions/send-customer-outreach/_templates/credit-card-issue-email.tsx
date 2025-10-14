@@ -35,26 +35,23 @@ export const CreditCardIssueEmail = ({
         <Heading style={h1}>Thank You for Letting Us Know</Heading>
         
         <Text style={text}>
-          Dear {customerName || 'Valued Customer'},
+          Thank you for sharing your experience.
         </Text>
         
         <Text style={text}>
-          Thank you for sharing your experience. My name is {guestFeedbackManager}, and I am the Guest Feedback Manager of the Jimmy John's at {storeAddress}.
+          My name is {guestFeedbackManager}, and I'm the Guest Feedback Manager for Jimmy John's at {storeAddress}.
         </Text>
 
         <Text style={text}>
-          Thanks for letting us know about the credit card issue you encountered. We'll be sure to address this with our merchant processor and the team!
+          Thank you for letting us know about the credit card issue you encountered. Payment problems are incredibly frustrating, and I apologize for the inconvenience. We'll be sure to address this with our payment processor and our team right away to prevent this from happening again.
         </Text>
 
-        <Section style={infoBox}>
-          <Text style={infoTitle}>What We're Doing</Text>
-          <Text style={infoText}>
-            We're working with our payment processor to investigate and resolve this issue to ensure smooth transactions for all our customers.
-          </Text>
-        </Section>
+        <Text style={text}>
+          If you experienced any charges or issues that need to be resolved, please reply to this email with details, and I'll personally ensure it gets handled.
+        </Text>
 
         <Text style={text}>
-          If you have any additional questions or concerns, feel free to reply to this email and I would be happy to chat more.
+          Thank you for your patience, and we hope to see you again soon.
         </Text>
 
         <Hr style={hr} />

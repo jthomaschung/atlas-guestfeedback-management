@@ -35,30 +35,19 @@ export const ProductQualityEmail = ({
         <Heading style={h1}>We're Sorry About the Product Quality</Heading>
         
         <Text style={text}>
-          Dear {customerName || 'Valued Customer'},
+          Thank you for sending in your feedback.
         </Text>
         
         <Text style={text}>
-          Thank you for sending in feedback. All our products are sliced, baked, and prepped fresh daily to avoid situations like yours as much as possible.
+          All of our products are sliced, baked, and prepped fresh daily to avoid situations like yours. This time, we fell short of the product quality we strive for at Jimmy John's, and I sincerely apologize.
         </Text>
 
         <Text style={text}>
-          This time we fell short of the product quality we strive for at Jimmy John's. I will address this with our team, so this does not happen again.
-        </Text>
-
-        <Section style={rewardBox}>
-          <Text style={rewardTitle}>Let Us Make It Right</Text>
-          <Text style={rewardText}>
-            If you have Rewards, I can add a <strong>free original sandwich</strong> to your account. I just need you to confirm the number associated with your loyalty account.
-          </Text>
-        </Section>
-
-        <Text style={text}>
-          If you have any additional questions or concerns, feel free to reply to this email and I would be happy to chat more.
+          I'll address this with our team immediately to ensure it doesn't happen again. If you have a Freaky Fast Rewards® account, I'd be happy to add a free original sandwich to your account. Just confirm the phone number associated with your loyalty account.
         </Text>
 
         <Text style={text}>
-          I hope we see you again soon.
+          If you have any additional questions or concerns, please reply to this email—I'd be happy to help make this right. We hope to see you again soon.
         </Text>
 
         <Hr style={hr} />

@@ -35,30 +35,19 @@ export const MissingItemEmail = ({
         <Heading style={h1}>We're Sorry About Your Missing Item</Heading>
         
         <Text style={text}>
-          Dear {customerName || 'Valued Customer'},
+          Thank you for taking the time to complete our survey and share your experience.
         </Text>
         
         <Text style={text}>
-          Thank you for taking the time to complete a survey and share your experience. My name is {storeManager}, and I manage the store at {storeAddress}.
+          My name is {storeManager}, and I manage the Jimmy John's at {storeAddress}. I sincerely apologize for missing items from your order. Missing items are unacceptable, and I understand how frustrating that must have been.
         </Text>
 
         <Text style={text}>
-          I understand your frustration and would like to make it up to you.
-        </Text>
-
-        <Section style={rewardBox}>
-          <Text style={rewardTitle}>Your Free Sandwich is Ready</Text>
-          <Text style={rewardText}>
-            I'll add a credit to your account at the store for a <strong>free original sandwich</strong>. The credit is store-specific, so you will want to call in your order or visit us in-store to redeem.
-          </Text>
-        </Section>
-
-        <Text style={text}>
-          If you have any additional questions or concerns, feel free to reply to this email and I would be happy to chat more.
+          I'd like to make it up to you by adding a credit to your account for a free original sandwich. This credit is store-specific, so you'll want to call in your order or visit us in-store to redeem it.
         </Text>
 
         <Text style={text}>
-          I hope we see you again soon.
+          If you have any additional questions or concerns, feel free to reply to this email—I'd be happy to help. I hope we can regain your trust and see you again soon.
         </Text>
 
         <Hr style={hr} />

@@ -39,30 +39,23 @@ export const OutOfProductOtherEmail = ({
         <Heading style={h1}>We're Sorry We Ran Out</Heading>
         
         <Text style={text}>
-          Dear {customerName || 'Valued Customer'},
+          Thank you for sharing your experience.
         </Text>
         
         <Text style={text}>
-          Thank you for sharing your experience. My name is {managerName}, and I am the {managerPosition} of the Jimmy John's at {storeAddress} that you attempted to order from.
+          My name is {managerName}, and I'm the {managerPosition} at the Jimmy John's located at {storeAddress} that you attempted to order from.
         </Text>
 
         <Text style={text}>
-          Not having {productName} available is unacceptable. I would like to personally apologize for your experience.
-        </Text>
-
-        <Section style={rewardBox}>
-          <Text style={rewardTitle}>Your Free Sandwich is Ready</Text>
-          <Text style={rewardText}>
-            I'll add a credit to your account at the store for a <strong>free original sandwich</strong>. The credit is store-specific, so you will want to call in your order or visit us in-store to redeem.
-          </Text>
-        </Section>
-
-        <Text style={text}>
-          If you have any additional questions or concerns, feel free to reply to this email and I would be happy to chat more.
+          Not having {productName} available is unacceptable, and I sincerely apologize for the inconvenience. Our customers should be able to count on us to have what they need, and we let you down.
         </Text>
 
         <Text style={text}>
-          I hope we see you again soon.
+          I'll add a credit to your account for a free original sandwich. This credit is store-specific, so please call in your order or visit us in-store to redeem it.
+        </Text>
+
+        <Text style={text}>
+          If you have any additional questions or concerns, please reply to this email—I'm here to help. We hope to see you again soon.
         </Text>
 
         <Hr style={hr} />

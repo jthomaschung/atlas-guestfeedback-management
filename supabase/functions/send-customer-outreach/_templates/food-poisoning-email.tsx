@@ -34,7 +34,7 @@ export const FoodPoisoningEmail = ({
     <Preview>We take food safety very seriously</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Thank You for Reaching Out</Heading>
+        <Heading style={h1}>We Take Food Safety Very Seriously</Heading>
         
         <Text style={text}>
           Dear {customerName || 'Valued Customer'},
