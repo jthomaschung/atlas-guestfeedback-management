@@ -25,12 +25,18 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     // Check if SendGrid API key is configured
     const sendGridApiKey = Deno.env.get("SENDGRID_API_KEY");
+    const slackBotToken = Deno.env.get("SLACK_BOT_TOKEN");
+    
     if (!sendGridApiKey) {
       console.error('SENDGRID_API_KEY not configured');
       return new Response(
         JSON.stringify({ error: 'Email service not configured' }),
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
+    }
+    
+    if (!slackBotToken) {
+      console.warn('⚠️ SLACK_BOT_TOKEN not configured - Slack notifications will be skipped');
     }
 
     const supabase = createClient(
@@ -63,7 +69,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Get the executive hierarchy for this feedback (CEO, VP, Director for region, DM)
-    const { data: executives, error: execError } = await supabase
+    const { data: hierarchyData, error: execError } = await supabase
       .rpc('get_executive_hierarchy', {
         feedback_market: feedback.market,
         feedback_store: feedback.store_number
@@ -76,6 +82,25 @@ const handler = async (req: Request): Promise<Response> => {
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
+
+    // Fetch profiles with Slack user IDs
+    const { data: profiles, error: profileError } = await supabase
+      .from('profiles')
+      .select('user_id, email, display_name, slack_user_id')
+      .in('user_id', (hierarchyData || []).map((e: any) => e.user_id));
+    
+    if (profileError) {
+      console.error('Error fetching profiles:', profileError);
+    }
+
+    // Merge hierarchy data with profile data
+    const executives = (hierarchyData || []).map((exec: any) => {
+      const profile = profiles?.find((p: any) => p.user_id === exec.user_id);
+      return {
+        ...exec,
+        slack_user_id: profile?.slack_user_id,
+      };
+    });
 
     console.log('Found executives to notify:', executives?.length);
 
@@ -109,9 +134,10 @@ const handler = async (req: Request): Promise<Response> => {
     const directorApproved = approvedRoles.has('director');
     const dmApproved = approvedRoles.has('dm');
 
-    // Send email to each executive
+    // Send notifications to each executive (both email and Slack)
     for (const exec of executivesList) {
       try {
+        // Send email notification
         const emailResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
           method: 'POST',
           headers: {
@@ -210,11 +236,52 @@ const handler = async (req: Request): Promise<Response> => {
           const errorText = await emailResponse.text();
           console.error('SendGrid error for', exec.email, ':', errorText);
         } else {
-          console.log('Approval notification sent to:', exec.email);
+          console.log('✅ Email notification sent to:', exec.email);
+        }
+        
+        // Send Slack DM if user has Slack ID and token is configured
+        if (slackBotToken && exec.slack_user_id) {
+          try {
+            const slackMessage = `🚨 *Critical Feedback Approval*\n\n` +
+              `*${approverName} (${approverRole.toUpperCase()})* has approved case *${feedback.case_number}*\n\n` +
+              `*Case Details:*\n` +
+              `• Store: #${feedback.store_number} (${feedback.market})\n` +
+              `• Category: ${feedback.complaint_category}\n` +
+              `• Priority: ${feedback.priority}\n` +
+              `• Customer: ${feedback.customer_name || 'Not provided'}\n` +
+              `• Date: ${new Date(feedback.feedback_date).toLocaleDateString()}\n\n` +
+              `*Approval Status:*\n` +
+              `${ceoApproved ? '✅' : '⏳'} CEO\n` +
+              `${vpApproved ? '✅' : '⏳'} VP\n` +
+              `${directorApproved ? '✅' : '⏳'} Director\n` +
+              `${dmApproved ? '✅' : '⏳'} DM\n\n` +
+              `<https://59a1a4a4-5107-4cbe-87fb-e1dcf4b1823a.lovableproject.com/executive-oversight|View Executive Dashboard>`;
+
+            const slackResponse = await fetch('https://slack.com/api/chat.postMessage', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${slackBotToken}`,
+              },
+              body: JSON.stringify({
+                channel: exec.slack_user_id,
+                text: slackMessage,
+              }),
+            });
+
+            const slackData = await slackResponse.json();
+            if (!slackData.ok) {
+              console.error(`❌ Failed to send Slack DM to ${exec.display_name || exec.email}:`, slackData.error);
+            } else {
+              console.log(`✅ Slack DM sent to ${exec.display_name || exec.email}`);
+            }
+          } catch (slackError) {
+            console.error(`Error sending Slack DM to ${exec.display_name || exec.email}:`, slackError);
+          }
         }
 
       } catch (emailError) {
-        console.error('Failed to send approval notification to', exec.email, ':', emailError);
+        console.error('Failed to send notifications to', exec.email, ':', emailError);
       }
     }
 
