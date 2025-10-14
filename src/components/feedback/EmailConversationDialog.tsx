@@ -51,6 +51,43 @@ export function EmailConversationDialog({
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
+  // Auto-select template based on feedback category
+  useEffect(() => {
+    if (feedback?.complaint_category) {
+      const category = feedback.complaint_category.toLowerCase();
+      
+      if (category === 'praise') {
+        setSelectedTemplate('praise');
+      } else if (category === 'slow service') {
+        setSelectedTemplate('slow_service');
+      } else if (category === 'sandwich made wrong') {
+        setSelectedTemplate('sandwich_wrong');
+      } else if (category === 'missing item') {
+        setSelectedTemplate('missing_item');
+      } else if (category.includes('bread')) {
+        setSelectedTemplate('bread_quality');
+      } else if (category.includes('product quality')) {
+        setSelectedTemplate('product_quality');
+      } else if (category.includes('out of product') && category.includes('bread')) {
+        setSelectedTemplate('out_of_bread');
+      } else if (category.includes('out of product')) {
+        setSelectedTemplate('out_of_product');
+      } else if (category.includes('closed early')) {
+        setSelectedTemplate('closed_early');
+      } else if (category.includes('credit card')) {
+        setSelectedTemplate('credit_card');
+      } else if (category.includes('cleanliness')) {
+        setSelectedTemplate('cleanliness');
+      } else if (category.includes('loyalty')) {
+        setSelectedTemplate('loyalty_issues');
+      } else if (category.includes('food poisoning')) {
+        setSelectedTemplate('food_poisoning');
+      } else {
+        setSelectedTemplate('acknowledgment');
+      }
+    }
+  }, [feedback]);
+
   useEffect(() => {
     if (isOpen && feedbackId) {
       loadEmailConversation();
@@ -345,10 +382,82 @@ export function EmailConversationDialog({
                         Acknowledgment
                       </div>
                     </SelectItem>
+                    <SelectItem value="slow_service">
+                      <div className="flex items-center gap-2">
+                        {getTemplateIcon('slow_service')}
+                        Slow Service
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="sandwich_wrong">
+                      <div className="flex items-center gap-2">
+                        {getTemplateIcon('sandwich_wrong')}
+                        Sandwich Made Wrong
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="missing_item">
+                      <div className="flex items-center gap-2">
+                        {getTemplateIcon('missing_item')}
+                        Missing Item
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="bread_quality">
+                      <div className="flex items-center gap-2">
+                        {getTemplateIcon('bread_quality')}
+                        Bread Quality
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="product_quality">
+                      <div className="flex items-center gap-2">
+                        {getTemplateIcon('product_quality')}
+                        Product Quality
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="out_of_bread">
+                      <div className="flex items-center gap-2">
+                        {getTemplateIcon('out_of_bread')}
+                        Out of Bread
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="out_of_product">
+                      <div className="flex items-center gap-2">
+                        {getTemplateIcon('out_of_product')}
+                        Out of Product
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="closed_early">
+                      <div className="flex items-center gap-2">
+                        {getTemplateIcon('closed_early')}
+                        Closed Early
+                      </div>
+                    </SelectItem>
                     <SelectItem value="praise">
                       <div className="flex items-center gap-2">
                         {getTemplateIcon('praise')}
-                        Praise Response
+                        Praise
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="credit_card">
+                      <div className="flex items-center gap-2">
+                        {getTemplateIcon('credit_card')}
+                        Credit Card Issue
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="cleanliness">
+                      <div className="flex items-center gap-2">
+                        {getTemplateIcon('cleanliness')}
+                        Cleanliness
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="loyalty_issues">
+                      <div className="flex items-center gap-2">
+                        {getTemplateIcon('loyalty_issues')}
+                        Loyalty Program Issues
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="food_poisoning">
+                      <div className="flex items-center gap-2">
+                        {getTemplateIcon('food_poisoning')}
+                        Possible Food Poisoning
                       </div>
                     </SelectItem>
                     <SelectItem value="resolution">

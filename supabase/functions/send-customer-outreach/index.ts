@@ -4,9 +4,21 @@ import React from 'npm:react@18.3.1';
 import { renderAsync } from 'npm:@react-email/components@0.0.22';
 import { AcknowledgmentEmail } from './_templates/acknowledgment-email.tsx';
 import { ResolutionEmail } from './_templates/resolution-email.tsx';
-import { PraiseResponseEmail } from './_templates/praise-response-email.tsx';
+import { PraiseEmail } from './_templates/praise-email.tsx';
 import { EscalationEmail } from './_templates/escalation-email.tsx';
 import { LoyaltyRewardEmail } from './_templates/loyalty-reward-email.tsx';
+import { SlowServiceEmail } from './_templates/slow-service-email.tsx';
+import { SandwichWrongEmail } from './_templates/sandwich-wrong-email.tsx';
+import { MissingItemEmail } from './_templates/missing-item-email.tsx';
+import { BreadQualityEmail } from './_templates/bread-quality-email.tsx';
+import { ProductQualityEmail } from './_templates/product-quality-email.tsx';
+import { OutOfProductBreadEmail } from './_templates/out-of-product-bread-email.tsx';
+import { OutOfProductOtherEmail } from './_templates/out-of-product-other-email.tsx';
+import { ClosedEarlyEmail } from './_templates/closed-early-email.tsx';
+import { CreditCardIssueEmail } from './_templates/credit-card-issue-email.tsx';
+import { CleanlinessEmail } from './_templates/cleanliness-email.tsx';
+import { LoyaltyIssuesEmail } from './_templates/loyalty-issues-email.tsx';
+import { FoodPoisoningEmail } from './_templates/food-poisoning-email.tsx';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,7 +29,10 @@ interface OutreachRequest {
   feedbackId: string;
   method: 'email';
   messageContent?: string;
-  templateType?: 'acknowledgment' | 'resolution' | 'praise' | 'escalation' | 'loyalty_reward' | 'custom';
+  templateType?: 'acknowledgment' | 'slow_service' | 'sandwich_wrong' | 'missing_item' | 
+                'bread_quality' | 'product_quality' | 'out_of_bread' | 'out_of_product' | 
+                'closed_early' | 'praise' | 'credit_card' | 'cleanliness' | 'loyalty_issues' | 
+                'food_poisoning' | 'resolution' | 'escalation' | 'loyalty_reward' | 'custom';
   customSubject?: string;
   resolutionNotes?: string;
   actionTaken?: string;
@@ -317,12 +332,143 @@ async function generateEmailContent(
   let subject: string;
   let emailComponent: any;
 
+  // Get store address from stores table if available
+  let storeAddress = `Store #${feedback.store_number}`;
+  try {
+    const { data: storeData } = await supabase
+      .from('stores')
+      .select('store_name, address, city, state')
+      .eq('store_number', feedback.store_number)
+      .single();
+    
+    if (storeData) {
+      storeAddress = storeData.address || `${storeData.city}, ${storeData.state}` || storeAddress;
+    }
+  } catch (err) {
+    console.log('Could not fetch store address:', err);
+  }
+
   switch (templateType) {
-    case 'praise':
-      subject = `Thank you for your kind words! - Case #${feedback.case_number}`;
-      emailComponent = React.createElement(PraiseResponseEmail, {
+    case 'slow_service':
+      subject = `We're Sorry About Your Wait - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(SlowServiceEmail, {
         ...baseProps,
-        storeTeam: `the team at Store #${feedback.store_number}`,
+        storeAddress,
+        guestFeedbackManager: 'Karine',
+      });
+      break;
+
+    case 'sandwich_wrong':
+      subject = `We're Sorry We Got Your Order Wrong - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(SandwichWrongEmail, {
+        ...baseProps,
+        storeAddress,
+        managerName: '[Store Manager]',
+        whatWeMissed: 'did not prepare your sandwich correctly',
+      });
+      break;
+
+    case 'missing_item':
+      subject = `We're Sorry About Your Missing Item - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(MissingItemEmail, {
+        ...baseProps,
+        storeAddress,
+        storeManager: '[Store Manager]',
+      });
+      break;
+
+    case 'bread_quality':
+      subject = `We're Sorry About the Bread Quality - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(BreadQualityEmail, {
+        ...baseProps,
+        storeAddress,
+        guestFeedbackManager: 'Karine',
+      });
+      break;
+
+    case 'product_quality':
+      subject = `We're Sorry About the Product Quality - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(ProductQualityEmail, {
+        ...baseProps,
+        storeAddress,
+        guestFeedbackManager: 'Karine',
+      });
+      break;
+
+    case 'out_of_bread':
+      subject = `We're Sorry We Ran Out of Bread - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(OutOfProductBreadEmail, {
+        ...baseProps,
+        storeAddress,
+        managerName: '[Store Manager]',
+        managerPosition: '[Position]',
+      });
+      break;
+
+    case 'out_of_product':
+      subject = `We're Sorry We Ran Out - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(OutOfProductOtherEmail, {
+        ...baseProps,
+        storeAddress,
+        managerName: '[Store Manager]',
+        managerPosition: '[Position]',
+        productName: '[Product]',
+      });
+      break;
+
+    case 'closed_early':
+      subject = `We're Sorry We Were Closed - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(ClosedEarlyEmail, {
+        ...baseProps,
+        storeAddress,
+        managerName: '[Store Manager]',
+        managerPosition: '[Position]',
+      });
+      break;
+
+    case 'praise':
+      subject = `Thank You for Your Kind Words! - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(PraiseEmail, {
+        ...baseProps,
+        storeAddress,
+        guestFeedbackManager: 'Karine',
+      });
+      break;
+
+    case 'credit_card':
+      subject = `Thank You for Reporting the Issue - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(CreditCardIssueEmail, {
+        ...baseProps,
+        storeAddress,
+        guestFeedbackManager: 'Karine',
+      });
+      break;
+
+    case 'cleanliness':
+      subject = `We're Sorry About the Cleanliness - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(CleanlinessEmail, {
+        ...baseProps,
+        storeAddress,
+        managerName: '[Store Manager]',
+      });
+      break;
+
+    case 'loyalty_issues':
+      subject = `Thank You for Reporting the Loyalty Issue - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(LoyaltyIssuesEmail, {
+        ...baseProps,
+        storeAddress,
+        guestFeedbackManager: 'Karine',
+      });
+      break;
+
+    case 'food_poisoning':
+      subject = `We Take This Very Seriously - Case #${feedback.case_number}`;
+      emailComponent = React.createElement(FoodPoisoningEmail, {
+        ...baseProps,
+        managerName: '[Manager Name]',
+        managerPosition: '[Position]',
+        marketOrRegion: feedback.market || '[Market/Region]',
       });
       break;
 
