@@ -4313,7 +4313,7 @@ export type Database = {
         }[]
       }
       get_executive_hierarchy: {
-        Args: { feedback_market: string; feedback_store: string }
+        Args: { p_market: string; p_store_number: string }
         Returns: {
           display_name: string
           email: string
