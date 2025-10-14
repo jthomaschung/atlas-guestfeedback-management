@@ -122,6 +122,11 @@ const handler = async (req: Request): Promise<Response> => {
       ];
     }
 
+    // IMPORTANT: Filter out the approver from the notification list
+    // They don't need to be notified about their own approval
+    executivesList = executivesList.filter(exec => exec.email !== approverEmail);
+    console.log('Executives to notify (excluding approver):', executivesList.length);
+
     // Get approval status to show in email
     const { data: approvals } = await supabase
       .from('critical_feedback_approvals')
