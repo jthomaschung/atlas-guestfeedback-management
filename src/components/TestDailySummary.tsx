@@ -36,15 +36,16 @@ export function TestDailySummary() {
   const sendTestWeeklySummary = async () => {
     setIsLoadingWeekly(true);
     try {
+      // Send with weekOffset=0 to get current week's data for testing
       const { data, error } = await supabase.functions.invoke('send-weekly-performance-summary', {
-        body: {}
+        body: { weekOffset: 0 } // 0 = current week, 1 = last week
       });
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Test weekly summary has been sent! Check Slack DMs for all managers.",
+        description: "Test weekly summary sent for THIS WEEK's data! Check Slack DMs.",
       });
     } catch (error: any) {
       console.error('Error sending weekly summary:', error);

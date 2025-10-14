@@ -185,17 +185,19 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
-    // Calculate last week's date range
+    // Calculate date range from request body or default to last week
+    const { weekOffset } = await req.json().catch(() => ({ weekOffset: 1 }));
+    
     const today = new Date();
-    const lastMonday = new Date(today);
-    lastMonday.setDate(today.getDate() - today.getDay() - 6); // Last Monday
-    lastMonday.setHours(0, 0, 0, 0);
+    const targetMonday = new Date(today);
+    targetMonday.setDate(today.getDate() - today.getDay() - (7 * weekOffset) + 1); // weekOffset=0 is current week, 1 is last week
+    targetMonday.setHours(0, 0, 0, 0);
 
-    const lastSunday = new Date(lastMonday);
-    lastSunday.setDate(lastMonday.getDate() + 6); // Last Sunday
-    lastSunday.setHours(23, 59, 59, 999);
+    const targetSunday = new Date(targetMonday);
+    targetSunday.setDate(targetMonday.getDate() + 6);
+    targetSunday.setHours(23, 59, 59, 999);
 
-    console.log('Generating weekly summary for:', lastMonday.toDateString(), '-', lastSunday.toDateString());
+    console.log('Generating weekly summary for:', targetMonday.toDateString(), '-', targetSunday.toDateString());
 
     // Get all directors and DMs
     const { data: managers, error: managersError } = await supabase
@@ -253,8 +255,8 @@ const handler = async (req: Request): Promise<Response> => {
           .from('customer_feedback')
           .select('*')
           .in('market', markets)
-          .gte('feedback_date', lastMonday.toISOString().split('T')[0])
-          .lte('feedback_date', lastSunday.toISOString().split('T')[0]);
+          .gte('feedback_date', targetMonday.toISOString().split('T')[0])
+          .lte('feedback_date', targetSunday.toISOString().split('T')[0]);
 
         if (!feedback || feedback.length === 0) {
           console.log(`No feedback for ${manager.display_name}, skipping`);
@@ -293,8 +295,8 @@ const handler = async (req: Request): Promise<Response> => {
         const blocks = buildWeeklySummaryBlocks(
           summary, 
           manager.display_name || manager.email, 
-          lastMonday, 
-          lastSunday
+          targetMonday, 
+          targetSunday
         );
 
         await sendSlackDM(
@@ -316,7 +318,7 @@ const handler = async (req: Request): Promise<Response> => {
     await supabase
       .from('daily_summary_log')
       .insert({
-        summary_date: lastSunday.toISOString().split('T')[0],
+        summary_date: targetSunday.toISOString().split('T')[0],
         summary_type: 'weekly_performance',
         recipient_email: 'system',
         metrics: { managers_notified: managersWithProfiles.length }
