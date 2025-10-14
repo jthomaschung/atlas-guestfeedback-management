@@ -104,7 +104,7 @@ export default function UserHierarchy() {
     can_access_facilities_dev: true,
     can_access_catering_dev: false,
     can_access_hr_dev: false,
-    can_access_guest_feedback_dev: false,
+    can_access_guest_feedback_dev: true,
     is_development_user: false
   });
   
