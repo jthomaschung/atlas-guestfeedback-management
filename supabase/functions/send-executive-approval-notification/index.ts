@@ -104,24 +104,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('Found executives to notify:', executives?.length);
 
-    // Ensure the approver is always included in the notification list
+    // Use the executive hierarchy (should include CEO, VP, Director, DM)
     let executivesList = executives || [];
-    const executiveEmails = new Set(executivesList.map(e => e.email));
     
-    if (approverEmail && !executiveEmails.has(approverEmail)) {
-      console.log('Adding approver to notification list:', approverEmail);
-      executivesList = [
-        ...executivesList,
-        {
-          user_id: approverUserId,
-          email: approverEmail,
-          display_name: approverName,
-          role: approverRole,
-          notification_level: 999 // For sorting purposes
-        }
-      ];
-    }
-
     // IMPORTANT: Filter out the approver from the notification list
     // They don't need to be notified about their own approval
     executivesList = executivesList.filter(exec => exec.email !== approverEmail);
