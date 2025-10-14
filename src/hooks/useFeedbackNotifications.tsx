@@ -37,7 +37,30 @@ export function useFeedbackNotifications() {
     }
   };
 
+  const sendTaggedSlackNotification = async (feedbackId: string, taggedDisplayName: string, note: string) => {
+    try {
+      const { error } = await supabase.functions.invoke('send-feedback-slack-notification', {
+        body: {
+          type: 'tagged',
+          feedbackId,
+          taggedDisplayName,
+          note
+        }
+      });
+
+      if (error) {
+        console.error('Error sending tagged Slack notification:', error);
+        return;
+      }
+
+      console.log('✅ Tagged Slack notification sent');
+    } catch (error) {
+      console.error('Error sending tagged Slack notification:', error);
+    }
+  };
+
   return {
-    sendAssignmentNotification
+    sendAssignmentNotification,
+    sendTaggedSlackNotification
   };
 }
