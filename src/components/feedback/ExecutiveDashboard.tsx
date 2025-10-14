@@ -219,7 +219,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
 
   const approveCriticalFeedback = async (feedbackId: string) => {
     try {
-      // Get user's role from hierarchy
+      // Get user's role and profile from hierarchy
       const { data: userHierarchy } = await supabase
         .from('user_hierarchy')
         .select('role')
@@ -229,6 +229,13 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
       if (!userHierarchy) {
         throw new Error('User role not found');
       }
+
+      // Get user's profile for display name
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('user_id', user?.id)
+        .single();
 
       // Insert approval record
       const { error: approvalError } = await supabase
@@ -241,6 +248,21 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
         });
 
       if (approvalError) throw approvalError;
+
+      // Send notification to executives about this approval
+      try {
+        await supabase.functions.invoke('send-executive-approval-notification', {
+          body: {
+            feedbackId: feedbackId,
+            approverRole: userHierarchy.role,
+            approverName: userProfile?.display_name || user?.email || 'Executive'
+          }
+        });
+        console.log('Executive approval notifications sent');
+      } catch (notifError) {
+        console.error('Failed to send approval notifications:', notifError);
+        // Don't fail the approval if notification fails
+      }
 
       // Check if all 4 roles have now approved (CEO, VP, Director, DM)
       const { data: allApprovals, error: checkError } = await supabase
