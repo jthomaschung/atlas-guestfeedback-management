@@ -244,7 +244,7 @@ const handler = async (req: Request): Promise<Response> => {
             .from('markets')
             .select('name');
           markets = allMarkets?.map(m => m.name) || [];
-          console.log(`${manager.role} ${manager.display_name} gets all markets:`, markets);
+          console.log(`${manager.role} ${manager.display_name} (${manager.email}) gets all markets:`, markets);
         } else {
           // Directors and DMs get their assigned markets
           const { data: permissions } = await supabase
@@ -254,10 +254,11 @@ const handler = async (req: Request): Promise<Response> => {
             .single();
 
           markets = permissions?.markets || [];
+          console.log(`${manager.role} ${manager.display_name} (${manager.email}) has markets:`, markets);
         }
         
         if (markets.length === 0) {
-          console.log(`No markets assigned to ${manager.display_name}, skipping`);
+          console.log(`⚠️ No markets assigned to ${manager.display_name} (${manager.email}), skipping`);
           continue;
         }
 
@@ -269,8 +270,10 @@ const handler = async (req: Request): Promise<Response> => {
           .gte('feedback_date', targetMonday.toISOString().split('T')[0])
           .lte('feedback_date', targetSunday.toISOString().split('T')[0]);
 
+        console.log(`${manager.display_name} (${manager.email}): Found ${feedback?.length || 0} feedback items for their markets`);
+
         if (!feedback || feedback.length === 0) {
-          console.log(`No feedback for ${manager.display_name}, skipping`);
+          console.log(`⚠️ No feedback for ${manager.display_name} (${manager.email}), skipping`);
           continue;
         }
 
