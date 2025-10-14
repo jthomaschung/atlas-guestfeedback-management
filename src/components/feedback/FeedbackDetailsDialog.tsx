@@ -220,6 +220,43 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
     }
   }, [feedback?.id, user?.id]);
 
+  // Auto-select template based on feedback category
+  useEffect(() => {
+    if (feedback?.complaint_category) {
+      const category = feedback.complaint_category.toLowerCase();
+      
+      if (category === 'praise') {
+        setSelectedTemplate('praise');
+      } else if (category === 'slow service') {
+        setSelectedTemplate('slow_service');
+      } else if (category === 'sandwich made wrong') {
+        setSelectedTemplate('sandwich_wrong');
+      } else if (category === 'missing item' || category === 'missing items') {
+        setSelectedTemplate('missing_item');
+      } else if (category.includes('bread')) {
+        setSelectedTemplate('bread_quality');
+      } else if (category.includes('product quality') || category.includes('food quality')) {
+        setSelectedTemplate('product_quality');
+      } else if (category.includes('out of product') && category.includes('bread')) {
+        setSelectedTemplate('out_of_bread');
+      } else if (category.includes('out of product')) {
+        setSelectedTemplate('out_of_product');
+      } else if (category.includes('closed early')) {
+        setSelectedTemplate('closed_early');
+      } else if (category.includes('credit card')) {
+        setSelectedTemplate('credit_card');
+      } else if (category.includes('cleanliness')) {
+        setSelectedTemplate('cleanliness');
+      } else if (category.includes('loyalty')) {
+        setSelectedTemplate('loyalty_issues');
+      } else if (category.includes('food poisoning')) {
+        setSelectedTemplate('food_poisoning');
+      } else {
+        setSelectedTemplate('acknowledgment');
+      }
+    }
+  }, [feedback?.complaint_category]);
+
   // Update local state when feedback changes
   useEffect(() => {
     if (feedback) {
@@ -774,36 +811,23 @@ Customer Service Team`);
                                   <SelectValue placeholder="Select template" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="acknowledgment">
-                                    <div className="flex items-center gap-2">
-                                      <MessageSquare className="h-3 w-3" />
-                                      Acknowledgment
-                                    </div>
-                                  </SelectItem>
-                                  <SelectItem value="praise">
-                                    <div className="flex items-center gap-2">
-                                      <Heart className="h-3 w-3" />
-                                      Praise Response
-                                    </div>
-                                  </SelectItem>
-                                  <SelectItem value="resolution">
-                                    <div className="flex items-center gap-2">
-                                      <CheckCircle className="h-3 w-3" />
-                                      Resolution Update
-                                    </div>
-                                  </SelectItem>
-                                  <SelectItem value="escalation">
-                                    <div className="flex items-center gap-2">
-                                      <AlertTriangle className="h-3 w-3" />
-                                      Escalation Notice
-                                    </div>
-                                  </SelectItem>
-                                  <SelectItem value="custom">
-                                    <div className="flex items-center gap-2">
-                                      <Mail className="h-3 w-3" />
-                                      Custom Message
-                                    </div>
-                                  </SelectItem>
+                                  <SelectItem value="acknowledgment">Acknowledgment</SelectItem>
+                                  <SelectItem value="slow_service">Slow Service</SelectItem>
+                                  <SelectItem value="sandwich_wrong">Sandwich Made Wrong</SelectItem>
+                                  <SelectItem value="missing_item">Missing Item</SelectItem>
+                                  <SelectItem value="bread_quality">Bread Quality</SelectItem>
+                                  <SelectItem value="product_quality">Product Quality</SelectItem>
+                                  <SelectItem value="out_of_bread">Out of Bread</SelectItem>
+                                  <SelectItem value="out_of_product">Out of Product</SelectItem>
+                                  <SelectItem value="closed_early">Closed Early</SelectItem>
+                                  <SelectItem value="praise">Praise</SelectItem>
+                                  <SelectItem value="credit_card">Credit Card Issue</SelectItem>
+                                  <SelectItem value="cleanliness">Cleanliness</SelectItem>
+                                  <SelectItem value="loyalty_issues">Loyalty Program Issues</SelectItem>
+                                  <SelectItem value="food_poisoning">Possible Food Poisoning</SelectItem>
+                                  <SelectItem value="resolution">Resolution Update</SelectItem>
+                                  <SelectItem value="escalation">Escalation Notice</SelectItem>
+                                  <SelectItem value="custom">Custom Message</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -847,8 +871,20 @@ Customer Service Team`);
                               <div>
                                 <span className="font-medium">Subject: </span>
                                 <span className="text-muted-foreground">
+                                  {selectedTemplate === 'slow_service' && `We're Sorry About Your Wait - Case #${feedback.case_number}`}
+                                  {selectedTemplate === 'sandwich_wrong' && `We're Sorry We Got Your Order Wrong - Case #${feedback.case_number}`}
+                                  {selectedTemplate === 'missing_item' && `We're Sorry About Your Missing Item - Case #${feedback.case_number}`}
+                                  {selectedTemplate === 'bread_quality' && `We're Sorry About the Bread Quality - Case #${feedback.case_number}`}
+                                  {selectedTemplate === 'product_quality' && `We're Sorry About the Product Quality - Case #${feedback.case_number}`}
+                                  {selectedTemplate === 'out_of_bread' && `We're Sorry We Ran Out of Bread - Case #${feedback.case_number}`}
+                                  {selectedTemplate === 'out_of_product' && `We're Sorry We Ran Out - Case #${feedback.case_number}`}
+                                  {selectedTemplate === 'closed_early' && `We're Sorry We Were Closed - Case #${feedback.case_number}`}
+                                  {selectedTemplate === 'praise' && `Thank You for Your Kind Words! - Case #${feedback.case_number}`}
+                                  {selectedTemplate === 'credit_card' && `Thank You for Reporting the Issue - Case #${feedback.case_number}`}
+                                  {selectedTemplate === 'cleanliness' && `We're Sorry About the Cleanliness - Case #${feedback.case_number}`}
+                                  {selectedTemplate === 'loyalty_issues' && `Thank You for Reporting the Loyalty Issue - Case #${feedback.case_number}`}
+                                  {selectedTemplate === 'food_poisoning' && `We Take This Very Seriously - Case #${feedback.case_number}`}
                                   {selectedTemplate === 'acknowledgment' && `Thank you for your feedback - Case #${feedback.case_number}`}
-                                  {selectedTemplate === 'praise' && `Thank you for your kind words! - Case #${feedback.case_number}`}
                                   {selectedTemplate === 'resolution' && `Resolution Update for Case #${feedback.case_number}`}
                                   {selectedTemplate === 'escalation' && `URGENT: Your feedback has been escalated - Case #${feedback.case_number}`}
                                   {selectedTemplate === 'custom' && `Regarding your feedback - Case #${feedback.case_number}`}
@@ -857,6 +893,14 @@ Customer Service Team`);
                               <Separator />
                               <div className="space-y-2 text-muted-foreground max-h-60 overflow-y-auto">
                                 <p>Dear {feedback.customer_name || 'Valued Customer'},</p>
+                                
+                                {selectedTemplate === 'slow_service' && (
+                                  <>
+                                    <p>Thank you for taking the time to complete a survey and share your experience. My name is Karine and I am the Guest Feedback Manager for the Jimmy John's team.</p>
+                                    <p>I am sorry that your order was not delivered in a timely manner. We strive to get deliveries out to customers as fast as we can, but sometimes we fall short.</p>
+                                    <p className="font-medium text-blue-600">If you have a rewards account, I can add a free original sandwich to your account.</p>
+                                  </>
+                                )}
                                 
                                 {selectedTemplate === 'acknowledgment' && (
                                   <>
