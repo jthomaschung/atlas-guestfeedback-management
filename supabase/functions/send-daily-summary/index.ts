@@ -120,32 +120,64 @@ function buildSlackCompanySummary(summary: FeedbackSummary, date: Date, scope: s
   return { blocks };
 }
 
-async function sendSlackSummary(summary: FeedbackSummary, date: Date, scope: string = "Company Wide"): Promise<void> {
-  const webhookUrl = Deno.env.get("SLACK_WEBHOOK_URL");
-  if (!webhookUrl) {
-    console.log("Slack webhook URL not configured, skipping Slack notification");
-    return;
-  }
-
+async function sendSlackDM(slackBotToken: string, recipientEmail: string, blocks: any[], fallbackText: string, supabase: any): Promise<boolean> {
   try {
-    const payload = buildSlackCompanySummary(summary, date, scope);
+    // Try to get stored Slack user ID
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('slack_user_id')
+      .eq('email', recipientEmail)
+      .single();
     
-    const response = await fetch(webhookUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Slack webhook failed: ${response.status} ${response.statusText}`);
+    let slackUserId = profile?.slack_user_id;
+    
+    // If no stored ID, look it up by email
+    if (!slackUserId) {
+      const lookupResponse = await fetch(`https://slack.com/api/users.lookupByEmail?email=${encodeURIComponent(recipientEmail)}`, {
+        headers: { 'Authorization': `Bearer ${slackBotToken}` }
+      });
+      
+      const lookupData = await lookupResponse.json();
+      if (lookupData.ok && lookupData.user) {
+        slackUserId = lookupData.user.id;
+        console.log(`📧 Looked up Slack ID for ${recipientEmail}: ${slackUserId}`);
+        
+        // Store it for future use
+        await supabase
+          .from('profiles')
+          .update({ slack_user_id: slackUserId })
+          .eq('email', recipientEmail);
+      } else {
+        console.log(`⚠️ Could not find Slack user for ${recipientEmail}`);
+        return false;
+      }
     }
-
-    console.log("Successfully sent summary to Slack");
+    
+    // Send DM
+    const slackResponse = await fetch('https://slack.com/api/chat.postMessage', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${slackBotToken}`
+      },
+      body: JSON.stringify({
+        channel: slackUserId,
+        blocks: blocks,
+        text: fallbackText
+      })
+    });
+    
+    const slackData = await slackResponse.json();
+    if (!slackData.ok) {
+      console.error(`❌ Slack DM failed for ${recipientEmail}:`, slackData.error);
+      return false;
+    }
+    
+    console.log(`✅ Slack DM sent to ${recipientEmail}`);
+    return true;
   } catch (error) {
-    console.error("Error sending to Slack:", error);
-    throw error;
+    console.error(`Error sending Slack DM to ${recipientEmail}:`, error);
+    return false;
   }
 }
 
@@ -277,81 +309,90 @@ serve(async (req) => {
       console.log(`Found ${directorsWithProfiles.length} directors with profiles`);
     }
 
-    // Send company-wide summary
+    // Send company-wide summary to CEO and VP via Slack DM
     if (executivesWithProfiles && executivesWithProfiles.length > 0) {
       const companySummary = await generateCompanySummary(yesterdayFeedback || [], supabase);
+      const slackBotToken = Deno.env.get('SLACK_BOT_TOKEN');
       
-      // Send to Slack first
-      try {
-        await sendSlackSummary(companySummary, yesterday, "Company Wide");
-      } catch (slackError) {
-        console.error("Failed to send Slack summary, continuing with emails:", slackError);
-      }
-      
-      // Send emails to executives
-      for (const exec of executivesWithProfiles) {
-        const profile = exec.profiles as any;
-        const html = buildCompanyEmail(companySummary, profile.display_name, yesterday);
-        
-        await resend.emails.send({
-          from: "Atlas Daily Summary <noreply@atlaswe.com>",
-          to: [profile.email],
-          subject: `Daily Feedback Summary - ${yesterday.toISOString().split('T')[0]}`,
-          html,
-        });
+      if (!slackBotToken) {
+        console.error('SLACK_BOT_TOKEN not configured');
+      } else {
+        for (const exec of executivesWithProfiles) {
+          const profile = exec.profiles as any;
+          const { blocks } = buildSlackCompanySummary(companySummary, yesterday, "Company Wide");
+          
+          const success = await sendSlackDM(
+            slackBotToken,
+            profile.email,
+            blocks,
+            `Daily Feedback Summary for ${yesterday.toLocaleDateString()}`,
+            supabase
+          );
+          
+          if (success) {
+            // Log the sent summary
+            await supabase.from("daily_summary_log").insert({
+              summary_date: yesterday.toISOString().split('T')[0],
+              recipient_email: profile.email,
+              summary_type: "company",
+              metrics: companySummary,
+            });
 
-        // Log the sent summary
-        await supabase.from("daily_summary_log").insert({
-          summary_date: yesterday.toISOString().split('T')[0],
-          recipient_email: profile.email,
-          summary_type: "company",
-          metrics: companySummary,
-        });
-
-        console.log(`Sent company summary to ${profile.email}`);
+            console.log(`Sent company summary Slack DM to ${profile.email}`);
+          }
+        }
       }
     }
 
-    // Send regional summaries to directors
+    // Send regional summaries to directors via Slack DM
     if (directorsWithProfiles && directorsWithProfiles.length > 0) {
-      for (const director of directorsWithProfiles) {
-        const profile = director.profiles as any;
+      const slackBotToken = Deno.env.get('SLACK_BOT_TOKEN');
+      
+      if (!slackBotToken) {
+        console.error('SLACK_BOT_TOKEN not configured');
+      } else {
+        for (const director of directorsWithProfiles) {
+          const profile = director.profiles as any;
 
-        // Get director's markets
-        const { data: marketPerms } = await supabase
-          .from("user_market_permissions")
-          .select("market_id, markets!inner(name, display_name)")
-          .eq("user_id", director.user_id);
+          // Get director's markets
+          const { data: marketPerms } = await supabase
+            .from("user_market_permissions")
+            .select("market_id, markets!inner(name, display_name)")
+            .eq("user_id", director.user_id);
 
-        if (!marketPerms || marketPerms.length === 0) continue;
+          if (!marketPerms || marketPerms.length === 0) continue;
 
-        const directorMarkets = marketPerms.map((m: any) => m.markets.name);
-        const regionalSummary = await generateRegionalSummary(
-          yesterdayFeedback || [],
-          directorMarkets,
-          profile.display_name,
-          supabase
-        );
+          const directorMarkets = marketPerms.map((m: any) => m.markets.name);
+          const regionalSummary = await generateRegionalSummary(
+            yesterdayFeedback || [],
+            directorMarkets,
+            profile.display_name,
+            supabase
+          );
 
-        const html = buildRegionalEmail(regionalSummary, profile.display_name, yesterday);
+          const { blocks } = buildSlackCompanySummary(regionalSummary, yesterday, directorMarkets.join(", "));
+          
+          const success = await sendSlackDM(
+            slackBotToken,
+            profile.email,
+            blocks,
+            `Daily Feedback Summary for ${directorMarkets.join(", ")} - ${yesterday.toLocaleDateString()}`,
+            supabase
+          );
+          
+          if (success) {
+            // Log the sent summary
+            await supabase.from("daily_summary_log").insert({
+              summary_date: yesterday.toISOString().split('T')[0],
+              recipient_email: profile.email,
+              summary_type: "regional",
+              region: directorMarkets.join(", "),
+              metrics: regionalSummary,
+            });
 
-        await resend.emails.send({
-          from: "Atlas Daily Summary <noreply@atlaswe.com>",
-          to: [profile.email],
-          subject: `Regional Daily Summary - ${yesterday.toISOString().split('T')[0]}`,
-          html,
-        });
-
-        // Log the sent summary
-        await supabase.from("daily_summary_log").insert({
-          summary_date: yesterday.toISOString().split('T')[0],
-          recipient_email: profile.email,
-          summary_type: "regional",
-          region: directorMarkets.join(", "),
-          metrics: regionalSummary,
-        });
-
-        console.log(`Sent regional summary to ${profile.email}`);
+            console.log(`Sent regional summary Slack DM to ${profile.email}`);
+          }
+        }
       }
     }
 
