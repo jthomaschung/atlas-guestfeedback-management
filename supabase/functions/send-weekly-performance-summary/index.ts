@@ -236,14 +236,25 @@ const handler = async (req: Request): Promise<Response> => {
     // For each manager, generate and send their summary
     for (const manager of managersWithProfiles) {
       try {
-        // Get their assigned markets
-        const { data: permissions } = await supabase
-          .from('user_permissions')
-          .select('markets')
-          .eq('user_id', manager.user_id)
-          .single();
+        let markets: string[] = [];
+        
+        // CEO and VP get company-wide summary (all markets)
+        if (manager.role === 'CEO' || manager.role === 'VP') {
+          const { data: allMarkets } = await supabase
+            .from('markets')
+            .select('name');
+          markets = allMarkets?.map(m => m.name) || [];
+          console.log(`${manager.role} ${manager.display_name} gets all markets:`, markets);
+        } else {
+          // Directors and DMs get their assigned markets
+          const { data: permissions } = await supabase
+            .from('user_permissions')
+            .select('markets')
+            .eq('user_id', manager.user_id)
+            .single();
 
-        const markets = permissions?.markets || [];
+          markets = permissions?.markets || [];
+        }
         
         if (markets.length === 0) {
           console.log(`No markets assigned to ${manager.display_name}, skipping`);
