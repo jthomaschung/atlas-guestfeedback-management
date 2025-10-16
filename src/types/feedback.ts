@@ -4,7 +4,7 @@ export interface CustomerFeedback {
   complaint_category: string; // Accept any string from webhook
   channel: string; // Accept any string from webhook
   rating?: number;
-  resolution_status: 'unopened' | 'opened' | 'responded' | 'resolved' | 'escalated';
+  resolution_status: 'unopened' | 'opened' | 'responded' | 'resolved' | 'escalated' | 'processing';
   resolution_notes?: string;
   store_number: string;
   market: string;

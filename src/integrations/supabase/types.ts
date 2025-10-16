@@ -3742,39 +3742,36 @@ export type Database = {
           created_at: string | null
           date: string
           financial_category: string
-          id: number
           shift: string
           store_number: string
           updated_at: string | null
           week_ending: string
-          week_number: number
-          year: number
+          week_number: number | null
+          year: number | null
         }
         Insert: {
           amount?: number | null
           created_at?: string | null
           date: string
           financial_category: string
-          id?: number
           shift: string
           store_number: string
           updated_at?: string | null
           week_ending: string
-          week_number: number
-          year: number
+          week_number?: number | null
+          year?: number | null
         }
         Update: {
           amount?: number | null
           created_at?: string | null
           date?: string
           financial_category?: string
-          id?: number
           shift?: string
           store_number?: string
           updated_at?: string | null
           week_ending?: string
-          week_number?: number
-          year?: number
+          week_number?: number | null
+          year?: number | null
         }
         Relationships: []
       }
@@ -3783,7 +3780,6 @@ export type Database = {
           city: string | null
           created_at: string | null
           general_manager: string | null
-          id: number
           processed_at: string | null
           state: string | null
           store_location: string | null
@@ -3797,7 +3793,6 @@ export type Database = {
           city?: string | null
           created_at?: string | null
           general_manager?: string | null
-          id?: number
           processed_at?: string | null
           state?: string | null
           store_location?: string | null
@@ -3811,7 +3806,6 @@ export type Database = {
           city?: string | null
           created_at?: string | null
           general_manager?: string | null
-          id?: number
           processed_at?: string | null
           state?: string | null
           store_location?: string | null
@@ -3828,7 +3822,6 @@ export type Database = {
           category: string
           cos_percent: number | null
           created_at: string | null
-          id: number
           store_number: string
           updated_at: string | null
           week_ending: string
@@ -3839,7 +3832,6 @@ export type Database = {
           category: string
           cos_percent?: number | null
           created_at?: string | null
-          id?: number
           store_number: string
           updated_at?: string | null
           week_ending: string
@@ -3850,7 +3842,6 @@ export type Database = {
           category?: string
           cos_percent?: number | null
           created_at?: string | null
-          id?: number
           store_number?: string
           updated_at?: string | null
           week_ending?: string
@@ -3864,7 +3855,6 @@ export type Database = {
           created_at: string | null
           date: string
           dmr_expense: number | null
-          id: number
           labor_dollars: number | null
           labor_type: string
           ot_pay: number | null
@@ -3882,7 +3872,6 @@ export type Database = {
           created_at?: string | null
           date: string
           dmr_expense?: number | null
-          id?: number
           labor_dollars?: number | null
           labor_type: string
           ot_pay?: number | null
@@ -3900,7 +3889,6 @@ export type Database = {
           created_at?: string | null
           date?: string
           dmr_expense?: number | null
-          id?: number
           labor_dollars?: number | null
           labor_type?: string
           ot_pay?: number | null
@@ -3916,13 +3904,189 @@ export type Database = {
         }
         Relationships: []
       }
+      wsr_labor_daily: {
+        Row: {
+          created_at: string | null
+          date: string
+          driver_dmr_expense: number | null
+          driver_labor: number | null
+          driver_ot_pay: number | null
+          driver_penalty_pay: number | null
+          driver_straight_pay: number | null
+          inshop_labor: number | null
+          manager_labor: number | null
+          store_number: string
+          total_labor: number | null
+          updated_at: string | null
+          week_ending: string
+          week_number: number | null
+          year: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          driver_dmr_expense?: number | null
+          driver_labor?: number | null
+          driver_ot_pay?: number | null
+          driver_penalty_pay?: number | null
+          driver_straight_pay?: number | null
+          inshop_labor?: number | null
+          manager_labor?: number | null
+          store_number: string
+          total_labor?: number | null
+          updated_at?: string | null
+          week_ending: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          driver_dmr_expense?: number | null
+          driver_labor?: number | null
+          driver_ot_pay?: number | null
+          driver_penalty_pay?: number | null
+          driver_straight_pay?: number | null
+          inshop_labor?: number | null
+          manager_labor?: number | null
+          store_number?: string
+          total_labor?: number | null
+          updated_at?: string | null
+          week_ending?: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Relationships: []
+      }
+      wsr_labor_weekly: {
+        Row: {
+          avg_daily_labor: number | null
+          created_at: string | null
+          driver_dmr_expense: number | null
+          driver_labor: number | null
+          driver_ot_pay: number | null
+          driver_penalty_pay: number | null
+          driver_straight_pay: number | null
+          inshop_labor: number | null
+          manager_labor: number | null
+          store_number: string
+          total_labor: number | null
+          updated_at: string | null
+          week_ending: string
+          week_number: number | null
+          year: number | null
+        }
+        Insert: {
+          avg_daily_labor?: number | null
+          created_at?: string | null
+          driver_dmr_expense?: number | null
+          driver_labor?: number | null
+          driver_ot_pay?: number | null
+          driver_penalty_pay?: number | null
+          driver_straight_pay?: number | null
+          inshop_labor?: number | null
+          manager_labor?: number | null
+          store_number: string
+          total_labor?: number | null
+          updated_at?: string | null
+          week_ending: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Update: {
+          avg_daily_labor?: number | null
+          created_at?: string | null
+          driver_dmr_expense?: number | null
+          driver_labor?: number | null
+          driver_ot_pay?: number | null
+          driver_penalty_pay?: number | null
+          driver_straight_pay?: number | null
+          inshop_labor?: number | null
+          manager_labor?: number | null
+          store_number?: string
+          total_labor?: number | null
+          updated_at?: string | null
+          week_ending?: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Relationships: []
+      }
+      wsr_line_items_daily: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          date: string
+          line_item: string
+          store_number: string
+          updated_at: string | null
+          week_ending: string
+          week_number: number | null
+          year: number | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          date: string
+          line_item: string
+          store_number: string
+          updated_at?: string | null
+          week_ending: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          date?: string
+          line_item?: string
+          store_number?: string
+          updated_at?: string | null
+          week_ending?: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Relationships: []
+      }
+      wsr_line_items_weekly: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          line_item: string
+          store_number: string
+          updated_at: string | null
+          week_ending: string
+          week_number: number | null
+          year: number | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          line_item: string
+          store_number: string
+          updated_at?: string | null
+          week_ending: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          line_item?: string
+          store_number?: string
+          updated_at?: string | null
+          week_ending?: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Relationships: []
+      }
       wsr_sales: {
         Row: {
           category: string
           category_type: string | null
           created_at: string | null
           date: string
-          id: number
           quantity: number | null
           sales_amount: number | null
           shift: string
@@ -3937,7 +4101,6 @@ export type Database = {
           category_type?: string | null
           created_at?: string | null
           date: string
-          id?: number
           quantity?: number | null
           sales_amount?: number | null
           shift: string
@@ -3952,7 +4115,6 @@ export type Database = {
           category_type?: string | null
           created_at?: string | null
           date?: string
-          id?: number
           quantity?: number | null
           sales_amount?: number | null
           shift?: string
@@ -3964,69 +4126,171 @@ export type Database = {
         }
         Relationships: []
       }
+      wsr_sales_daily: {
+        Row: {
+          adjusted_sales: number | null
+          catering: number | null
+          created_at: string | null
+          date: string
+          delivery: number | null
+          desserts: number | null
+          inshop: number | null
+          loyalty_coupon: number | null
+          net_employee_freebies: number | null
+          net_manager_freebies: number | null
+          other_promo: number | null
+          other_revenue: number | null
+          over_rings: number | null
+          royalty_sales: number | null
+          sampling: number | null
+          store_number: string
+          total_deductions: number | null
+          total_of_above: number | null
+          total_quantity: number | null
+          updated_at: string | null
+          waste: number | null
+          week_ending: string
+          week_number: number | null
+          year: number | null
+        }
+        Insert: {
+          adjusted_sales?: number | null
+          catering?: number | null
+          created_at?: string | null
+          date: string
+          delivery?: number | null
+          desserts?: number | null
+          inshop?: number | null
+          loyalty_coupon?: number | null
+          net_employee_freebies?: number | null
+          net_manager_freebies?: number | null
+          other_promo?: number | null
+          other_revenue?: number | null
+          over_rings?: number | null
+          royalty_sales?: number | null
+          sampling?: number | null
+          store_number: string
+          total_deductions?: number | null
+          total_of_above?: number | null
+          total_quantity?: number | null
+          updated_at?: string | null
+          waste?: number | null
+          week_ending: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Update: {
+          adjusted_sales?: number | null
+          catering?: number | null
+          created_at?: string | null
+          date?: string
+          delivery?: number | null
+          desserts?: number | null
+          inshop?: number | null
+          loyalty_coupon?: number | null
+          net_employee_freebies?: number | null
+          net_manager_freebies?: number | null
+          other_promo?: number | null
+          other_revenue?: number | null
+          over_rings?: number | null
+          royalty_sales?: number | null
+          sampling?: number | null
+          store_number?: string
+          total_deductions?: number | null
+          total_of_above?: number | null
+          total_quantity?: number | null
+          updated_at?: string | null
+          waste?: number | null
+          week_ending?: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Relationships: []
+      }
+      wsr_sales_weekly: {
+        Row: {
+          adjusted_sales: number | null
+          avg_daily_royalty_sales: number | null
+          catering: number | null
+          created_at: string | null
+          delivery: number | null
+          desserts: number | null
+          inshop: number | null
+          loyalty_coupon: number | null
+          net_employee_freebies: number | null
+          net_manager_freebies: number | null
+          other_promo: number | null
+          other_revenue: number | null
+          over_rings: number | null
+          royalty_sales: number | null
+          sampling: number | null
+          store_number: string
+          total_deductions: number | null
+          total_of_above: number | null
+          total_quantity: number | null
+          updated_at: string | null
+          waste: number | null
+          week_ending: string
+          week_number: number | null
+          year: number | null
+        }
+        Insert: {
+          adjusted_sales?: number | null
+          avg_daily_royalty_sales?: number | null
+          catering?: number | null
+          created_at?: string | null
+          delivery?: number | null
+          desserts?: number | null
+          inshop?: number | null
+          loyalty_coupon?: number | null
+          net_employee_freebies?: number | null
+          net_manager_freebies?: number | null
+          other_promo?: number | null
+          other_revenue?: number | null
+          over_rings?: number | null
+          royalty_sales?: number | null
+          sampling?: number | null
+          store_number: string
+          total_deductions?: number | null
+          total_of_above?: number | null
+          total_quantity?: number | null
+          updated_at?: string | null
+          waste?: number | null
+          week_ending: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Update: {
+          adjusted_sales?: number | null
+          avg_daily_royalty_sales?: number | null
+          catering?: number | null
+          created_at?: string | null
+          delivery?: number | null
+          desserts?: number | null
+          inshop?: number | null
+          loyalty_coupon?: number | null
+          net_employee_freebies?: number | null
+          net_manager_freebies?: number | null
+          other_promo?: number | null
+          other_revenue?: number | null
+          over_rings?: number | null
+          royalty_sales?: number | null
+          sampling?: number | null
+          store_number?: string
+          total_deductions?: number | null
+          total_of_above?: number | null
+          total_quantity?: number | null
+          updated_at?: string | null
+          waste?: number | null
+          week_ending?: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
-      mv_daily_store_summary: {
-        Row: {
-          avg_ticket: number | null
-          date: string | null
-          delivery_revenue: number | null
-          direct_delivery: number | null
-          doordash_sales: number | null
-          employee_freebies: number | null
-          gross_sales: number | null
-          grubhub_sales: number | null
-          inshop_revenue: number | null
-          loyalty_discounts: number | null
-          manager_freebies: number | null
-          net_sales: number | null
-          online_sales: number | null
-          other_promo: number | null
-          over_rings: number | null
-          sampling: number | null
-          store_number: string | null
-          third_party_delivery: number | null
-          third_party_pct_of_delivery: number | null
-          total_deductions: number | null
-          transaction_count: number | null
-          ubereats_sales: number | null
-          waste: number | null
-          week_number: number | null
-          year: number | null
-        }
-        Relationships: []
-      }
-      mv_weekly_financial_summary: {
-        Row: {
-          ar_drivers: number | null
-          ar_due: number | null
-          ar_paid: number | null
-          cash_payouts: number | null
-          cc_inshop_amex: number | null
-          cc_inshop_vmc: number | null
-          cc_online_amex: number | null
-          cc_online_vmc: number | null
-          doordash_fees: number | null
-          freebie_promo_tax: number | null
-          gift_cards_issued: number | null
-          gift_cards_redeemed: number | null
-          grubhub_fees: number | null
-          nsf_deposits: number | null
-          other_payment_types: number | null
-          other_tax_fee: number | null
-          over_rings_tax: number | null
-          store_number: string | null
-          total_actual_deposit: number | null
-          total_cash_variance: number | null
-          total_expected_deposit: number | null
-          total_sales_tax: number | null
-          ubereats_fees: number | null
-          week_ending: string | null
-          week_number: number | null
-          year: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       add_user_market_permission: {
@@ -4446,6 +4710,7 @@ export type Database = {
         Returns: {
           completed: number
           completion_rate: number
+          employee_average: number
           in_progress: number
           manager: string
           not_started: number

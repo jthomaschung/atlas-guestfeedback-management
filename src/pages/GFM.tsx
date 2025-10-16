@@ -16,6 +16,7 @@ export default function GFM() {
   const { toast } = useToast();
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
   const [filteredFeedbacks, setFilteredFeedbacks] = useState<CustomerFeedback[]>([]);
+  const [processingFeedbacks, setProcessingFeedbacks] = useState<CustomerFeedback[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFeedback, setSelectedFeedback] = useState<CustomerFeedback | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
@@ -28,12 +29,12 @@ export default function GFM() {
     try {
       setLoading(true);
       
-      // Get feedback assigned to guestfeedback@atlaswe.com (Guest Feedback Manager)
+      // Get all feedback assigned to guestfeedback@atlaswe.com (Guest Feedback Manager)
       const { data, error } = await supabase
         .from('customer_feedback')
         .select('*')
         .eq('assignee', 'guestfeedback@atlaswe.com')
-        .in('resolution_status', ['unopened', 'opened', 'responded'])
+        .in('resolution_status', ['unopened', 'opened', 'responded', 'processing'])
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -47,8 +48,13 @@ export default function GFM() {
         priority: item.priority as CustomerFeedback['priority']
       })) || [];
 
-      setFeedbacks(formattedData);
-      setFilteredFeedbacks(formattedData);
+      // Separate processing tickets from others
+      const processing = formattedData.filter(f => f.resolution_status === 'processing');
+      const others = formattedData.filter(f => f.resolution_status !== 'processing');
+
+      setProcessingFeedbacks(processing);
+      setFeedbacks(others);
+      setFilteredFeedbacks(others);
     } catch (error) {
       console.error('Error loading GFM feedback:', error);
       toast({
@@ -122,15 +128,41 @@ export default function GFM() {
           </p>
         </div>
         <Badge variant="secondary" className="text-sm">
-          {filteredFeedbacks.length} Active Cases
+          {filteredFeedbacks.length + processingFeedbacks.length} Total Cases
         </Badge>
       </div>
 
-      <CustomerFeedbackStats feedbacks={filteredFeedbacks} />
+      <CustomerFeedbackStats feedbacks={[...processingFeedbacks, ...filteredFeedbacks]} />
 
+      {/* Processing Section */}
+      {processingFeedbacks.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400">
+                Processing
+              </Badge>
+              {processingFeedbacks.length} Case{processingFeedbacks.length !== 1 ? 's' : ''}
+            </CardTitle>
+            <CardDescription>
+              Cases currently being processed by the Guest Feedback Manager
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CustomerFeedbackTable
+              feedbacks={processingFeedbacks}
+              onEdit={handleEdit}
+              onViewDetails={handleViewDetails}
+              canEditCategory={false}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Active Cases Section */}
       <Card>
         <CardHeader>
-          <CardTitle>Centrally Assigned Feedback Cases</CardTitle>
+          <CardTitle>Active Feedback Cases</CardTitle>
           <CardDescription>
             Feedback assigned to guestfeedback@atlaswe.com that requires attention
           </CardDescription>
@@ -144,7 +176,7 @@ export default function GFM() {
             
             {filteredFeedbacks.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">No centrally assigned feedback cases found.</p>
+                <p className="text-muted-foreground">No active feedback cases found.</p>
               </div>
             ) : (
               <CustomerFeedbackTable
