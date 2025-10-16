@@ -37,6 +37,8 @@ interface FeedbackFiltersProps {
 
 const statusOptions = [
   { value: 'unopened', label: 'Unopened' },
+  { value: 'opened', label: 'Opened' },
+  { value: 'processing', label: 'Processing' },
   { value: 'responded', label: 'Responded' },
   { value: 'resolved', label: 'Resolved' },
   { value: 'escalated', label: 'Escalated' },

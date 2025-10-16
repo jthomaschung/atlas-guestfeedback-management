@@ -1,6 +1,6 @@
 import { CustomerFeedback } from "@/types/feedback";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare, Clock, CheckCircle, AlertTriangle, Star } from "lucide-react";
+import { MessageSquare, Clock, CheckCircle, AlertTriangle, Star, Loader2 } from "lucide-react";
 
 interface CustomerFeedbackStatsProps {
   feedbacks: CustomerFeedback[];
@@ -10,10 +10,11 @@ interface CustomerFeedbackStatsProps {
 export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFeedbackStatsProps) {
   const unopened = feedbacks.filter(fb => fb.resolution_status === 'unopened').length;
   const opened = feedbacks.filter(fb => fb.resolution_status === 'opened').length;
+  const processing = feedbacks.filter(fb => fb.resolution_status === 'processing').length;
   const responded = feedbacks.filter(fb => fb.resolution_status === 'responded').length;
   const resolved = feedbacks.filter(fb => fb.resolution_status === 'resolved').length;
   const escalated = feedbacks.filter(fb => fb.resolution_status === 'escalated').length;
-  const totalOpen = unopened + opened + responded + escalated; // All non-resolved feedback
+  const totalOpen = unopened + opened + processing + responded + escalated; // All non-resolved feedback
   const critical = feedbacks.filter(fb => fb.priority === 'Critical').length;
   const praise = feedbacks.filter(fb => fb.complaint_category === 'Praise').length;
 
@@ -31,6 +32,13 @@ export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFee
       icon: Clock,
       color: 'text-red-600',
       onClick: () => onFilterChange?.('status', 'unopened'),
+    },
+    {
+      title: 'Processing',
+      value: processing,
+      icon: Loader2,
+      color: 'text-purple-600',
+      onClick: () => onFilterChange?.('status', 'processing'),
     },
     {
       title: 'Resolved',
@@ -56,7 +64,7 @@ export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFee
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
       {stats.map((stat) => (
         <Card 
           key={stat.title} 
