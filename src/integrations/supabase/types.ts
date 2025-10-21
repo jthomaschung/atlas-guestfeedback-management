@@ -1784,6 +1784,60 @@ export type Database = {
         }
         Relationships: []
       }
+      manager_approval_notifications: {
+        Row: {
+          created_at: string
+          employee_id: string
+          id: string
+          manager_user_id: string | null
+          requested_at: string
+          reviewed_at: string | null
+          reviewer_notes: string | null
+          status: string
+          template_item_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          employee_id: string
+          id?: string
+          manager_user_id?: string | null
+          requested_at?: string
+          reviewed_at?: string | null
+          reviewer_notes?: string | null
+          status?: string
+          template_item_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          employee_id?: string
+          id?: string
+          manager_user_id?: string | null
+          requested_at?: string
+          reviewed_at?: string | null
+          reviewer_notes?: string | null
+          status?: string
+          template_item_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manager_approval_notifications_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "manager_approval_notifications_template_item_id_fkey"
+            columns: ["template_item_id"]
+            isOneToOne: false
+            referencedRelation: "career_path_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       manager_review_log: {
         Row: {
           action: string
@@ -2380,6 +2434,78 @@ export type Database = {
             referencedColumns: ["store_id"]
           },
         ]
+      }
+      orders_backup: {
+        Row: {
+          business_date: string | null
+          catering_delivery_charge: number | null
+          customer_id: string | null
+          delivery_address: string | null
+          delivery_charge: number | null
+          delivery_city: string | null
+          delivery_email: Json | null
+          delivery_name: string | null
+          delivery_phone: string | null
+          delivery_state: string | null
+          delivery_zip: string | null
+          has_ez_cater: boolean | null
+          order_id: number | null
+          order_reference: string | null
+          order_total: number | null
+          original_order_id: string | null
+          processed_at: string | null
+          source_file: string | null
+          store_id: number | null
+          sub_total: number | null
+          tax: number | null
+        }
+        Insert: {
+          business_date?: string | null
+          catering_delivery_charge?: number | null
+          customer_id?: string | null
+          delivery_address?: string | null
+          delivery_charge?: number | null
+          delivery_city?: string | null
+          delivery_email?: Json | null
+          delivery_name?: string | null
+          delivery_phone?: string | null
+          delivery_state?: string | null
+          delivery_zip?: string | null
+          has_ez_cater?: boolean | null
+          order_id?: number | null
+          order_reference?: string | null
+          order_total?: number | null
+          original_order_id?: string | null
+          processed_at?: string | null
+          source_file?: string | null
+          store_id?: number | null
+          sub_total?: number | null
+          tax?: number | null
+        }
+        Update: {
+          business_date?: string | null
+          catering_delivery_charge?: number | null
+          customer_id?: string | null
+          delivery_address?: string | null
+          delivery_charge?: number | null
+          delivery_city?: string | null
+          delivery_email?: Json | null
+          delivery_name?: string | null
+          delivery_phone?: string | null
+          delivery_state?: string | null
+          delivery_zip?: string | null
+          has_ez_cater?: boolean | null
+          order_id?: number | null
+          order_reference?: string | null
+          order_total?: number | null
+          original_order_id?: string | null
+          processed_at?: string | null
+          source_file?: string | null
+          store_id?: number | null
+          sub_total?: number | null
+          tax?: number | null
+        }
+        Relationships: []
       }
       payroll_ticket_comments: {
         Row: {
@@ -3223,6 +3349,7 @@ export type Database = {
       }
       training_catalog: {
         Row: {
+          career_path_day: number | null
           category: string | null
           class: string | null
           created_at: string | null
@@ -3236,6 +3363,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          career_path_day?: number | null
           category?: string | null
           class?: string | null
           created_at?: string | null
@@ -3249,6 +3377,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          career_path_day?: number | null
           category?: string | null
           class?: string | null
           created_at?: string | null
@@ -3736,6 +3865,42 @@ export type Database = {
         }
         Relationships: []
       }
+      wsr_dmr: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          driver_name: string
+          id: number
+          metric: string
+          shift: string
+          store_number: string
+          updated_at: string | null
+          week_ending: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          driver_name: string
+          id?: number
+          metric: string
+          shift: string
+          store_number: string
+          updated_at?: string | null
+          week_ending: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          driver_name?: string
+          id?: number
+          metric?: string
+          shift?: string
+          store_number?: string
+          updated_at?: string | null
+          week_ending?: string
+        }
+        Relationships: []
+      }
       wsr_financial: {
         Row: {
           amount: number | null
@@ -3772,6 +3937,42 @@ export type Database = {
           week_ending?: string
           week_number?: number | null
           year?: number | null
+        }
+        Relationships: []
+      }
+      wsr_financial_daily: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          date: string
+          id: number
+          line_item: string
+          store_number: string
+          week_ending: string
+          week_number: number
+          year: number
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          date: string
+          id?: number
+          line_item: string
+          store_number: string
+          week_ending: string
+          week_number: number
+          year: number
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          date?: string
+          id?: number
+          line_item?: string
+          store_number?: string
+          week_ending?: string
+          week_number?: number
+          year?: number
         }
         Relationships: []
       }
@@ -3913,14 +4114,16 @@ export type Database = {
           driver_ot_pay: number | null
           driver_penalty_pay: number | null
           driver_straight_pay: number | null
+          id: number
           inshop_labor: number | null
+          labor_percentage: number | null
           manager_labor: number | null
+          overtime_labor: number | null
           store_number: string
           total_labor: number | null
-          updated_at: string | null
           week_ending: string
-          week_number: number | null
-          year: number | null
+          week_number: number
+          year: number
         }
         Insert: {
           created_at?: string | null
@@ -3930,14 +4133,16 @@ export type Database = {
           driver_ot_pay?: number | null
           driver_penalty_pay?: number | null
           driver_straight_pay?: number | null
+          id?: number
           inshop_labor?: number | null
+          labor_percentage?: number | null
           manager_labor?: number | null
+          overtime_labor?: number | null
           store_number: string
           total_labor?: number | null
-          updated_at?: string | null
           week_ending: string
-          week_number?: number | null
-          year?: number | null
+          week_number: number
+          year: number
         }
         Update: {
           created_at?: string | null
@@ -3947,137 +4152,16 @@ export type Database = {
           driver_ot_pay?: number | null
           driver_penalty_pay?: number | null
           driver_straight_pay?: number | null
+          id?: number
           inshop_labor?: number | null
+          labor_percentage?: number | null
           manager_labor?: number | null
+          overtime_labor?: number | null
           store_number?: string
           total_labor?: number | null
-          updated_at?: string | null
           week_ending?: string
-          week_number?: number | null
-          year?: number | null
-        }
-        Relationships: []
-      }
-      wsr_labor_weekly: {
-        Row: {
-          avg_daily_labor: number | null
-          created_at: string | null
-          driver_dmr_expense: number | null
-          driver_labor: number | null
-          driver_ot_pay: number | null
-          driver_penalty_pay: number | null
-          driver_straight_pay: number | null
-          inshop_labor: number | null
-          manager_labor: number | null
-          store_number: string
-          total_labor: number | null
-          updated_at: string | null
-          week_ending: string
-          week_number: number | null
-          year: number | null
-        }
-        Insert: {
-          avg_daily_labor?: number | null
-          created_at?: string | null
-          driver_dmr_expense?: number | null
-          driver_labor?: number | null
-          driver_ot_pay?: number | null
-          driver_penalty_pay?: number | null
-          driver_straight_pay?: number | null
-          inshop_labor?: number | null
-          manager_labor?: number | null
-          store_number: string
-          total_labor?: number | null
-          updated_at?: string | null
-          week_ending: string
-          week_number?: number | null
-          year?: number | null
-        }
-        Update: {
-          avg_daily_labor?: number | null
-          created_at?: string | null
-          driver_dmr_expense?: number | null
-          driver_labor?: number | null
-          driver_ot_pay?: number | null
-          driver_penalty_pay?: number | null
-          driver_straight_pay?: number | null
-          inshop_labor?: number | null
-          manager_labor?: number | null
-          store_number?: string
-          total_labor?: number | null
-          updated_at?: string | null
-          week_ending?: string
-          week_number?: number | null
-          year?: number | null
-        }
-        Relationships: []
-      }
-      wsr_line_items_daily: {
-        Row: {
-          amount: number | null
-          created_at: string | null
-          date: string
-          line_item: string
-          store_number: string
-          updated_at: string | null
-          week_ending: string
-          week_number: number | null
-          year: number | null
-        }
-        Insert: {
-          amount?: number | null
-          created_at?: string | null
-          date: string
-          line_item: string
-          store_number: string
-          updated_at?: string | null
-          week_ending: string
-          week_number?: number | null
-          year?: number | null
-        }
-        Update: {
-          amount?: number | null
-          created_at?: string | null
-          date?: string
-          line_item?: string
-          store_number?: string
-          updated_at?: string | null
-          week_ending?: string
-          week_number?: number | null
-          year?: number | null
-        }
-        Relationships: []
-      }
-      wsr_line_items_weekly: {
-        Row: {
-          amount: number | null
-          created_at: string | null
-          line_item: string
-          store_number: string
-          updated_at: string | null
-          week_ending: string
-          week_number: number | null
-          year: number | null
-        }
-        Insert: {
-          amount?: number | null
-          created_at?: string | null
-          line_item: string
-          store_number: string
-          updated_at?: string | null
-          week_ending: string
-          week_number?: number | null
-          year?: number | null
-        }
-        Update: {
-          amount?: number | null
-          created_at?: string | null
-          line_item?: string
-          store_number?: string
-          updated_at?: string | null
-          week_ending?: string
-          week_number?: number | null
-          year?: number | null
+          week_number?: number
+          year?: number
         }
         Relationships: []
       }
@@ -4129,162 +4213,138 @@ export type Database = {
       wsr_sales_daily: {
         Row: {
           adjusted_sales: number | null
-          catering: number | null
+          box_lunch: number | null
+          cookie: number | null
           created_at: string | null
           date: string
-          delivery: number | null
-          desserts: number | null
-          inshop: number | null
+          day_old_bread: number | null
+          del_club: number | null
+          del_combos: number | null
+          del_pop: number | null
+          del_side: number | null
+          del_sub: number | null
+          delivery_fee: number | null
+          doordash: number | null
+          fresh_bread: number | null
+          grubhub: number | null
+          id: number
+          in_club: number | null
+          in_combos: number | null
+          in_pop: number | null
+          in_side: number | null
+          in_sub: number | null
           loyalty_coupon: number | null
+          modifiers: number | null
           net_employee_freebies: number | null
           net_manager_freebies: number | null
+          num_of_checks: number | null
+          num_of_sales: number | null
           other_promo: number | null
           other_revenue: number | null
           over_rings: number | null
+          platters: number | null
           royalty_sales: number | null
           sampling: number | null
           store_number: string
           total_deductions: number | null
           total_of_above: number | null
+          total_online_orders: number | null
           total_quantity: number | null
-          updated_at: string | null
+          ubereats: number | null
           waste: number | null
           week_ending: string
-          week_number: number | null
-          year: number | null
+          week_number: number
+          year: number
         }
         Insert: {
           adjusted_sales?: number | null
-          catering?: number | null
+          box_lunch?: number | null
+          cookie?: number | null
           created_at?: string | null
           date: string
-          delivery?: number | null
-          desserts?: number | null
-          inshop?: number | null
+          day_old_bread?: number | null
+          del_club?: number | null
+          del_combos?: number | null
+          del_pop?: number | null
+          del_side?: number | null
+          del_sub?: number | null
+          delivery_fee?: number | null
+          doordash?: number | null
+          fresh_bread?: number | null
+          grubhub?: number | null
+          id?: number
+          in_club?: number | null
+          in_combos?: number | null
+          in_pop?: number | null
+          in_side?: number | null
+          in_sub?: number | null
           loyalty_coupon?: number | null
+          modifiers?: number | null
           net_employee_freebies?: number | null
           net_manager_freebies?: number | null
+          num_of_checks?: number | null
+          num_of_sales?: number | null
           other_promo?: number | null
           other_revenue?: number | null
           over_rings?: number | null
+          platters?: number | null
           royalty_sales?: number | null
           sampling?: number | null
           store_number: string
           total_deductions?: number | null
           total_of_above?: number | null
+          total_online_orders?: number | null
           total_quantity?: number | null
-          updated_at?: string | null
+          ubereats?: number | null
           waste?: number | null
           week_ending: string
-          week_number?: number | null
-          year?: number | null
+          week_number: number
+          year: number
         }
         Update: {
           adjusted_sales?: number | null
-          catering?: number | null
+          box_lunch?: number | null
+          cookie?: number | null
           created_at?: string | null
           date?: string
-          delivery?: number | null
-          desserts?: number | null
-          inshop?: number | null
+          day_old_bread?: number | null
+          del_club?: number | null
+          del_combos?: number | null
+          del_pop?: number | null
+          del_side?: number | null
+          del_sub?: number | null
+          delivery_fee?: number | null
+          doordash?: number | null
+          fresh_bread?: number | null
+          grubhub?: number | null
+          id?: number
+          in_club?: number | null
+          in_combos?: number | null
+          in_pop?: number | null
+          in_side?: number | null
+          in_sub?: number | null
           loyalty_coupon?: number | null
+          modifiers?: number | null
           net_employee_freebies?: number | null
           net_manager_freebies?: number | null
+          num_of_checks?: number | null
+          num_of_sales?: number | null
           other_promo?: number | null
           other_revenue?: number | null
           over_rings?: number | null
+          platters?: number | null
           royalty_sales?: number | null
           sampling?: number | null
           store_number?: string
           total_deductions?: number | null
           total_of_above?: number | null
+          total_online_orders?: number | null
           total_quantity?: number | null
-          updated_at?: string | null
+          ubereats?: number | null
           waste?: number | null
           week_ending?: string
-          week_number?: number | null
-          year?: number | null
-        }
-        Relationships: []
-      }
-      wsr_sales_weekly: {
-        Row: {
-          adjusted_sales: number | null
-          avg_daily_royalty_sales: number | null
-          catering: number | null
-          created_at: string | null
-          delivery: number | null
-          desserts: number | null
-          inshop: number | null
-          loyalty_coupon: number | null
-          net_employee_freebies: number | null
-          net_manager_freebies: number | null
-          other_promo: number | null
-          other_revenue: number | null
-          over_rings: number | null
-          royalty_sales: number | null
-          sampling: number | null
-          store_number: string
-          total_deductions: number | null
-          total_of_above: number | null
-          total_quantity: number | null
-          updated_at: string | null
-          waste: number | null
-          week_ending: string
-          week_number: number | null
-          year: number | null
-        }
-        Insert: {
-          adjusted_sales?: number | null
-          avg_daily_royalty_sales?: number | null
-          catering?: number | null
-          created_at?: string | null
-          delivery?: number | null
-          desserts?: number | null
-          inshop?: number | null
-          loyalty_coupon?: number | null
-          net_employee_freebies?: number | null
-          net_manager_freebies?: number | null
-          other_promo?: number | null
-          other_revenue?: number | null
-          over_rings?: number | null
-          royalty_sales?: number | null
-          sampling?: number | null
-          store_number: string
-          total_deductions?: number | null
-          total_of_above?: number | null
-          total_quantity?: number | null
-          updated_at?: string | null
-          waste?: number | null
-          week_ending: string
-          week_number?: number | null
-          year?: number | null
-        }
-        Update: {
-          adjusted_sales?: number | null
-          avg_daily_royalty_sales?: number | null
-          catering?: number | null
-          created_at?: string | null
-          delivery?: number | null
-          desserts?: number | null
-          inshop?: number | null
-          loyalty_coupon?: number | null
-          net_employee_freebies?: number | null
-          net_manager_freebies?: number | null
-          other_promo?: number | null
-          other_revenue?: number | null
-          over_rings?: number | null
-          royalty_sales?: number | null
-          sampling?: number | null
-          store_number?: string
-          total_deductions?: number | null
-          total_of_above?: number | null
-          total_quantity?: number | null
-          updated_at?: string | null
-          waste?: number | null
-          week_ending?: string
-          week_number?: number | null
-          year?: number | null
+          week_number?: number
+          year?: number
         }
         Relationships: []
       }
@@ -4324,6 +4384,10 @@ export type Database = {
       calculate_completion_metrics_with_hierarchy: {
         Args: { p_batch_id: string; p_metric_date: string }
         Returns: undefined
+      }
+      calculate_day_training_completion: {
+        Args: { p_day_number: number; p_employee_id: string }
+        Returns: Json
       }
       calculate_feedback_score: {
         Args: {
@@ -4384,6 +4448,20 @@ export type Database = {
         Args: { email: string; first_name: string; last_name: string }
         Returns: string
       }
+      get_aggregated_customers: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          customer_name: string
+          email: string
+          first_order_date: string
+          last_order_date: string
+          location: string
+          order_count: number
+          phone: string
+          state: string
+          total_spent: number
+        }[]
+      }
       get_all_employees_r2r_progress: {
         Args: {
           store_num: string
@@ -4398,6 +4476,17 @@ export type Database = {
           percent_complete: number
           status: string
           training_module_name: string
+        }[]
+      }
+      get_catering_metrics: {
+        Args: { cutoff_date?: string }
+        Returns: {
+          active_locations: number
+          avg_order_value: number
+          last_updated: string
+          total_customers: number
+          total_orders: number
+          total_revenue: number
         }[]
       }
       get_class_category_counts: {
@@ -4504,28 +4593,32 @@ export type Database = {
         Returns: string
       }
       get_employee_career_path: {
-        Args: { target_employee_id: string }
+        Args: { p_employee_id: string }
         Returns: {
           approved_at: string
           approved_by: string
+          completed_at: string
+          completed_by: string
           day_label: string
           day_number: number
           estimated_minutes: number
           instructions: string
           is_complete: boolean
-          is_manually_completed: boolean
           is_required: boolean
           item_order: number
           item_title: string
           item_type: string
           manager_approved: boolean
           manager_notes: string
-          manually_completed_at: string
-          manually_completed_by: string
+          position_name: string
+          requires_manager_approval: boolean
           section_name: string
           template_item_id: string
-          training_completed_date: string
-          training_status: string
+          training_complete: boolean
+          training_completion_percentage: number
+          training_module_id: string
+          training_module_name: string
+          training_verification: Json
         }[]
       }
       get_employee_class_category_completions: {
@@ -4584,6 +4677,37 @@ export type Database = {
           notification_level: number
           role: string
           user_id: string
+        }[]
+      }
+      get_manager_approval_requests: {
+        Args: { p_manager_user_id?: string }
+        Returns: {
+          day_label: string
+          employee_id: string
+          employee_name: string
+          item_title: string
+          item_type: string
+          notification_id: string
+          requested_at: string
+          status: string
+          store_number: string
+          template_item_id: string
+        }[]
+      }
+      get_market_analysis: {
+        Args: {
+          cutoff_date?: string
+          period_id?: string
+          previous_cutoff_date?: string
+          region_filter?: string
+        }
+        Returns: {
+          avg_order_value: number
+          market_name: string
+          market_type: string
+          orders: number
+          percentage: number
+          revenue: number
         }[]
       }
       get_market_class_category_counts: {
@@ -4684,6 +4808,14 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_sales_trend: {
+        Args: { cutoff_date?: string; end_date?: string; period_id?: string }
+        Returns: {
+          date: string
+          orders: number
+          revenue: number
+        }[]
+      }
       get_store_class_category_counts: {
         Args: {
           target_category: string
@@ -4774,6 +4906,24 @@ export type Database = {
           total_employees: number
         }[]
       }
+      get_store_performance: {
+        Args: {
+          cutoff_date: string
+          previous_cutoff_date: string
+          region_filter?: string
+        }
+        Returns: {
+          avg_order_value: number
+          growth_percent: number
+          last_order_date: string
+          region: string
+          store_id: number
+          store_name: string
+          store_number: string
+          total_orders: number
+          total_revenue: number
+        }[]
+      }
       get_store_position_completion_rates: {
         Args: {
           target_class: string
@@ -4810,6 +4960,20 @@ export type Database = {
           status_51_75: number
           status_76_99: number
           total_employees: number
+        }[]
+      }
+      get_top_stores: {
+        Args: {
+          cutoff_date?: string
+          end_date?: string
+          limit_count?: number
+          period_id?: string
+        }
+        Returns: {
+          orders: number
+          revenue: number
+          store_name: string
+          store_number: string
         }[]
       }
       get_training_completions_for_store: {
@@ -4892,6 +5056,10 @@ export type Database = {
       normalize_market: {
         Args: { market_name: string }
         Returns: string
+      }
+      process_approval: {
+        Args: { p_notes?: string; p_notification_id: string; p_status: string }
+        Returns: boolean
       }
       query_portal_auth_access_definitions: {
         Args: Record<PropertyKey, never>
@@ -5018,6 +5186,10 @@ export type Database = {
           p_portal_id: string
           p_user_id: string
         }
+        Returns: string
+      }
+      submit_approval_request: {
+        Args: { p_employee_id: string; p_template_item_id: string }
         Returns: string
       }
       user_has_market_access: {
