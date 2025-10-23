@@ -639,6 +639,97 @@ export type Database = {
           },
         ]
       }
+      catering_crm_callbacks: {
+        Row: {
+          assigned_to: string | null
+          callback_type: string
+          completed_at: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          lead_id: string
+          notes: string | null
+          priority: string
+          scheduled_for: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          callback_type: string
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          lead_id: string
+          notes?: string | null
+          priority?: string
+          scheduled_for: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          callback_type?: string
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          lead_id?: string
+          notes?: string | null
+          priority?: string
+          scheduled_for?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catering_crm_callbacks_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "catering_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      catering_crm_interactions: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          direction: string | null
+          id: string
+          interaction_type: string
+          lead_id: string
+          notes: string | null
+          outcome: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          direction?: string | null
+          id?: string
+          interaction_type: string
+          lead_id: string
+          notes?: string | null
+          outcome?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          direction?: string | null
+          id?: string
+          interaction_type?: string
+          lead_id?: string
+          notes?: string | null
+          outcome?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catering_crm_interactions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "catering_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       catering_customers: {
         Row: {
           address: string | null
@@ -776,16 +867,24 @@ export type Database = {
       }
       catering_leads: {
         Row: {
+          assigned_to: string | null
           campaign_id: string | null
           campaign_slug: string | null
+          company_name: string | null
           contacted_at: string | null
           converted_at: string | null
           created_at: string | null
           email: string
+          estimated_order_value: number | null
+          event_type: string | null
+          expected_close_date: string | null
           id: string
+          last_interaction_at: string | null
+          lead_score: number | null
           marketing_consent: boolean | null
           message: string | null
           name: string
+          next_callback_at: string | null
           notes: string | null
           phone: string
           source: string | null
@@ -793,16 +892,24 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          assigned_to?: string | null
           campaign_id?: string | null
           campaign_slug?: string | null
+          company_name?: string | null
           contacted_at?: string | null
           converted_at?: string | null
           created_at?: string | null
           email: string
+          estimated_order_value?: number | null
+          event_type?: string | null
+          expected_close_date?: string | null
           id?: string
+          last_interaction_at?: string | null
+          lead_score?: number | null
           marketing_consent?: boolean | null
           message?: string | null
           name: string
+          next_callback_at?: string | null
           notes?: string | null
           phone: string
           source?: string | null
@@ -810,16 +917,24 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          assigned_to?: string | null
           campaign_id?: string | null
           campaign_slug?: string | null
+          company_name?: string | null
           contacted_at?: string | null
           converted_at?: string | null
           created_at?: string | null
           email?: string
+          estimated_order_value?: number | null
+          event_type?: string | null
+          expected_close_date?: string | null
           id?: string
+          last_interaction_at?: string | null
+          lead_score?: number | null
           marketing_consent?: boolean | null
           message?: string | null
           name?: string
+          next_callback_at?: string | null
           notes?: string | null
           phone?: string
           source?: string | null
@@ -2831,7 +2946,7 @@ export type Database = {
           action: string
           created_at: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           portal_id: string
           resource_id: string | null
           resource_type: string | null
@@ -2842,7 +2957,7 @@ export type Database = {
           action: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           portal_id: string
           resource_id?: string | null
           resource_type?: string | null
@@ -2853,7 +2968,7 @@ export type Database = {
           action?: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           portal_id?: string
           resource_id?: string | null
           resource_type?: string | null
@@ -3355,6 +3470,7 @@ export type Database = {
           created_at: string | null
           id: string
           is_live: boolean | null
+          is_observation: boolean | null
           last_seen_date: string | null
           position: string[] | null
           training_name: string
@@ -3369,6 +3485,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           is_live?: boolean | null
+          is_observation?: boolean | null
           last_seen_date?: string | null
           position?: string[] | null
           training_name: string
@@ -3383,6 +3500,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           is_live?: boolean | null
+          is_observation?: boolean | null
           last_seen_date?: string | null
           position?: string[] | null
           training_name?: string
@@ -3869,35 +3987,92 @@ export type Database = {
         Row: {
           amount: number | null
           created_at: string | null
+          date: string
           driver_name: string
           id: number
           metric: string
           shift: string
+          shift_num: number
           store_number: string
-          updated_at: string | null
-          week_ending: string
+          week_ending_date: string
         }
         Insert: {
           amount?: number | null
           created_at?: string | null
+          date: string
           driver_name: string
           id?: number
           metric: string
           shift: string
+          shift_num: number
           store_number: string
-          updated_at?: string | null
-          week_ending: string
+          week_ending_date: string
         }
         Update: {
           amount?: number | null
           created_at?: string | null
+          date?: string
           driver_name?: string
           id?: number
           metric?: string
           shift?: string
+          shift_num?: number
           store_number?: string
-          updated_at?: string | null
-          week_ending?: string
+          week_ending_date?: string
+        }
+        Relationships: []
+      }
+      wsr_dmr_daily: {
+        Row: {
+          amount_of_checks: number | null
+          cash_due: number | null
+          created_at: string | null
+          date: string
+          dmr: number | null
+          driver_name: string
+          id: number
+          net_sales: number | null
+          num_of_checks: number | null
+          store_number: string
+          taxable_income: number | null
+          tips: number | null
+          total_miles: number | null
+          total_sales: number | null
+          week_ending_date: string
+        }
+        Insert: {
+          amount_of_checks?: number | null
+          cash_due?: number | null
+          created_at?: string | null
+          date: string
+          dmr?: number | null
+          driver_name: string
+          id?: number
+          net_sales?: number | null
+          num_of_checks?: number | null
+          store_number: string
+          taxable_income?: number | null
+          tips?: number | null
+          total_miles?: number | null
+          total_sales?: number | null
+          week_ending_date: string
+        }
+        Update: {
+          amount_of_checks?: number | null
+          cash_due?: number | null
+          created_at?: string | null
+          date?: string
+          dmr?: number | null
+          driver_name?: string
+          id?: number
+          net_sales?: number | null
+          num_of_checks?: number | null
+          store_number?: string
+          taxable_income?: number | null
+          tips?: number | null
+          total_miles?: number | null
+          total_sales?: number | null
+          week_ending_date?: string
         }
         Relationships: []
       }
@@ -4021,6 +4196,7 @@ export type Database = {
       wsr_inventory: {
         Row: {
           category: string
+          cos_dollars: number | null
           cos_percent: number | null
           created_at: string | null
           store_number: string
@@ -4031,6 +4207,7 @@ export type Database = {
         }
         Insert: {
           category: string
+          cos_dollars?: number | null
           cos_percent?: number | null
           created_at?: string | null
           store_number: string
@@ -4041,6 +4218,7 @@ export type Database = {
         }
         Update: {
           category?: string
+          cos_dollars?: number | null
           cos_percent?: number | null
           created_at?: string | null
           store_number?: string
@@ -4406,10 +4584,7 @@ export type Database = {
         Args: { period_uuid: string; user_uuid: string }
         Returns: boolean
       }
-      check_sla_violations: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      check_sla_violations: { Args: never; Returns: undefined }
       check_sniper_badge: {
         Args: { period_uuid: string; user_uuid: string }
         Returns: boolean
@@ -4418,16 +4593,13 @@ export type Database = {
         Args: { period_uuid: string; user_uuid: string }
         Returns: boolean
       }
-      cleanup_old_wsr_data: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+      cleanup_old_wsr_data: { Args: never; Returns: number }
       create_training_snapshot: {
         Args: { p_batch_id: string; p_snapshot_date: string }
         Returns: undefined
       }
       distinct_states: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           state: string
         }[]
@@ -4449,7 +4621,7 @@ export type Database = {
         Returns: string
       }
       get_aggregated_customers: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           customer_name: string
           email: string
@@ -4532,20 +4704,40 @@ export type Database = {
           total_employees: number
         }[]
       }
-      get_company_completion_trends: {
-        Args:
-          | Record<PropertyKey, never>
-          | { module_id?: string }
-          | { target_category?: string }
-        Returns: {
-          completed: number
-          completion_rate: number
-          date_point: string
-          in_progress: number
-          not_started: number
-          total: number
-        }[]
-      }
+      get_company_completion_trends:
+        | {
+            Args: never
+            Returns: {
+              completed: number
+              completion_rate: number
+              date_point: string
+              in_progress: number
+              not_started: number
+              total: number
+            }[]
+          }
+        | {
+            Args: { module_id?: string }
+            Returns: {
+              completed: number
+              completion_rate: number
+              date_point: string
+              in_progress: number
+              not_started: number
+              total: number
+            }[]
+          }
+        | {
+            Args: { target_category?: string }
+            Returns: {
+              completed: number
+              completion_rate: number
+              date_point: string
+              in_progress: number
+              not_started: number
+              total: number
+            }[]
+          }
       get_company_employee_counts: {
         Args: { target_category?: string }
         Returns: {
@@ -4588,10 +4780,8 @@ export type Database = {
           total_employees: number
         }[]
       }
-      get_current_user_email: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      get_crm_metrics: { Args: { user_uuid?: string }; Returns: Json }
+      get_current_user_email: { Args: never; Returns: string }
       get_employee_career_path: {
         Args: { p_employee_id: string }
         Returns: {
@@ -4721,21 +4911,43 @@ export type Database = {
           total_employees: number
         }[]
       }
-      get_market_completion_trends: {
-        Args:
-          | Record<PropertyKey, never>
-          | { module_id?: string }
-          | { target_category?: string }
-        Returns: {
-          completed: number
-          completion_rate: number
-          date_point: string
-          in_progress: number
-          market: string
-          not_started: number
-          total: number
-        }[]
-      }
+      get_market_completion_trends:
+        | {
+            Args: never
+            Returns: {
+              completed: number
+              completion_rate: number
+              date_point: string
+              in_progress: number
+              market: string
+              not_started: number
+              total: number
+            }[]
+          }
+        | {
+            Args: { module_id?: string }
+            Returns: {
+              completed: number
+              completion_rate: number
+              date_point: string
+              in_progress: number
+              market: string
+              not_started: number
+              total: number
+            }[]
+          }
+        | {
+            Args: { target_category?: string }
+            Returns: {
+              completed: number
+              completion_rate: number
+              date_point: string
+              in_progress: number
+              market: string
+              not_started: number
+              total: number
+            }[]
+          }
       get_market_employee_counts: {
         Args: { target_category?: string }
         Returns: {
@@ -4851,22 +5063,46 @@ export type Database = {
           total_employees: number
         }[]
       }
-      get_store_completion_trends: {
-        Args:
-          | { module_id?: string; target_market: string }
-          | { target_category?: string; target_market: string }
-          | { target_market: string }
-        Returns: {
-          completed: number
-          completion_rate: number
-          date_point: string
-          in_progress: number
-          not_started: number
-          store_name: string
-          store_number: string
-          total: number
-        }[]
-      }
+      get_store_completion_trends:
+        | {
+            Args: { target_market: string }
+            Returns: {
+              completed: number
+              completion_rate: number
+              date_point: string
+              in_progress: number
+              not_started: number
+              store_name: string
+              store_number: string
+              total: number
+            }[]
+          }
+        | {
+            Args: { module_id?: string; target_market: string }
+            Returns: {
+              completed: number
+              completion_rate: number
+              date_point: string
+              in_progress: number
+              not_started: number
+              store_name: string
+              store_number: string
+              total: number
+            }[]
+          }
+        | {
+            Args: { target_category?: string; target_market: string }
+            Returns: {
+              completed: number
+              completion_rate: number
+              date_point: string
+              in_progress: number
+              not_started: number
+              store_name: string
+              store_number: string
+              total: number
+            }[]
+          }
       get_store_employee_counts: {
         Args: { target_category?: string; target_market: string }
         Returns: {
@@ -4951,7 +5187,7 @@ export type Database = {
         }[]
       }
       get_team_member_average_progress: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           avg_completion_rate: number
           status_0_25: number
@@ -4976,20 +5212,40 @@ export type Database = {
           store_number: string
         }[]
       }
-      get_training_completions_for_store: {
-        Args:
-          | { module_id?: string; store_num: string }
-          | { store_num: string }
-          | { store_num: string; target_category?: string }
-        Returns: {
-          completed_date: string
-          employee_id: string
-          employee_name: string
-          percent_complete: number
-          status: string
-          training_module_name: string
-        }[]
-      }
+      get_training_completions_for_store:
+        | {
+            Args: { store_num: string }
+            Returns: {
+              completed_date: string
+              employee_id: string
+              employee_name: string
+              percent_complete: number
+              status: string
+              training_module_name: string
+            }[]
+          }
+        | {
+            Args: { store_num: string; target_category?: string }
+            Returns: {
+              completed_date: string
+              employee_id: string
+              employee_name: string
+              percent_complete: number
+              status: string
+              training_module_name: string
+            }[]
+          }
+        | {
+            Args: { module_id?: string; store_num: string }
+            Returns: {
+              completed_date: string
+              employee_id: string
+              employee_name: string
+              percent_complete: number
+              status: string
+              training_module_name: string
+            }[]
+          }
       get_user_accessible_markets: {
         Args: { user_uuid: string }
         Returns: {
@@ -5008,7 +5264,7 @@ export type Database = {
         }[]
       }
       get_user_display_info: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           display_name: string
           first_name: string
@@ -5029,40 +5285,19 @@ export type Database = {
         Args: { _role_name: string; _user_id: string }
         Returns: boolean
       }
-      is_admin: {
-        Args: { user_id: string }
-        Returns: boolean
-      }
-      is_dm: {
-        Args: { user_uuid: string }
-        Returns: boolean
-      }
-      is_executive: {
-        Args: { user_uuid: string }
-        Returns: boolean
-      }
-      is_jsonb_array_of_strings: {
-        Args: { j: Json }
-        Returns: boolean
-      }
-      is_portal_master_admin: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
-      jsonb_try_parse: {
-        Args: { txt: string }
-        Returns: Json
-      }
-      normalize_market: {
-        Args: { market_name: string }
-        Returns: string
-      }
+      is_admin: { Args: { user_id: string }; Returns: boolean }
+      is_dm: { Args: { user_uuid: string }; Returns: boolean }
+      is_executive: { Args: { user_uuid: string }; Returns: boolean }
+      is_jsonb_array_of_strings: { Args: { j: Json }; Returns: boolean }
+      is_portal_master_admin: { Args: { _user_id: string }; Returns: boolean }
+      jsonb_try_parse: { Args: { txt: string }; Returns: Json }
+      normalize_market: { Args: { market_name: string }; Returns: string }
       process_approval: {
         Args: { p_notes?: string; p_notification_id: string; p_status: string }
         Returns: boolean
       }
       query_portal_auth_access_definitions: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           can_comment: boolean
           can_edit: boolean
@@ -5102,7 +5337,7 @@ export type Database = {
         }[]
       }
       query_portal_auth_roles: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           created_at: string
           description: string
@@ -5142,7 +5377,7 @@ export type Database = {
         }[]
       }
       query_portal_auth_users_with_roles: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           display_name: string
           email: string
@@ -5152,10 +5387,7 @@ export type Database = {
           user_id: string
         }[]
       }
-      refresh_wsr_analytics: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      refresh_wsr_analytics: { Args: never; Returns: undefined }
       remove_user_market_permission: {
         Args: { target_market_name: string; target_user_id: string }
         Returns: undefined
@@ -5172,10 +5404,7 @@ export type Database = {
         Args: { p_revoked_by: string; p_scope_id: string }
         Returns: boolean
       }
-      rollback_work_orders_migration: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      rollback_work_orders_migration: { Args: never; Returns: undefined }
       set_portal_auth_custom_permission: {
         Args: {
           p_can_comment: boolean
@@ -5205,7 +5434,7 @@ export type Database = {
         Returns: boolean
       }
       validate_work_orders_migration: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           check_name: string
           details: string
