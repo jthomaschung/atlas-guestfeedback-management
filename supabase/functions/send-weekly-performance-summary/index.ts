@@ -63,7 +63,7 @@ async function sendSlackDM(slackBotToken: string, recipientEmail: string, blocks
   }
 }
 
-function buildWeeklySummaryBlocks(summary: any, directorName: string, weekStart: Date, weekEnd: Date): any[] {
+function buildWeeklySummaryBlocks(summary: any, directorName: string, weekStart: Date, weekEnd: Date, frontendUrl: string): any[] {
   const blocks: any[] = [
     {
       type: "header",
@@ -147,7 +147,7 @@ function buildWeeklySummaryBlocks(summary: any, directorName: string, weekStart:
         {
           type: "button",
           text: { type: "plain_text", text: "View Full Dashboard", emoji: true },
-          url: `https://59a1a4a4-5107-4cbe-87fb-e1dcf4b1823a.lovableproject.com/customer-feedback`
+          url: `${frontendUrl}/customer-feedback`
         }
       ]
     }
@@ -165,6 +165,7 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const slackBotToken = Deno.env.get("SLACK_BOT_TOKEN");
+    const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://guestfeedback.atlaswe.com';
     
     if (!slackBotToken) {
       console.error('SLACK_BOT_TOKEN not configured');
@@ -310,7 +311,8 @@ const handler = async (req: Request): Promise<Response> => {
           summary, 
           manager.display_name || manager.email, 
           targetMonday, 
-          targetSunday
+          targetSunday,
+          frontendUrl
         );
 
         await sendSlackDM(

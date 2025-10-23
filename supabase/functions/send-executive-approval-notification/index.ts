@@ -203,7 +203,7 @@ const handler = async (req: Request): Promise<Response> => {
                   ` : ''}
                   
                   <div style="text-align: center; margin-bottom: 25px;">
-                    <a href="https://59a1a4a4-5107-4cbe-87fb-e1dcf4b1823a.lovableproject.com/executive-oversight" style="background: linear-gradient(135deg, #dc2626, #991b1b); color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">View Executive Dashboard</a>
+                    <a href="${Deno.env.get('FRONTEND_URL') || 'https://guestfeedback.atlaswe.com'}/executive-oversight" style="background: linear-gradient(135deg, #dc2626, #991b1b); color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">View Executive Dashboard</a>
                   </div>
                   
                   <div style="border-top: 2px solid #e5e7eb; padding-top: 20px; text-align: center;">

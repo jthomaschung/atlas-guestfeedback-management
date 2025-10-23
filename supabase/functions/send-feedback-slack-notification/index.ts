@@ -73,7 +73,7 @@ async function sendSlackDM(slackBotToken: string, recipientEmail: string, blocks
 }
 
 // Build Slack blocks for new feedback
-function buildNewFeedbackBlocks(feedback: any): any[] {
+function buildNewFeedbackBlocks(feedback: any, frontendUrl: string): any[] {
   const priorityEmoji = feedback.priority === 'Critical' ? '🚨' : 
                         feedback.priority === 'High' ? '⚠️' : 
                         feedback.priority === 'Praise' ? '⭐' : 'ℹ️';
@@ -116,7 +116,7 @@ function buildNewFeedbackBlocks(feedback: any): any[] {
         {
           type: "button",
           text: { type: "plain_text", text: "View Details", emoji: true },
-          url: `https://59a1a4a4-5107-4cbe-87fb-e1dcf4b1823a.lovableproject.com/customer-feedback`
+          url: `${frontendUrl}/customer-feedback`
         }
       ]
     }
@@ -124,7 +124,7 @@ function buildNewFeedbackBlocks(feedback: any): any[] {
 }
 
 // Build Slack blocks for tagged notification
-function buildTaggedBlocks(feedback: any, taggerName: string, note: string): any[] {
+function buildTaggedBlocks(feedback: any, taggerName: string, note: string, frontendUrl: string): any[] {
   return [
     {
       type: "header",
@@ -162,7 +162,7 @@ function buildTaggedBlocks(feedback: any, taggerName: string, note: string): any
         {
           type: "button",
           text: { type: "plain_text", text: "View Feedback", emoji: true },
-          url: `https://59a1a4a4-5107-4cbe-87fb-e1dcf4b1823a.lovableproject.com/customer-feedback`
+          url: `${frontendUrl}/customer-feedback`
         }
       ]
     }
@@ -170,7 +170,7 @@ function buildTaggedBlocks(feedback: any, taggerName: string, note: string): any
 }
 
 // Build Slack blocks for SLA warning/exceeded
-function buildSLABlocks(feedback: any, type: 'warning' | 'exceeded', hoursRemaining?: number): any[] {
+function buildSLABlocks(feedback: any, type: 'warning' | 'exceeded', hoursRemaining: number | undefined, frontendUrl: string): any[] {
   return [
     {
       type: "header",
@@ -204,7 +204,7 @@ function buildSLABlocks(feedback: any, type: 'warning' | 'exceeded', hoursRemain
         {
           type: "button",
           text: { type: "plain_text", text: "Resolve Now", emoji: true },
-          url: `https://59a1a4a4-5107-4cbe-87fb-e1dcf4b1823a.lovableproject.com/executive-oversight`,
+          url: `${frontendUrl}/executive-oversight`,
           style: "danger"
         }
       ]
@@ -213,7 +213,7 @@ function buildSLABlocks(feedback: any, type: 'warning' | 'exceeded', hoursRemain
 }
 
 // Build Slack blocks for critical escalation
-function buildCriticalEscalationBlocks(feedback: any): any[] {
+function buildCriticalEscalationBlocks(feedback: any, frontendUrl: string): any[] {
   return [
     {
       type: "header",
@@ -251,7 +251,7 @@ function buildCriticalEscalationBlocks(feedback: any): any[] {
         {
           type: "button",
           text: { type: "plain_text", text: "Review Immediately", emoji: true },
-          url: `https://59a1a4a4-5107-4cbe-87fb-e1dcf4b1823a.lovableproject.com/executive-oversight`,
+          url: `${frontendUrl}/executive-oversight`,
           style: "danger"
         }
       ]
@@ -260,7 +260,7 @@ function buildCriticalEscalationBlocks(feedback: any): any[] {
 }
 
 // Build Slack blocks for customer response
-function buildCustomerResponseBlocks(feedback: any, sentiment: string): any[] {
+function buildCustomerResponseBlocks(feedback: any, sentiment: string, frontendUrl: string): any[] {
   const sentimentEmoji = sentiment === 'positive' ? '😊' : sentiment === 'negative' ? '😟' : '😐';
   
   return [
@@ -292,7 +292,7 @@ function buildCustomerResponseBlocks(feedback: any, sentiment: string): any[] {
         {
           type: "button",
           text: { type: "plain_text", text: "View Conversation", emoji: true },
-          url: `https://59a1a4a4-5107-4cbe-87fb-e1dcf4b1823a.lovableproject.com/customer-feedback`
+          url: `${frontendUrl}/customer-feedback`
         }
       ]
     }
@@ -300,7 +300,7 @@ function buildCustomerResponseBlocks(feedback: any, sentiment: string): any[] {
 }
 
 // Build Slack blocks for store alert (3+ critical in a day)
-function buildStoreAlertBlocks(storeNumber: string, market: string, criticalCount: number): any[] {
+function buildStoreAlertBlocks(storeNumber: string, market: string, criticalCount: number, frontendUrl: string): any[] {
   return [
     {
       type: "header",
@@ -330,7 +330,7 @@ function buildStoreAlertBlocks(storeNumber: string, market: string, criticalCoun
         {
           type: "button",
           text: { type: "plain_text", text: "Review All Cases", emoji: true },
-          url: `https://59a1a4a4-5107-4cbe-87fb-e1dcf4b1823a.lovableproject.com/customer-feedback`,
+          url: `${frontendUrl}/customer-feedback`,
           style: "danger"
         }
       ]
@@ -347,6 +347,7 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const slackBotToken = Deno.env.get("SLACK_BOT_TOKEN");
+    const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://guestfeedback.atlaswe.com';
     
     if (!slackBotToken) {
       console.error('SLACK_BOT_TOKEN not configured');
@@ -409,7 +410,7 @@ const handler = async (req: Request): Promise<Response> => {
           recipients = profiles || [];
         }
 
-        blocks = buildNewFeedbackBlocks(feedback);
+        blocks = buildNewFeedbackBlocks(feedback, frontendUrl);
         fallbackText = `New ${feedback.priority} feedback for Store #${feedback.store_number}`;
         break;
 
@@ -431,7 +432,7 @@ const handler = async (req: Request): Promise<Response> => {
             .eq('user_id', feedback.user_id)
             .single();
           
-          blocks = buildTaggedBlocks(feedback, taggerData?.display_name || 'Someone', note || '');
+          blocks = buildTaggedBlocks(feedback, taggerData?.display_name || 'Someone', note || '', frontendUrl);
           fallbackText = `You've been tagged in case ${feedback.case_number}`;
         }
         break;
@@ -454,7 +455,7 @@ const handler = async (req: Request): Promise<Response> => {
           recipients = slaProfiles || [];
         }
 
-        blocks = buildSLABlocks(feedback, type === 'sla_exceeded' ? 'exceeded' : 'warning', hoursRemaining);
+        blocks = buildSLABlocks(feedback, type === 'sla_exceeded' ? 'exceeded' : 'warning', hoursRemaining, frontendUrl);
         fallbackText = type === 'sla_exceeded' 
           ? `SLA EXCEEDED for case ${feedback.case_number}`
           : `SLA warning: ${hoursRemaining}h remaining for case ${feedback.case_number}`;
@@ -477,7 +478,7 @@ const handler = async (req: Request): Promise<Response> => {
           recipients = execProfiles || [];
         }
 
-        blocks = buildCriticalEscalationBlocks(feedback);
+        blocks = buildCriticalEscalationBlocks(feedback, frontendUrl);
         fallbackText = `CRITICAL: Case ${feedback.case_number} auto-escalated`;
         break;
 
@@ -493,7 +494,7 @@ const handler = async (req: Request): Promise<Response> => {
           recipients = [assignedUser];
         }
 
-        blocks = buildCustomerResponseBlocks(feedback, feedback.customer_response_sentiment || 'neutral');
+        blocks = buildCustomerResponseBlocks(feedback, feedback.customer_response_sentiment || 'neutral', frontendUrl);
         fallbackText = `Customer responded to case ${feedback.case_number}`;
         break;
 
@@ -528,7 +529,7 @@ const handler = async (req: Request): Promise<Response> => {
             recipients = alertProfiles || [];
           }
 
-          blocks = buildStoreAlertBlocks(feedback.store_number, feedback.market, count);
+          blocks = buildStoreAlertBlocks(feedback.store_number, feedback.market, count, frontendUrl);
           fallbackText = `ALERT: Store #${feedback.store_number} has ${count} critical issues today`;
         }
         break;
