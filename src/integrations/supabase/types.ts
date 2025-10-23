@@ -1853,6 +1853,8 @@ export type Database = {
       }
       internal_feedback: {
         Row: {
+          archived: boolean
+          archived_at: string | null
           browser_info: Json | null
           category: string
           created_at: string
@@ -1868,6 +1870,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          archived?: boolean
+          archived_at?: string | null
           browser_info?: Json | null
           category: string
           created_at?: string
@@ -1883,6 +1887,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          archived?: boolean
+          archived_at?: string | null
           browser_info?: Json | null
           category?: string
           created_at?: string

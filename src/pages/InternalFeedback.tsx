@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { MessageSquare, Bug, Lightbulb, AlertCircle, CheckCircle2, Clock, ExternalLink } from "lucide-react";
+import { MessageSquare, Bug, Lightbulb, AlertCircle, CheckCircle2, Clock, ExternalLink, Archive, ArchiveRestore } from "lucide-react";
 import { format } from "date-fns";
 
 interface InternalFeedback {
@@ -20,6 +20,8 @@ interface InternalFeedback {
   screenshot_path: string | null;
   created_at: string;
   user_id: string;
+  archived: boolean;
+  archived_at: string | null;
   profiles: {
     display_name: string;
     email: string;
@@ -31,18 +33,25 @@ export default function InternalFeedback() {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [showArchived, setShowArchived] = useState<boolean>(false);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchFeedback();
-  }, []);
+  }, [showArchived]);
 
   const fetchFeedback = async () => {
     try {
-      const { data: feedbackData, error: feedbackError } = await supabase
+      let query = supabase
         .from("internal_feedback")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select("*");
+      
+      // Filter by archived status
+      if (!showArchived) {
+        query = query.eq("archived", false);
+      }
+      
+      const { data: feedbackData, error: feedbackError } = await query.order("created_at", { ascending: false });
 
       if (feedbackError) throw feedbackError;
 
@@ -129,6 +138,62 @@ export default function InternalFeedback() {
     }
   };
 
+  const archiveFeedback = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("internal_feedback")
+        .update({ 
+          archived: true,
+          archived_at: new Date().toISOString()
+        })
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setFeedback(prev => prev.filter(item => item.id !== id));
+
+      toast({
+        title: "Archived",
+        description: "Feedback has been archived.",
+      });
+    } catch (error) {
+      console.error("Error archiving feedback:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to archive feedback.",
+      });
+    }
+  };
+
+  const unarchiveFeedback = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("internal_feedback")
+        .update({ 
+          archived: false,
+          archived_at: null
+        })
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setFeedback(prev => prev.filter(item => item.id !== id));
+
+      toast({
+        title: "Unarchived",
+        description: "Feedback has been restored.",
+      });
+    } catch (error) {
+      console.error("Error unarchiving feedback:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to unarchive feedback.",
+      });
+    }
+  };
+
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case "bug":
@@ -198,7 +263,7 @@ export default function InternalFeedback() {
         </p>
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex gap-4 flex-wrap">
         <Select value={filterStatus} onValueChange={setFilterStatus}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Filter by status" />
@@ -222,6 +287,14 @@ export default function InternalFeedback() {
             <SelectItem value="feedback">General Feedback</SelectItem>
           </SelectContent>
         </Select>
+
+        <Button
+          variant={showArchived ? "default" : "outline"}
+          onClick={() => setShowArchived(!showArchived)}
+        >
+          <Archive className="h-4 w-4 mr-2" />
+          {showArchived ? "Showing Archived" : "Show Archived"}
+        </Button>
       </div>
 
       <div className="grid gap-4">
@@ -286,7 +359,7 @@ export default function InternalFeedback() {
                   </Button>
                 )}
 
-                <div className="flex gap-2 pt-2">
+                <div className="flex gap-2 pt-2 flex-wrap">
                   <Select
                     value={item.status}
                     onValueChange={(value) => updateStatus(item.id, value)}
@@ -314,6 +387,26 @@ export default function InternalFeedback() {
                       <SelectItem value="high">High Priority</SelectItem>
                     </SelectContent>
                   </Select>
+
+                  {item.archived ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => unarchiveFeedback(item.id)}
+                    >
+                      <ArchiveRestore className="h-4 w-4 mr-2" />
+                      Unarchive
+                    </Button>
+                  ) : item.status === "resolved" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => archiveFeedback(item.id)}
+                    >
+                      <Archive className="h-4 w-4 mr-2" />
+                      Archive
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
