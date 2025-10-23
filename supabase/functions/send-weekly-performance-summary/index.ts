@@ -165,7 +165,7 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const slackBotToken = Deno.env.get("SLACK_BOT_TOKEN");
-    const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://guestfeedback.atlaswe.com';
+    const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://guestfeedback.lovable.app';
     
     if (!slackBotToken) {
       console.error('SLACK_BOT_TOKEN not configured');

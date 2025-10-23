@@ -24,7 +24,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Redirect to the dashboard with the work order ID as a query parameter
     // This will allow the frontend to automatically open the work order details modal
-    const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://guestfeedback.atlaswe.com';
+    const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://guestfeedback.lovable.app';
     const redirectUrl = `${frontendUrl}/dashboard?workOrderId=${workOrderId}`;
     
     return new Response(null, {
