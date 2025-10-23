@@ -2267,6 +2267,10 @@ export type Database = {
           id: string
           id_photo_back_url: string | null
           id_photo_front_url: string | null
+          id_photo_uploaded_at: string | null
+          id_upload_requested_at: string | null
+          id_upload_token: string | null
+          id_upload_token_expires_at: string | null
           is_rehire: boolean | null
           last_name: string
           license_expiration_date: string | null
@@ -2307,6 +2311,10 @@ export type Database = {
           id?: string
           id_photo_back_url?: string | null
           id_photo_front_url?: string | null
+          id_photo_uploaded_at?: string | null
+          id_upload_requested_at?: string | null
+          id_upload_token?: string | null
+          id_upload_token_expires_at?: string | null
           is_rehire?: boolean | null
           last_name: string
           license_expiration_date?: string | null
@@ -2347,6 +2355,10 @@ export type Database = {
           id?: string
           id_photo_back_url?: string | null
           id_photo_front_url?: string | null
+          id_photo_uploaded_at?: string | null
+          id_upload_requested_at?: string | null
+          id_upload_token?: string | null
+          id_upload_token_expires_at?: string | null
           is_rehire?: boolean | null
           last_name?: string
           license_expiration_date?: string | null
@@ -4620,6 +4632,7 @@ export type Database = {
         Args: { email: string; first_name: string; last_name: string }
         Returns: string
       }
+      generate_id_upload_token: { Args: never; Returns: string }
       get_aggregated_customers: {
         Args: never
         Returns: {
@@ -4661,17 +4674,28 @@ export type Database = {
           total_revenue: number
         }[]
       }
-      get_class_category_counts: {
-        Args: { target_class: string }
-        Returns: {
-          category: string
-          completed: number
-          completion_rate: number
-          in_progress: number
-          not_started: number
-          total_employees: number
-        }[]
-      }
+      get_class_category_counts:
+        | {
+            Args: { target_class: string }
+            Returns: {
+              category: string
+              completed: number
+              completion_rate: number
+              in_progress: number
+              not_started: number
+              total_employees: number
+            }[]
+          }
+        | {
+            Args: { target_category: string; target_class: string }
+            Returns: {
+              completed: number
+              completion_rate: number
+              in_progress: number
+              not_started: number
+              total_employees: number
+            }[]
+          }
       get_class_employee_counts: {
         Args: { target_class: string }
         Returns: {
@@ -4759,16 +4783,26 @@ export type Database = {
           total: number
         }[]
       }
-      get_company_lto_employee_counts: {
-        Args: { training_title: string }
-        Returns: {
-          completed: number
-          completion_rate: number
-          in_progress: number
-          not_started: number
-          total_employees: number
-        }[]
-      }
+      get_company_lto_employee_counts:
+        | {
+            Args: never
+            Returns: {
+              completed_employees: number
+              in_progress_employees: number
+              not_started_employees: number
+              total_employees: number
+            }[]
+          }
+        | {
+            Args: { training_title: string }
+            Returns: {
+              completed: number
+              completion_rate: number
+              in_progress: number
+              not_started: number
+              total_employees: number
+            }[]
+          }
       get_company_position_completion_rates: {
         Args: { target_class: string }
         Returns: {
@@ -4959,17 +4993,28 @@ export type Database = {
           total_employees: number
         }[]
       }
-      get_market_lto_employee_counts: {
-        Args: { training_title: string }
-        Returns: {
-          completed: number
-          completion_rate: number
-          in_progress: number
-          market: string
-          not_started: number
-          total_employees: number
-        }[]
-      }
+      get_market_lto_employee_counts:
+        | {
+            Args: never
+            Returns: {
+              completed_employees: number
+              in_progress_employees: number
+              market: string
+              not_started_employees: number
+              total_employees: number
+            }[]
+          }
+        | {
+            Args: { training_title: string }
+            Returns: {
+              completed: number
+              completion_rate: number
+              in_progress: number
+              market: string
+              not_started: number
+              total_employees: number
+            }[]
+          }
       get_market_position_completion_rates: {
         Args: { target_class: string; target_market: string }
         Returns: {
