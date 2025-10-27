@@ -41,6 +41,39 @@ export type Database = {
         }
         Relationships: []
       }
+      airport_clearance_appointment_history: {
+        Row: {
+          appointment_type: string
+          changed_at: string
+          changed_by: string | null
+          id: string
+          new_date: string
+          new_hire_id: string
+          notes: string | null
+          old_date: string | null
+        }
+        Insert: {
+          appointment_type: string
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          new_date: string
+          new_hire_id: string
+          notes?: string | null
+          old_date?: string | null
+        }
+        Update: {
+          appointment_type?: string
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          new_date?: string
+          new_hire_id?: string
+          notes?: string | null
+          old_date?: string | null
+        }
+        Relationships: []
+      }
       backlog_activity_log: {
         Row: {
           action_details: Json | null
@@ -795,6 +828,7 @@ export type Database = {
           from_name: string
           id: string
           recipient_count: number | null
+          recipient_filter: Json | null
           sent_at: string | null
           status: string
           subject: string
@@ -810,6 +844,7 @@ export type Database = {
           from_name: string
           id?: string
           recipient_count?: number | null
+          recipient_filter?: Json | null
           sent_at?: string | null
           status?: string
           subject: string
@@ -825,6 +860,7 @@ export type Database = {
           from_name?: string
           id?: string
           recipient_count?: number | null
+          recipient_filter?: Json | null
           sent_at?: string | null
           status?: string
           subject?: string
@@ -1125,6 +1161,36 @@ export type Database = {
           store_number?: string
           total_orders?: number | null
           total_revenue?: number | null
+        }
+        Relationships: []
+      }
+      catering_unsubscribe_list: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          ip_address: string | null
+          reason: string | null
+          unsubscribed_at: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          ip_address?: string | null
+          reason?: string | null
+          unsubscribed_at?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          ip_address?: string | null
+          reason?: string | null
+          unsubscribed_at?: string | null
+          user_agent?: string | null
         }
         Relationships: []
       }
@@ -2117,6 +2183,16 @@ export type Database = {
         Row: {
           adp_employee_id: string | null
           adp_user_id: string | null
+          airport_background_check_complete: boolean | null
+          airport_background_check_complete_at: string | null
+          airport_badge_issued: boolean | null
+          airport_badge_issued_at: string | null
+          airport_badge_pickup_appointment_date: string | null
+          airport_badge_request_sent: boolean | null
+          airport_badge_request_sent_at: string | null
+          airport_fingerprint_appointment_date: string | null
+          airport_fingerprinting_complete: boolean | null
+          airport_fingerprinting_complete_at: string | null
           associate_id: string | null
           clearance_email_sent: boolean | null
           clearance_email_sent_at: string | null
@@ -2160,6 +2236,16 @@ export type Database = {
         Insert: {
           adp_employee_id?: string | null
           adp_user_id?: string | null
+          airport_background_check_complete?: boolean | null
+          airport_background_check_complete_at?: string | null
+          airport_badge_issued?: boolean | null
+          airport_badge_issued_at?: string | null
+          airport_badge_pickup_appointment_date?: string | null
+          airport_badge_request_sent?: boolean | null
+          airport_badge_request_sent_at?: string | null
+          airport_fingerprint_appointment_date?: string | null
+          airport_fingerprinting_complete?: boolean | null
+          airport_fingerprinting_complete_at?: string | null
           associate_id?: string | null
           clearance_email_sent?: boolean | null
           clearance_email_sent_at?: string | null
@@ -2203,6 +2289,16 @@ export type Database = {
         Update: {
           adp_employee_id?: string | null
           adp_user_id?: string | null
+          airport_background_check_complete?: boolean | null
+          airport_background_check_complete_at?: string | null
+          airport_badge_issued?: boolean | null
+          airport_badge_issued_at?: string | null
+          airport_badge_pickup_appointment_date?: string | null
+          airport_badge_request_sent?: boolean | null
+          airport_badge_request_sent_at?: string | null
+          airport_fingerprint_appointment_date?: string | null
+          airport_fingerprinting_complete?: boolean | null
+          airport_fingerprinting_complete_at?: string | null
           associate_id?: string | null
           clearance_email_sent?: boolean | null
           clearance_email_sent_at?: string | null
@@ -2255,6 +2351,7 @@ export type Database = {
       }
       new_hire_submissions: {
         Row: {
+          annual_salary: number | null
           applicant_email: string
           applicant_phone: string
           auto_insurance_carrier: string | null
@@ -2263,6 +2360,7 @@ export type Database = {
           drivers_license_number: string | null
           drivers_license_state: string | null
           email_address: string
+          employment_type: string | null
           estimated_start_date: string
           fhc_expiration: string | null
           fhc_number: string | null
@@ -2277,6 +2375,7 @@ export type Database = {
           id_upload_requested_at: string | null
           id_upload_token: string | null
           id_upload_token_expires_at: string | null
+          is_airport_store: boolean | null
           is_rehire: boolean | null
           last_name: string
           license_expiration_date: string | null
@@ -2287,9 +2386,13 @@ export type Database = {
           policy_number: string | null
           position: string
           referral_name: string | null
+          security_clearance_notes: string | null
+          security_clearance_required: boolean | null
+          security_clearance_status: string | null
           servsafe_expiration: string | null
           servsafe_number: string | null
           sign_on_bonus: string | null
+          state_of_residence: string | null
           status: string | null
           store_number: string
           submitted_by: string | null
@@ -2299,6 +2402,7 @@ export type Database = {
           will_be_driving: boolean | null
         }
         Insert: {
+          annual_salary?: number | null
           applicant_email: string
           applicant_phone: string
           auto_insurance_carrier?: string | null
@@ -2307,6 +2411,7 @@ export type Database = {
           drivers_license_number?: string | null
           drivers_license_state?: string | null
           email_address: string
+          employment_type?: string | null
           estimated_start_date: string
           fhc_expiration?: string | null
           fhc_number?: string | null
@@ -2321,6 +2426,7 @@ export type Database = {
           id_upload_requested_at?: string | null
           id_upload_token?: string | null
           id_upload_token_expires_at?: string | null
+          is_airport_store?: boolean | null
           is_rehire?: boolean | null
           last_name: string
           license_expiration_date?: string | null
@@ -2331,9 +2437,13 @@ export type Database = {
           policy_number?: string | null
           position: string
           referral_name?: string | null
+          security_clearance_notes?: string | null
+          security_clearance_required?: boolean | null
+          security_clearance_status?: string | null
           servsafe_expiration?: string | null
           servsafe_number?: string | null
           sign_on_bonus?: string | null
+          state_of_residence?: string | null
           status?: string | null
           store_number: string
           submitted_by?: string | null
@@ -2343,6 +2453,7 @@ export type Database = {
           will_be_driving?: boolean | null
         }
         Update: {
+          annual_salary?: number | null
           applicant_email?: string
           applicant_phone?: string
           auto_insurance_carrier?: string | null
@@ -2351,6 +2462,7 @@ export type Database = {
           drivers_license_number?: string | null
           drivers_license_state?: string | null
           email_address?: string
+          employment_type?: string | null
           estimated_start_date?: string
           fhc_expiration?: string | null
           fhc_number?: string | null
@@ -2365,6 +2477,7 @@ export type Database = {
           id_upload_requested_at?: string | null
           id_upload_token?: string | null
           id_upload_token_expires_at?: string | null
+          is_airport_store?: boolean | null
           is_rehire?: boolean | null
           last_name?: string
           license_expiration_date?: string | null
@@ -2375,9 +2488,13 @@ export type Database = {
           policy_number?: string | null
           position?: string
           referral_name?: string | null
+          security_clearance_notes?: string | null
+          security_clearance_required?: boolean | null
+          security_clearance_status?: string | null
           servsafe_expiration?: string | null
           servsafe_number?: string | null
           sign_on_bonus?: string | null
+          state_of_residence?: string | null
           status?: string | null
           store_number?: string
           submitted_by?: string | null
@@ -3493,7 +3610,6 @@ export type Database = {
           position: string[] | null
           training_name: string
           training_provider: string | null
-          training_type: string | null
           updated_at: string | null
         }
         Insert: {
@@ -3508,7 +3624,6 @@ export type Database = {
           position?: string[] | null
           training_name: string
           training_provider?: string | null
-          training_type?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -3523,7 +3638,117 @@ export type Database = {
           position?: string[] | null
           training_name?: string
           training_provider?: string | null
-          training_type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      training_completion_data_category: {
+        Row: {
+          category: string | null
+          category_completion_pct: number | null
+          id: number
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          category_completion_pct?: number | null
+          id?: number
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          category_completion_pct?: number | null
+          id?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      training_completion_data_employee_category: {
+        Row: {
+          category: string
+          employee_category_completion_pct: number | null
+          employee_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          employee_category_completion_pct?: number | null
+          employee_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          employee_category_completion_pct?: number | null
+          employee_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      training_completion_data_individual: {
+        Row: {
+          completion_pct: number | null
+          employee_completion_pct: number | null
+          employee_name: string | null
+          id: number
+          store: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          completion_pct?: number | null
+          employee_completion_pct?: number | null
+          employee_name?: string | null
+          id?: number
+          store?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          completion_pct?: number | null
+          employee_completion_pct?: number | null
+          employee_name?: string | null
+          id?: number
+          store?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      training_completion_data_store: {
+        Row: {
+          id: number
+          store: string | null
+          store_completion_pct: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: number
+          store?: string | null
+          store_completion_pct?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: number
+          store?: string | null
+          store_completion_pct?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      training_completion_data_store_category: {
+        Row: {
+          category: string
+          store: string
+          store_category_completion_pct: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          store: string
+          store_category_completion_pct?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          store?: string
+          store_category_completion_pct?: number | null
           updated_at?: string | null
         }
         Relationships: []
@@ -4301,6 +4526,42 @@ export type Database = {
         }
         Relationships: []
       }
+      wsr_labor_cost_summary: {
+        Row: {
+          amount: number | null
+          category: string
+          date: string
+          id: number
+          store_number: string
+          uploaded_at: string | null
+          week_ending: string | null
+          week_number: number | null
+          year: number | null
+        }
+        Insert: {
+          amount?: number | null
+          category: string
+          date: string
+          id?: number
+          store_number: string
+          uploaded_at?: string | null
+          week_ending?: string | null
+          week_number?: number | null
+          year?: number | null
+        }
+        Update: {
+          amount?: number | null
+          category?: string
+          date?: string
+          id?: number
+          store_number?: string
+          uploaded_at?: string | null
+          week_ending?: string | null
+          week_number?: number | null
+          year?: number | null
+        }
+        Relationships: []
+      }
       wsr_labor_daily: {
         Row: {
           created_at: string | null
@@ -4789,26 +5050,16 @@ export type Database = {
           total: number
         }[]
       }
-      get_company_lto_employee_counts:
-        | {
-            Args: never
-            Returns: {
-              completed_employees: number
-              in_progress_employees: number
-              not_started_employees: number
-              total_employees: number
-            }[]
-          }
-        | {
-            Args: { training_title: string }
-            Returns: {
-              completed: number
-              completion_rate: number
-              in_progress: number
-              not_started: number
-              total_employees: number
-            }[]
-          }
+      get_company_lto_employee_counts: {
+        Args: { training_title: string }
+        Returns: {
+          completed: number
+          completion_rate: number
+          in_progress: number
+          not_started: number
+          total_employees: number
+        }[]
+      }
       get_company_position_completion_rates: {
         Args: { target_class: string }
         Returns: {
@@ -4999,28 +5250,17 @@ export type Database = {
           total_employees: number
         }[]
       }
-      get_market_lto_employee_counts:
-        | {
-            Args: never
-            Returns: {
-              completed_employees: number
-              in_progress_employees: number
-              market: string
-              not_started_employees: number
-              total_employees: number
-            }[]
-          }
-        | {
-            Args: { training_title: string }
-            Returns: {
-              completed: number
-              completion_rate: number
-              in_progress: number
-              market: string
-              not_started: number
-              total_employees: number
-            }[]
-          }
+      get_market_lto_employee_counts: {
+        Args: { training_title: string }
+        Returns: {
+          completed: number
+          completion_rate: number
+          in_progress: number
+          market: string
+          not_started: number
+          total_employees: number
+        }[]
+      }
       get_market_position_completion_rates: {
         Args: { target_class: string; target_market: string }
         Returns: {
@@ -5096,24 +5336,36 @@ export type Database = {
           total_employees: number
         }[]
       }
-      get_store_class_category_counts_with_employee_average: {
-        Args: {
-          target_category: string
-          target_class: string
-          target_market: string
-        }
-        Returns: {
-          completed: number
-          completion_rate: number
-          employee_average: number
-          in_progress: number
-          manager: string
-          not_started: number
-          store_name: string
-          store_number: string
-          total_employees: number
-        }[]
-      }
+      get_store_class_category_counts_with_employee_average:
+        | {
+            Args: { target_class: string; target_market: string }
+            Returns: {
+              category: string
+              completed: number
+              completion_rate: number
+              in_progress: number
+              not_started: number
+              total_employees: number
+            }[]
+          }
+        | {
+            Args: {
+              target_category: string
+              target_class: string
+              target_market: string
+            }
+            Returns: {
+              completed: number
+              completion_rate: number
+              employee_average: number
+              in_progress: number
+              manager: string
+              not_started: number
+              store_name: string
+              store_number: string
+              total_employees: number
+            }[]
+          }
       get_store_completion_trends:
         | {
             Args: { target_market: string }
