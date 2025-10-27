@@ -363,8 +363,79 @@ Customer Service Team`);
     }
   }, [isOpen]);
 
+// Priority mapping based on category (same as ingest-feedback function)
+  const getPriorityForCategory = (category: string): string => {
+    const normalizedCategory = category.toLowerCase();
+    
+    const priorityMap: Record<string, string> = {
+      'sandwich made wrong': 'High',
+      'slow service': 'Medium',
+      'rude service': 'Critical',
+      'product issue': 'Low',
+      'closed early': 'High',
+      'praise': 'Praise',
+      'missing item': 'High',
+      'missing items': 'High',
+      'credit card issue': 'Low',
+      'bread quality': 'Medium',
+      'out of product': 'Critical',
+      'other': 'Low',
+      'cleanliness': 'Medium',
+      'possible food poisoning': 'Critical',
+      'food poisoning': 'Critical',
+      'loyalty program issues': 'Low',
+      'loyalty issues': 'Low',
+      'food quality': 'Medium',
+      'staff service': 'Medium',
+      'delivery service': 'Low',
+      'store appearance': 'Medium',
+      'wait time': 'Medium',
+      'order accuracy': 'High',
+      'temperature': 'Medium',
+      'quantity': 'Medium',
+      'experience': 'Low',
+      'multiple issues': 'High',
+      'manager/supervisor contact request': 'Medium',
+      'training': 'Low',
+      'appreciation': 'Praise'
+    };
+    
+    return priorityMap[normalizedCategory] || 'Low';
+  };
+
+  // Check if all 4 executive approvals exist for this feedback
+  const checkAllApprovalsComplete = async (feedbackId: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase
+        .from('critical_feedback_approvals')
+        .select('approver_role')
+        .eq('feedback_id', feedbackId);
+      
+      if (error) {
+        console.error('Error checking approvals:', error);
+        return false;
+      }
+      
+      const roles = new Set(data?.map(a => a.approver_role) || []);
+      const hasAllApprovals = roles.has('ceo') && roles.has('vp') && roles.has('director') && roles.has('dm');
+      
+      console.log('🔍 Approval check:', { feedbackId, roles: Array.from(roles), hasAllApprovals });
+      return hasAllApprovals;
+    } catch (error) {
+      console.error('Error checking approvals:', error);
+      return false;
+    }
+  };
+
   const handleCategoryChange = async (newCategory: string) => {
     setCategory(newCategory);
+    
+    // Calculate new priority based on category
+    const newPriority = getPriorityForCategory(newCategory);
+    const wasCritical = priority === 'Critical';
+    const isNowCritical = newPriority === 'Critical';
+    
+    setPriority(newPriority);
     
     // Auto-assign based on the new category and current store/market
     if (feedback && storeNumber && market) {
@@ -372,15 +443,106 @@ Customer Service Team`);
         const newAssignee = await getAssigneeForFeedback(storeNumber, market, newCategory);
         setAssignee(newAssignee);
         
-        toast({
-          title: "Category Updated",
-          description: `Category changed to ${newCategory}. Assignee updated to ${newAssignee}.`,
-        });
+        // Prepare update object
+        const updates: any = {
+          complaint_category: newCategory,
+          priority: newPriority,
+          assignee: newAssignee,
+          updated_at: new Date().toISOString(),
+        };
+        
+        // If downgrading from Critical to non-Critical
+        if (wasCritical && !isNowCritical) {
+          console.log('🔽 Downgrading from Critical to', newPriority);
+          
+          // Check if all 4 approvals exist
+          const hasAllApprovals = await checkAllApprovalsComplete(feedback.id);
+          
+          if (hasAllApprovals) {
+            // All approvals exist - auto-resolve
+            updates.resolution_status = 'resolved';
+            updates.resolution_notes = `Auto-resolved: Category changed from Critical to "${newCategory}" after all executive approvals were obtained.`;
+            setStatus('resolved');
+            setResolutionNotes(updates.resolution_notes);
+            
+            console.log('✅ Auto-resolving: All approvals complete and category changed');
+            
+            toast({
+              title: "Feedback Auto-Resolved",
+              description: `Category changed to "${newCategory}" with priority "${newPriority}". Since all executive approvals were complete, this feedback has been automatically resolved.`,
+            });
+          } else {
+            // No approvals or incomplete - just downgrade status
+            if (status === 'escalated') {
+              updates.resolution_status = 'opened';
+              setStatus('opened');
+            }
+            
+            // Clear escalation fields
+            updates.escalated_at = null;
+            updates.escalated_by = null;
+            updates.sla_deadline = null;
+            updates.auto_escalated = null;
+            
+            console.log('🔽 Downgrading status from escalated to opened');
+            
+            toast({
+              title: "Priority Downgraded",
+              description: `Category changed to "${newCategory}". Priority updated to "${newPriority}" and escalation cleared.`,
+            });
+          }
+        } else if (!wasCritical && isNowCritical) {
+          // Upgrading to Critical - escalate
+          updates.resolution_status = 'escalated';
+          updates.escalated_at = new Date().toISOString();
+          updates.escalated_by = user?.email || 'system';
+          
+          // Calculate SLA deadline (24 hours for Critical)
+          const slaDeadline = new Date();
+          slaDeadline.setHours(slaDeadline.getHours() + 24);
+          updates.sla_deadline = slaDeadline.toISOString();
+          
+          setStatus('escalated');
+          
+          console.log('🔺 Upgrading to Critical - auto-escalating');
+          
+          toast({
+            title: "Escalated to Critical",
+            description: `Category changed to "${newCategory}". Priority upgraded to Critical and feedback has been escalated.`,
+            variant: "destructive",
+          });
+        } else {
+          // Just a normal category change
+          toast({
+            title: "Category Updated",
+            description: `Category changed to "${newCategory}". Priority: "${newPriority}". Assignee: ${newAssignee}.`,
+          });
+        }
+        
+        // Update the database immediately
+        const { error } = await supabase
+          .from('customer_feedback')
+          .update(updates)
+          .eq('id', feedback.id);
+        
+        if (error) {
+          console.error('Error updating feedback:', error);
+          toast({
+            title: "Error",
+            description: "Failed to update feedback in database.",
+            variant: "destructive",
+          });
+        } else {
+          console.log('✅ Feedback updated successfully');
+          onUpdate(); // Refresh the data
+        }
+        
       } catch (error) {
-        console.error('Error auto-assigning:', error);
+        console.error('Error in handleCategoryChange:', error);
         toast({
-          title: "Category Updated",
-          description: `Category changed to ${newCategory}. Please manually set the assignee.`,
+          title: "Error",
+          description: "Failed to process category change.",
+          variant: "destructive",
         });
       }
     }
