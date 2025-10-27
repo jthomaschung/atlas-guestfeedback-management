@@ -69,3 +69,6 @@ verify_jwt = false
 
 [functions.send-weekly-performance-summary]
 verify_jwt = false
+
+[functions.send-internal-feedback-notification]
+verify_jwt = false

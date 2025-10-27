@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useInternalFeedbackNotifications } from "@/hooks/useInternalFeedbackNotifications";
 import { MessageSquare, Bug, Lightbulb, AlertCircle, CheckCircle2, Clock, ExternalLink, Archive, ArchiveRestore } from "lucide-react";
 import { format } from "date-fns";
 
@@ -35,6 +36,7 @@ export default function InternalFeedback() {
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [showArchived, setShowArchived] = useState<boolean>(false);
   const { toast } = useToast();
+  const { sendStatusChangeNotification } = useInternalFeedbackNotifications();
 
   useEffect(() => {
     fetchFeedback();
@@ -85,6 +87,10 @@ export default function InternalFeedback() {
   };
 
   const updateStatus = async (id: string, newStatus: string) => {
+    // Find current item to get old status
+    const currentItem = feedback.find(item => item.id === id);
+    const oldStatus = currentItem?.status;
+    
     try {
       const { error } = await supabase
         .from("internal_feedback")
@@ -97,9 +103,14 @@ export default function InternalFeedback() {
         prev.map(item => (item.id === id ? { ...item, status: newStatus } : item))
       );
 
+      // Send notification if status actually changed
+      if (oldStatus && oldStatus !== newStatus) {
+        await sendStatusChangeNotification(id, oldStatus, newStatus);
+      }
+
       toast({
         title: "Status Updated",
-        description: `Feedback marked as ${newStatus}.`,
+        description: `Feedback marked as ${newStatus}. Notification sent to submitter.`,
       });
     } catch (error) {
       console.error("Error updating status:", error);
