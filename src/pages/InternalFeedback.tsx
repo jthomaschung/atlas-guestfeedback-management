@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useInternalFeedbackNotifications } from "@/hooks/useInternalFeedbackNotifications";
-import { MessageSquare, Bug, Lightbulb, AlertCircle, CheckCircle2, Clock, ExternalLink, Archive, ArchiveRestore } from "lucide-react";
+import { MessageSquare, Bug, Lightbulb, AlertCircle, CheckCircle2, Clock, ExternalLink, Archive, ArchiveRestore, Mail } from "lucide-react";
 import { format } from "date-fns";
 
 interface InternalFeedback {
@@ -35,6 +35,7 @@ export default function InternalFeedback() {
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [showArchived, setShowArchived] = useState<boolean>(false);
+  const [sendingBulk, setSendingBulk] = useState<boolean>(false);
   const { toast } = useToast();
   const { sendStatusChangeNotification } = useInternalFeedbackNotifications();
 
@@ -205,6 +206,39 @@ export default function InternalFeedback() {
     }
   };
 
+  const sendBulkResolvedNotifications = async () => {
+    setSendingBulk(true);
+    try {
+      toast({
+        title: "Sending Notifications",
+        description: "Sending emails for all resolved feedback...",
+      });
+
+      const { data, error } = await supabase.functions.invoke(
+        "send-bulk-internal-feedback-notifications",
+        { body: {} }
+      );
+
+      if (error) throw error;
+
+      toast({
+        title: "Notifications Sent",
+        description: `Successfully sent ${data.sent} notifications. ${data.failed} failed, ${data.skipped} skipped.`,
+      });
+
+      console.log("Bulk notification results:", data);
+    } catch (error) {
+      console.error("Error sending bulk notifications:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to send bulk notifications.",
+      });
+    } finally {
+      setSendingBulk(false);
+    }
+  };
+
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case "bug":
@@ -305,6 +339,15 @@ export default function InternalFeedback() {
         >
           <Archive className="h-4 w-4 mr-2" />
           {showArchived ? "Showing Archived" : "Show Archived"}
+        </Button>
+
+        <Button
+          variant="default"
+          onClick={sendBulkResolvedNotifications}
+          disabled={sendingBulk}
+        >
+          <Mail className="h-4 w-4 mr-2" />
+          {sendingBulk ? "Sending..." : "Email All Resolved"}
         </Button>
       </div>
 

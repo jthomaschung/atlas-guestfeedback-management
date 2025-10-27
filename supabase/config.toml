@@ -72,3 +72,6 @@ verify_jwt = false
 
 [functions.send-internal-feedback-notification]
 verify_jwt = false
+
+[functions.send-bulk-internal-feedback-notifications]
+verify_jwt = false
