@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, User, Star, MapPin, Phone, Mail, MessageSquare, Clock, AlertTriangle, Store, Edit, Save, X, Heart, CheckCircle } from "lucide-react";
+import { Calendar, User, Star, MapPin, Phone, Mail, MessageSquare, Clock, AlertTriangle, Store, Edit, Save, X, Heart, CheckCircle, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -197,6 +197,13 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const processedFeedbackId = useRef<string | null>(null);
 
   const isAdmin = permissions?.role?.toLowerCase() === 'admin' || permissions?.role?.toLowerCase() === 'dm' || permissions?.isAdmin || permissions?.isDirectorOrAbove;
+
+  const shouldShowCMXLink = (feedback: CustomerFeedback): boolean => {
+    return (
+      feedback.complaint_category === 'Product Issue' &&
+      feedback.resolution_notes?.toLowerCase().includes('cmx')
+    );
+  };
 
   // Check acknowledgment status - use useCallback to memoize
   const checkAcknowledgmentStatus = useCallback(async () => {
@@ -1538,6 +1545,19 @@ Customer Service Team`);
                       <SelectItem value="Loyalty Program Issues">Loyalty Program Issues</SelectItem>
                     </SelectContent>
                   </Select>
+                  
+                  {/* CMX Link for Product Issues */}
+                  {feedback && shouldShowCMXLink(feedback) && (
+                    <a
+                      href="https://jimmyjohns.compliancemetrix.com/rql/p/acoretableauhomevhomeactivator"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 mt-2 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950 dark:hover:bg-blue-900 border border-blue-200 dark:border-blue-800 rounded-md text-sm font-medium text-blue-700 dark:text-blue-400 transition-colors"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Open in CMX
+                    </a>
+                  )}
                 </div>
               )}
             </div>

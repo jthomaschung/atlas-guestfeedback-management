@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { Edit, Calendar, Eye, User, Clock, AlertTriangle, Trash2, Star, Phone, Hash, Save, X } from "lucide-react";
+import { Edit, Calendar, Eye, User, Clock, AlertTriangle, Trash2, Star, Phone, Hash, Save, X, ExternalLink } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -85,6 +85,13 @@ export function CustomerFeedbackCard({
   const [isUpdatingFeedback, setIsUpdatingFeedback] = useState(false);
   const PriorityIcon = priorityIcons[feedback.priority as keyof typeof priorityIcons];
   const isUrgent = feedback.priority === 'Critical';
+
+  const shouldShowCMXLink = (feedback: CustomerFeedback): boolean => {
+    return (
+      feedback.complaint_category === 'Product Issue' &&
+      feedback.resolution_notes?.toLowerCase().includes('cmx')
+    );
+  };
 
   const handleCalledChange = async (checked: boolean) => {
     setIsUpdatingCalled(true);
@@ -334,6 +341,20 @@ export function CustomerFeedbackCard({
               </Badge>
             )}
           </div>
+          
+          {/* CMX Link for Product Issues */}
+          {shouldShowCMXLink(feedback) && (
+            <a
+              href="https://jimmyjohns.compliancemetrix.com/rql/p/acoretableauhomevhomeactivator"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950 dark:hover:bg-blue-900 border border-blue-200 dark:border-blue-800 rounded-md text-xs font-medium text-blue-700 dark:text-blue-400 transition-colors"
+            >
+              <ExternalLink className="h-3 w-3" />
+              Open in CMX
+            </a>
+          )}
           
           {/* Meta Information */}
           <div className="flex flex-col gap-2 text-xs text-muted-foreground">
