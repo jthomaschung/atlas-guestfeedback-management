@@ -58,8 +58,9 @@ export const LoyaltyRewardEmail = ({
             <strong>Reward:</strong> {rewardDetails}
           </Text>
           <Text style={rewardInstructions}>
-            To redeem your free sub, simply visit any of our locations and provide your 
-            phone number or email address at checkout. Your reward is ready and waiting!
+            We will use your phone number to add the credit. To redeem your free sub, visit the 
+            store where your original purchase was made and provide your phone number at checkout. 
+            Your reward is ready and waiting!
           </Text>
         </Section>
 

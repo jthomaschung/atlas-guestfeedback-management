@@ -49,7 +49,7 @@ export const ClosedEarlyEmail = ({
         </Text>
 
         <Text style={text}>
-          I'll add a credit to your account for a free original sandwich to make it right. This credit is store-specific, so please call in your order or visit us in-store to redeem it.
+          I'll add a credit to your account for a free original sandwich to make it right. We will use your phone number to add the credit and this credit is only applicable at the store where your original purchase was made.
         </Text>
 
         <Text style={text}>

@@ -43,7 +43,7 @@ export const MissingItemEmail = ({
         </Text>
 
         <Text style={text}>
-          I'd like to make it up to you by adding a credit to your account for a free original sandwich. This credit is store-specific, so you'll want to call in your order or visit us in-store to redeem it.
+          I'd like to make it up to you by adding a credit to your account for a free original sandwich. We will use your phone number to add the credit and this credit is only applicable at the store where your original purchase was made.
         </Text>
 
         <Text style={text}>
