@@ -47,6 +47,7 @@ const Index = () => {
       const { data, error } = await supabase
         .from('customer_feedback')
         .select('*')
+        .neq('resolution_status', 'resolved')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -244,11 +245,18 @@ const Index = () => {
           viewed: data.viewed || false
         };
 
-        // Update the feedbacks array
-        setFeedbacks(prev => prev.map(fb => fb.id === updatedFeedback.id ? updatedFeedback : fb));
-        
-        // Update the selected feedback to prevent stale reference
-        setSelectedFeedback(updatedFeedback);
+        // If feedback is resolved, remove it from dashboard
+        if (updatedFeedback.resolution_status === 'resolved') {
+          setFeedbacks(prev => prev.filter(fb => fb.id !== updatedFeedback.id));
+          setIsDialogOpen(false);
+          setSelectedFeedback(null);
+        } else {
+          // Update the feedbacks array
+          setFeedbacks(prev => prev.map(fb => fb.id === updatedFeedback.id ? updatedFeedback : fb));
+          
+          // Update the selected feedback to prevent stale reference
+          setSelectedFeedback(updatedFeedback);
+        }
       } catch (error) {
         console.error('Error updating feedback:', error);
       }
