@@ -394,6 +394,14 @@ const Index = () => {
         <CategoryBreakdownChart 
           className="mb-6" 
           feedbacks={filteredFeedbacks}
+          onCategoryClick={(category) => {
+            // Toggle category filter - if already selected, clear it; otherwise set it
+            if (categoryFilter.length === 1 && categoryFilter[0] === category) {
+              setCategoryFilter([]);
+            } else {
+              setCategoryFilter([category]);
+            }
+          }}
         />
 
         <FeedbackReportingFilters

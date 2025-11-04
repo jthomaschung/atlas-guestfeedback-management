@@ -13,6 +13,7 @@ interface CategoryData {
 interface CategoryBreakdownChartProps {
   className?: string;
   feedbacks: CustomerFeedback[];
+  onCategoryClick?: (category: string) => void;
 }
 
 const chartConfig = {
@@ -32,7 +33,7 @@ const normalizeCategory = (category: string): string => {
     .join(' ');
 };
 
-export function CategoryBreakdownChart({ className, feedbacks }: CategoryBreakdownChartProps) {
+export function CategoryBreakdownChart({ className, feedbacks, onCategoryClick }: CategoryBreakdownChartProps) {
   const categoryData = useMemo(() => {
     // Process the data to count categories
     const categoryCount: { [key: string]: number } = {};
@@ -127,6 +128,12 @@ export function CategoryBreakdownChart({ className, feedbacks }: CategoryBreakdo
                 dataKey="count"
                 fill="var(--color-count)"
                 radius={[4, 4, 0, 0]}
+                cursor={onCategoryClick ? "pointer" : "default"}
+                onClick={(data) => {
+                  if (onCategoryClick && data) {
+                    onCategoryClick(data.category);
+                  }
+                }}
               />
             </BarChart>
           </ResponsiveContainer>
