@@ -433,8 +433,10 @@ const handler = async (req: Request): Promise<Response> => {
             .eq('user_id', feedback.user_id)
             .single();
           
+          console.log(`🔨 Building blocks for tagger: ${taggerData?.display_name || 'Someone'}, note length: ${(note || '').length}`);
           blocks = buildTaggedBlocks(feedback, taggerData?.display_name || 'Someone', note || '', frontendUrl);
           fallbackText = `You've been tagged in case ${feedback.case_number}`;
+          console.log(`✅ Blocks built (${blocks.length} blocks), fallback: "${fallbackText}"`);
         } else {
           console.warn(`⚠️ No user found matching: ${taggedDisplayName}`);
         }
