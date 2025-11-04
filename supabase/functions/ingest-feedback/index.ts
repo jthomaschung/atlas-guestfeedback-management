@@ -96,6 +96,13 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
   const categoryLower = complaint_category.toLowerCase()
   defaultPriority = priorityMapping[categoryLower] || 'Low'
   
+  // Check feedback text for critical keywords (case-insensitive)
+  const feedbackTextLower = (data.feedback_text || data.Feedback || data.complaint_text || '').toLowerCase()
+  if (feedbackTextLower.includes('food poisoning')) {
+    console.log('🚨 CRITICAL: Food poisoning detected in feedback text - escalating to Critical priority')
+    defaultPriority = 'Critical'
+  }
+  
   // Determine assignee based on complaint category
   let defaultAssignee = 'Unassigned'
   
@@ -222,6 +229,77 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
   } else {
     // Default fallback for any other categories
     defaultAssignee = 'guestfeedback@atlaswe.com'
+  }
+  
+  // Override assignee if food poisoning detected in text - assign to DM
+  if (feedbackTextLower.includes('food poisoning')) {
+    try {
+      console.log('🚨 Food poisoning detected - attempting to assign to District Manager')
+      const { data: marketDm } = await supabase
+        .from('user_hierarchy')
+        .select('user_id')
+        .eq('role', 'DM')
+        .limit(200)
+      
+      if (marketDm && marketDm.length > 0) {
+        for (const dm of marketDm) {
+          const [{ data: permissions }, { data: profile }] = await Promise.all([
+            supabase
+              .from('user_permissions')
+              .select('markets')
+              .eq('user_id', dm.user_id)
+              .maybeSingle(),
+            supabase
+              .from('profiles')
+              .select('email')
+              .eq('user_id', dm.user_id)
+              .maybeSingle(),
+          ])
+
+          const dmEmail = profile?.email || 'unknown'
+          if (permissions?.markets?.includes(market)) {
+            console.log(`Assigned food poisoning case to DM: ${dmEmail}`)
+            defaultAssignee = dmEmail
+            break
+          }
+        }
+        
+        // Try normalized market match if no exact match
+        if (defaultAssignee === 'guestfeedback@atlaswe.com') {
+          const normalizedMarket = market.replace(/\s+/g, '').toUpperCase()
+          for (const dm of marketDm) {
+            const [{ data: permissions }, { data: profile }] = await Promise.all([
+              supabase
+                .from('user_permissions')
+                .select('markets')
+                .eq('user_id', dm.user_id)
+                .maybeSingle(),
+              supabase
+                .from('profiles')
+                .select('email')
+                .eq('user_id', dm.user_id)
+                .maybeSingle(),
+            ])
+
+            const dmEmail = profile?.email || 'unknown'
+            if (permissions?.markets) {
+              const hasMatchingMarket = permissions.markets.some((m: string) => {
+                const normalizedPermission = m.replace(/\s+/g, '').toUpperCase()
+                return normalizedPermission === normalizedMarket
+              })
+              
+              if (hasMatchingMarket) {
+                console.log(`Assigned food poisoning case to DM (normalized match): ${dmEmail}`)
+                defaultAssignee = dmEmail
+                break
+              }
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error assigning food poisoning case to DM:', error)
+    }
   }
   
   const validatedData = {
