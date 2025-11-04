@@ -190,6 +190,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
     productName: '',
     storeManager: ''
   });
+  const [editableEmailContent, setEditableEmailContent] = useState<string>('');
   const { toast } = useToast();
   const { user } = useAuth();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
@@ -234,6 +235,228 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
     }
   }, [feedback?.id, user?.id]);
 
+  // Generate email content based on template
+  const generateEmailContent = (template: string) => {
+    if (!feedback) return '';
+    
+    const lines: string[] = [`Dear ${feedback.customer_name || 'Valued Customer'},`, ''];
+    
+    switch (template) {
+      case 'slow_service':
+        lines.push(
+          "Thank you for taking the time to complete our survey and share your experience. My name is Karine, and I'm the Guest Feedback Manager for Jimmy John's.",
+          "",
+          "I sincerely apologize that your order wasn't delivered as quickly as it should have been. At Jimmy John's, we're known for Freaky Fast® service, and we fell short of that promise to you. Whether it was traffic, a rush of orders, or something else, there's no excuse for not meeting your expectations.",
+          "",
+          "I'd love to make it right. If you have a Freaky Fast Rewards® account, I'll add a free original sandwich to your account right away. Just confirm the phone number associated with your rewards account, and it's yours.",
+          "",
+          "If you have any additional questions or concerns, feel free to reply to this email—I'd be happy to chat more. We hope to earn back your trust and see you again soon."
+        );
+        break;
+      case 'sandwich_wrong':
+        lines.push(
+          `Hi ${feedback.customer_name || 'Valued Customer'},`,
+          "",
+          `My name is ${emailPlaceholders.managerName || '[Manager Name]'}, and I help manage the Jimmy John's you recently visited.`,
+          "",
+          "I'm truly sorry that we did not prepare your sandwich correctly. Serving Freaky Fast® sandwiches is only meaningful if your sandwich is made perfectly every single time! I completely understand your frustration, and I want to make it right.",
+          "",
+          "I'll add a credit to your account for a free original sandwich on your next visit. This credit is store-specific, so please call in your order or visit us in-store to redeem it.",
+          "",
+          "If you have any other questions or concerns, please don't hesitate to reply to this email. I hope we'll see you again soon and can show you the Jimmy John's experience you deserve."
+        );
+        break;
+      case 'missing_item':
+        lines.push(
+          "Thank you for taking the time to complete our survey and share your experience.",
+          "",
+          `My name is ${emailPlaceholders.managerName || '[Store Manager]'}, and I manage the Jimmy John's that you visited. I sincerely apologize for missing items from your order. Missing items are unacceptable, and I understand how frustrating that must have been.`,
+          "",
+          "I'd like to make it up to you by adding a credit to your account for a free original sandwich. This credit is store-specific, so you'll want to call in your order or visit us in-store to redeem it.",
+          "",
+          "If you have any additional questions or concerns, feel free to reply to this email—I'd be happy to help. I hope we can regain your trust and see you again soon."
+        );
+        break;
+      case 'bread_quality':
+        lines.push(
+          "Thank you for submitting our survey and sharing your experience.",
+          "",
+          "My name is Karine, and I'm the Guest Feedback Manager for Jimmy John's. Perfect Bread® is one of the cornerstones of our brand—we bake it fresh throughout the day to ensure every bite is perfect. I understand that stale or hard bread can quickly ruin your meal, and I'm truly sorry we didn't meet that standard.",
+          "",
+          "I hope you'll give us another opportunity to earn back your business. If you have a Freaky Fast Rewards® account, I'd be happy to add a free original sandwich to your account. Just confirm the phone number associated with your loyalty account.",
+          "",
+          "If you have any additional questions or concerns, please reply to this email—I'd love to chat more. We hope to see you again soon."
+        );
+        break;
+      case 'product_quality':
+        lines.push(
+          "Thank you for sending in your feedback.",
+          "",
+          "All of our products are sliced, baked, and prepped fresh daily to avoid situations like yours. This time, we fell short of the product quality we strive for at Jimmy John's, and I sincerely apologize.",
+          "",
+          "I'll address this with our team immediately to ensure it doesn't happen again. If you have a Freaky Fast Rewards® account, I'd be happy to add a free original sandwich to your account. Just confirm the phone number associated with your loyalty account.",
+          "",
+          "If you have any additional questions or concerns, please reply to this email—I'd be happy to help make this right. We hope to see you again soon."
+        );
+        break;
+      case 'out_of_bread':
+        lines.push(
+          "Thank you for sharing your experience.",
+          "",
+          `My name is ${emailPlaceholders.managerName || '[Name]'}, and I'm the ${emailPlaceholders.managerPosition || '[Position]'} at the Jimmy John's that you attempted to order from.`,
+          "",
+          "Perfect Bread® is our #1 rule at Jimmy John's, and not having any available is completely unacceptable. I would like to personally apologize for this failure. This should never happen, and I'm taking immediate steps to address it with our team.",
+          "",
+          "I'll add a credit to your account for a free original sandwich. This credit is store-specific, so please call in your order or visit us in-store to redeem it.",
+          "",
+          "If you have any additional questions or concerns, please reply to this email—I'd be happy to discuss this further. I genuinely hope we can earn another chance to serve you."
+        );
+        break;
+      case 'out_of_product':
+        lines.push(
+          "Thank you for sharing your experience.",
+          "",
+          `My name is ${emailPlaceholders.managerName || '[Name]'}, and I'm the ${emailPlaceholders.managerPosition || '[Position]'} at the Jimmy John's that you attempted to order from.`,
+          "",
+          `Not having ${emailPlaceholders.productName || '[Product]'} available is unacceptable, and I sincerely apologize for the inconvenience. Our customers should be able to count on us to have what they need, and we let you down.`,
+          "",
+          "I'll add a credit to your account for a free original sandwich. This credit is store-specific, so please call in your order or visit us in-store to redeem it.",
+          "",
+          "If you have any additional questions or concerns, please reply to this email—I'm here to help. We hope to see you again soon."
+        );
+        break;
+      case 'closed_early':
+        lines.push(
+          "Thank you for sharing your experience.",
+          "",
+          `My name is ${emailPlaceholders.managerName || '[Name]'}, and I'm the ${emailPlaceholders.managerPosition || '[Position]'} at the Jimmy John's that you attempted to visit.`,
+          "",
+          "Closing early is completely unacceptable and goes against everything we stand for. I sincerely apologize that you made the trip to see us, only to find us closed. This should never have happened, and I'm addressing it with my team immediately.",
+          "",
+          "I'll add a credit to your account for a free original sandwich to make it right. This credit is store-specific, so please call in your order or visit us in-store to redeem it.",
+          "",
+          "If you have any additional questions or concerns, please reply to this email. I hope we can earn back your trust and serve you again soon."
+        );
+        break;
+      case 'credit_card':
+        lines.push(
+          "Thank you for sharing your experience.",
+          "",
+          "My name is Karine, and I'm the Guest Feedback Manager for Jimmy John's.",
+          "",
+          "Thank you for letting us know about the credit card issue you encountered. Payment problems are incredibly frustrating, and I apologize for the inconvenience. We'll be sure to address this with our payment processor and our team right away to prevent this from happening again.",
+          "",
+          "If you experienced any charges or issues that need to be resolved, please reply to this email with details, and I'll personally ensure it gets handled.",
+          "",
+          "Thank you for your patience, and we hope to see you again soon."
+        );
+        break;
+      case 'cleanliness':
+        lines.push(
+          "Thank you for sharing your experience.",
+          "",
+          `My name is ${emailPlaceholders.managerName || '[Name]'}, and I'm the Manager of the Jimmy John's that you visited.`,
+          "",
+          "We pride ourselves on being Hospital Clean®—cleanliness is one of our core values, and an unclean store is absolutely unacceptable. I sincerely apologize for failing to meet this standard during your visit.",
+          "",
+          "I'll be working with my team immediately to address this issue and ensure we exceed our cleanliness standards moving forward. I'd also like to make it up to you by adding a credit to your account for a free original sandwich. This credit is store-specific, so please call in your order or visit us in-store to redeem it.",
+          "",
+          "If you have any additional questions or concerns, please reply to this email—I'd be happy to discuss this further. I hope we can earn back your trust and see you again soon."
+        );
+        break;
+      case 'loyalty_issues':
+        lines.push(
+          "Thank you for sharing your experience.",
+          "",
+          "My name is Karine, and I'm the Guest Feedback Manager for Jimmy John's.",
+          "",
+          "Thank you for letting us know about the loyalty program issue you encountered. Our Freaky Fast Rewards® program should make your experience better, not frustrating, and I apologize for the inconvenience.",
+          "",
+          "I'll escalate this to our rewards support team and our corporate office to get this resolved for you. If you'd like, please reply with your rewards account information (phone number or email), and I'll personally follow up to ensure the issue is fixed.",
+          "",
+          "Thank you for your patience, and we appreciate your loyalty!"
+        );
+        break;
+      case 'food_poisoning':
+        lines.push(
+          "Thank you for reaching out.",
+          "",
+          `My name is ${emailPlaceholders.managerName || '[Name]'}, and I'm the ${emailPlaceholders.managerPosition || '[Position]'} for ${feedback.market || '[Market/Region]'}. We take any feedback regarding possible food poisoning extremely seriously, and I'm very sorry to hear about your experience.`,
+          "",
+          "I'd like to speak with you directly to learn more about what happened so we can conduct a thorough investigation on our end. Your health and safety are our top priority, and we need to understand the situation fully to prevent this from happening to anyone else.",
+          "",
+          "Please provide a good phone number where I can reach you at your earliest convenience. I'll personally follow up to discuss this matter further.",
+          "",
+          "Thank you for bringing this to our attention."
+        );
+        break;
+      case 'acknowledgment':
+        lines.push(
+          "Thank you for taking the time to share your feedback with us. We have received your message and want to assure you that we take all customer feedback seriously.",
+          "",
+          "Feedback Details:",
+          `Case Number: ${feedback.case_number}`,
+          `Store Number: ${feedback.store_number}`,
+          `Date: ${new Date(feedback.feedback_date).toLocaleDateString()}`,
+          `Category: ${feedback.complaint_category}`,
+          "",
+          feedback.priority === 'Critical' || feedback.priority === 'High'
+            ? 'Your feedback has been marked as high priority and will be reviewed by our management team within 24 hours.'
+            : 'We will review your feedback and respond appropriately based on the nature of your concerns.'
+        );
+        break;
+      case 'praise':
+        lines.push(
+          "Thank you so much for taking the time to share your positive experience with us! Feedback like yours truly makes our day and motivates our team to continue providing excellent service.",
+          "",
+          `We've shared your kind words with the team at Store #${feedback.store_number}. They will be thrilled to hear that their hard work made a positive impact on your visit.`,
+          "",
+          "We look forward to serving you again soon!"
+        );
+        break;
+      case 'resolution':
+        lines.push(
+          `Thank you for bringing this matter to our attention. I wanted to update you on the resolution of your concern regarding your visit on ${new Date(feedback.feedback_date).toLocaleDateString()}.`,
+          ""
+        );
+        if (emailActionTaken) {
+          lines.push("Action Taken:", emailActionTaken, "");
+        }
+        if (emailResolutionNotes) {
+          lines.push("Resolution Details:", emailResolutionNotes, "");
+        }
+        lines.push(
+          "We appreciate your patience and understanding as we worked to address your concerns. If you have any questions about this resolution, please don't hesitate to reach out."
+        );
+        break;
+      case 'escalation':
+        lines.push(
+          "We wanted to inform you that your feedback has been escalated to our senior management team for immediate attention.",
+          "",
+          "Escalation Details:",
+          `Case Number: ${feedback.case_number}`,
+          `Store Number: ${feedback.store_number}`,
+          `Priority: ${feedback.priority}`,
+          "",
+          "A member of our management team will contact you within 24 hours to discuss this matter and work towards a resolution."
+        );
+        break;
+      case 'custom':
+        return emailMessage;
+      default:
+        return emailMessage;
+    }
+    
+    lines.push(
+      "",
+      "Best regards,",
+      "Customer Service Team",
+      "guestfeedback@atlaswe.com"
+    );
+    
+    return lines.join('\n');
+  };
+
   // Auto-select template based on feedback category
   useEffect(() => {
     if (feedback?.complaint_category) {
@@ -270,6 +493,14 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
       }
     }
   }, [feedback?.complaint_category]);
+
+  // Update editable email content when template or placeholders change
+  useEffect(() => {
+    if (feedback) {
+      const content = generateEmailContent(selectedTemplate);
+      setEditableEmailContent(content);
+    }
+  }, [selectedTemplate, emailPlaceholders, emailMessage, emailActionTaken, emailResolutionNotes, feedback]);
 
   // Update local state when feedback changes
   useEffect(() => {
@@ -607,7 +838,7 @@ Customer Service Team`);
       return;
     }
 
-    if (selectedTemplate === 'custom' && !emailMessage.trim()) {
+    if (!editableEmailContent.trim()) {
       toast({
         title: "Error",
         description: "Please enter an email message before sending.",
@@ -621,19 +852,9 @@ Customer Service Team`);
       const requestBody: any = {
         feedbackId: feedback.id,
         method: 'email',
-        templateType: selectedTemplate,
+        templateType: 'custom', // Always send as custom since user can edit
+        messageContent: editableEmailContent, // Send the edited content
       };
-
-      // Add custom message for custom template
-      if (selectedTemplate === 'custom') {
-        requestBody.messageContent = emailMessage;
-      }
-
-      // Add resolution-specific fields
-      if (selectedTemplate === 'resolution') {
-        requestBody.actionTaken = emailActionTaken;
-        requestBody.resolutionNotes = emailResolutionNotes;
-      }
 
       const { error } = await supabase.functions.invoke('send-customer-outreach', {
         body: requestBody
@@ -650,6 +871,7 @@ Customer Service Team`);
       setEmailMessage("");
       setEmailActionTaken("");
       setEmailResolutionNotes("");
+      setEditableEmailContent("");
       onUpdate();
     } catch (error) {
       console.error('Error sending outreach:', error);
@@ -1310,25 +1532,27 @@ Customer Service Team`);
                             </div>
                           </Card>
 
-                          {/* Custom Message (only for custom template) */}
-                          {selectedTemplate === 'custom' && (
-                            <div>
-                              <Label htmlFor="emailMessage">Email Message</Label>
-                              <Textarea 
-                                id="emailMessage"
-                                value={emailMessage}
-                                onChange={(e) => setEmailMessage(e.target.value)}
-                                placeholder="Write your message to the customer..."
-                                rows={8}
-                                className="mt-1"
-                              />
-                            </div>
-                          )}
+                          {/* Editable Email Content */}
+                          <div className="space-y-2">
+                            <Label htmlFor="editableEmailContent" className="flex items-center gap-2">
+                              <Edit className="h-4 w-4" />
+                              Edit Email Before Sending
+                              <span className="text-xs text-muted-foreground font-normal">(changes won't affect the master template)</span>
+                            </Label>
+                            <Textarea 
+                              id="editableEmailContent"
+                              value={editableEmailContent}
+                              onChange={(e) => setEditableEmailContent(e.target.value)}
+                              placeholder="Edit the email content before sending..."
+                              rows={12}
+                              className="font-mono text-sm"
+                            />
+                          </div>
 
                           <div className="flex gap-2">
                             <Button 
                               onClick={handleSendOutreach}
-                              disabled={isLoading || (selectedTemplate === 'custom' && !emailMessage.trim())}
+                              disabled={isLoading || !editableEmailContent.trim()}
                               className="flex-1"
                             >
                               <Mail className="h-4 w-4 mr-2" />
