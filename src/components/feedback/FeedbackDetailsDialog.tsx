@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { CustomerFeedback } from "@/types/feedback";
+import { GuestFeedbackNote } from "@/types/guestFeedbackNote";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -11,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, User, Star, MapPin, Phone, Mail, MessageSquare, Clock, AlertTriangle, Store, Edit, Save, X, Heart, CheckCircle, ExternalLink } from "lucide-react";
+import { Calendar, User, Star, MapPin, Phone, Mail, MessageSquare, Clock, AlertTriangle, Store, Edit, Save, X, Heart, CheckCircle, ExternalLink, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -191,6 +193,14 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
     storeManager: ''
   });
   const [editableEmailContent, setEditableEmailContent] = useState<string>('');
+  
+  // New state for immutable notes system
+  const [notes, setNotes] = useState<GuestFeedbackNote[]>([]);
+  const [newNoteText, setNewNoteText] = useState<string>('');
+  const [showAddNote, setShowAddNote] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [noteTypeToAdd, setNoteTypeToAdd] = useState<'resolution' | 'executive' | 'general'>('resolution');
+  
   const { toast } = useToast();
   const { user } = useAuth();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
@@ -198,6 +208,131 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const processedFeedbackId = useRef<string | null>(null);
 
   const isAdmin = permissions?.role?.toLowerCase() === 'admin' || permissions?.role?.toLowerCase() === 'dm' || permissions?.isAdmin || permissions?.isDirectorOrAbove;
+
+  // Fetch notes when feedback changes
+  const fetchNotes = useCallback(async () => {
+    if (!feedback?.id) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('guest_feedback_notes')
+        .select('*')
+        .eq('feedback_id', feedback.id)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching notes:', error);
+        return;
+      }
+      
+      setNotes((data || []) as GuestFeedbackNote[]);
+    } catch (error) {
+      console.error('Error fetching notes:', error);
+    }
+  }, [feedback?.id]);
+
+  // Extract @mentions from text
+  const extractMentions = (text: string): string[] => {
+    const mentionRegex = /@([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g;
+    const matches = text.matchAll(mentionRegex);
+    const mentions: string[] = [];
+    for (const match of matches) {
+      const displayName = match[1].trim();
+      if (displayName) {
+        mentions.push(displayName);
+      }
+    }
+    return mentions;
+  };
+
+  // Handle saving a new note with confirmation
+  const handleConfirmSaveNote = async () => {
+    if (!feedback?.id || !user?.id || !newNoteText.trim()) {
+      toast({
+        title: "Error",
+        description: "Note text cannot be empty.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Get user display name
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('user_id', user.id)
+        .single();
+
+      const displayName = profileData?.display_name || 'Unknown User';
+      
+      // Extract mentions
+      const mentions = extractMentions(newNoteText);
+
+      // Insert the note
+      const { data: noteData, error } = await supabase
+        .from('guest_feedback_notes')
+        .insert({
+          feedback_id: feedback.id,
+          note_text: newNoteText,
+          note_type: noteTypeToAdd,
+          created_by_user_id: user.id,
+          created_by_name: displayName,
+          mentioned_users: mentions.length > 0 ? mentions : null,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Send @mention notifications
+      let mentionCount = 0;
+      let failedMentions = 0;
+      
+      for (const mentionedName of mentions) {
+        try {
+          await sendTaggedSlackNotification(feedback.id, mentionedName, newNoteText);
+          mentionCount++;
+          console.log(`✅ Slack notification sent for @${mentionedName}`);
+        } catch (notificationError) {
+          console.error(`❌ Error sending Slack notification for @${mentionedName}:`, notificationError);
+          failedMentions++;
+        }
+      }
+
+      toast({
+        title: "Note Saved",
+        description: `Note saved successfully${mentionCount > 0 ? `. ${mentionCount} user(s) tagged and notified.` : '.'}`,
+      });
+
+      if (failedMentions > 0) {
+        toast({
+          variant: "destructive",
+          title: "Warning",
+          description: `${failedMentions} mention(s) could not be matched to users`,
+        });
+      }
+
+      // Refresh notes
+      await fetchNotes();
+      
+      // Clear the form
+      setNewNoteText('');
+      setShowAddNote(false);
+      setShowConfirmDialog(false);
+      
+    } catch (error) {
+      console.error('Error saving note:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save note. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const shouldShowCMXLink = (feedback: CustomerFeedback): boolean => {
     return (
@@ -515,6 +650,9 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
       setCustomerCalled(feedback.customer_called || false);
       setEditedFeedbackText(feedback.feedback_text || '');
       
+      // Fetch notes for this feedback
+      fetchNotes();
+      
       // Set default email message
       setEmailMessage(`Dear ${feedback.customer_name || 'Valued Customer'},
 
@@ -531,7 +669,7 @@ Thank you for choosing us and giving us the opportunity to serve you better.
 Best regards,
 Customer Service Team`);
     }
-  }, [feedback]);
+  }, [feedback, fetchNotes]);
 
   // Check acknowledgment when feedback or user changes
   useEffect(() => {
@@ -1045,16 +1183,6 @@ Customer Service Team`);
   const handleSave = async () => {
     if (!feedback) return;
 
-    // Validate that resolution notes are required for resolved status
-    if (status === 'resolved' && (!resolutionNotes || resolutionNotes.trim() === '')) {
-      toast({
-        title: "Resolution Notes Required",
-        description: "Please add resolution notes before marking this feedback as resolved.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsLoading(true);
     try {
       const { error } = await supabase
@@ -1064,7 +1192,6 @@ Customer Service Team`);
           priority: priority,
           assignee: assignee || null,
           complaint_category: category,
-          resolution_notes: resolutionNotes || null,
           store_number: storeNumber,
           market: market,
           updated_at: new Date().toISOString(),
@@ -1072,36 +1199,6 @@ Customer Service Team`);
         .eq('id', feedback.id);
 
       if (error) throw error;
-
-      // Check for @mentions in resolution notes and send Slack notifications
-      if (resolutionNotes) {
-        const mentionRegex = /@([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g;
-        const matches = resolutionNotes.matchAll(mentionRegex);
-        let mentionCount = 0;
-        let failedMentions = 0;
-        
-        for (const match of matches) {
-          const displayName = match[1].trim();
-          if (displayName) {
-            try {
-              await sendTaggedSlackNotification(feedback.id, displayName, resolutionNotes);
-              mentionCount++;
-              console.log(`✅ Slack notification sent for @${displayName}`);
-            } catch (notificationError) {
-              console.error(`❌ Error sending Slack notification for @${displayName}:`, notificationError);
-              failedMentions++;
-            }
-          }
-        }
-        
-        if (failedMentions > 0) {
-          toast({
-            variant: "destructive",
-            title: "Warning",
-            description: `${failedMentions} mention(s) could not be matched to users`,
-          });
-        }
-      }
 
       toast({
         title: "Feedback Updated",
@@ -1861,14 +1958,70 @@ Customer Service Team`);
             )}
 
             <div>
-              <Label htmlFor="notes">Resolution Notes</Label>
-              <MentionsTextarea 
-                id="notes"
-                value={resolutionNotes} 
-                onChange={setResolutionNotes}
-                placeholder="Enter resolution notes... Use @username to mention someone"
-                rows={4}
-              />
+              <div className="flex items-center justify-between mb-3">
+                <Label>Resolution Notes</Label>
+                {!showAddNote && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowAddNote(true)}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Resolution Note
+                  </Button>
+                )}
+              </div>
+              
+              {/* Display existing notes (read-only) */}
+              {notes.filter(n => n.note_type === 'resolution').length > 0 && (
+                <div className="space-y-2 mb-4">
+                  {notes.filter(n => n.note_type === 'resolution').map((note) => (
+                    <Card key={note.id} className="p-3 bg-muted/30">
+                      <div className="text-xs text-muted-foreground mb-1">
+                        <span className="font-medium">{format(new Date(note.created_at), 'MMM dd, yyyy h:mm a')}</span>
+                        {' - '}
+                        <span>{note.created_by_name}</span>
+                      </div>
+                      <p className="text-sm whitespace-pre-wrap">{note.note_text}</p>
+                    </Card>
+                  ))}
+                </div>
+              )}
+              
+              {/* Add new note form */}
+              {showAddNote && (
+                <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
+                  <MentionsTextarea
+                    value={newNoteText}
+                    onChange={setNewNoteText}
+                    placeholder="Enter resolution note... Use @username to mention someone"
+                    rows={4}
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => setShowConfirmDialog(true)}
+                      disabled={!newNoteText.trim() || isLoading}
+                    >
+                      Save Note
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setNewNoteText('');
+                        setShowAddNote(false);
+                      }}
+                      disabled={isLoading}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1913,6 +2066,27 @@ Customer Service Team`);
           onOpenChange={setShowEmailConversation}
         />
       )}
+      
+      {/* Confirmation Dialog for Adding Notes */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>⚠️ Confirm Permanent Note</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>Once saved, this note will be <strong>permanent and cannot be edited or deleted</strong>.</p>
+              <p>Are you sure you want to add this note?</p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowConfirmDialog(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmSaveNote}>
+              Confirm & Save
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 };

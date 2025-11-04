@@ -1870,6 +1870,47 @@ export type Database = {
           },
         ]
       }
+      guest_feedback_notes: {
+        Row: {
+          created_at: string
+          created_by_name: string
+          created_by_user_id: string
+          feedback_id: string
+          id: string
+          mentioned_users: string[] | null
+          note_text: string
+          note_type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by_name: string
+          created_by_user_id: string
+          feedback_id: string
+          id?: string
+          mentioned_users?: string[] | null
+          note_text: string
+          note_type: string
+        }
+        Update: {
+          created_at?: string
+          created_by_name?: string
+          created_by_user_id?: string
+          feedback_id?: string
+          id?: string
+          mentioned_users?: string[] | null
+          note_text?: string
+          note_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_feedback_notes_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "customer_feedback"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hr_notification_log: {
         Row: {
           created_at: string
