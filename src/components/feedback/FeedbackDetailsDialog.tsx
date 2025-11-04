@@ -1075,16 +1075,31 @@ Customer Service Team`);
 
       // Check for @mentions in resolution notes and send Slack notifications
       if (resolutionNotes) {
-        const mentionRegex = /@([\w\s]+?)(?=\s|$|@)/g;
+        const mentionRegex = /@([^@]+)/g;
         const matches = resolutionNotes.matchAll(mentionRegex);
+        let mentionCount = 0;
+        let failedMentions = 0;
         
         for (const match of matches) {
           const displayName = match[1].trim();
-          try {
-            await sendTaggedSlackNotification(feedback.id, displayName, resolutionNotes);
-          } catch (notificationError) {
-            console.error('Error sending Slack notification:', notificationError);
+          if (displayName) {
+            try {
+              await sendTaggedSlackNotification(feedback.id, displayName, resolutionNotes);
+              mentionCount++;
+              console.log(`✅ Slack notification sent for @${displayName}`);
+            } catch (notificationError) {
+              console.error(`❌ Error sending Slack notification for @${displayName}:`, notificationError);
+              failedMentions++;
+            }
           }
+        }
+        
+        if (failedMentions > 0) {
+          toast({
+            variant: "destructive",
+            title: "Warning",
+            description: `${failedMentions} mention(s) could not be matched to users`,
+          });
         }
       }
 

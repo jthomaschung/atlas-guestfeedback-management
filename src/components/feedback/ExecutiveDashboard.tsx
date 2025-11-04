@@ -156,18 +156,31 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
       if (logError) throw logError;
 
       // Check for @mentions in the notes and send Slack notifications
-      const mentionRegex = /@([\w\s]+?)(?=\s|$|@)/g;
+      const mentionRegex = /@([^@]+)/g;
       const matches = executiveNotes.matchAll(mentionRegex);
       let mentionCount = 0;
+      let failedMentions = 0;
       
       for (const match of matches) {
         const displayName = match[1].trim();
-        try {
-          await sendTaggedSlackNotification(selectedFeedback.id, displayName, executiveNotes);
-          mentionCount++;
-        } catch (notificationError) {
-          console.error('Error sending Slack notification:', notificationError);
+        if (displayName) {
+          try {
+            await sendTaggedSlackNotification(selectedFeedback.id, displayName, executiveNotes);
+            mentionCount++;
+            console.log(`✅ Slack notification sent for @${displayName}`);
+          } catch (notificationError) {
+            console.error(`❌ Error sending Slack notification for @${displayName}:`, notificationError);
+            failedMentions++;
+          }
         }
+      }
+      
+      if (failedMentions > 0) {
+        toast({
+          variant: "destructive",
+          title: "Warning",
+          description: `${failedMentions} mention(s) could not be matched to users`,
+        });
       }
 
       toast({

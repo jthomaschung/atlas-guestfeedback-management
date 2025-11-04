@@ -415,15 +415,18 @@ const handler = async (req: Request): Promise<Response> => {
         break;
 
       case 'tagged':
-        // Find user by display name
+        // Find user by display name (with wildcard matching for partial names)
         const { data: taggedUser } = await supabase
           .from('profiles')
           .select('user_id, email, display_name')
-          .ilike('display_name', taggedDisplayName)
+          .ilike('display_name', `%${taggedDisplayName}%`)
           .single();
 
         if (taggedUser) {
           recipients = [taggedUser];
+          console.log(`✅ Found tagged user: ${taggedUser.display_name} (${taggedUser.email})`);
+        } else {
+          console.warn(`⚠️ No user found matching: ${taggedDisplayName}`);
           
           // Get tagger name
           const { data: taggerData } = await supabase
