@@ -1679,6 +1679,45 @@ export type Database = {
         }
         Relationships: []
       }
+      email_templates: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          email_body: string
+          id: string
+          subject_line: string
+          template_key: string
+          template_name: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          email_body: string
+          id?: string
+          subject_line: string
+          template_key: string
+          template_name: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          email_body?: string
+          id?: string
+          subject_line?: string
+          template_key?: string
+          template_name?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       employee_training_completions: {
         Row: {
           completed_date: string | null

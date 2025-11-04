@@ -1,4 +1,4 @@
-import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive, UserCheck, TrendingUp, Shield, Target, BookOpen } from "lucide-react";
+import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive, UserCheck, TrendingUp, Shield, Target, BookOpen, Mail } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
 import {
@@ -32,6 +32,7 @@ const supportItems = [
 const adminItems = [
   { title: "User Management", url: "/user-hierarchy", icon: Users },
   { title: "GFM (Guest Feedback Manager)", url: "/gfm", icon: UserCheck },
+  { title: "Email Templates", url: "/email-templates", icon: Mail },
   { title: "Internal Feedback", url: "/internal-feedback", icon: MessageSquare },
   { title: "Settings", url: "/settings", icon: Settings },
 ];

@@ -31,6 +31,7 @@ import Summary from '@/pages/Summary';
 import InternalFeedback from '@/pages/InternalFeedback';
 import Accuracy from '@/pages/Accuracy';
 import Training from '@/pages/Training';
+import EmailTemplates from '@/pages/EmailTemplates';
 import { AuthGate } from '@/components/AuthGate';
 
 import { SmartRedirect } from '@/components/SmartRedirect';
@@ -383,6 +384,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Training />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/email-templates" 
+                element={
+                  <ProtectedRoute>
+                    <EmailTemplates />
                   </ProtectedRoute>
                 } 
               />
