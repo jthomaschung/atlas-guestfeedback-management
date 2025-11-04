@@ -251,19 +251,33 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
 
       // Send notification to executives about this approval
       try {
-      await supabase.functions.invoke('send-executive-approval-notification', {
-        body: {
-          feedbackId: feedbackId,
-          approverRole: userHierarchy.role,
-          approverName: userProfile?.display_name || user?.email || 'Executive',
-          approverUserId: user?.id,
-          approverEmail: user?.email
+        const { data: notifData, error: notifError } = await supabase.functions.invoke('send-executive-approval-notification', {
+          body: {
+            feedbackId: feedbackId,
+            approverRole: userHierarchy.role,
+            approverName: userProfile?.display_name || user?.email || 'Executive',
+            approverUserId: user?.id,
+            approverEmail: user?.email
+          }
+        });
+        
+        if (notifError) {
+          console.error('Notification API error:', notifError);
+          toast({
+            variant: "destructive",
+            title: "Notification Warning",
+            description: "Approval recorded but notifications may not have been sent to all executives",
+          });
+        } else {
+          console.log('Executive approval notifications sent:', notifData);
         }
-      });
-        console.log('Executive approval notifications sent');
       } catch (notifError) {
         console.error('Failed to send approval notifications:', notifError);
-        // Don't fail the approval if notification fails
+        toast({
+          variant: "destructive",
+          title: "Notification Warning",
+          description: "Approval recorded but failed to send notifications to executives",
+        });
       }
 
       // Check if all 4 roles have now approved (CEO, VP, Director, DM)
