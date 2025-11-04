@@ -425,8 +425,6 @@ const handler = async (req: Request): Promise<Response> => {
         if (taggedUser) {
           recipients = [taggedUser];
           console.log(`✅ Found tagged user: ${taggedUser.display_name} (${taggedUser.email})`);
-        } else {
-          console.warn(`⚠️ No user found matching: ${taggedDisplayName}`);
           
           // Get tagger name
           const { data: taggerData } = await supabase
@@ -437,6 +435,8 @@ const handler = async (req: Request): Promise<Response> => {
           
           blocks = buildTaggedBlocks(feedback, taggerData?.display_name || 'Someone', note || '', frontendUrl);
           fallbackText = `You've been tagged in case ${feedback.case_number}`;
+        } else {
+          console.warn(`⚠️ No user found matching: ${taggedDisplayName}`);
         }
         break;
 

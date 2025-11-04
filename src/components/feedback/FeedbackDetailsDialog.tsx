@@ -1075,7 +1075,7 @@ Customer Service Team`);
 
       // Check for @mentions in resolution notes and send Slack notifications
       if (resolutionNotes) {
-        const mentionRegex = /@([^@]+)/g;
+        const mentionRegex = /@([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g;
         const matches = resolutionNotes.matchAll(mentionRegex);
         let mentionCount = 0;
         let failedMentions = 0;

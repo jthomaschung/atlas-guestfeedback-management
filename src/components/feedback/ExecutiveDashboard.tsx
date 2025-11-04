@@ -156,7 +156,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
       if (logError) throw logError;
 
       // Check for @mentions in the notes and send Slack notifications
-      const mentionRegex = /@([^@]+)/g;
+      const mentionRegex = /@([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g;
       const matches = executiveNotes.matchAll(mentionRegex);
       let mentionCount = 0;
       let failedMentions = 0;
