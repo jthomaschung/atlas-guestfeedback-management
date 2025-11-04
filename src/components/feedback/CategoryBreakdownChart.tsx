@@ -22,6 +22,16 @@ const chartConfig = {
   },
 };
 
+// Helper function to normalize category names (title case)
+const normalizeCategory = (category: string): string => {
+  if (!category) return 'Other';
+  return category
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
 export function CategoryBreakdownChart({ className, feedbacks }: CategoryBreakdownChartProps) {
   const categoryData = useMemo(() => {
     // Process the data to count categories
@@ -29,7 +39,7 @@ export function CategoryBreakdownChart({ className, feedbacks }: CategoryBreakdo
     let totalCount = 0;
 
     feedbacks.forEach(feedback => {
-      const category = feedback.complaint_category || 'Other';
+      const category = normalizeCategory(feedback.complaint_category || 'Other');
       categoryCount[category] = (categoryCount[category] || 0) + 1;
       totalCount++;
     });
