@@ -194,7 +194,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const { toast } = useToast();
   const { user } = useAuth();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
-  const { sendAssignmentNotification } = useFeedbackNotifications();
+  const { sendAssignmentNotification, sendTaggedSlackNotification } = useFeedbackNotifications();
   const processedFeedbackId = useRef<string | null>(null);
 
   const isAdmin = permissions?.role?.toLowerCase() === 'admin' || permissions?.role?.toLowerCase() === 'dm' || permissions?.isAdmin || permissions?.isDirectorOrAbove;
@@ -1072,6 +1072,21 @@ Customer Service Team`);
         .eq('id', feedback.id);
 
       if (error) throw error;
+
+      // Check for @mentions in resolution notes and send Slack notifications
+      if (resolutionNotes) {
+        const mentionRegex = /@([\w\s]+?)(?=\s|$|@)/g;
+        const matches = resolutionNotes.matchAll(mentionRegex);
+        
+        for (const match of matches) {
+          const displayName = match[1].trim();
+          try {
+            await sendTaggedSlackNotification(feedback.id, displayName, resolutionNotes);
+          } catch (notificationError) {
+            console.error('Error sending Slack notification:', notificationError);
+          }
+        }
+      }
 
       toast({
         title: "Feedback Updated",

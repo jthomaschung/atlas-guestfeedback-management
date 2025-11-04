@@ -13,6 +13,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { CustomerFeedback } from '@/types/feedback';
 import { FeedbackDetailsDialog } from '@/components/feedback/FeedbackDetailsDialog';
+import { useUserPermissions } from '@/hooks/useUserPermissions';
+import { useFeedbackNotifications } from '@/hooks/useFeedbackNotifications';
 
 interface EscalationLog {
   id: string;
@@ -61,6 +63,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
   
   const { user } = useAuth();
   const { toast } = useToast();
+  const { sendTaggedSlackNotification } = useFeedbackNotifications();
 
   // Regional groupings
   const regionalGroups = {
@@ -128,30 +131,6 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
     if (!selectedFeedback || !executiveNotes.trim()) return;
 
     try {
-      // Check for @mentions in the notes
-      const mentions = [];
-      const mentionRegex = /@(\w+(?:\s+\w+)*)/g;
-      let match;
-      
-      while ((match = mentionRegex.exec(executiveNotes)) !== null) {
-        const mentionedName = match[1];
-        
-        // Look up user by display name in profiles
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('user_id, email, display_name')
-          .ilike('display_name', `%${mentionedName}%`)
-          .limit(1);
-        
-        if (profileData && profileData.length > 0) {
-          mentions.push({
-            user_id: profileData[0].user_id,
-            email: profileData[0].email,
-            display_name: profileData[0].display_name
-          });
-        }
-      }
-
       // Update feedback with executive notes
       const { error: updateError } = await supabase
         .from('customer_feedback')
@@ -176,31 +155,24 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
 
       if (logError) throw logError;
 
-      // Send notifications to mentioned users
-      if (mentions.length > 0) {
-        for (const mention of mentions) {
-          try {
-            await supabase.functions.invoke('send-notifications', {
-              body: {
-                type: 'mention',
-                recipient_email: mention.email,
-                data: {
-                  message: `You were mentioned in executive notes for case ${selectedFeedback.case_number}`,
-                  feedback_id: selectedFeedback.id,
-                  case_number: selectedFeedback.case_number,
-                  mentioned_by: user?.email
-                }
-              }
-            });
-          } catch (notificationError) {
-            console.error('Error sending mention notification:', notificationError);
-          }
+      // Check for @mentions in the notes and send Slack notifications
+      const mentionRegex = /@([\w\s]+?)(?=\s|$|@)/g;
+      const matches = executiveNotes.matchAll(mentionRegex);
+      let mentionCount = 0;
+      
+      for (const match of matches) {
+        const displayName = match[1].trim();
+        try {
+          await sendTaggedSlackNotification(selectedFeedback.id, displayName, executiveNotes);
+          mentionCount++;
+        } catch (notificationError) {
+          console.error('Error sending Slack notification:', notificationError);
         }
       }
 
       toast({
         title: "Success",
-        description: `Executive notes added successfully${mentions.length > 0 ? ` and ${mentions.length} user(s) notified` : ''}`,
+        description: `Executive notes added successfully${mentionCount > 0 ? ` and ${mentionCount} Slack notification(s) sent` : ''}`,
       });
 
       setIsNotesDialogOpen(false);
