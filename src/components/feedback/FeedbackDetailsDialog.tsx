@@ -182,9 +182,6 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
   const [emailActionTaken, setEmailActionTaken] = useState("");
   const [customerCalled, setCustomerCalled] = useState<boolean>(false);
   const [isUpdatingCalled, setIsUpdatingCalled] = useState(false);
-  const [isEditingFeedbackText, setIsEditingFeedbackText] = useState(false);
-  const [editedFeedbackText, setEditedFeedbackText] = useState<string>('');
-  const [isUpdatingFeedbackText, setIsUpdatingFeedbackText] = useState(false);
   const [hasAcknowledged, setHasAcknowledged] = useState(false);
   const [emailPlaceholders, setEmailPlaceholders] = useState({
     managerName: '',
@@ -648,7 +645,6 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
       setStoreNumber(feedback.store_number || '');
       setMarket(feedback.market || '');
       setCustomerCalled(feedback.customer_called || false);
-      setEditedFeedbackText(feedback.feedback_text || '');
       
       // Fetch notes for this feedback
       fetchNotes();
@@ -1139,45 +1135,6 @@ Customer Service Team`);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleSaveFeedbackText = async () => {
-    if (!feedback) return;
-    
-    setIsUpdatingFeedbackText(true);
-    try {
-      const { error } = await supabase
-        .from('customer_feedback')
-        .update({ 
-          feedback_text: editedFeedbackText,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', feedback.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Feedback Updated",
-        description: "Customer feedback text has been updated successfully.",
-      });
-      
-      setIsEditingFeedbackText(false);
-      onUpdate();
-    } catch (error) {
-      console.error('Error updating feedback text:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update feedback text.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsUpdatingFeedbackText(false);
-    }
-  };
-
-  const handleCancelEditFeedbackText = () => {
-    setEditedFeedbackText(feedback?.feedback_text || '');
-    setIsEditingFeedbackText(false);
   };
 
   const handleSave = async () => {
@@ -1795,52 +1752,10 @@ Customer Service Team`);
               <h3 className="font-semibold mb-3 flex items-center gap-2">
                 <MessageSquare className="h-4 w-4" />
                 Customer Feedback
-                {isAdmin && !isEditingFeedbackText && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 w-7 p-0 ml-auto"
-                    onClick={() => setIsEditingFeedbackText(true)}
-                    title="Edit Feedback Text (Admin Only)"
-                  >
-                    <Edit className="h-3 w-3" />
-                  </Button>
-                )}
               </h3>
-              
-              {isEditingFeedbackText ? (
-                <div className="space-y-3">
-                  <Textarea
-                    value={editedFeedbackText}
-                    onChange={(e) => setEditedFeedbackText(e.target.value)}
-                    className="min-h-[120px]"
-                    disabled={isUpdatingFeedbackText}
-                  />
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={handleSaveFeedbackText}
-                      disabled={isUpdatingFeedbackText}
-                    >
-                      <Save className="h-3 w-3 mr-2" />
-                      {isUpdatingFeedbackText ? "Saving..." : "Save Changes"}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={handleCancelEditFeedbackText}
-                      disabled={isUpdatingFeedbackText}
-                    >
-                      <X className="h-3 w-3 mr-2" />
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-sm whitespace-pre-wrap bg-muted/50 p-3 rounded border">
-                  {feedback.feedback_text}
-                </p>
-              )}
+              <p className="text-sm whitespace-pre-wrap bg-muted/50 p-3 rounded border">
+                {feedback.feedback_text}
+              </p>
             </Card>
           )}
 
