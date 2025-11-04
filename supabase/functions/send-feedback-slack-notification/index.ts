@@ -59,12 +59,14 @@ async function sendSlackDM(slackBotToken: string, recipientEmail: string, blocks
     });
     
     const slackData = await slackResponse.json();
+    console.log(`📤 Slack API response for ${recipientEmail}:`, JSON.stringify(slackData, null, 2));
+    
     if (!slackData.ok) {
       console.error(`❌ Slack DM failed for ${recipientEmail}:`, slackData.error);
       return false;
     }
     
-    console.log(`✅ Slack DM sent to ${recipientEmail}`);
+    console.log(`✅ Slack DM sent to ${recipientEmail} (channel: ${slackUserId}, ts: ${slackData.ts})`);
     return true;
   } catch (error) {
     console.error(`Error sending Slack DM to ${recipientEmail}:`, error);
