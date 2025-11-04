@@ -38,4 +38,8 @@ export interface CustomerFeedback {
   dm_approved_at?: string;
   ready_for_dm_resolution?: boolean;
   customer_called?: boolean;
+  time_of_day?: string;
+  order_number?: string;
+  period?: string;
+  ee_action?: string;
 }

@@ -43,6 +43,8 @@ interface FeedbackWebhookData {
   // Additional fields
   ee_action?: string
   period?: string
+  time_of_day?: string
+  order_number?: string
 }
 
 async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | null> {
@@ -236,8 +238,10 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     case_number,
     assignee: data.assignee || defaultAssignee,
     priority: data.priority || defaultPriority,
-    ee_action: data.ee_action || data.Action || null,
-    period: data.period || data.Period || null
+    ee_action: data.ee_action || data.Action || data['Action Item'] || null,
+    period: data.period || data.Period || null,
+    time_of_day: data.time_of_day || data['Time of Day'] || data.time || null,
+    order_number: data.order_number || data['Order Number'] || data.order || null
   }
   
   console.log('=== VALIDATION SUCCESS ===')
@@ -439,7 +443,11 @@ Deno.serve(async (req) => {
         user_id: '00000000-0000-0000-0000-000000000000', // System user
         escalated_at: escalatedAt,
         sla_deadline: slaDeadline,
-        auto_escalated: validatedData.priority === 'Critical'
+        auto_escalated: validatedData.priority === 'Critical',
+        ee_action: validatedData.ee_action,
+        period: validatedData.period,
+        time_of_day: validatedData.time_of_day,
+        order_number: validatedData.order_number
       })
       .select()
       .single()

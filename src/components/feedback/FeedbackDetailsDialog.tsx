@@ -1391,6 +1391,11 @@ Customer Service Team`);
                 <div>
                   <span className="text-muted-foreground">Case Number:</span> {feedback.case_number}
                 </div>
+                {feedback.order_number && (
+                  <div>
+                    <span className="text-muted-foreground">Order #:</span> <span className="font-mono">{feedback.order_number}</span>
+                  </div>
+                )}
               </div>
             </Card>
 
@@ -1409,6 +1414,21 @@ Customer Service Team`);
                 {feedback.rating && (
                   <div>
                     <span className="text-muted-foreground">Rating:</span> {feedback.rating}/5
+                  </div>
+                )}
+                {feedback.time_of_day && (
+                  <div>
+                    <span className="text-muted-foreground">Time of Day:</span> {feedback.time_of_day}
+                  </div>
+                )}
+                {feedback.period && (
+                  <div>
+                    <span className="text-muted-foreground">Period:</span> {feedback.period}
+                  </div>
+                )}
+                {feedback.ee_action && (
+                  <div className="col-span-2 p-2 bg-amber-50 dark:bg-amber-950/20 rounded border border-amber-200 dark:border-amber-900">
+                    <span className="text-muted-foreground">Action Required:</span> <span className="font-medium">{feedback.ee_action}</span>
                   </div>
                 )}
                 <div>

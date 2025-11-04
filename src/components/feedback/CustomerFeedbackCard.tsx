@@ -356,6 +356,30 @@ export function CustomerFeedbackCard({
             </a>
           )}
           
+          {/* Time & Order Information */}
+          {(feedback.time_of_day || feedback.order_number || feedback.period) && (
+            <div className="flex flex-wrap gap-3 text-xs">
+              {feedback.time_of_day && (
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Clock className="h-3 w-3" />
+                  <span>{feedback.time_of_day}</span>
+                </div>
+              )}
+              {feedback.order_number && (
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Hash className="h-3 w-3" />
+                  <span className="font-mono">{feedback.order_number}</span>
+                </div>
+              )}
+              {feedback.period && (
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Calendar className="h-3 w-3" />
+                  <span>Period {feedback.period}</span>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Meta Information */}
           <div className="flex flex-col gap-2 text-xs text-muted-foreground">
             <div className="flex items-center gap-2 sm:gap-4 flex-wrap">

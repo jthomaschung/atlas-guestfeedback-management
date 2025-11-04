@@ -1319,6 +1319,7 @@ export type Database = {
           feedback_text: string | null
           id: string
           market: string
+          order_number: string | null
           outreach_method: string | null
           outreach_sent_at: string | null
           period: string | null
@@ -1329,6 +1330,7 @@ export type Database = {
           resolution_status: string | null
           sla_deadline: string | null
           store_number: string
+          time_of_day: string | null
           updated_at: string
           user_id: string
           viewed: boolean | null
@@ -1360,6 +1362,7 @@ export type Database = {
           feedback_text?: string | null
           id?: string
           market: string
+          order_number?: string | null
           outreach_method?: string | null
           outreach_sent_at?: string | null
           period?: string | null
@@ -1370,6 +1373,7 @@ export type Database = {
           resolution_status?: string | null
           sla_deadline?: string | null
           store_number: string
+          time_of_day?: string | null
           updated_at?: string
           user_id: string
           viewed?: boolean | null
@@ -1401,6 +1405,7 @@ export type Database = {
           feedback_text?: string | null
           id?: string
           market?: string
+          order_number?: string | null
           outreach_method?: string | null
           outreach_sent_at?: string | null
           period?: string | null
@@ -1411,6 +1416,7 @@ export type Database = {
           resolution_status?: string | null
           sla_deadline?: string | null
           store_number?: string
+          time_of_day?: string | null
           updated_at?: string
           user_id?: string
           viewed?: boolean | null
@@ -2021,6 +2027,44 @@ export type Database = {
             columns: ["template_item_id"]
             isOneToOne: false
             referencedRelation: "career_path_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      manager_reminder_log: {
+        Row: {
+          created_at: string | null
+          id: string
+          recipient_email: string
+          reminder_level: string
+          sent_at: string | null
+          status: string | null
+          ticket_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          recipient_email: string
+          reminder_level: string
+          sent_at?: string | null
+          status?: string | null
+          ticket_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          recipient_email?: string
+          reminder_level?: string
+          sent_at?: string | null
+          status?: string | null
+          ticket_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manager_reminder_log_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_tickets"
             referencedColumns: ["id"]
           },
         ]
@@ -2870,6 +2914,7 @@ export type Database = {
           contact_email: string | null
           contact_phone: string | null
           created_at: string
+          date_of_birth: string | null
           description: string
           employee_visible_notes: string | null
           expected_resolution_date: string | null
@@ -2886,8 +2931,10 @@ export type Database = {
           market: string
           pay_period_end: string | null
           pay_period_start: string | null
+          payroll_id: string | null
           resolution_notes: string | null
           resolved_at: string | null
+          ssn_last_four: string | null
           status: Database["public"]["Enums"]["ticket_status"]
           store_number: string
           sub_category: string | null
@@ -2896,6 +2943,7 @@ export type Database = {
           ticket_number: string
           updated_at: string
           urgency_level: Database["public"]["Enums"]["ticket_urgency"]
+          verification_method: string | null
         }
         Insert: {
           acknowledgment_confirmed?: boolean | null
@@ -2907,6 +2955,7 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string
+          date_of_birth?: string | null
           description: string
           employee_visible_notes?: string | null
           expected_resolution_date?: string | null
@@ -2923,8 +2972,10 @@ export type Database = {
           market: string
           pay_period_end?: string | null
           pay_period_start?: string | null
+          payroll_id?: string | null
           resolution_notes?: string | null
           resolved_at?: string | null
+          ssn_last_four?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
           store_number: string
           sub_category?: string | null
@@ -2933,6 +2984,7 @@ export type Database = {
           ticket_number?: string
           updated_at?: string
           urgency_level?: Database["public"]["Enums"]["ticket_urgency"]
+          verification_method?: string | null
         }
         Update: {
           acknowledgment_confirmed?: boolean | null
@@ -2944,6 +2996,7 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string
+          date_of_birth?: string | null
           description?: string
           employee_visible_notes?: string | null
           expected_resolution_date?: string | null
@@ -2960,8 +3013,10 @@ export type Database = {
           market?: string
           pay_period_end?: string | null
           pay_period_start?: string | null
+          payroll_id?: string | null
           resolution_notes?: string | null
           resolved_at?: string | null
+          ssn_last_four?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
           store_number?: string
           sub_category?: string | null
@@ -2970,6 +3025,7 @@ export type Database = {
           ticket_number?: string
           updated_at?: string
           urgency_level?: Database["public"]["Enums"]["ticket_urgency"]
+          verification_method?: string | null
         }
         Relationships: [
           {
@@ -3487,6 +3543,45 @@ export type Database = {
         }
         Relationships: []
       }
+      services_wsr: {
+        Row: {
+          amount: number
+          class_code: string
+          created_at: string | null
+          description: string
+          id: number
+          legal_entity: string
+          sales_item: string
+          store_name: string
+          store_number: number
+          week_ending: string
+        }
+        Insert: {
+          amount: number
+          class_code: string
+          created_at?: string | null
+          description: string
+          id?: number
+          legal_entity: string
+          sales_item: string
+          store_name: string
+          store_number: number
+          week_ending: string
+        }
+        Update: {
+          amount?: number
+          class_code?: string
+          created_at?: string | null
+          description?: string
+          id?: number
+          legal_entity?: string
+          sales_item?: string
+          store_name?: string
+          store_number?: number
+          week_ending?: string
+        }
+        Relationships: []
+      }
       sla_notifications: {
         Row: {
           created_at: string
@@ -3518,6 +3613,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      store_region_groups: {
+        Row: {
+          created_at: string | null
+          market: string
+          region_group: string
+        }
+        Insert: {
+          created_at?: string | null
+          market: string
+          region_group: string
+        }
+        Update: {
+          created_at?: string | null
+          market?: string
+          region_group?: string
+        }
+        Relationships: []
       }
       stores: {
         Row: {
@@ -3668,18 +3781,24 @@ export type Database = {
           category: string
           employee_category_completion_pct: number | null
           employee_name: string
+          id: number
+          store: string
           updated_at: string | null
         }
         Insert: {
           category: string
           employee_category_completion_pct?: number | null
           employee_name: string
+          id?: number
+          store: string
           updated_at?: string | null
         }
         Update: {
           category?: string
           employee_category_completion_pct?: number | null
           employee_name?: string
+          id?: number
+          store?: string
           updated_at?: string | null
         }
         Relationships: []
@@ -4580,6 +4699,9 @@ export type Database = {
           total_labor: number | null
           week_ending: string
           week_number: number
+          wsr_labor_dollars: number | null
+          wsr_labor_overtime: number | null
+          wsr_labor_percent: number | null
           year: number
         }
         Insert: {
@@ -4599,6 +4721,9 @@ export type Database = {
           total_labor?: number | null
           week_ending: string
           week_number: number
+          wsr_labor_dollars?: number | null
+          wsr_labor_overtime?: number | null
+          wsr_labor_percent?: number | null
           year: number
         }
         Update: {
@@ -4616,6 +4741,48 @@ export type Database = {
           overtime_labor?: number | null
           store_number?: string
           total_labor?: number | null
+          week_ending?: string
+          week_number?: number
+          wsr_labor_dollars?: number | null
+          wsr_labor_overtime?: number | null
+          wsr_labor_percent?: number | null
+          year?: number
+        }
+        Relationships: []
+      }
+      wsr_labor_metrics: {
+        Row: {
+          created_at: string | null
+          date: string
+          metric_name: string
+          metric_value: number | null
+          shift: string
+          store_number: string
+          updated_at: string | null
+          week_ending: string
+          week_number: number
+          year: number
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          metric_name: string
+          metric_value?: number | null
+          shift: string
+          store_number: string
+          updated_at?: string | null
+          week_ending: string
+          week_number: number
+          year: number
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          metric_name?: string
+          metric_value?: number | null
+          shift?: string
+          store_number?: string
+          updated_at?: string | null
           week_ending?: string
           week_number?: number
           year?: number
