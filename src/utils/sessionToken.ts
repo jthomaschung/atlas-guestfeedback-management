@@ -37,7 +37,7 @@ export const sessionTokenUtils = {
     return url.toString();
   },
 
-  // Extract tokens from URL parameters
+  // Extract tokens from URL parameters (legacy format)
   extractTokensFromUrl: (): SessionTokenData | null => {
     const urlParams = new URLSearchParams(window.location.search);
     const access_token = urlParams.get('access_token');
@@ -53,6 +53,46 @@ export const sessionTokenUtils = {
       refresh_token,
       expires_at: expires_at ? parseInt(expires_at) : 0
     };
+  },
+
+  // Extract tokens from __lovable_token JWT or fall back to legacy format
+  extractTokensFromLovableToken: (): SessionTokenData | null => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const lovableToken = urlParams.get('__lovable_token');
+    
+    if (lovableToken) {
+      try {
+        console.log('🔐 GUEST FEEDBACK sessionTokenUtils: Decoding __lovable_token JWT...');
+        
+        // JWT format: header.payload.signature
+        // We need to decode the payload (middle part)
+        const parts = lovableToken.split('.');
+        if (parts.length !== 3) {
+          console.error('❌ GUEST FEEDBACK sessionTokenUtils: Invalid JWT format (expected 3 parts)');
+          return sessionTokenUtils.extractTokensFromUrl();
+        }
+        
+        const payload = JSON.parse(atob(parts[1]));
+        console.log('✅ GUEST FEEDBACK sessionTokenUtils: JWT decoded successfully', {
+          hasAccessToken: !!payload.access_token,
+          hasRefreshToken: !!payload.refresh_token,
+          expiresAt: payload.expires_at
+        });
+        
+        return {
+          access_token: payload.access_token,
+          refresh_token: payload.refresh_token,
+          expires_at: payload.expires_at || 0
+        };
+      } catch (error) {
+        console.error('❌ GUEST FEEDBACK sessionTokenUtils: Failed to decode __lovable_token:', error);
+        // Fall through to legacy method
+      }
+    }
+    
+    // Fallback to legacy token extraction
+    console.log('🔄 GUEST FEEDBACK sessionTokenUtils: No __lovable_token found, trying legacy format...');
+    return sessionTokenUtils.extractTokensFromUrl();
   },
 
   // Authenticate with tokens from URL
@@ -103,6 +143,7 @@ export const sessionTokenUtils = {
     });
 
     const url = new URL(window.location.href);
+    url.searchParams.delete('__lovable_token');
     url.searchParams.delete('access_token');
     url.searchParams.delete('refresh_token');
     url.searchParams.delete('expires_at');

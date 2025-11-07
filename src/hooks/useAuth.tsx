@@ -8,6 +8,8 @@ interface AuthContextType {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
+  isProcessingTokens: boolean;
+  setIsProcessingTokens: (processing: boolean) => void;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -21,6 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isProcessingTokens, setIsProcessingTokens] = useState(false);
 
   useEffect(() => {
     // Set up auth state listener
@@ -110,6 +113,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       session,
       profile,
       loading,
+      isProcessingTokens,
+      setIsProcessingTokens,
       signIn,
       signUp,
       signOut,
