@@ -69,6 +69,7 @@ export function AccuracyTrendsChart({ feedbacks, periods, selectedPeriod }: Accu
               stroke="hsl(var(--destructive))" 
               strokeWidth={2}
               dot={{ fill: "hsl(var(--destructive))" }}
+              connectNulls={true}
             />
             <Line 
               type="monotone" 
@@ -76,6 +77,7 @@ export function AccuracyTrendsChart({ feedbacks, periods, selectedPeriod }: Accu
               stroke="hsl(var(--chart-2))" 
               strokeWidth={2}
               dot={{ fill: "hsl(var(--chart-2))" }}
+              connectNulls={true}
             />
           </LineChart>
         </ResponsiveContainer>
