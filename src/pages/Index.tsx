@@ -127,6 +127,7 @@ const Index = () => {
       const matchesStatus = statusFilter.length === 0 || statusFilter.includes(fb.resolution_status);
       const matchesPriority = priorityFilter.length === 0 || priorityFilter.includes(fb.priority);
       const matchesCategory = categoryFilter.length === 0 || categoryFilter.some(cat => {
+        if (!cat) return false;
         const categoryLower = fb.complaint_category?.toLowerCase() || '';
         const filterLower = cat.toLowerCase();
         // Bidirectional matching: check if either contains the other
