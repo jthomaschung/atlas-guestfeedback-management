@@ -33,12 +33,14 @@ export function AccuracyTrendsChart({ feedbacks, periods, selectedPeriod }: Accu
 
       return {
         periodName: period.name,
-        "Missing Items": missingItems,
-        "Sandwich Made Wrong": sandwichWrong,
+        missingItems: missingItems,
+        sandwichWrong: sandwichWrong,
       };
     });
 
-    return periodData.reverse(); // Show oldest to newest
+    const result = periodData.reverse(); // Show oldest to newest
+    console.log("Chart data:", result);
+    return result;
   }, [feedbacks, periods]);
 
   return (
@@ -65,19 +67,21 @@ export function AccuracyTrendsChart({ feedbacks, periods, selectedPeriod }: Accu
             <Legend />
             <Line 
               type="monotone" 
-              dataKey="Missing Items" 
+              dataKey="missingItems" 
+              name="Missing Items"
               stroke="hsl(var(--destructive))" 
-              strokeWidth={2}
-              dot={{ fill: "hsl(var(--destructive))" }}
-              connectNulls={true}
+              strokeWidth={3}
+              dot={{ fill: "hsl(var(--destructive))", r: 4 }}
+              activeDot={{ r: 6 }}
             />
             <Line 
               type="monotone" 
-              dataKey="Sandwich Made Wrong" 
+              dataKey="sandwichWrong" 
+              name="Sandwich Made Wrong"
               stroke="hsl(var(--chart-2))" 
-              strokeWidth={2}
-              dot={{ fill: "hsl(var(--chart-2))" }}
-              connectNulls={true}
+              strokeWidth={3}
+              dot={{ fill: "hsl(var(--chart-2))", r: 4 }}
+              activeDot={{ r: 6 }}
             />
           </LineChart>
         </ResponsiveContainer>
