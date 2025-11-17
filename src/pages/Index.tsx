@@ -126,7 +126,9 @@ const Index = () => {
                            fb.store_number.includes(searchTerm);
       const matchesStatus = statusFilter.length === 0 || statusFilter.includes(fb.resolution_status);
       const matchesPriority = priorityFilter.length === 0 || priorityFilter.includes(fb.priority);
-      const matchesCategory = categoryFilter.length === 0 || categoryFilter.includes(fb.complaint_category);
+      const matchesCategory = categoryFilter.length === 0 || categoryFilter.some(cat => 
+        fb.complaint_category?.toLowerCase().includes(cat.toLowerCase())
+      );
       const matchesChannel = channelFilter.length === 0 || channelFilter.includes(fb.channel);
       const matchesStore = storeFilter.length === 0 || storeFilter.includes(fb.store_number);
       const matchesMarket = marketFilter.length === 0 || marketFilter.includes(fb.market);
