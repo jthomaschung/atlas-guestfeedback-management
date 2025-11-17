@@ -43,9 +43,9 @@ export function CategoryComparisonChart({ feedbacks }: CategoryComparisonChartPr
         byMarket[market] = { missingItems: 0, sandwichWrong: 0 };
       }
 
-      if (feedback.complaint_category === "Missing item") {
+      if (feedback.complaint_category?.toLowerCase().includes('missing item')) {
         byMarket[market].missingItems += 1;
-      } else if (feedback.complaint_category === "Sandwich Made Wrong") {
+      } else if (feedback.complaint_category?.toLowerCase().includes('sandwich made wrong')) {
         byMarket[market].sandwichWrong += 1;
       }
     });

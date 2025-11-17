@@ -67,7 +67,7 @@ export default function Accuracy() {
       const { data: allData, error: allError } = await supabase
         .from("customer_feedback")
         .select("*")
-        .in("complaint_category", ["Missing item", "Sandwich Made Wrong"])
+        .or("complaint_category.ilike.%missing item%,complaint_category.ilike.%sandwich made wrong%")
         .order("feedback_date", { ascending: false });
 
       if (allError) throw allError;
@@ -110,11 +110,11 @@ export default function Accuracy() {
 
   // Calculate metrics
   const missingItems = filteredFeedbacks.filter(
-    (fb) => fb.complaint_category === "Missing item"
+    (fb) => fb.complaint_category?.toLowerCase().includes('missing item')
   ).length;
   
   const sandwichMadeWrong = filteredFeedbacks.filter(
-    (fb) => fb.complaint_category === "Sandwich Made Wrong"
+    (fb) => fb.complaint_category?.toLowerCase().includes('sandwich made wrong')
   ).length;
 
   const totalAccuracyIssues = filteredFeedbacks.length;
@@ -138,12 +138,12 @@ export default function Accuracy() {
     
     // This is an estimate based on current data - in production you'd query the previous period
     return Math.floor(
-      filteredFeedbacks.filter((fb) => fb.complaint_category === category).length * 0.9
+      filteredFeedbacks.filter((fb) => fb.complaint_category?.toLowerCase().includes(category.toLowerCase())).length * 0.9
     );
   };
 
-  const prevMissingItems = getPreviousPeriodCount("Missing item");
-  const prevSandwichWrong = getPreviousPeriodCount("Sandwich Made Wrong");
+  const prevMissingItems = getPreviousPeriodCount("missing item");
+  const prevSandwichWrong = getPreviousPeriodCount("sandwich made wrong");
 
   const missingItemsTrend = prevMissingItems > 0 
     ? (((missingItems - prevMissingItems) / prevMissingItems) * 100).toFixed(1)

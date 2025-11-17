@@ -37,9 +37,9 @@ export function StoreRankingsTable({ feedbacks }: StoreRankingsTableProps) {
         };
       }
 
-      if (feedback.complaint_category === "Missing item") {
+      if (feedback.complaint_category?.toLowerCase().includes('missing item')) {
         byStore[key].missingItems += 1;
-      } else if (feedback.complaint_category === "Sandwich Made Wrong") {
+      } else if (feedback.complaint_category?.toLowerCase().includes('sandwich made wrong')) {
         byStore[key].sandwichWrong += 1;
       }
       byStore[key].total += 1;
