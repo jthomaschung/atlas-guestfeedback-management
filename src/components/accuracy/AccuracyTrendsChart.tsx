@@ -70,7 +70,7 @@ export function AccuracyTrendsChart({ feedbacks, periods, selectedPeriod }: Accu
               dataKey="missingItems" 
               name="Missing Items"
               stroke="hsl(var(--destructive))" 
-              strokeWidth={3}
+              strokeWidth={2}
               dot={{ fill: "hsl(var(--destructive))", r: 4 }}
               activeDot={{ r: 6 }}
             />
@@ -78,9 +78,9 @@ export function AccuracyTrendsChart({ feedbacks, periods, selectedPeriod }: Accu
               type="monotone" 
               dataKey="sandwichWrong" 
               name="Sandwich Made Wrong"
-              stroke="hsl(var(--primary))" 
-              strokeWidth={3}
-              dot={{ fill: "hsl(var(--primary))", r: 4 }}
+              stroke="hsl(var(--foreground))" 
+              strokeWidth={2}
+              dot={{ fill: "hsl(var(--foreground))", r: 4 }}
               activeDot={{ r: 6 }}
             />
           </LineChart>
