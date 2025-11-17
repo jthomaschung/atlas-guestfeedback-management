@@ -1,7 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from "recharts";
 import { CustomerFeedback } from "@/types/feedback";
 
 interface CategoryBreakdownChartProps {
@@ -10,53 +10,90 @@ interface CategoryBreakdownChartProps {
   onCategoryClick?: (category: string) => void;
 }
 
-const chartConfig = {
-  "Missing Items": {
-    label: "Missing Items",
-    color: "hsl(var(--destructive))",
-  },
-  "Sandwich Made Wrong": {
-    label: "Sandwich Made Wrong",
-    color: "hsl(var(--foreground))",
-  },
+// Dynamic color palette for categories
+const getCategoryColor = (index: number) => {
+  const colors = [
+    "hsl(var(--destructive))",
+    "hsl(var(--chart-1))",
+    "hsl(var(--chart-2))",
+    "hsl(var(--chart-3))",
+    "hsl(var(--chart-4))",
+    "hsl(var(--chart-5))",
+    "hsl(var(--primary))",
+    "hsl(var(--secondary))",
+  ];
+  return colors[index % colors.length];
 };
 
 export function CategoryBreakdownChart({ className, feedbacks, onCategoryClick }: CategoryBreakdownChartProps) {
-  const districtData = useMemo(() => {
+  const [selectedMarket, setSelectedMarket] = useState<string | null>(null);
+
+  const { districtData, categories, chartConfig } = useMemo(() => {
+    // Get all unique categories
+    const categorySet = new Set<string>();
+    feedbacks.forEach(feedback => {
+      if (feedback.complaint_category) {
+        categorySet.add(feedback.complaint_category);
+      }
+    });
+    const uniqueCategories = Array.from(categorySet).sort();
+
+    // Create dynamic chart config
+    const config: Record<string, { label: string; color: string }> = {};
+    uniqueCategories.forEach((category, index) => {
+      config[category] = {
+        label: category,
+        color: getCategoryColor(index),
+      };
+    });
+
     // Process the data to count by market and category
-    const marketCategoryCount: { [key: string]: { missingItems: number; sandwichWrong: number; total: number } } = {};
+    const marketCategoryCount: { [key: string]: { [category: string]: number; total: number } } = {};
 
     feedbacks.forEach(feedback => {
       const market = feedback.market;
+      const category = feedback.complaint_category || 'Unknown';
       
       if (!marketCategoryCount[market]) {
-        marketCategoryCount[market] = {
-          missingItems: 0,
-          sandwichWrong: 0,
-          total: 0
-        };
+        marketCategoryCount[market] = { total: 0 };
+        uniqueCategories.forEach(cat => {
+          marketCategoryCount[market][cat] = 0;
+        });
       }
 
-      const categoryLower = feedback.complaint_category?.toLowerCase() || '';
-      if (categoryLower.includes('missing item')) {
-        marketCategoryCount[market].missingItems += 1;
-      } else if (categoryLower.includes('sandwich made wrong')) {
-        marketCategoryCount[market].sandwichWrong += 1;
+      if (marketCategoryCount[market][category] !== undefined) {
+        marketCategoryCount[market][category] += 1;
+      } else {
+        marketCategoryCount[market][category] = 1;
       }
       marketCategoryCount[market].total += 1;
     });
 
     // Convert to array for chart display
     const processedData = Object.entries(marketCategoryCount)
-      .map(([market, counts]) => ({
-        market,
-        "Missing Items": counts.missingItems,
-        "Sandwich Made Wrong": counts.sandwichWrong,
-      }))
-      .sort((a, b) => b["Missing Items"] + b["Sandwich Made Wrong"] - (a["Missing Items"] + a["Sandwich Made Wrong"]));
+      .map(([market, counts]) => {
+        const data: any = { market };
+        uniqueCategories.forEach(category => {
+          data[category] = counts[category] || 0;
+        });
+        return data;
+      })
+      .sort((a, b) => {
+        const aTotal = uniqueCategories.reduce((sum, cat) => sum + (a[cat] || 0), 0);
+        const bTotal = uniqueCategories.reduce((sum, cat) => sum + (b[cat] || 0), 0);
+        return bTotal - aTotal;
+      });
 
-    return processedData;
+    return { districtData: processedData, categories: uniqueCategories, chartConfig: config };
   }, [feedbacks]);
+
+  const handleBarClick = (data: any) => {
+    const clickedMarket = data.market;
+    setSelectedMarket(clickedMarket === selectedMarket ? null : clickedMarket);
+    if (onCategoryClick) {
+      onCategoryClick(clickedMarket);
+    }
+  };
 
   if (feedbacks.length === 0) {
     return (
@@ -87,7 +124,7 @@ export function CategoryBreakdownChart({ className, feedbacks, onCategoryClick }
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={districtData} margin={{ top: 5, right: 30, left: 20, bottom: 80 }}>
+            <BarChart data={districtData} margin={{ top: 5, right: 30, left: 20, bottom: 80 }} onClick={handleBarClick}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis 
                 dataKey="market"
@@ -109,17 +146,21 @@ export function CategoryBreakdownChart({ className, feedbacks, onCategoryClick }
                 content={({ active, payload, label }) => {
                   if (active && payload && payload.length) {
                     const data = payload[0].payload;
+                    const total = categories.reduce((sum, cat) => sum + (data[cat] || 0), 0);
                     return (
                       <div className="bg-background border border-border rounded-lg shadow-lg p-3">
-                        <div className="text-sm font-semibold text-foreground">{label}</div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          Missing Items: <span className="font-medium text-red-600">{data["Missing Items"]}</span>
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Sandwich Made Wrong: <span className="font-medium text-foreground">{data["Sandwich Made Wrong"]}</span>
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          Total: <span className="font-medium text-foreground">{data["Missing Items"] + data["Sandwich Made Wrong"]}</span>
+                        <div className="text-sm font-semibold text-foreground mb-2">{label}</div>
+                        {categories.map((category, index) => {
+                          const value = data[category] || 0;
+                          if (value === 0) return null;
+                          return (
+                            <div key={category} className="text-xs text-muted-foreground">
+                              {category}: <span className="font-medium" style={{ color: getCategoryColor(index) }}>{value}</span>
+                            </div>
+                          );
+                        })}
+                        <div className="text-xs text-muted-foreground mt-2 pt-1 border-t border-border">
+                          Total: <span className="font-medium text-foreground">{total}</span>
                         </div>
                       </div>
                     );
@@ -127,18 +168,23 @@ export function CategoryBreakdownChart({ className, feedbacks, onCategoryClick }
                   return null;
                 }}
               />
-              <Bar 
-                dataKey="Missing Items" 
-                fill="hsl(var(--destructive))"
-                radius={[4, 4, 0, 0]}
-                stackId="a"
-              />
-              <Bar 
-                dataKey="Sandwich Made Wrong" 
-                fill="hsl(var(--foreground))"
-                radius={[4, 4, 0, 0]}
-                stackId="a"
-              />
+              {categories.map((category, index) => (
+                <Bar 
+                  key={category}
+                  dataKey={category} 
+                  fill={getCategoryColor(index)}
+                  radius={index === categories.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+                  stackId="a"
+                  cursor="pointer"
+                >
+                  {districtData.map((entry, idx) => (
+                    <Cell 
+                      key={`cell-${idx}`}
+                      opacity={selectedMarket === null || selectedMarket === entry.market ? 1 : 0.3}
+                    />
+                  ))}
+                </Bar>
+              ))}
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
