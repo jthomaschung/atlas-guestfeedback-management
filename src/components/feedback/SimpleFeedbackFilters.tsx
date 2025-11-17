@@ -56,13 +56,15 @@ export function SimpleFeedbackFilters({ feedbacks, onFilter }: SimpleFeedbackFil
       filtered = filtered.filter(feedback => priorityFilter.includes(feedback.priority));
     }
 
-    // Category filter (case-insensitive partial matching)
+    // Category filter (bidirectional case-insensitive matching)
     if (categoryFilter.length > 0) {
-      filtered = filtered.filter(feedback => 
-        categoryFilter.some(cat => 
-          feedback.complaint_category?.toLowerCase().includes(cat.toLowerCase())
-        )
-      );
+      filtered = filtered.filter(feedback => {
+        const categoryLower = feedback.complaint_category?.toLowerCase() || '';
+        return categoryFilter.some(cat => {
+          const filterLower = cat.toLowerCase();
+          return categoryLower.includes(filterLower) || filterLower.includes(categoryLower);
+        });
+      });
     }
 
     // Channel filter
