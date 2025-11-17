@@ -56,7 +56,7 @@ export function EmailConversationDialog({
     if (feedback?.complaint_category) {
       const category = feedback.complaint_category.toLowerCase();
       
-      if (category === 'praise') {
+      if (category === 'praise' || category === 'rockstar service') {
         setSelectedTemplate('praise');
       } else if (category === 'slow service') {
         setSelectedTemplate('slow_service');

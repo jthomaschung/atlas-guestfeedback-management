@@ -98,10 +98,10 @@ const getAssigneeForFeedback = async (storeNumber: string, market: string, categ
     const storeManager = storeData?.manager;
     console.log('🏪 ASSIGNMENT: Store manager found:', storeManager);
 
-    // Special handling for Praise category - assign to store manager if available
-    if (category === 'Praise') {
+    // Special handling for Praise and Rockstar Service categories - assign to store manager if available
+    if (category === 'Praise' || category?.toLowerCase() === 'rockstar service') {
       if (storeManager && storeManager.trim() !== '') {
-        console.log('👏 ASSIGNMENT: Assigning praise to store manager:', storeManager);
+        console.log('👏 ASSIGNMENT: Assigning praise/rockstar service to store manager:', storeManager);
         return storeManager;
       }
     }
@@ -594,7 +594,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
     if (feedback?.complaint_category) {
       const category = feedback.complaint_category.toLowerCase();
       
-      if (category === 'praise') {
+      if (category === 'praise' || category === 'rockstar service') {
         setSelectedTemplate('praise');
       } else if (category === 'slow service') {
         setSelectedTemplate('slow_service');

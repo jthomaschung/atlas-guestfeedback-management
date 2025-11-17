@@ -74,6 +74,260 @@ export type Database = {
         }
         Relationships: []
       }
+      amex_connections: {
+        Row: {
+          access_token: string
+          connection_status: string | null
+          created_at: string | null
+          cursor: string | null
+          id: string
+          institution_name: string | null
+          item_id: string
+          last_error: string | null
+          last_synced_at: string | null
+          profile_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          access_token: string
+          connection_status?: string | null
+          created_at?: string | null
+          cursor?: string | null
+          id?: string
+          institution_name?: string | null
+          item_id: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          profile_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          access_token?: string
+          connection_status?: string | null
+          created_at?: string | null
+          cursor?: string | null
+          id?: string
+          institution_name?: string | null
+          item_id?: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          profile_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "amex_connections_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "amex_connections_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
+      amex_transactions: {
+        Row: {
+          account_id: string
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          business_purpose: string | null
+          category: string[] | null
+          connection_id: string
+          created_at: string | null
+          date: string
+          description: string | null
+          expense_category: string | null
+          id: string
+          merchant_name: string | null
+          notes: string | null
+          payment_channel: string | null
+          pending: boolean | null
+          profile_id: string
+          qb_expense_id: string | null
+          qb_synced: boolean | null
+          qb_synced_at: string | null
+          receipt_uploaded: boolean | null
+          receipt_url: string | null
+          rejection_reason: string | null
+          status: string | null
+          store_id: number | null
+          submitted_at: string | null
+          transaction_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          account_id: string
+          amount: number
+          approved_at?: string | null
+          approved_by?: string | null
+          business_purpose?: string | null
+          category?: string[] | null
+          connection_id: string
+          created_at?: string | null
+          date: string
+          description?: string | null
+          expense_category?: string | null
+          id?: string
+          merchant_name?: string | null
+          notes?: string | null
+          payment_channel?: string | null
+          pending?: boolean | null
+          profile_id: string
+          qb_expense_id?: string | null
+          qb_synced?: boolean | null
+          qb_synced_at?: string | null
+          receipt_uploaded?: boolean | null
+          receipt_url?: string | null
+          rejection_reason?: string | null
+          status?: string | null
+          store_id?: number | null
+          submitted_at?: string | null
+          transaction_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          account_id?: string
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          business_purpose?: string | null
+          category?: string[] | null
+          connection_id?: string
+          created_at?: string | null
+          date?: string
+          description?: string | null
+          expense_category?: string | null
+          id?: string
+          merchant_name?: string | null
+          notes?: string | null
+          payment_channel?: string | null
+          pending?: boolean | null
+          profile_id?: string
+          qb_expense_id?: string | null
+          qb_synced?: boolean | null
+          qb_synced_at?: string | null
+          receipt_uploaded?: boolean | null
+          receipt_url?: string | null
+          rejection_reason?: string | null
+          status?: string | null
+          store_id?: number | null
+          submitted_at?: string | null
+          transaction_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "amex_transactions_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "amex_transactions_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "amex_transactions_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "amex_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "amex_transactions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "amex_transactions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "amex_transactions_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["store_id"]
+          },
+          {
+            foreignKeyName: "amex_transactions_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "v_store_monthly_spending"
+            referencedColumns: ["store_id"]
+          },
+        ]
+      }
+      audit_log: {
+        Row: {
+          action: string
+          created_at: string | null
+          entity_id: string | null
+          entity_type: string
+          id: string
+          ip_address: string | null
+          new_values: Json | null
+          old_values: Json | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
       backlog_activity_log: {
         Row: {
           action_details: Json | null
@@ -113,6 +367,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "backlog_activity_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["profile_id"]
           },
         ]
       }
@@ -202,6 +463,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "backlog_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["profile_id"]
           },
         ]
       }
@@ -299,11 +567,25 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "backlog_items_deferred_by_fkey"
+            columns: ["deferred_by"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["profile_id"]
+          },
+          {
             foreignKeyName: "backlog_items_reviewed_by_regional_lead_fkey"
             columns: ["reviewed_by_regional_lead"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "backlog_items_reviewed_by_regional_lead_fkey"
+            columns: ["reviewed_by_regional_lead"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["profile_id"]
           },
           {
             foreignKeyName: "backlog_items_work_order_id_fkey"
@@ -408,6 +690,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "backlog_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["profile_id"]
           },
         ]
       }
@@ -550,6 +839,13 @@ export type Database = {
             foreignKeyName: "career_path_progress_employee_id_fkey"
             columns: ["employee_id"]
             isOneToOne: false
+            referencedRelation: "certified_managers_registry"
+            referencedColumns: ["employee_id"]
+          },
+          {
+            foreignKeyName: "career_path_progress_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
             referencedRelation: "employees"
             referencedColumns: ["id"]
           },
@@ -618,6 +914,73 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      cash_deposits: {
+        Row: {
+          business_date: string
+          created_at: string | null
+          created_by_user_id: string | null
+          deposit_amount: number
+          deposit_date: string
+          deposited_by_name: string
+          id: string
+          notes: string | null
+          receipt_image_url: string
+          store_number: string
+          submission_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          business_date: string
+          created_at?: string | null
+          created_by_user_id?: string | null
+          deposit_amount: number
+          deposit_date: string
+          deposited_by_name: string
+          id?: string
+          notes?: string | null
+          receipt_image_url: string
+          store_number: string
+          submission_type?: string
+          updated_at?: string | null
+        }
+        Update: {
+          business_date?: string
+          created_at?: string | null
+          created_by_user_id?: string | null
+          deposit_amount?: number
+          deposit_date?: string
+          deposited_by_name?: string
+          id?: string
+          notes?: string | null
+          receipt_image_url?: string
+          store_number?: string
+          submission_type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cash_deposits_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["store_number"]
+          },
+          {
+            foreignKeyName: "cash_deposits_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["store_number"]
+          },
+          {
+            foreignKeyName: "cash_deposits_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "v_store_monthly_spending"
+            referencedColumns: ["store_number"]
+          },
+        ]
       }
       catering_campaign_recipients: {
         Row: {
@@ -1194,6 +1557,213 @@ export type Database = {
         }
         Relationships: []
       }
+      certification_locations: {
+        Row: {
+          address: string | null
+          city: string | null
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          location_name: string
+          state: string | null
+          zip: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          location_name: string
+          state?: string | null
+          zip?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          location_name?: string
+          state?: string | null
+          zip?: string | null
+        }
+        Relationships: []
+      }
+      certification_patches: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          patch_description: string | null
+          patch_icon: string | null
+          patch_name: string
+          required_position_ids: string[] | null
+          requires_internal_employee: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          patch_description?: string | null
+          patch_icon?: string | null
+          patch_name: string
+          required_position_ids?: string[] | null
+          requires_internal_employee?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          patch_description?: string | null
+          patch_icon?: string | null
+          patch_name?: string
+          required_position_ids?: string[] | null
+          requires_internal_employee?: boolean | null
+        }
+        Relationships: []
+      }
+      certification_requests: {
+        Row: {
+          accounting_notified_at: string | null
+          accounting_notified_by: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          certification_date: string | null
+          certification_location: string | null
+          created_at: string
+          employee_id: string | null
+          external_company_address: string | null
+          external_company_name: string | null
+          fast_track_confirmation_number: string | null
+          fast_track_registered_at: string | null
+          id: string
+          notes: string | null
+          patch_issued_at: string | null
+          patch_issued_by: string | null
+          patch_tracking_number: string | null
+          requester_market: string
+          requester_store_number: string
+          requester_user_id: string | null
+          status: string
+          trainee_email: string
+          trainee_first_name: string
+          trainee_last_name: string
+          trainee_phone: string | null
+          trainee_store_number: string
+          trainee_type: string
+          trainer_name: string | null
+          updated_at: string
+          verification_notes: string | null
+          verification_requested_at: string | null
+          verification_requested_by: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          accounting_notified_at?: string | null
+          accounting_notified_by?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          certification_date?: string | null
+          certification_location?: string | null
+          created_at?: string
+          employee_id?: string | null
+          external_company_address?: string | null
+          external_company_name?: string | null
+          fast_track_confirmation_number?: string | null
+          fast_track_registered_at?: string | null
+          id?: string
+          notes?: string | null
+          patch_issued_at?: string | null
+          patch_issued_by?: string | null
+          patch_tracking_number?: string | null
+          requester_market: string
+          requester_store_number: string
+          requester_user_id?: string | null
+          status?: string
+          trainee_email: string
+          trainee_first_name: string
+          trainee_last_name: string
+          trainee_phone?: string | null
+          trainee_store_number: string
+          trainee_type: string
+          trainer_name?: string | null
+          updated_at?: string
+          verification_notes?: string | null
+          verification_requested_at?: string | null
+          verification_requested_by?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          accounting_notified_at?: string | null
+          accounting_notified_by?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          certification_date?: string | null
+          certification_location?: string | null
+          created_at?: string
+          employee_id?: string | null
+          external_company_address?: string | null
+          external_company_name?: string | null
+          fast_track_confirmation_number?: string | null
+          fast_track_registered_at?: string | null
+          id?: string
+          notes?: string | null
+          patch_issued_at?: string | null
+          patch_issued_by?: string | null
+          patch_tracking_number?: string | null
+          requester_market?: string
+          requester_store_number?: string
+          requester_user_id?: string | null
+          status?: string
+          trainee_email?: string
+          trainee_first_name?: string
+          trainee_last_name?: string
+          trainee_phone?: string | null
+          trainee_store_number?: string
+          trainee_type?: string
+          trainer_name?: string | null
+          updated_at?: string
+          verification_notes?: string | null
+          verification_requested_at?: string | null
+          verification_requested_by?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certification_requests_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "certified_managers_registry"
+            referencedColumns: ["employee_id"]
+          },
+          {
+            foreignKeyName: "certification_requests_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       completion_metrics: {
         Row: {
           category: string | null
@@ -1250,6 +1820,13 @@ export type Database = {
             columns: ["store_id"]
             isOneToOne: false
             referencedRelation: "stores"
+            referencedColumns: ["store_id"]
+          },
+          {
+            foreignKeyName: "completion_metrics_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "v_store_monthly_spending"
             referencedColumns: ["store_id"]
           },
         ]
@@ -1640,6 +2217,208 @@ export type Database = {
         }
         Relationships: []
       }
+      deposit_reconciliation_history: {
+        Row: {
+          action: string
+          cash_deposit_id: string
+          created_at: string
+          id: string
+          new_expected_amount: number | null
+          new_status: string | null
+          new_variance_explanation: string | null
+          notes: string | null
+          old_expected_amount: number | null
+          old_status: string | null
+          old_variance_explanation: string | null
+          performed_by: string | null
+          reconciliation_id: string | null
+        }
+        Insert: {
+          action: string
+          cash_deposit_id: string
+          created_at?: string
+          id?: string
+          new_expected_amount?: number | null
+          new_status?: string | null
+          new_variance_explanation?: string | null
+          notes?: string | null
+          old_expected_amount?: number | null
+          old_status?: string | null
+          old_variance_explanation?: string | null
+          performed_by?: string | null
+          reconciliation_id?: string | null
+        }
+        Update: {
+          action?: string
+          cash_deposit_id?: string
+          created_at?: string
+          id?: string
+          new_expected_amount?: number | null
+          new_status?: string | null
+          new_variance_explanation?: string | null
+          notes?: string | null
+          old_expected_amount?: number | null
+          old_status?: string | null
+          old_variance_explanation?: string | null
+          performed_by?: string | null
+          reconciliation_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deposit_reconciliation_history_cash_deposit_id_fkey"
+            columns: ["cash_deposit_id"]
+            isOneToOne: false
+            referencedRelation: "cash_deposits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deposit_reconciliation_history_reconciliation_id_fkey"
+            columns: ["reconciliation_id"]
+            isOneToOne: false
+            referencedRelation: "deposit_reconciliations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deposit_reconciliations: {
+        Row: {
+          actual_deposit: number | null
+          business_date: string
+          created_at: string | null
+          deposit_count: number | null
+          expected_am_shift: number | null
+          expected_amount: number | null
+          expected_deposit: number | null
+          expected_pm_shift: number | null
+          house_account_closures: number | null
+          house_account_count: number | null
+          id: string
+          net_variance: number | null
+          notes: string | null
+          reconciled_at: string | null
+          reconciled_by: string | null
+          status: string
+          store_number: string
+          updated_at: string | null
+          variance: number | null
+          variance_amount: number | null
+          variance_explained: number | null
+        }
+        Insert: {
+          actual_deposit?: number | null
+          business_date: string
+          created_at?: string | null
+          deposit_count?: number | null
+          expected_am_shift?: number | null
+          expected_amount?: number | null
+          expected_deposit?: number | null
+          expected_pm_shift?: number | null
+          house_account_closures?: number | null
+          house_account_count?: number | null
+          id?: string
+          net_variance?: number | null
+          notes?: string | null
+          reconciled_at?: string | null
+          reconciled_by?: string | null
+          status?: string
+          store_number: string
+          updated_at?: string | null
+          variance?: number | null
+          variance_amount?: number | null
+          variance_explained?: number | null
+        }
+        Update: {
+          actual_deposit?: number | null
+          business_date?: string
+          created_at?: string | null
+          deposit_count?: number | null
+          expected_am_shift?: number | null
+          expected_amount?: number | null
+          expected_deposit?: number | null
+          expected_pm_shift?: number | null
+          house_account_closures?: number | null
+          house_account_count?: number | null
+          id?: string
+          net_variance?: number | null
+          notes?: string | null
+          reconciled_at?: string | null
+          reconciled_by?: string | null
+          status?: string
+          store_number?: string
+          updated_at?: string | null
+          variance?: number | null
+          variance_amount?: number | null
+          variance_explained?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deposit_reconciliations_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["store_number"]
+          },
+          {
+            foreignKeyName: "deposit_reconciliations_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["store_number"]
+          },
+          {
+            foreignKeyName: "deposit_reconciliations_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "v_store_monthly_spending"
+            referencedColumns: ["store_number"]
+          },
+        ]
+      }
+      deposit_submission_log: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          form_data: Json
+          id: string
+          ip_address: unknown
+          related_record_id: string
+          related_table: string
+          submission_type: string
+          submitted_at: string | null
+          submitted_by_name: string | null
+          success: boolean
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          form_data: Json
+          id?: string
+          ip_address?: unknown
+          related_record_id: string
+          related_table: string
+          submission_type: string
+          submitted_at?: string | null
+          submitted_by_name?: string | null
+          success?: boolean
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          form_data?: Json
+          id?: string
+          ip_address?: unknown
+          related_record_id?: string
+          related_table?: string
+          submission_type?: string
+          submitted_at?: string | null
+          submitted_by_name?: string | null
+          success?: boolean
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       email_campaigns: {
         Row: {
           content: Json
@@ -1718,6 +2497,81 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_onboarding: {
+        Row: {
+          company_policies: string | null
+          created_at: string | null
+          email: string | null
+          emergency_contacts: string | null
+          experience: string | null
+          first_name: string | null
+          form_i9: string | null
+          hire_date: string | null
+          id: number
+          last_name: string | null
+          manager: string | null
+          onboarding_status: string | null
+          override_status: string | null
+          override_status_by: string | null
+          override_status_on: string | null
+          payment_options: string | null
+          prehire: string | null
+          processed_at: string | null
+          review_documents: string | null
+          tax_withholding: string | null
+          updated_at: string | null
+          upload_documents: string | null
+        }
+        Insert: {
+          company_policies?: string | null
+          created_at?: string | null
+          email?: string | null
+          emergency_contacts?: string | null
+          experience?: string | null
+          first_name?: string | null
+          form_i9?: string | null
+          hire_date?: string | null
+          id?: number
+          last_name?: string | null
+          manager?: string | null
+          onboarding_status?: string | null
+          override_status?: string | null
+          override_status_by?: string | null
+          override_status_on?: string | null
+          payment_options?: string | null
+          prehire?: string | null
+          processed_at?: string | null
+          review_documents?: string | null
+          tax_withholding?: string | null
+          updated_at?: string | null
+          upload_documents?: string | null
+        }
+        Update: {
+          company_policies?: string | null
+          created_at?: string | null
+          email?: string | null
+          emergency_contacts?: string | null
+          experience?: string | null
+          first_name?: string | null
+          form_i9?: string | null
+          hire_date?: string | null
+          id?: number
+          last_name?: string | null
+          manager?: string | null
+          onboarding_status?: string | null
+          override_status?: string | null
+          override_status_by?: string | null
+          override_status_on?: string | null
+          payment_options?: string | null
+          prehire?: string | null
+          processed_at?: string | null
+          review_documents?: string | null
+          tax_withholding?: string | null
+          updated_at?: string | null
+          upload_documents?: string | null
+        }
+        Relationships: []
+      }
       employee_training_completions: {
         Row: {
           completed_date: string | null
@@ -1774,10 +2628,13 @@ export type Database = {
       }
       employees: {
         Row: {
+          certification_achieved_date: string | null
+          certification_request_id: string | null
           created_at: string | null
           full_name: string
           id: string
           is_active: boolean | null
+          is_certified_manager: boolean | null
           position_id: string | null
           profile_id: string | null
           store_number: string | null
@@ -1785,10 +2642,13 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          certification_achieved_date?: string | null
+          certification_request_id?: string | null
           created_at?: string | null
           full_name: string
           id?: string
           is_active?: boolean | null
+          is_certified_manager?: boolean | null
           position_id?: string | null
           profile_id?: string | null
           store_number?: string | null
@@ -1796,10 +2656,13 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          certification_achieved_date?: string | null
+          certification_request_id?: string | null
           created_at?: string | null
           full_name?: string
           id?: string
           is_active?: boolean | null
+          is_certified_manager?: boolean | null
           position_id?: string | null
           profile_id?: string | null
           store_number?: string | null
@@ -1807,6 +2670,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "employees_certification_request_id_fkey"
+            columns: ["certification_request_id"]
+            isOneToOne: false
+            referencedRelation: "certification_requests"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "employees_position_id_fkey"
             columns: ["position_id"]
@@ -1819,6 +2689,20 @@ export type Database = {
             columns: ["store_number"]
             isOneToOne: false
             referencedRelation: "stores"
+            referencedColumns: ["store_number"]
+          },
+          {
+            foreignKeyName: "employees_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["store_number"]
+          },
+          {
+            foreignKeyName: "employees_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "v_store_monthly_spending"
             referencedColumns: ["store_number"]
           },
         ]
@@ -1870,6 +2754,139 @@ export type Database = {
           },
         ]
       }
+      expense_report_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          report_id: string
+          transaction_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          report_id: string
+          transaction_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          report_id?: string
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expense_report_items_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "expense_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expense_report_items_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "amex_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expense_reports: {
+        Row: {
+          created_at: string | null
+          id: string
+          paid_at: string | null
+          profile_id: string
+          report_period_end: string
+          report_period_start: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          submitted_at: string | null
+          submitted_by: string | null
+          total_amount: number | null
+          transaction_count: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          paid_at?: string | null
+          profile_id: string
+          report_period_end: string
+          report_period_start: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          submitted_by?: string | null
+          total_amount?: number | null
+          transaction_count?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          paid_at?: string | null
+          profile_id?: string
+          report_period_end?: string
+          report_period_start?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          submitted_by?: string | null
+          total_amount?: number | null
+          transaction_count?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expense_reports_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expense_reports_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "expense_reports_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expense_reports_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "expense_reports_submitted_by_fkey"
+            columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expense_reports_submitted_by_fkey"
+            columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
       guest_feedback_notes: {
         Row: {
           created_at: string
@@ -1908,6 +2925,134 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "customer_feedback"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      house_account_customers: {
+        Row: {
+          created_at: string | null
+          current_balance: number | null
+          email: string | null
+          id: string
+          is_active: boolean | null
+          last_transaction_date: string | null
+          name: string
+          notes: string | null
+          phone: string | null
+          status: string | null
+          store_number: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_balance?: number | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_transaction_date?: string | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          status?: string | null
+          store_number?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_balance?: number | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_transaction_date?: string | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          status?: string | null
+          store_number?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      house_account_transactions: {
+        Row: {
+          closed_at: string | null
+          closed_by_user_id: string | null
+          created_at: string | null
+          created_by_user_id: string | null
+          house_account_customer_id: string
+          id: string
+          notes: string | null
+          order_amount: number
+          order_date: string
+          paid_date: string | null
+          payment_method: string | null
+          payment_notes: string | null
+          status: string
+          store_number: string
+          updated_at: string | null
+        }
+        Insert: {
+          closed_at?: string | null
+          closed_by_user_id?: string | null
+          created_at?: string | null
+          created_by_user_id?: string | null
+          house_account_customer_id: string
+          id?: string
+          notes?: string | null
+          order_amount: number
+          order_date: string
+          paid_date?: string | null
+          payment_method?: string | null
+          payment_notes?: string | null
+          status?: string
+          store_number: string
+          updated_at?: string | null
+        }
+        Update: {
+          closed_at?: string | null
+          closed_by_user_id?: string | null
+          created_at?: string | null
+          created_by_user_id?: string | null
+          house_account_customer_id?: string
+          id?: string
+          notes?: string | null
+          order_amount?: number
+          order_date?: string
+          paid_date?: string | null
+          payment_method?: string | null
+          payment_notes?: string | null
+          status?: string
+          store_number?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "house_account_transactions_house_account_customer_id_fkey"
+            columns: ["house_account_customer_id"]
+            isOneToOne: false
+            referencedRelation: "house_account_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "house_account_transactions_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["store_number"]
+          },
+          {
+            foreignKeyName: "house_account_transactions_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["store_number"]
+          },
+          {
+            foreignKeyName: "house_account_transactions_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "v_store_monthly_spending"
+            referencedColumns: ["store_number"]
           },
         ]
       }
@@ -2099,6 +3244,13 @@ export type Database = {
             foreignKeyName: "manager_approval_notifications_employee_id_fkey"
             columns: ["employee_id"]
             isOneToOne: false
+            referencedRelation: "certified_managers_registry"
+            referencedColumns: ["employee_id"]
+          },
+          {
+            foreignKeyName: "manager_approval_notifications_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
             referencedRelation: "employees"
             referencedColumns: ["id"]
           },
@@ -2110,6 +3262,87 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      manager_certification_requests: {
+        Row: {
+          approved_at: string | null
+          created_at: string
+          dm_email: string
+          dm_name: string
+          dm_position: string
+          employee_id: string | null
+          id: string
+          market: string
+          position_name: string
+          rejected_at: string | null
+          rejection_reason: string | null
+          request_notes: string | null
+          requested_at: string
+          requester_user_id: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          store_number: string
+          trainee_email: string
+          trainee_fast_track_username: string
+          trainee_home_store_number: string
+          trainee_name: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          created_at?: string
+          dm_email?: string
+          dm_name?: string
+          dm_position?: string
+          employee_id?: string | null
+          id?: string
+          market: string
+          position_name: string
+          rejected_at?: string | null
+          rejection_reason?: string | null
+          request_notes?: string | null
+          requested_at?: string
+          requester_user_id?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          store_number: string
+          trainee_email?: string
+          trainee_fast_track_username?: string
+          trainee_home_store_number?: string
+          trainee_name?: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          created_at?: string
+          dm_email?: string
+          dm_name?: string
+          dm_position?: string
+          employee_id?: string | null
+          id?: string
+          market?: string
+          position_name?: string
+          rejected_at?: string | null
+          rejection_reason?: string | null
+          request_notes?: string | null
+          requested_at?: string
+          requester_user_id?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          store_number?: string
+          trainee_email?: string
+          trainee_fast_track_username?: string
+          trainee_home_store_number?: string
+          trainee_name?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       manager_reminder_log: {
         Row: {
@@ -2320,9 +3553,15 @@ export type Database = {
           associate_id: string | null
           clearance_email_sent: boolean | null
           clearance_email_sent_at: string | null
+          company_policies_complete: boolean | null
+          company_policies_completed_at: string | null
           completed_at: string | null
           completed_by: string | null
           created_at: string
+          drivers_license_verified: boolean | null
+          drivers_license_verified_at: string | null
+          emergency_contacts_complete: boolean | null
+          emergency_contacts_completed_at: string | null
           fhc_complete: boolean | null
           fhc_completed_at: string | null
           handbook_signed: boolean | null
@@ -2344,16 +3583,32 @@ export type Database = {
           i9_list_c_issuing_authority: string | null
           i9_video_call_complete: boolean | null
           id: string
+          insurance_card_verified: boolean | null
+          insurance_card_verified_at: string | null
+          insurance_info_verified: boolean | null
+          insurance_info_verified_at: string | null
           makeshift_sent: boolean | null
           makeshift_sent_at: string | null
+          mvr_approved: boolean | null
+          mvr_approved_at: string | null
           mvr_clearance_at: string | null
           mvr_clearance_complete: boolean | null
           new_hire_id: string
+          oe_sent_complete: boolean | null
+          oe_sent_completed_at: string | null
           onboarding_sent: boolean | null
           onboarding_sent_at: string | null
+          payment_options_complete: boolean | null
+          payment_options_completed_at: string | null
+          review_documents_complete: boolean | null
+          review_documents_completed_at: string | null
           servsafe_complete: boolean | null
           servsafe_completed_at: string | null
+          tax_withholding_complete: boolean | null
+          tax_withholding_completed_at: string | null
           updated_at: string
+          upload_documents_complete: boolean | null
+          upload_documents_completed_at: string | null
           welcome_text_sent: boolean | null
           welcome_text_sent_at: string | null
         }
@@ -2373,9 +3628,15 @@ export type Database = {
           associate_id?: string | null
           clearance_email_sent?: boolean | null
           clearance_email_sent_at?: string | null
+          company_policies_complete?: boolean | null
+          company_policies_completed_at?: string | null
           completed_at?: string | null
           completed_by?: string | null
           created_at?: string
+          drivers_license_verified?: boolean | null
+          drivers_license_verified_at?: string | null
+          emergency_contacts_complete?: boolean | null
+          emergency_contacts_completed_at?: string | null
           fhc_complete?: boolean | null
           fhc_completed_at?: string | null
           handbook_signed?: boolean | null
@@ -2397,16 +3658,32 @@ export type Database = {
           i9_list_c_issuing_authority?: string | null
           i9_video_call_complete?: boolean | null
           id?: string
+          insurance_card_verified?: boolean | null
+          insurance_card_verified_at?: string | null
+          insurance_info_verified?: boolean | null
+          insurance_info_verified_at?: string | null
           makeshift_sent?: boolean | null
           makeshift_sent_at?: string | null
+          mvr_approved?: boolean | null
+          mvr_approved_at?: string | null
           mvr_clearance_at?: string | null
           mvr_clearance_complete?: boolean | null
           new_hire_id: string
+          oe_sent_complete?: boolean | null
+          oe_sent_completed_at?: string | null
           onboarding_sent?: boolean | null
           onboarding_sent_at?: string | null
+          payment_options_complete?: boolean | null
+          payment_options_completed_at?: string | null
+          review_documents_complete?: boolean | null
+          review_documents_completed_at?: string | null
           servsafe_complete?: boolean | null
           servsafe_completed_at?: string | null
+          tax_withholding_complete?: boolean | null
+          tax_withholding_completed_at?: string | null
           updated_at?: string
+          upload_documents_complete?: boolean | null
+          upload_documents_completed_at?: string | null
           welcome_text_sent?: boolean | null
           welcome_text_sent_at?: string | null
         }
@@ -2426,9 +3703,15 @@ export type Database = {
           associate_id?: string | null
           clearance_email_sent?: boolean | null
           clearance_email_sent_at?: string | null
+          company_policies_complete?: boolean | null
+          company_policies_completed_at?: string | null
           completed_at?: string | null
           completed_by?: string | null
           created_at?: string
+          drivers_license_verified?: boolean | null
+          drivers_license_verified_at?: string | null
+          emergency_contacts_complete?: boolean | null
+          emergency_contacts_completed_at?: string | null
           fhc_complete?: boolean | null
           fhc_completed_at?: string | null
           handbook_signed?: boolean | null
@@ -2450,16 +3733,32 @@ export type Database = {
           i9_list_c_issuing_authority?: string | null
           i9_video_call_complete?: boolean | null
           id?: string
+          insurance_card_verified?: boolean | null
+          insurance_card_verified_at?: string | null
+          insurance_info_verified?: boolean | null
+          insurance_info_verified_at?: string | null
           makeshift_sent?: boolean | null
           makeshift_sent_at?: string | null
+          mvr_approved?: boolean | null
+          mvr_approved_at?: string | null
           mvr_clearance_at?: string | null
           mvr_clearance_complete?: boolean | null
           new_hire_id?: string
+          oe_sent_complete?: boolean | null
+          oe_sent_completed_at?: string | null
           onboarding_sent?: boolean | null
           onboarding_sent_at?: string | null
+          payment_options_complete?: boolean | null
+          payment_options_completed_at?: string | null
+          review_documents_complete?: boolean | null
+          review_documents_completed_at?: string | null
           servsafe_complete?: boolean | null
           servsafe_completed_at?: string | null
+          tax_withholding_complete?: boolean | null
+          tax_withholding_completed_at?: string | null
           updated_at?: string
+          upload_documents_complete?: boolean | null
+          upload_documents_completed_at?: string | null
           welcome_text_sent?: boolean | null
           welcome_text_sent_at?: string | null
         }
@@ -2493,9 +3792,12 @@ export type Database = {
           has_servsafe: boolean | null
           hiring_manager: string
           id: string
+          id_expiration_date: string | null
+          id_number: string | null
           id_photo_back_url: string | null
           id_photo_front_url: string | null
           id_photo_uploaded_at: string | null
+          id_type: string | null
           id_upload_requested_at: string | null
           id_upload_token: string | null
           id_upload_token_expires_at: string | null
@@ -2544,9 +3846,12 @@ export type Database = {
           has_servsafe?: boolean | null
           hiring_manager: string
           id?: string
+          id_expiration_date?: string | null
+          id_number?: string | null
           id_photo_back_url?: string | null
           id_photo_front_url?: string | null
           id_photo_uploaded_at?: string | null
+          id_type?: string | null
           id_upload_requested_at?: string | null
           id_upload_token?: string | null
           id_upload_token_expires_at?: string | null
@@ -2595,9 +3900,12 @@ export type Database = {
           has_servsafe?: boolean | null
           hiring_manager?: string
           id?: string
+          id_expiration_date?: string | null
+          id_number?: string | null
           id_photo_back_url?: string | null
           id_photo_front_url?: string | null
           id_photo_uploaded_at?: string | null
+          id_type?: string | null
           id_upload_requested_at?: string | null
           id_upload_token?: string | null
           id_upload_token_expires_at?: string | null
@@ -2805,6 +4113,13 @@ export type Database = {
             columns: ["store_id"]
             isOneToOne: false
             referencedRelation: "stores"
+            referencedColumns: ["store_id"]
+          },
+          {
+            foreignKeyName: "orders_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "v_store_monthly_spending"
             referencedColumns: ["store_id"]
           },
         ]
@@ -3467,6 +4782,7 @@ export type Database = {
           id: string
           last_name: string | null
           slack_user_id: string | null
+          store_id: number | null
           updated_at: string
           user_id: string
         }
@@ -3478,6 +4794,7 @@ export type Database = {
           id?: string
           last_name?: string | null
           slack_user_id?: string | null
+          store_id?: number | null
           updated_at?: string
           user_id: string
         }
@@ -3489,10 +4806,26 @@ export type Database = {
           id?: string
           last_name?: string | null
           slack_user_id?: string | null
+          store_id?: number | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["store_id"]
+          },
+          {
+            foreignKeyName: "profiles_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "v_store_monthly_spending"
+            referencedColumns: ["store_id"]
+          },
+        ]
       }
       rewards_transactions: {
         Row: {
@@ -3594,6 +4927,13 @@ export type Database = {
             referencedRelation: "stores"
             referencedColumns: ["store_id"]
           },
+          {
+            foreignKeyName: "sales_funnel_activities_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "v_store_monthly_spending"
+            referencedColumns: ["store_id"]
+          },
         ]
       }
       sales_periods: {
@@ -3662,6 +5002,72 @@ export type Database = {
         }
         Relationships: []
       }
+      sexual_harassment_training_completions: {
+        Row: {
+          certificate_url: string
+          completion_date: string
+          created_at: string | null
+          employee_id: string | null
+          employee_name: string
+          expires_at: string
+          id: string
+          is_california_employee: boolean | null
+          is_new_hire_completion: boolean | null
+          market: string | null
+          position_name: string | null
+          region: string | null
+          state: string
+          status: string
+          store_number: string
+          training_type: string
+          updated_at: string | null
+          upload_notes: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          certificate_url: string
+          completion_date: string
+          created_at?: string | null
+          employee_id?: string | null
+          employee_name: string
+          expires_at: string
+          id?: string
+          is_california_employee?: boolean | null
+          is_new_hire_completion?: boolean | null
+          market?: string | null
+          position_name?: string | null
+          region?: string | null
+          state: string
+          status?: string
+          store_number: string
+          training_type: string
+          updated_at?: string | null
+          upload_notes?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          certificate_url?: string
+          completion_date?: string
+          created_at?: string | null
+          employee_id?: string | null
+          employee_name?: string
+          expires_at?: string
+          id?: string
+          is_california_employee?: boolean | null
+          is_new_hire_completion?: boolean | null
+          market?: string | null
+          position_name?: string | null
+          region?: string | null
+          state?: string
+          status?: string
+          store_number?: string
+          training_type?: string
+          updated_at?: string | null
+          upload_notes?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
       sla_notifications: {
         Row: {
           created_at: string
@@ -3718,6 +5124,7 @@ export type Database = {
           city: string | null
           created_at: string | null
           email: string | null
+          entity: string | null
           is_active: boolean | null
           manager: string | null
           phone: string | null
@@ -3733,6 +5140,7 @@ export type Database = {
           city?: string | null
           created_at?: string | null
           email?: string | null
+          entity?: string | null
           is_active?: boolean | null
           manager?: string | null
           phone?: string | null
@@ -3748,6 +5156,7 @@ export type Database = {
           city?: string | null
           created_at?: string | null
           email?: string | null
+          entity?: string | null
           is_active?: boolean | null
           manager?: string | null
           phone?: string | null
@@ -3759,6 +5168,53 @@ export type Database = {
           zip?: string | null
         }
         Relationships: []
+      }
+      sync_history: {
+        Row: {
+          connection_id: string
+          created_at: string | null
+          error_message: string | null
+          id: string
+          status: string | null
+          sync_completed_at: string | null
+          sync_started_at: string
+          transactions_added: number | null
+          transactions_modified: number | null
+          transactions_removed: number | null
+        }
+        Insert: {
+          connection_id: string
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          status?: string | null
+          sync_completed_at?: string | null
+          sync_started_at: string
+          transactions_added?: number | null
+          transactions_modified?: number | null
+          transactions_removed?: number | null
+        }
+        Update: {
+          connection_id?: string
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          status?: string | null
+          sync_completed_at?: string | null
+          sync_started_at?: string
+          transactions_added?: number | null
+          transactions_modified?: number | null
+          transactions_removed?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sync_history_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "amex_connections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       systems_access: {
         Row: {
@@ -3835,120 +5291,87 @@ export type Database = {
         }
         Relationships: []
       }
-      training_completion_data_category: {
+      training_company_avg: {
         Row: {
-          category: string | null
-          category_completion_pct: number | null
+          avg_completion: number | null
           id: number
-          updated_at: string | null
+          inserted_at: string | null
+          training: string | null
         }
         Insert: {
-          category?: string | null
-          category_completion_pct?: number | null
+          avg_completion?: number | null
           id?: number
-          updated_at?: string | null
+          inserted_at?: string | null
+          training?: string | null
         }
         Update: {
-          category?: string | null
-          category_completion_pct?: number | null
+          avg_completion?: number | null
           id?: number
-          updated_at?: string | null
+          inserted_at?: string | null
+          training?: string | null
         }
         Relationships: []
       }
-      training_completion_data_employee_category: {
-        Row: {
-          category: string
-          employee_category_completion_pct: number | null
-          employee_name: string
-          id: number
-          store: string
-          updated_at: string | null
-        }
-        Insert: {
-          category: string
-          employee_category_completion_pct?: number | null
-          employee_name: string
-          id?: number
-          store: string
-          updated_at?: string | null
-        }
-        Update: {
-          category?: string
-          employee_category_completion_pct?: number | null
-          employee_name?: string
-          id?: number
-          store?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      training_completion_data_individual: {
+      training_completion_detailed: {
         Row: {
           completion_pct: number | null
-          employee_completion_pct: number | null
           employee_name: string | null
           id: number
+          position: string | null
+          source_type: string | null
+          status_group: string | null
           store: string | null
-          updated_at: string | null
+          training: string | null
+          uploaded_at: string | null
         }
         Insert: {
           completion_pct?: number | null
-          employee_completion_pct?: number | null
           employee_name?: string | null
           id?: number
+          position?: string | null
+          source_type?: string | null
+          status_group?: string | null
           store?: string | null
-          updated_at?: string | null
+          training?: string | null
+          uploaded_at?: string | null
         }
         Update: {
           completion_pct?: number | null
-          employee_completion_pct?: number | null
           employee_name?: string | null
           id?: number
+          position?: string | null
+          source_type?: string | null
+          status_group?: string | null
           store?: string | null
-          updated_at?: string | null
+          training?: string | null
+          uploaded_at?: string | null
         }
         Relationships: []
       }
-      training_completion_data_store: {
+      training_employee_avg: {
         Row: {
+          avg_completion: number | null
+          employee_name: string | null
           id: number
+          inserted_at: string | null
           store: string | null
-          store_completion_pct: number | null
-          updated_at: string | null
+          training: string | null
         }
         Insert: {
+          avg_completion?: number | null
+          employee_name?: string | null
           id?: number
+          inserted_at?: string | null
           store?: string | null
-          store_completion_pct?: number | null
-          updated_at?: string | null
+          training?: string | null
         }
         Update: {
+          avg_completion?: number | null
+          employee_name?: string | null
           id?: number
+          inserted_at?: string | null
           store?: string | null
-          store_completion_pct?: number | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      training_completion_data_store_category: {
-        Row: {
-          category: string
-          store: string
-          store_category_completion_pct: number | null
-          updated_at: string | null
-        }
-        Insert: {
-          category: string
-          store: string
-          store_category_completion_pct?: number | null
-          updated_at?: string | null
-        }
-        Update: {
-          category?: string
-          store?: string
-          store_category_completion_pct?: number | null
-          updated_at?: string | null
+          training?: string | null
         }
         Relationships: []
       }
@@ -3956,19 +5379,27 @@ export type Database = {
         Row: {
           assigned_date: string | null
           completed_date: string | null
+          completion_pct: number | null
           created_at: string | null
           due_date: string | null
           employee_id: string | null
           employee_name: string | null
           id: string
           import_batch_id: string | null
+          inserted_at: string | null
           module_view_time: number | null
+          position: string | null
           registration_date: string | null
+          sheet: string | null
+          source_file: string | null
           start_date: string | null
           status: string | null
+          status_group: string | null
+          store: string | null
           store_id: string | null
           store_location: string | null
           store_number: string | null
+          training: string | null
           training_duration: number | null
           training_hours: number | null
           training_id: string | null
@@ -3978,19 +5409,27 @@ export type Database = {
         Insert: {
           assigned_date?: string | null
           completed_date?: string | null
+          completion_pct?: number | null
           created_at?: string | null
           due_date?: string | null
           employee_id?: string | null
           employee_name?: string | null
           id?: string
           import_batch_id?: string | null
+          inserted_at?: string | null
           module_view_time?: number | null
+          position?: string | null
           registration_date?: string | null
+          sheet?: string | null
+          source_file?: string | null
           start_date?: string | null
           status?: string | null
+          status_group?: string | null
+          store?: string | null
           store_id?: string | null
           store_location?: string | null
           store_number?: string | null
+          training?: string | null
           training_duration?: number | null
           training_hours?: number | null
           training_id?: string | null
@@ -4000,24 +5439,56 @@ export type Database = {
         Update: {
           assigned_date?: string | null
           completed_date?: string | null
+          completion_pct?: number | null
           created_at?: string | null
           due_date?: string | null
           employee_id?: string | null
           employee_name?: string | null
           id?: string
           import_batch_id?: string | null
+          inserted_at?: string | null
           module_view_time?: number | null
+          position?: string | null
           registration_date?: string | null
+          sheet?: string | null
+          source_file?: string | null
           start_date?: string | null
           status?: string | null
+          status_group?: string | null
+          store?: string | null
           store_id?: string | null
           store_location?: string | null
           store_number?: string | null
+          training?: string | null
           training_duration?: number | null
           training_hours?: number | null
           training_id?: string | null
           training_title?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      training_store_avg: {
+        Row: {
+          avg_completion: number | null
+          id: number
+          inserted_at: string | null
+          store: string | null
+          training: string | null
+        }
+        Insert: {
+          avg_completion?: number | null
+          id?: number
+          inserted_at?: string | null
+          store?: string | null
+          training?: string | null
+        }
+        Update: {
+          avg_completion?: number | null
+          id?: number
+          inserted_at?: string | null
+          store?: string | null
+          training?: string | null
         }
         Relationships: []
       }
@@ -4125,6 +5596,7 @@ export type Database = {
           can_access_facilities_dev: boolean | null
           can_access_guest_feedback_dev: boolean | null
           can_access_hr_dev: boolean | null
+          can_access_kpi_dev: boolean | null
           can_access_training_dev: boolean | null
           created_at: string
           id: string
@@ -4139,6 +5611,7 @@ export type Database = {
           can_access_facilities_dev?: boolean | null
           can_access_guest_feedback_dev?: boolean | null
           can_access_hr_dev?: boolean | null
+          can_access_kpi_dev?: boolean | null
           can_access_training_dev?: boolean | null
           created_at?: string
           id?: string
@@ -4153,6 +5626,7 @@ export type Database = {
           can_access_facilities_dev?: boolean | null
           can_access_guest_feedback_dev?: boolean | null
           can_access_hr_dev?: boolean | null
+          can_access_kpi_dev?: boolean | null
           can_access_training_dev?: boolean | null
           created_at?: string
           id?: string
@@ -4221,6 +5695,13 @@ export type Database = {
             columns: ["store_id"]
             isOneToOne: false
             referencedRelation: "stores"
+            referencedColumns: ["store_id"]
+          },
+          {
+            foreignKeyName: "user_store_permissions_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "v_store_monthly_spending"
             referencedColumns: ["store_id"]
           },
         ]
@@ -4728,9 +6209,11 @@ export type Database = {
       wsr_labor_cost_summary: {
         Row: {
           amount: number | null
+          as_of: string
           category: string
           date: string
           id: number
+          labor_percent: number | null
           store_number: string
           uploaded_at: string | null
           week_ending: string | null
@@ -4739,9 +6222,11 @@ export type Database = {
         }
         Insert: {
           amount?: number | null
+          as_of: string
           category: string
           date: string
           id?: number
+          labor_percent?: number | null
           store_number: string
           uploaded_at?: string | null
           week_ending?: string | null
@@ -4750,9 +6235,11 @@ export type Database = {
         }
         Update: {
           amount?: number | null
+          as_of?: string
           category?: string
           date?: string
           id?: number
+          labor_percent?: number | null
           store_number?: string
           uploaded_at?: string | null
           week_ending?: string | null
@@ -5054,7 +6541,105 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      certified_managers_registry: {
+        Row: {
+          certification_achieved_date: string | null
+          certification_request_date: string | null
+          certification_status: string | null
+          days_since_certification: number | null
+          employee_id: string | null
+          employee_name: string | null
+          is_active: boolean | null
+          is_certified_manager: boolean | null
+          market: string | null
+          position_name: string | null
+          recently_certified: boolean | null
+          store_name: string | null
+          store_number: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employees_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["store_number"]
+          },
+          {
+            foreignKeyName: "employees_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["store_number"]
+          },
+          {
+            foreignKeyName: "employees_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "v_store_monthly_spending"
+            referencedColumns: ["store_number"]
+          },
+        ]
+      }
+      v_daily_deposit_tracking: {
+        Row: {
+          actual_total: number | null
+          business_date: string | null
+          deposit_ids: string | null
+          expected_total: number | null
+          match_status: string | null
+          store_name: string | null
+          store_number: string | null
+          submitted_at: string | null
+          submitted_by: string | null
+          submitted_date: string | null
+          variance: number | null
+          variance_abs: number | null
+        }
+        Relationships: []
+      }
+      v_employee_expense_summary: {
+        Row: {
+          approved_amount: number | null
+          email: string | null
+          entity: string | null
+          first_name: string | null
+          last_name: string | null
+          last_transaction_date: string | null
+          missing_receipts: number | null
+          pending_amount: number | null
+          profile_id: string | null
+          store_name: string | null
+          store_number: string | null
+          total_amount: number | null
+          total_transactions: number | null
+        }
+        Relationships: []
+      }
+      v_entity_monthly_spending: {
+        Row: {
+          employee_count: number | null
+          entity: string | null
+          month: string | null
+          total_amount: number | null
+          transaction_count: number | null
+        }
+        Relationships: []
+      }
+      v_store_monthly_spending: {
+        Row: {
+          avg_transaction_amount: number | null
+          employee_count: number | null
+          entity: string | null
+          month: string | null
+          store_id: number | null
+          store_name: string | null
+          store_number: string | null
+          total_amount: number | null
+          transaction_count: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_user_market_permission: {
@@ -5407,6 +6992,84 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_harassment_training_by_market: {
+        Args: { p_state: string }
+        Returns: {
+          completed: number
+          compliance_rate: number
+          expired: number
+          expiring_soon: number
+          market: string
+          not_completed: number
+          total_employees: number
+        }[]
+      }
+      get_harassment_training_by_region: {
+        Args: never
+        Returns: {
+          completed: number
+          compliance_rate: number
+          expired: number
+          expiring_soon: number
+          not_completed: number
+          region: string
+          total_employees: number
+        }[]
+      }
+      get_harassment_training_by_state: {
+        Args: { p_region: string }
+        Returns: {
+          completed: number
+          compliance_rate: number
+          expired: number
+          expiring_soon: number
+          is_california: boolean
+          not_completed: number
+          state: string
+          total_employees: number
+        }[]
+      }
+      get_harassment_training_by_store: {
+        Args: { p_market: string }
+        Returns: {
+          completed: number
+          compliance_rate: number
+          expired: number
+          expiring_soon: number
+          not_completed: number
+          store_name: string
+          store_number: string
+          total_employees: number
+        }[]
+      }
+      get_harassment_training_company_overview: {
+        Args: never
+        Returns: {
+          california_current: number
+          california_employees: number
+          completed_current: number
+          compliance_rate: number
+          expired: number
+          expiring_soon: number
+          not_completed: number
+          total_employees: number
+        }[]
+      }
+      get_harassment_training_employees: {
+        Args: { p_store_number: string }
+        Returns: {
+          certificate_url: string
+          completion_date: string
+          days_until_expiration: number
+          employee_id: string
+          employee_name: string
+          expires_at: string
+          is_california_employee: boolean
+          position_name: string
+          status: string
+          training_type: string
+        }[]
+      }
       get_manager_approval_requests: {
         Args: { p_manager_user_id?: string }
         Returns: {
@@ -5420,6 +7083,13 @@ export type Database = {
           status: string
           store_number: string
           template_item_id: string
+        }[]
+      }
+      get_manager_for_market: {
+        Args: { market_name: string }
+        Returns: {
+          manager_email: string
+          manager_name: string
         }[]
       }
       get_market_analysis: {
@@ -5796,6 +7466,33 @@ export type Database = {
               training_module_name: string
             }[]
           }
+      get_training_market_breakdown: {
+        Args: { region_group_filter: string; training_type: string }
+        Returns: {
+          avg_completion: number
+          market: string
+          store_count: number
+        }[]
+      }
+      get_training_region_breakdown: {
+        Args: { training_type: string }
+        Returns: {
+          avg_completion: number
+          market_count: number
+          region_group: string
+          store_count: number
+        }[]
+      }
+      get_training_store_breakdown: {
+        Args: { market_filter: string; training_type: string }
+        Returns: {
+          avg_completion: number
+          inserted_at: string
+          manager: string
+          store: string
+          store_name: string
+        }[]
+      }
       get_user_accessible_markets: {
         Args: { user_uuid: string }
         Returns: {

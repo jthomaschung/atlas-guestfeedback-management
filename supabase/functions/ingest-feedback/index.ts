@@ -82,6 +82,7 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     'product issue': 'Low',
     'closed early': 'High',
     'praise': 'High',
+    'rockstar service': 'High', // Same as praise
     'missing item': 'High',
     'credit card issue': 'Low',
     'bread quality': 'Medium',
