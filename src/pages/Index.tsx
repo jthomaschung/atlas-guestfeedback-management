@@ -400,12 +400,12 @@ const Index = () => {
         <CategoryBreakdownChart 
           className="mb-6" 
           feedbacks={filteredFeedbacks}
-          onCategoryClick={(category) => {
-            // Toggle category filter - if already selected, clear it; otherwise set it
-            if (categoryFilter.length === 1 && categoryFilter[0] === category) {
-              setCategoryFilter([]);
+          onCategoryClick={(market) => {
+            // Toggle market filter - if already selected, clear it; otherwise set it
+            if (marketFilter.length === 1 && marketFilter[0] === market) {
+              setMarketFilter([]);
             } else {
-              setCategoryFilter([category]);
+              setMarketFilter([market]);
             }
           }}
         />
