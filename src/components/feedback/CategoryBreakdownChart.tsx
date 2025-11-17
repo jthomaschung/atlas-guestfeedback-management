@@ -10,30 +10,6 @@ interface CategoryBreakdownChartProps {
   onCategoryClick?: (category: string) => void;
 }
 
-// District mapping based on market
-const marketToDistrict: Record<string, string> = {
-  'AZ 1': 'West Coast',
-  'AZ 2': 'West Coast',
-  'AZ 3': 'West Coast',
-  'AZ 4': 'West Coast',
-  'AZ 5': 'West Coast',
-  'IE/LA': 'West Coast',
-  'OC': 'West Coast',
-  'NE 1': 'Mid West',
-  'NE 2': 'Mid West',
-  'NE 3': 'Mid West',
-  'NE 4': 'Mid West',
-  'FL 1': 'South East',
-  'FL 2': 'South East',
-  'MN 1': 'North East',
-  'MN 2': 'North East',
-  'PA 1': 'North East',
-};
-
-const getDistrict = (market: string): string => {
-  return marketToDistrict[market] || 'Other';
-};
-
 const chartConfig = {
   "Missing Items": {
     label: "Missing Items",
@@ -47,32 +23,33 @@ const chartConfig = {
 
 export function CategoryBreakdownChart({ className, feedbacks, onCategoryClick }: CategoryBreakdownChartProps) {
   const districtData = useMemo(() => {
-    // Process the data to count by district and category
-    const districtCategoryCount: { [key: string]: { missingItems: number; sandwichWrong: number; total: number } } = {};
+    // Process the data to count by market and category
+    const marketCategoryCount: { [key: string]: { missingItems: number; sandwichWrong: number; total: number } } = {};
 
     feedbacks.forEach(feedback => {
-      const district = getDistrict(feedback.market);
+      const market = feedback.market;
       
-      if (!districtCategoryCount[district]) {
-        districtCategoryCount[district] = {
+      if (!marketCategoryCount[market]) {
+        marketCategoryCount[market] = {
           missingItems: 0,
           sandwichWrong: 0,
           total: 0
         };
       }
 
-      if (feedback.complaint_category === "Missing item") {
-        districtCategoryCount[district].missingItems += 1;
-      } else if (feedback.complaint_category === "Sandwich Made Wrong") {
-        districtCategoryCount[district].sandwichWrong += 1;
+      const categoryLower = feedback.complaint_category?.toLowerCase() || '';
+      if (categoryLower.includes('missing item')) {
+        marketCategoryCount[market].missingItems += 1;
+      } else if (categoryLower.includes('sandwich made wrong')) {
+        marketCategoryCount[market].sandwichWrong += 1;
       }
-      districtCategoryCount[district].total += 1;
+      marketCategoryCount[market].total += 1;
     });
 
     // Convert to array for chart display
-    const processedData = Object.entries(districtCategoryCount)
-      .map(([district, counts]) => ({
-        district,
+    const processedData = Object.entries(marketCategoryCount)
+      .map(([market, counts]) => ({
+        market,
         "Missing Items": counts.missingItems,
         "Sandwich Made Wrong": counts.sandwichWrong,
       }))
@@ -113,7 +90,7 @@ export function CategoryBreakdownChart({ className, feedbacks, onCategoryClick }
             <BarChart data={districtData} margin={{ top: 5, right: 30, left: 20, bottom: 80 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis 
-                dataKey="district" 
+                dataKey="market"
                 stroke="hsl(var(--muted-foreground))"
                 fontSize={12}
                 tickLine={false}
