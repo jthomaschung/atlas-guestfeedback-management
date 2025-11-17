@@ -10,17 +10,17 @@ interface CategoryBreakdownChartProps {
   onCategoryClick?: (category: string) => void;
 }
 
-// Dynamic color palette for categories
+// Dynamic color palette for categories - matching line chart colors
 const getCategoryColor = (index: number) => {
   const colors = [
-    "hsl(var(--destructive))",
-    "hsl(var(--chart-1))",
-    "hsl(var(--chart-2))",
-    "hsl(var(--chart-3))",
-    "hsl(var(--chart-4))",
-    "hsl(var(--chart-5))",
-    "hsl(var(--primary))",
-    "hsl(var(--secondary))",
+    "#ef4444", // red - matches Rude Service
+    "#f59e0b", // amber - matches Sandwich Made Wrong
+    "#3b82f6", // blue - matches Missing Item
+    "#10b981", // green - matches Praise
+    "#8b5cf6", // purple
+    "#ec4899", // pink
+    "#06b6d4", // cyan
+    "#f97316", // orange
   ];
   return colors[index % colors.length];
 };
