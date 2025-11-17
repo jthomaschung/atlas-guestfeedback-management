@@ -33,6 +33,8 @@ const getDistrict = (market: string): string => {
 };
 
 export function CategoryComparisonChart({ feedbacks }: CategoryComparisonChartProps) {
+  console.log("CategoryComparisonChart feedbacks:", feedbacks.length, feedbacks);
+  
   const chartData = useMemo(() => {
     const byDistrict: Record<string, { missingItems: number; sandwichWrong: number }> = {};
 
@@ -50,7 +52,7 @@ export function CategoryComparisonChart({ feedbacks }: CategoryComparisonChartPr
       }
     });
 
-    return Object.entries(byDistrict)
+    const result = Object.entries(byDistrict)
       .map(([district, counts]) => ({
         district,
         "Missing Items": counts.missingItems,
@@ -58,6 +60,9 @@ export function CategoryComparisonChart({ feedbacks }: CategoryComparisonChartPr
         total: counts.missingItems + counts.sandwichWrong,
       }))
       .sort((a, b) => b.total - a.total);
+    
+    console.log("CategoryComparisonChart chartData:", result);
+    return result;
   }, [feedbacks]);
 
   return (
