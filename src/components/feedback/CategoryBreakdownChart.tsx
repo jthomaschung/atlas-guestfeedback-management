@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import { CustomerFeedback } from "@/types/feedback";
 
 interface CategoryBreakdownChartProps {
@@ -26,7 +26,7 @@ const getCategoryColor = (index: number) => {
 };
 
 export function CategoryBreakdownChart({ className, feedbacks, onCategoryClick }: CategoryBreakdownChartProps) {
-  const [selectedMarket, setSelectedMarket] = useState<string | null>(null);
+  const [sortByMarket, setSortByMarket] = useState<string | null>(null);
 
   const { districtData, categories, chartConfig } = useMemo(() => {
     // Get all unique categories
@@ -70,28 +70,33 @@ export function CategoryBreakdownChart({ className, feedbacks, onCategoryClick }
     });
 
     // Convert to array for chart display
-    const processedData = Object.entries(marketCategoryCount)
+    let processedData = Object.entries(marketCategoryCount)
       .map(([market, counts]) => {
         const data: any = { market };
         uniqueCategories.forEach(category => {
           data[category] = counts[category] || 0;
         });
         return data;
-      })
-      .sort((a, b) => {
+      });
+
+    // Sort data - if a market is selected, sort alphabetically, otherwise by total count
+    if (sortByMarket) {
+      processedData.sort((a, b) => a.market.localeCompare(b.market));
+    } else {
+      processedData.sort((a, b) => {
         const aTotal = uniqueCategories.reduce((sum, cat) => sum + (a[cat] || 0), 0);
         const bTotal = uniqueCategories.reduce((sum, cat) => sum + (b[cat] || 0), 0);
         return bTotal - aTotal;
       });
+    }
 
     return { districtData: processedData, categories: uniqueCategories, chartConfig: config };
-  }, [feedbacks]);
+  }, [feedbacks, sortByMarket]);
 
   const handleBarClick = (data: any) => {
-    const clickedMarket = data.market;
-    setSelectedMarket(clickedMarket === selectedMarket ? null : clickedMarket);
-    if (onCategoryClick) {
-      onCategoryClick(clickedMarket);
+    if (data && data.activePayload && data.activePayload[0]) {
+      const clickedMarket = data.activePayload[0].payload.market;
+      setSortByMarket(clickedMarket === sortByMarket ? null : clickedMarket);
     }
   };
 
@@ -176,14 +181,7 @@ export function CategoryBreakdownChart({ className, feedbacks, onCategoryClick }
                   radius={index === categories.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]}
                   stackId="a"
                   cursor="pointer"
-                >
-                  {districtData.map((entry, idx) => (
-                    <Cell 
-                      key={`cell-${idx}`}
-                      opacity={selectedMarket === null || selectedMarket === entry.market ? 1 : 0.3}
-                    />
-                  ))}
-                </Bar>
+                />
               ))}
             </BarChart>
           </ResponsiveContainer>
