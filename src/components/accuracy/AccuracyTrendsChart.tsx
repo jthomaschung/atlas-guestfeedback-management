@@ -24,11 +24,11 @@ export function AccuracyTrendsChart({ feedbacks, periods, selectedPeriod }: Accu
       });
 
       const missingItems = periodFeedbacks.filter(
-        fb => fb.complaint_category === "Missing item"
+        fb => fb.complaint_category?.toLowerCase().includes('missing item')
       ).length;
 
       const sandwichWrong = periodFeedbacks.filter(
-        fb => fb.complaint_category === "Sandwich Made Wrong"
+        fb => fb.complaint_category?.toLowerCase().includes('sandwich made wrong')
       ).length;
 
       return {
