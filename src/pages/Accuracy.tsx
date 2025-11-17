@@ -20,7 +20,8 @@ import { Badge } from "@/components/ui/badge";
 export default function Accuracy() {
   const { user } = useAuth();
   const { permissions } = useUserPermissions();
-  const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
+  const [allFeedbacks, setAllFeedbacks] = useState<CustomerFeedback[]>([]); // All periods for trends
+  const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]); // Selected period for stats
   const [filteredFeedbacks, setFilteredFeedbacks] = useState<CustomerFeedback[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFeedback, setSelectedFeedback] = useState<CustomerFeedback | null>(null);
@@ -57,22 +58,30 @@ export default function Accuracy() {
     try {
       setLoading(true);
       
-      if (!selectedPeriod) return;
+      if (!selectedPeriod || !periods.length) return;
       
       const period = periods.find(p => p.id === selectedPeriod);
       if (!period) return;
 
-      const { data, error } = await supabase
+      // Load all feedback for trend chart (across all periods)
+      const { data: allData, error: allError } = await supabase
         .from("customer_feedback")
         .select("*")
         .in("complaint_category", ["Missing item", "Sandwich Made Wrong"])
-        .gte("feedback_date", period.start_date)
-        .lte("feedback_date", period.end_date)
         .order("feedback_date", { ascending: false });
 
-      if (error) throw error;
-      setFeedbacks((data as CustomerFeedback[]) || []);
-      setFilteredFeedbacks((data as CustomerFeedback[]) || []);
+      if (allError) throw allError;
+      setAllFeedbacks((allData as CustomerFeedback[]) || []);
+
+      // Filter to selected period for stats/tables
+      const periodData = (allData as CustomerFeedback[]).filter(fb => {
+        const feedbackDate = new Date(fb.feedback_date);
+        return feedbackDate >= new Date(period.start_date) &&
+               feedbackDate <= new Date(period.end_date);
+      });
+      
+      setFeedbacks(periodData);
+      setFilteredFeedbacks(periodData);
     } catch (error) {
       console.error("Error loading accuracy feedback:", error);
     } finally {
@@ -269,7 +278,7 @@ export default function Accuracy() {
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <AccuracyTrendsChart 
-              feedbacks={feedbacks} 
+              feedbacks={allFeedbacks}
               periods={periods}
               selectedPeriod={selectedPeriod}
             />
