@@ -328,7 +328,7 @@ const Summary = () => {
       </div>
 
       {/* Complaint Trends Chart */}
-      <ComplaintTrendsChart />
+      <ComplaintTrendsChart feedbacks={filteredFeedbacks} periods={periods} />
 
       {/* Store Category Performance Table */}
       <StoreCategoryTable feedbacks={filteredFeedbacks} />

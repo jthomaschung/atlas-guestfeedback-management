@@ -18,6 +18,8 @@ interface TrendData {
 
 interface ComplaintTrendsChartProps {
   className?: string;
+  feedbacks?: any[];
+  periods?: Array<{ id: string; name: string; start_date: string; end_date: string; period_number?: number; year?: number }>;
 }
 
 const chartConfig = {
@@ -39,66 +41,56 @@ const chartConfig = {
   },
 };
 
-export function ComplaintTrendsChart({ className }: ComplaintTrendsChartProps) {
+export function ComplaintTrendsChart({ className, feedbacks = [], periods = [] }: ComplaintTrendsChartProps) {
   const [trendData, setTrendData] = useState<TrendData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [internalPeriods, setInternalPeriods] = useState<Array<{ id: string; name: string; start_date: string; end_date: string; period_number?: number; year?: number }>>([]);
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchTrendData();
-  }, []);
+    if (periods.length === 0) {
+      fetchPeriods();
+    } else {
+      setInternalPeriods(periods);
+    }
+  }, [periods]);
 
-  // Force refresh when component mounts to show latest data
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchTrendData();
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
+    if (feedbacks.length > 0 && internalPeriods.length > 0) {
+      // Use provided filtered feedbacks
+      processData(feedbacks, internalPeriods);
+    } else if (periods.length > 0 && internalPeriods.length > 0) {
+      // Periods provided but no feedbacks, fetch all feedbacks
+      fetchAllTrendData();
+    } else if (feedbacks.length === 0 && internalPeriods.length === 0) {
+      // Nothing provided, fetch everything
+      fetchAllTrendData();
+    }
+  }, [feedbacks, internalPeriods]);
 
-  const fetchTrendData = async () => {
+  const fetchPeriods = async () => {
     try {
-      setLoading(true);
-
-      // First get all periods for 2025
-      const { data: periods, error: periodsError } = await supabase
+      const { data: periodsData, error: periodsError } = await supabase
         .from('periods')
         .select('*')
         .eq('year', 2025)
         .order('period_number');
 
-      if (periodsError) {
-        console.error('Error fetching periods:', periodsError);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to load period data"
-        });
-        return;
-      }
+      if (periodsError) throw periodsError;
+      setInternalPeriods(periodsData || []);
+    } catch (error) {
+      console.error('Error fetching periods:', error);
+    }
+  };
 
-      // Get complaint data for the target categories including praise (case insensitive)
-      const { data: complaints, error: complaintsError } = await supabase
-        .from('customer_feedback')
-        .select('feedback_date, complaint_category')
-        .or('complaint_category.ilike.%rude service%,complaint_category.ilike.%sandwich made wrong%,complaint_category.ilike.%missing item%,complaint_category.ilike.%praise%,complaint_category.ilike.%rockstar service%');
-
-      if (complaintsError) {
-        console.error('Error fetching complaints:', complaintsError);
-        toast({
-          variant: "destructive", 
-          title: "Error",
-          description: "Failed to load complaint data"
-        });
-        return;
-      }
-
-      // Process the data to create trend chart data
-      const processedData: TrendData[] = periods.map(period => {
+  const processData = (complaints: any[], periodsToUse: any[]) => {
+    try {
+      setLoading(true);
+      
+      const processedData: TrendData[] = periodsToUse.map(period => {
         const periodStart = new Date(period.start_date);
         const periodEnd = new Date(period.end_date);
 
-        // Count complaints for each category in this period
         const periodComplaints = complaints.filter(complaint => {
           const complaintDate = new Date(complaint.feedback_date);
           return complaintDate >= periodStart && complaintDate <= periodEnd;
@@ -126,13 +118,44 @@ export function ComplaintTrendsChart({ className }: ComplaintTrendsChartProps) {
 
       setTrendData(processedData);
     } catch (error) {
+      console.error('Error processing trend data:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to process trend data"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAllTrendData = async () => {
+    try {
+      setLoading(true);
+
+      const { data: periodsData, error: periodsError } = await supabase
+        .from('periods')
+        .select('*')
+        .eq('year', 2025)
+        .order('period_number');
+
+      if (periodsError) throw periodsError;
+
+      const { data: complaints, error: complaintsError } = await supabase
+        .from('customer_feedback')
+        .select('feedback_date, complaint_category')
+        .or('complaint_category.ilike.%rude service%,complaint_category.ilike.%sandwich made wrong%,complaint_category.ilike.%missing item%,complaint_category.ilike.%praise%,complaint_category.ilike.%rockstar service%');
+
+      if (complaintsError) throw complaintsError;
+
+      processData(complaints || [], periodsData || []);
+    } catch (error) {
       console.error('Error fetching trend data:', error);
       toast({
         variant: "destructive",
         title: "Error", 
         description: "Failed to load trend data"
       });
-    } finally {
       setLoading(false);
     }
   };
