@@ -48,9 +48,18 @@ export default function Accuracy() {
       .eq('year', 2025)
       .order('period_number', { ascending: false });
     
-    if (data) {
+    if (data && data.length > 0) {
       setPeriods(data);
-      setSelectedPeriod(data[0]?.id); // Default to most recent period
+      
+      // Find the period that contains today's date
+      const today = new Date();
+      const currentPeriod = data.find(p => {
+        const start = new Date(p.start_date);
+        const end = new Date(p.end_date);
+        return today >= start && today <= end;
+      });
+      
+      setSelectedPeriod(currentPeriod?.id || data[0]?.id); // Fall back to most recent if no match
     }
   };
 
