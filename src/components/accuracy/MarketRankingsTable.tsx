@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { CustomerFeedback } from "@/types/feedback";
+import { Period } from "@/types/period";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -7,10 +8,11 @@ import { Trophy, TrendingUp, Award } from "lucide-react";
 
 interface MarketRankingsTableProps {
   feedbacks: CustomerFeedback[];
-  timeRange: "7days" | "30days" | "90days";
+  periods: Period[];
+  selectedPeriod: string | null;
 }
 
-export function MarketRankingsTable({ feedbacks, timeRange }: MarketRankingsTableProps) {
+export function MarketRankingsTable({ feedbacks }: MarketRankingsTableProps) {
   const marketData = useMemo(() => {
     const byMarket: Record<string, {
       market: string;

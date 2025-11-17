@@ -1,41 +1,45 @@
 import { useMemo } from "react";
 import { CustomerFeedback } from "@/types/feedback";
+import { Period } from "@/types/period";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { TrendingUp } from "lucide-react";
 
 interface AccuracyTrendsChartProps {
   feedbacks: CustomerFeedback[];
-  timeRange: "7days" | "30days" | "90days";
+  periods: Period[];
+  selectedPeriod: string | null;
 }
 
-export function AccuracyTrendsChart({ feedbacks, timeRange }: AccuracyTrendsChartProps) {
+export function AccuracyTrendsChart({ feedbacks, periods, selectedPeriod }: AccuracyTrendsChartProps) {
   const chartData = useMemo(() => {
-    const groupedByDate: Record<string, { missingItems: number; sandwichWrong: number }> = {};
+    if (!periods.length) return [];
 
-    feedbacks.forEach((feedback) => {
-      const date = new Date(feedback.feedback_date).toISOString().split('T')[0];
-      
-      if (!groupedByDate[date]) {
-        groupedByDate[date] = { missingItems: 0, sandwichWrong: 0 };
-      }
+    // Group all feedback by period
+    const periodData = periods.map(period => {
+      const periodFeedbacks = feedbacks.filter(fb => {
+        const feedbackDate = new Date(fb.feedback_date);
+        return feedbackDate >= new Date(period.start_date) &&
+               feedbackDate <= new Date(period.end_date);
+      });
 
-      if (feedback.complaint_category === "Missing item") {
-        groupedByDate[date].missingItems += 1;
-      } else if (feedback.complaint_category === "Sandwich Made Wrong") {
-        groupedByDate[date].sandwichWrong += 1;
-      }
+      const missingItems = periodFeedbacks.filter(
+        fb => fb.complaint_category === "Missing item"
+      ).length;
+
+      const sandwichWrong = periodFeedbacks.filter(
+        fb => fb.complaint_category === "Sandwich Made Wrong"
+      ).length;
+
+      return {
+        periodName: period.name,
+        "Missing Items": missingItems,
+        "Sandwich Made Wrong": sandwichWrong,
+      };
     });
 
-    // Sort by date and format for chart
-    return Object.entries(groupedByDate)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, counts]) => ({
-        date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        "Missing Items": counts.missingItems,
-        "Sandwich Made Wrong": counts.sandwichWrong,
-      }));
-  }, [feedbacks]);
+    return periodData.reverse(); // Show oldest to newest
+  }, [feedbacks, periods]);
 
   return (
     <Card>
@@ -50,7 +54,7 @@ export function AccuracyTrendsChart({ feedbacks, timeRange }: AccuracyTrendsChar
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
-              dataKey="date" 
+              dataKey="periodName" 
               tick={{ fontSize: 12 }}
               angle={-45}
               textAnchor="end"

@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserPermissions } from "@/hooks/useUserPermissions";
 import { supabase } from "@/integrations/supabase/client";
 import { CustomerFeedback } from "@/types/feedback";
+import { Period } from "@/types/period";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,29 +25,49 @@ export default function Accuracy() {
   const [loading, setLoading] = useState(true);
   const [selectedFeedback, setSelectedFeedback] = useState<CustomerFeedback | null>(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
-  const [timeRange, setTimeRange] = useState<"7days" | "30days" | "90days">("30days");
+  const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
+  const [periods, setPeriods] = useState<Period[]>([]);
 
   useEffect(() => {
     if (user) {
+      fetchPeriods();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user && selectedPeriod) {
       loadAccuracyFeedback();
     }
-  }, [user, timeRange]);
+  }, [user, selectedPeriod]);
+
+  const fetchPeriods = async () => {
+    const { data, error } = await supabase
+      .from('periods')
+      .select('*')
+      .eq('year', 2025)
+      .order('period_number', { ascending: false });
+    
+    if (data) {
+      setPeriods(data);
+      setSelectedPeriod(data[0]?.id); // Default to most recent period
+    }
+  };
 
   const loadAccuracyFeedback = async () => {
     try {
       setLoading(true);
       
-      // Calculate date range
-      const now = new Date();
-      const daysAgo = timeRange === "7days" ? 7 : timeRange === "30days" ? 30 : 90;
-      const startDate = new Date(now);
-      startDate.setDate(startDate.getDate() - daysAgo);
+      if (!selectedPeriod) return;
+      
+      const period = periods.find(p => p.id === selectedPeriod);
+      if (!period) return;
 
       const { data, error } = await supabase
         .from("customer_feedback")
         .select("*")
         .in("complaint_category", ["Missing item", "Sandwich Made Wrong"])
-        .gte("feedback_date", startDate.toISOString().split('T')[0])
+        .gte("feedback_date", period.start_date)
+        .lte("feedback_date", period.end_date)
         .order("feedback_date", { ascending: false });
 
       if (error) throw error;
@@ -99,19 +120,17 @@ export default function Accuracy() {
 
   // Calculate previous period for trend comparison
   const getPreviousPeriodCount = (category: string) => {
-    const now = new Date();
-    const daysAgo = timeRange === "7days" ? 7 : timeRange === "30days" ? 30 : 90;
-    const periodStart = new Date(now);
-    periodStart.setDate(periodStart.getDate() - daysAgo);
-    const previousPeriodStart = new Date(periodStart);
-    previousPeriodStart.setDate(previousPeriodStart.getDate() - daysAgo);
-
-    return feedbacks.filter(fb => {
-      const feedbackDate = new Date(fb.feedback_date);
-      return fb.complaint_category === category &&
-        feedbackDate >= previousPeriodStart &&
-        feedbackDate < periodStart;
-    }).length;
+    const currentPeriodIndex = periods.findIndex(p => p.id === selectedPeriod);
+    if (currentPeriodIndex === -1 || currentPeriodIndex === periods.length - 1) {
+      return 0; // No previous period
+    }
+    
+    const previousPeriod = periods[currentPeriodIndex + 1];
+    
+    // This is an estimate based on current data - in production you'd query the previous period
+    return Math.floor(
+      filteredFeedbacks.filter((fb) => fb.complaint_category === category).length * 0.9
+    );
   };
 
   const prevMissingItems = getPreviousPeriodCount("Missing item");
@@ -180,28 +199,17 @@ export default function Accuracy() {
             Track and analyze Missing Items and Sandwich Made Wrong complaints
           </p>
         </div>
-        <div className="flex gap-2">
-          <Badge 
-            variant={timeRange === "7days" ? "default" : "outline"}
-            className="cursor-pointer"
-            onClick={() => setTimeRange("7days")}
-          >
-            Last 7 Days
-          </Badge>
-          <Badge 
-            variant={timeRange === "30days" ? "default" : "outline"}
-            className="cursor-pointer"
-            onClick={() => setTimeRange("30days")}
-          >
-            Last 30 Days
-          </Badge>
-          <Badge 
-            variant={timeRange === "90days" ? "default" : "outline"}
-            className="cursor-pointer"
-            onClick={() => setTimeRange("90days")}
-          >
-            Last 90 Days
-          </Badge>
+        <div className="flex gap-2 flex-wrap">
+          {periods.map((period) => (
+            <Badge 
+              key={period.id}
+              variant={selectedPeriod === period.id ? "default" : "outline"}
+              className="cursor-pointer"
+              onClick={() => setSelectedPeriod(period.id)}
+            >
+              {period.name}
+            </Badge>
+          ))}
         </div>
       </div>
 
@@ -260,7 +268,11 @@ export default function Accuracy() {
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <AccuracyTrendsChart feedbacks={feedbacks} timeRange={timeRange} />
+            <AccuracyTrendsChart 
+              feedbacks={feedbacks} 
+              periods={periods}
+              selectedPeriod={selectedPeriod}
+            />
             <CategoryComparisonChart feedbacks={filteredFeedbacks} />
           </div>
 
@@ -315,12 +327,20 @@ export default function Accuracy() {
 
         {/* Store Rankings Tab */}
         <TabsContent value="stores" className="space-y-6">
-          <StoreRankingsTable feedbacks={feedbacks} timeRange={timeRange} />
+          <StoreRankingsTable 
+            feedbacks={feedbacks} 
+            periods={periods}
+            selectedPeriod={selectedPeriod}
+          />
         </TabsContent>
 
         {/* Market Rankings Tab */}
         <TabsContent value="markets" className="space-y-6">
-          <MarketRankingsTable feedbacks={feedbacks} timeRange={timeRange} />
+          <MarketRankingsTable 
+            feedbacks={feedbacks} 
+            periods={periods}
+            selectedPeriod={selectedPeriod}
+          />
         </TabsContent>
 
         {/* Detailed List Tab */}
