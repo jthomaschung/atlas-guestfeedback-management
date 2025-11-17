@@ -97,6 +97,9 @@ export function CategoryBreakdownChart({ className, feedbacks, onCategoryClick }
     if (data && data.activePayload && data.activePayload[0]) {
       const clickedMarket = data.activePayload[0].payload.market;
       setSortByMarket(clickedMarket === sortByMarket ? null : clickedMarket);
+      if (onCategoryClick) {
+        onCategoryClick(clickedMarket);
+      }
     }
   };
 
