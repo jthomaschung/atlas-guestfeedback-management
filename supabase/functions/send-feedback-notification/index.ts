@@ -287,6 +287,19 @@ async function getNotificationRecipients(supabase: any, assigneeEmail: string) {
         name: assigneeProfile.display_name
       });
 
+      // Check if this is a store email (e.g., store1127@atlaswe.com) and add the group email
+      const storeEmailMatch = assigneeEmail.match(/^store(\d+)@atlaswe\.com$/);
+      if (storeEmailMatch) {
+        const storeNumber = storeEmailMatch[1];
+        const groupEmail = `${storeNumber}@atlaswe.com`;
+        recipients.push({
+          email: groupEmail,
+          role: 'Store Group',
+          name: `Store ${storeNumber} Group`
+        });
+        console.log(`Added store group email: ${groupEmail}`);
+      }
+
       // Get the user's hierarchy to find supervisor and director
       const { data: hierarchy } = await supabase
         .from('user_hierarchy')
@@ -344,6 +357,9 @@ function getHtmlContentForRole(baseHtmlContent: string, role: string): string {
   switch (role) {
     case 'Assignee':
       roleSpecificMessage = '<p style="color: #dc2626; font-weight: bold; margin-bottom: 15px;">You have been assigned to handle this guest feedback case.</p>';
+      break;
+    case 'Store Group':
+      roleSpecificMessage = '<p style="color: #dc2626; font-weight: bold; margin-bottom: 15px;">This guest feedback case has been assigned to your store location.</p>';
       break;
     case 'Supervisor':
       roleSpecificMessage = '<p style="color: #ea580c; font-weight: bold; margin-bottom: 15px;">A guest feedback case has been assigned to one of your team members. Please monitor the progress and provide support as needed.</p>';
