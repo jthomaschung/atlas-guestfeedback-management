@@ -8,33 +8,56 @@ interface CategoryComparisonChartProps {
   feedbacks: CustomerFeedback[];
 }
 
+// District mapping based on market
+const marketToDistrict: Record<string, string> = {
+  'AZ 1': 'West Coast',
+  'AZ 2': 'West Coast',
+  'AZ 3': 'West Coast',
+  'AZ 4': 'West Coast',
+  'AZ 5': 'West Coast',
+  'IE/LA': 'West Coast',
+  'OC': 'West Coast',
+  'NE 1': 'Mid West',
+  'NE 2': 'Mid West',
+  'NE 3': 'Mid West',
+  'NE 4': 'Mid West',
+  'FL 1': 'South East',
+  'FL 2': 'South East',
+  'MN 1': 'North East',
+  'MN 2': 'North East',
+  'PA 1': 'North East',
+};
+
+const getDistrict = (market: string): string => {
+  return marketToDistrict[market] || 'Other';
+};
+
 export function CategoryComparisonChart({ feedbacks }: CategoryComparisonChartProps) {
   const chartData = useMemo(() => {
-    const byMarket: Record<string, { missingItems: number; sandwichWrong: number }> = {};
+    const byDistrict: Record<string, { missingItems: number; sandwichWrong: number }> = {};
 
     feedbacks.forEach((feedback) => {
-      const market = feedback.market || "Unknown";
+      const district = getDistrict(feedback.market);
       
-      if (!byMarket[market]) {
-        byMarket[market] = { missingItems: 0, sandwichWrong: 0 };
+      if (!byDistrict[district]) {
+        byDistrict[district] = { missingItems: 0, sandwichWrong: 0 };
       }
 
       if (feedback.complaint_category === "Missing item") {
-        byMarket[market].missingItems += 1;
+        byDistrict[district].missingItems += 1;
       } else if (feedback.complaint_category === "Sandwich Made Wrong") {
-        byMarket[market].sandwichWrong += 1;
+        byDistrict[district].sandwichWrong += 1;
       }
     });
 
-    return Object.entries(byMarket)
-      .map(([market, counts]) => ({
-        market,
+    return Object.entries(byDistrict)
+      .map(([district, counts]) => ({
+        district,
         "Missing Items": counts.missingItems,
         "Sandwich Made Wrong": counts.sandwichWrong,
         total: counts.missingItems + counts.sandwichWrong,
       }))
-      .sort((a, b) => b.total - a.total)
-      .slice(0, 10); // Top 10 markets
+      .sort((a, b) => b.total - a.total);
   }, [feedbacks]);
 
   return (
@@ -42,7 +65,7 @@ export function CategoryComparisonChart({ feedbacks }: CategoryComparisonChartPr
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <BarChart3 className="h-5 w-5 text-primary" />
-          Category Breakdown by Market
+          Category Breakdown by District
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -50,7 +73,7 @@ export function CategoryComparisonChart({ feedbacks }: CategoryComparisonChartPr
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
-              dataKey="market" 
+              dataKey="district" 
               tick={{ fontSize: 11 }}
               angle={-45}
               textAnchor="end"
@@ -59,8 +82,8 @@ export function CategoryComparisonChart({ feedbacks }: CategoryComparisonChartPr
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip />
             <Legend />
-            <Bar dataKey="Missing Items" fill="hsl(var(--destructive))" />
-            <Bar dataKey="Sandwich Made Wrong" fill="hsl(var(--chart-2))" />
+            <Bar dataKey="Missing Items" fill="hsl(var(--destructive))" stackId="a" />
+            <Bar dataKey="Sandwich Made Wrong" fill="hsl(var(--foreground))" stackId="a" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
