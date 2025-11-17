@@ -16,7 +16,10 @@ export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFee
   const escalated = feedbacks.filter(fb => fb.resolution_status === 'escalated').length;
   const totalOpen = unopened + opened + processing + responded + escalated; // All non-resolved feedback
   const critical = feedbacks.filter(fb => fb.priority === 'Critical').length;
-  const praise = feedbacks.filter(fb => fb.complaint_category === 'Praise').length;
+  const praise = feedbacks.filter(fb => 
+    fb.complaint_category === 'Praise' || 
+    fb.complaint_category?.toLowerCase() === 'rockstar service'
+  ).length;
 
   const stats = [
     {

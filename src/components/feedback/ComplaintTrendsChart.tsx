@@ -81,7 +81,7 @@ export function ComplaintTrendsChart({ className }: ComplaintTrendsChartProps) {
       const { data: complaints, error: complaintsError } = await supabase
         .from('customer_feedback')
         .select('feedback_date, complaint_category')
-        .or('complaint_category.ilike.%rude service%,complaint_category.ilike.%sandwich made wrong%,complaint_category.ilike.%missing item%,complaint_category.ilike.%praise%');
+        .or('complaint_category.ilike.%rude service%,complaint_category.ilike.%sandwich made wrong%,complaint_category.ilike.%missing item%,complaint_category.ilike.%praise%,complaint_category.ilike.%rockstar service%');
 
       if (complaintsError) {
         console.error('Error fetching complaints:', complaintsError);
@@ -107,7 +107,10 @@ export function ComplaintTrendsChart({ className }: ComplaintTrendsChartProps) {
         const rudeService = periodComplaints.filter(c => c.complaint_category?.toLowerCase().includes('rude service')).length;
         const sandwichMadeWrong = periodComplaints.filter(c => c.complaint_category?.toLowerCase().includes('sandwich made wrong')).length;
         const missingItem = periodComplaints.filter(c => c.complaint_category?.toLowerCase().includes('missing item')).length;
-        const praise = periodComplaints.filter(c => c.complaint_category?.toLowerCase().includes('praise')).length;
+        const praise = periodComplaints.filter(c => {
+          const cat = c.complaint_category?.toLowerCase();
+          return cat?.includes('praise') || cat?.includes('rockstar service');
+        }).length;
 
         return {
           periodName: period.name,

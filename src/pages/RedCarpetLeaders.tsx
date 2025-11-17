@@ -142,7 +142,7 @@ export default function RedCarpetLeaders() {
         }
         marketStats[market].total++;
         marketStats[market].score += score;
-        if (category === 'Praise') {
+        if (category === 'Praise' || category?.toLowerCase() === 'rockstar service') {
           marketStats[market].praise++;
         }
 
@@ -152,7 +152,7 @@ export default function RedCarpetLeaders() {
         }
         storeStats[storeKey].total++;
         storeStats[storeKey].score += score;
-        if (category === 'Praise') {
+        if (category === 'Praise' || category?.toLowerCase() === 'rockstar service') {
           storeStats[storeKey].praise++;
         }
       });
