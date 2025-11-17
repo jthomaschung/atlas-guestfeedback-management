@@ -122,8 +122,8 @@ const Index = () => {
     let filtered = feedbacks.filter(fb => {
       const matchesSearch = fb.feedback_text?.toLowerCase().includes(searchTerm.toLowerCase()) || 
                            fb.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                           fb.case_number.includes(searchTerm) ||
-                           fb.store_number.includes(searchTerm);
+                           fb.case_number?.includes(searchTerm) ||
+                           fb.store_number?.includes(searchTerm);
       const matchesStatus = statusFilter.length === 0 || statusFilter.includes(fb.resolution_status);
       const matchesPriority = priorityFilter.length === 0 || priorityFilter.includes(fb.priority);
       const matchesCategory = categoryFilter.length === 0 || categoryFilter.some(cat => {
