@@ -56,9 +56,13 @@ export function SimpleFeedbackFilters({ feedbacks, onFilter }: SimpleFeedbackFil
       filtered = filtered.filter(feedback => priorityFilter.includes(feedback.priority));
     }
 
-    // Category filter
+    // Category filter (case-insensitive partial matching)
     if (categoryFilter.length > 0) {
-      filtered = filtered.filter(feedback => categoryFilter.includes(feedback.complaint_category));
+      filtered = filtered.filter(feedback => 
+        categoryFilter.some(cat => 
+          feedback.complaint_category?.toLowerCase().includes(cat.toLowerCase())
+        )
+      );
     }
 
     // Channel filter
