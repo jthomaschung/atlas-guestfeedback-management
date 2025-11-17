@@ -36,6 +36,7 @@ const statusColors = {
   resolved: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800',
   escalated: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800',
   processing: 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800',
+  acknowledged: 'bg-cyan-100 text-cyan-800 border-cyan-200 dark:bg-cyan-900/20 dark:text-cyan-400 dark:border-cyan-800',
 };
 
 const priorityColors = {
@@ -1775,6 +1776,9 @@ Customer Service Team`);
                     <SelectItem value="responded">Responded</SelectItem>
                     <SelectItem value="resolved">Resolved</SelectItem>
                     <SelectItem value="escalated">Escalated</SelectItem>
+                    {feedback?.channel?.toLowerCase() === 'qualtrics' && (
+                      <SelectItem value="acknowledged">Acknowledged</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -1954,15 +1958,6 @@ Customer Service Team`);
             >
               <CheckCircle className="h-4 w-4 mr-2" />
               {hasAcknowledged ? "Acknowledged" : (isLoading ? "Acknowledging..." : "Acknowledge Critical Feedback")}
-            </Button>
-          )}
-          {isAdmin && (
-            <Button 
-              variant="secondary" 
-              onClick={handleTestNotifications} 
-              disabled={isLoading || !assignee || assignee === 'Unassigned'}
-            >
-              {isLoading ? "Testing..." : "🧪 Test Notifications"}
             </Button>
           )}
           <Button onClick={handleSave} disabled={isLoading}>
