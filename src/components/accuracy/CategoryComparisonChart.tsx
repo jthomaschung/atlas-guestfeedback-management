@@ -33,36 +33,31 @@ const getDistrict = (market: string): string => {
 };
 
 export function CategoryComparisonChart({ feedbacks }: CategoryComparisonChartProps) {
-  console.log("CategoryComparisonChart feedbacks:", feedbacks.length, feedbacks);
-  
   const chartData = useMemo(() => {
-    const byDistrict: Record<string, { missingItems: number; sandwichWrong: number }> = {};
+    const byMarket: Record<string, { missingItems: number; sandwichWrong: number }> = {};
 
     feedbacks.forEach((feedback) => {
-      const district = getDistrict(feedback.market);
+      const market = feedback.market;
       
-      if (!byDistrict[district]) {
-        byDistrict[district] = { missingItems: 0, sandwichWrong: 0 };
+      if (!byMarket[market]) {
+        byMarket[market] = { missingItems: 0, sandwichWrong: 0 };
       }
 
       if (feedback.complaint_category === "Missing item") {
-        byDistrict[district].missingItems += 1;
+        byMarket[market].missingItems += 1;
       } else if (feedback.complaint_category === "Sandwich Made Wrong") {
-        byDistrict[district].sandwichWrong += 1;
+        byMarket[market].sandwichWrong += 1;
       }
     });
 
-    const result = Object.entries(byDistrict)
-      .map(([district, counts]) => ({
-        district,
+    return Object.entries(byMarket)
+      .map(([market, counts]) => ({
+        market,
         "Missing Items": counts.missingItems,
         "Sandwich Made Wrong": counts.sandwichWrong,
         total: counts.missingItems + counts.sandwichWrong,
       }))
       .sort((a, b) => b.total - a.total);
-    
-    console.log("CategoryComparisonChart chartData:", result);
-    return result;
   }, [feedbacks]);
 
   return (
@@ -78,7 +73,7 @@ export function CategoryComparisonChart({ feedbacks }: CategoryComparisonChartPr
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
-              dataKey="district" 
+              dataKey="market" 
               tick={{ fontSize: 11 }}
               angle={-45}
               textAnchor="end"
