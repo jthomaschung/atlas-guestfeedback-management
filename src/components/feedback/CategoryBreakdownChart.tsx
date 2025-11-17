@@ -4,56 +4,79 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import { CustomerFeedback } from "@/types/feedback";
 
-interface CategoryData {
-  category: string;
-  count: number;
-  percentage: number;
-}
-
 interface CategoryBreakdownChartProps {
   className?: string;
   feedbacks: CustomerFeedback[];
   onCategoryClick?: (category: string) => void;
 }
 
+// District mapping based on market
+const marketToDistrict: Record<string, string> = {
+  'AZ 1': 'West Coast',
+  'AZ 2': 'West Coast',
+  'AZ 3': 'West Coast',
+  'AZ 4': 'West Coast',
+  'AZ 5': 'West Coast',
+  'IE/LA': 'West Coast',
+  'OC': 'West Coast',
+  'NE 1': 'Mid West',
+  'NE 2': 'Mid West',
+  'NE 3': 'Mid West',
+  'NE 4': 'Mid West',
+  'FL 1': 'South East',
+  'FL 2': 'South East',
+  'MN 1': 'North East',
+  'MN 2': 'North East',
+  'PA 1': 'North East',
+};
+
+const getDistrict = (market: string): string => {
+  return marketToDistrict[market] || 'Other';
+};
+
 const chartConfig = {
-  count: {
-    label: "Count",
-    color: "hsl(var(--primary))",
+  "Missing Items": {
+    label: "Missing Items",
+    color: "hsl(var(--destructive))",
+  },
+  "Sandwich Made Wrong": {
+    label: "Sandwich Made Wrong",
+    color: "hsl(var(--foreground))",
   },
 };
 
-// Helper function to normalize category names (title case)
-const normalizeCategory = (category: string): string => {
-  if (!category) return 'Other';
-  return category
-    .toLowerCase()
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-};
-
 export function CategoryBreakdownChart({ className, feedbacks, onCategoryClick }: CategoryBreakdownChartProps) {
-  const categoryData = useMemo(() => {
-    // Process the data to count categories
-    const categoryCount: { [key: string]: number } = {};
-    let totalCount = 0;
+  const districtData = useMemo(() => {
+    // Process the data to count by district and category
+    const districtCategoryCount: { [key: string]: { missingItems: number; sandwichWrong: number; total: number } } = {};
 
     feedbacks.forEach(feedback => {
-      const category = normalizeCategory(feedback.complaint_category || 'Other');
-      categoryCount[category] = (categoryCount[category] || 0) + 1;
-      totalCount++;
+      const district = getDistrict(feedback.market);
+      
+      if (!districtCategoryCount[district]) {
+        districtCategoryCount[district] = {
+          missingItems: 0,
+          sandwichWrong: 0,
+          total: 0
+        };
+      }
+
+      if (feedback.complaint_category === "Missing item") {
+        districtCategoryCount[district].missingItems += 1;
+      } else if (feedback.complaint_category === "Sandwich Made Wrong") {
+        districtCategoryCount[district].sandwichWrong += 1;
+      }
+      districtCategoryCount[district].total += 1;
     });
 
-    // Convert to array and calculate percentages
-    const processedData: CategoryData[] = Object.entries(categoryCount)
-      .map(([category, count]) => ({
-        category,
-        count,
-        percentage: totalCount > 0 ? Math.round((count / totalCount) * 100) : 0
+    // Convert to array for chart display
+    const processedData = Object.entries(districtCategoryCount)
+      .map(([district, counts]) => ({
+        district,
+        "Missing Items": counts.missingItems,
+        "Sandwich Made Wrong": counts.sandwichWrong,
       }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 10); // Show top 10 categories
+      .sort((a, b) => b["Missing Items"] + b["Sandwich Made Wrong"] - (a["Missing Items"] + a["Sandwich Made Wrong"]));
 
     return processedData;
   }, [feedbacks]);
@@ -62,9 +85,9 @@ export function CategoryBreakdownChart({ className, feedbacks, onCategoryClick }
     return (
       <Card className={className}>
         <CardHeader>
-          <CardTitle>Feedback Category Breakdown</CardTitle>
+          <CardTitle>Category Breakdown by District</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Count of feedback by category type
+            Accuracy issues by district
           </p>
         </CardHeader>
         <CardContent>
@@ -79,18 +102,18 @@ export function CategoryBreakdownChart({ className, feedbacks, onCategoryClick }
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle>Feedback Category Breakdown</CardTitle>
+        <CardTitle>Category Breakdown by District</CardTitle>
         <p className="text-sm text-muted-foreground">
-          Count of feedback by category type ({feedbacks.length} total items)
+          Accuracy issues by district ({feedbacks.length} total items)
         </p>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={categoryData} margin={{ top: 5, right: 30, left: 20, bottom: 80 }}>
+            <BarChart data={districtData} margin={{ top: 5, right: 30, left: 20, bottom: 80 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis 
-                dataKey="category" 
+                dataKey="district" 
                 stroke="hsl(var(--muted-foreground))"
                 fontSize={12}
                 tickLine={false}
@@ -108,32 +131,36 @@ export function CategoryBreakdownChart({ className, feedbacks, onCategoryClick }
               <ChartTooltip 
                 content={({ active, payload, label }) => {
                   if (active && payload && payload.length) {
-                    const data = payload[0].payload as CategoryData;
+                    const data = payload[0].payload;
                     return (
                       <div className="bg-background border border-border rounded-lg shadow-lg p-3">
-                        <p className="font-medium">{label}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Count: <span className="font-medium text-foreground">{data.count}</span>
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Percentage: <span className="font-medium text-foreground">{data.percentage}%</span>
-                        </p>
+                        <div className="text-sm font-semibold text-foreground">{label}</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Missing Items: <span className="font-medium text-red-600">{data["Missing Items"]}</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          Sandwich Made Wrong: <span className="font-medium text-foreground">{data["Sandwich Made Wrong"]}</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Total: <span className="font-medium text-foreground">{data["Missing Items"] + data["Sandwich Made Wrong"]}</span>
+                        </div>
                       </div>
                     );
                   }
                   return null;
                 }}
               />
-              <Bar
-                dataKey="count"
-                fill="var(--color-count)"
+              <Bar 
+                dataKey="Missing Items" 
+                fill="hsl(var(--destructive))"
                 radius={[4, 4, 0, 0]}
-                cursor={onCategoryClick ? "pointer" : "default"}
-                onClick={(data) => {
-                  if (onCategoryClick && data) {
-                    onCategoryClick(data.category);
-                  }
-                }}
+                stackId="a"
+              />
+              <Bar 
+                dataKey="Sandwich Made Wrong" 
+                fill="hsl(var(--foreground))"
+                radius={[4, 4, 0, 0]}
+                stackId="a"
               />
             </BarChart>
           </ResponsiveContainer>
