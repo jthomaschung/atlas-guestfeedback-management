@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 const Index = () => {
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
   const [periods, setPeriods] = useState<Array<{ id: string; name: string; start_date: string; end_date: string }>>([]);
+  const [stores, setStores] = useState<Array<{ store_number: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFeedback, setSelectedFeedback] = useState<CustomerFeedback | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -39,6 +40,7 @@ const Index = () => {
   useEffect(() => {
     fetchFeedbacks();
     fetchPeriods();
+    fetchStores();
   }, []);
 
   const fetchFeedbacks = async () => {
@@ -117,6 +119,29 @@ const Index = () => {
     }
   };
 
+  const fetchStores = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('stores')
+        .select('store_number')
+        .order('store_number');
+
+      if (error) {
+        console.error('Error fetching stores:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load stores data"
+        });
+        return;
+      }
+
+      setStores(data || []);
+    } catch (error) {
+      console.error('Error fetching stores:', error);
+    }
+  };
+
   // Filter and sort feedbacks
   const filteredFeedbacks = useMemo(() => {
     let filtered = feedbacks.filter(fb => {
@@ -188,9 +213,9 @@ const Index = () => {
 
   // Get available filter options
   const availableStores = useMemo(() => {
-    const stores = [...new Set(feedbacks.map(fb => fb.store_number))];
-    return stores.sort();
-  }, [feedbacks]);
+    const storeNumbers = stores.map(s => s.store_number);
+    return storeNumbers.sort();
+  }, [stores]);
   
   const availableMarkets = useMemo(() => {
     const markets = [...new Set(feedbacks.map(fb => fb.market))];
