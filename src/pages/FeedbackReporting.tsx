@@ -60,7 +60,9 @@ const FeedbackReporting = () => {
       });
       const matchesChannel = channelFilter.length === 0 || channelFilter.includes(fb.channel);
       const matchesStore = storeFilter.length === 0 || storeFilter.includes(fb.store_number);
-      const matchesMarket = marketFilter.length === 0 || marketFilter.includes(fb.market);
+      // Normalize market for comparison (e.g., "NE4" -> "NE 4")
+      const normalizedMarket = fb.market.replace(/([A-Z]+)(\d+)/, '$1 $2');
+      const matchesMarket = marketFilter.length === 0 || marketFilter.includes(normalizedMarket);
       const matchesAssignee = assigneeFilter.length === 0 || 
                              (assigneeFilter.includes('unassigned') && (!fb.assignee || fb.assignee === 'Unassigned')) ||
                              (fb.assignee && assigneeFilter.includes(fb.assignee));
@@ -97,7 +99,12 @@ const FeedbackReporting = () => {
   }, [stores]);
 
   const availableMarkets = useMemo(() => {
-    const markets = [...new Set(feedbacks.map(fb => fb.market))];
+    // Normalize market names to ensure consistent spacing (e.g., "NE4" -> "NE 4")
+    const normalizeMarket = (market: string) => {
+      return market.replace(/([A-Z]+)(\d+)/, '$1 $2');
+    };
+    
+    const markets = [...new Set(feedbacks.map(fb => normalizeMarket(fb.market)))];
     return markets.sort();
   }, [feedbacks]);
 
