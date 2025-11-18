@@ -19,6 +19,7 @@ interface SummaryStats {
 const Summary = () => {
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
   const [periods, setPeriods] = useState<Array<{ id: string; name: string; start_date: string; end_date: string }>>([]);
+  const [stores, setStores] = useState<Array<{ store_number: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
@@ -79,9 +80,9 @@ const Summary = () => {
       storeFilter, marketFilter, assigneeFilter, periodFilter, periods, dateFrom, dateTo]);
 
   const availableStores = useMemo(() => {
-    const stores = [...new Set(feedbacks.map(fb => fb.store_number))];
-    return stores.sort();
-  }, [feedbacks]);
+    const storeNumbers = stores.map(s => s.store_number);
+    return storeNumbers.sort();
+  }, [stores]);
 
   const availableMarkets = useMemo(() => {
     const markets = [...new Set(feedbacks.map(fb => fb.market))];
@@ -175,6 +176,21 @@ const Summary = () => {
         });
       }
 
+      // Fetch stores data
+      const { data: storesData, error: storesError } = await supabase
+        .from('stores')
+        .select('store_number')
+        .order('store_number');
+
+      if (storesError) {
+        console.error('Error fetching stores:', storesError);
+        toast({
+          title: "Error",
+          description: "Failed to load stores data.",
+          variant: "destructive"
+        });
+      }
+
       // Map feedback data
       const mappedFeedbacks: CustomerFeedback[] = (feedbackData || []).map(item => ({
         id: item.id,
@@ -201,6 +217,7 @@ const Summary = () => {
 
       setFeedbacks(mappedFeedbacks);
       setPeriods(periodsData || []);
+      setStores(storesData || []);
     } catch (error) {
       console.error('Unexpected error:', error);
       toast({
