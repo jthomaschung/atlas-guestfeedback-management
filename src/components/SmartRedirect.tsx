@@ -17,7 +17,7 @@ export function SmartRedirect() {
 
   // Check if there are session tokens in the URL that need to be processed
   const urlParams = new URLSearchParams(window.location.search);
-  const hasSessionTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
+  const hasSessionTokens = urlParams.has('__lovable_token') || (urlParams.has('access_token') && urlParams.has('refresh_token'));
 
   console.log('🔍 SmartRedirect: Session tokens check', {
     hasSessionTokens,
