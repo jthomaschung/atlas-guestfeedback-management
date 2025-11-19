@@ -55,8 +55,12 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Redirect to welcome if no user
-  if (!user) {
+  // Failsafe: Don't redirect if tokens are in URL (they're being processed)
+  const urlParams = new URLSearchParams(window.location.search);
+  const hasTokensInUrl = urlParams.has('access_token') && urlParams.has('refresh_token');
+
+  // Redirect to welcome if no user and no tokens in URL
+  if (!user && !hasTokensInUrl) {
     return <Navigate to="/welcome" replace />;
   }
 

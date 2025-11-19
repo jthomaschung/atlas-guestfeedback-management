@@ -1,11 +1,19 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { extractTokensFromUrl, authenticateWithTokens, cleanUrlFromTokens, hasAuthTokensInUrl } from '@/utils/sessionToken';
 import { useAuth } from '@/hooks/useAuth';
 
 export function SessionTokenHandler() {
   const { user, setIsProcessingTokens } = useAuth();
 
+  // Synchronously detect tokens on mount
+  const [hasDetectedTokens] = useState(() => hasAuthTokensInUrl());
+
   useEffect(() => {
+    // If tokens detected and no user, set processing flag immediately (synchronously)
+    if (hasDetectedTokens && !user) {
+      setIsProcessingTokens(true);
+    }
+
     const handleIncomingTokens = async () => {
       console.log('GUESTFEEDBACK SessionTokenHandler: Checking for tokens...', { 
         hasUser: !!user, 
