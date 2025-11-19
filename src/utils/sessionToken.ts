@@ -174,5 +174,27 @@ export const sessionTokenUtils = {
     
     const now = Date.now() / 1000;
     return tokens.expires_at > now;
+  },
+
+  // Check if URL contains authentication tokens
+  hasAuthTokensInUrl: (): boolean => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return !!(urlParams.get('access_token') || urlParams.get('__lovable_token'));
+  },
+
+  // Alias for cleanUrl to match Facilities pattern naming
+  cleanUrlFromTokens: (): void => {
+    sessionTokenUtils.cleanUrl();
   }
 };
+
+// Export individual functions for compatibility with Facilities pattern
+export const getCurrentSessionTokens = sessionTokenUtils.getCurrentSessionTokens;
+export const createAuthenticatedUrl = sessionTokenUtils.createAuthenticatedUrl;
+export const extractTokensFromUrl = sessionTokenUtils.extractTokensFromUrl;
+export const extractTokensFromLovableToken = sessionTokenUtils.extractTokensFromLovableToken;
+export const authenticateWithTokens = sessionTokenUtils.authenticateWithTokens;
+export const cleanUrl = sessionTokenUtils.cleanUrl;
+export const cleanUrlFromTokens = sessionTokenUtils.cleanUrlFromTokens;
+export const areTokensValid = sessionTokenUtils.areTokensValid;
+export const hasAuthTokensInUrl = sessionTokenUtils.hasAuthTokensInUrl;
