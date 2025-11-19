@@ -328,129 +328,6 @@ export type Database = {
           },
         ]
       }
-      backlog_items: {
-        Row: {
-          ai_priority_factors: Json | null
-          ai_recommendation: string | null
-          backlog_category: string
-          backlog_status: string | null
-          budget_allocation_id: string | null
-          business_impact: string | null
-          created_at: string | null
-          deferral_justification: string | null
-          deferred_at: string | null
-          deferred_by: string | null
-          dependent_on_project: string | null
-          estimated_cost: number | null
-          estimated_fix_timing: string | null
-          id: string
-          justification: string
-          priority_score: number | null
-          region: string
-          regional_notes: string | null
-          regional_priority: number | null
-          reviewed_at: string | null
-          reviewed_by_regional_lead: string | null
-          roi_potential: string | null
-          similar_issue_cluster_id: string | null
-          target_completion_date: string | null
-          updated_at: string | null
-          work_order_id: string | null
-        }
-        Insert: {
-          ai_priority_factors?: Json | null
-          ai_recommendation?: string | null
-          backlog_category: string
-          backlog_status?: string | null
-          budget_allocation_id?: string | null
-          business_impact?: string | null
-          created_at?: string | null
-          deferral_justification?: string | null
-          deferred_at?: string | null
-          deferred_by?: string | null
-          dependent_on_project?: string | null
-          estimated_cost?: number | null
-          estimated_fix_timing?: string | null
-          id?: string
-          justification: string
-          priority_score?: number | null
-          region: string
-          regional_notes?: string | null
-          regional_priority?: number | null
-          reviewed_at?: string | null
-          reviewed_by_regional_lead?: string | null
-          roi_potential?: string | null
-          similar_issue_cluster_id?: string | null
-          target_completion_date?: string | null
-          updated_at?: string | null
-          work_order_id?: string | null
-        }
-        Update: {
-          ai_priority_factors?: Json | null
-          ai_recommendation?: string | null
-          backlog_category?: string
-          backlog_status?: string | null
-          budget_allocation_id?: string | null
-          business_impact?: string | null
-          created_at?: string | null
-          deferral_justification?: string | null
-          deferred_at?: string | null
-          deferred_by?: string | null
-          dependent_on_project?: string | null
-          estimated_cost?: number | null
-          estimated_fix_timing?: string | null
-          id?: string
-          justification?: string
-          priority_score?: number | null
-          region?: string
-          regional_notes?: string | null
-          regional_priority?: number | null
-          reviewed_at?: string | null
-          reviewed_by_regional_lead?: string | null
-          roi_potential?: string | null
-          similar_issue_cluster_id?: string | null
-          target_completion_date?: string | null
-          updated_at?: string | null
-          work_order_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "backlog_items_deferred_by_fkey"
-            columns: ["deferred_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "backlog_items_deferred_by_fkey"
-            columns: ["deferred_by"]
-            isOneToOne: false
-            referencedRelation: "v_employee_expense_summary"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "backlog_items_reviewed_by_regional_lead_fkey"
-            columns: ["reviewed_by_regional_lead"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "backlog_items_reviewed_by_regional_lead_fkey"
-            columns: ["reviewed_by_regional_lead"]
-            isOneToOne: false
-            referencedRelation: "v_employee_expense_summary"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "backlog_items_work_order_id_fkey"
-            columns: ["work_order_id"]
-            isOneToOne: true
-            referencedRelation: "work_orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       campaign_recipients: {
         Row: {
           bounced_at: string | null
@@ -7179,6 +7056,14 @@ export type Database = {
               training_module_name: string
             }[]
           }
+      get_training_employee_list: {
+        Args: { store_filter: string; training_type: string }
+        Returns: {
+          avg_completion: number
+          employee_name: string
+          inserted_at: string
+        }[]
+      }
       get_training_market_breakdown: {
         Args: { region_group_filter: string; training_type: string }
         Returns: {
@@ -7187,6 +7072,41 @@ export type Database = {
           store_count: number
         }[]
       }
+      get_training_market_breakdown_filtered:
+        | {
+            Args: { region_group: string; training: string; user_uuid: string }
+            Returns: {
+              avg_completion: number
+              market: string
+              store_count: number
+            }[]
+          }
+        | {
+            Args: {
+              access_level?: string
+              region_group_filter: string
+              training_type: string
+            }
+            Returns: {
+              avg_completion: number
+              market: string
+              store_count: number
+            }[]
+          }
+        | {
+            Args: {
+              access_level: string
+              region_group_filter: string
+              training_type: string
+              user_markets?: string[]
+              user_stores?: string[]
+            }
+            Returns: {
+              avg_completion: number
+              market: string
+              store_count: number
+            }[]
+          }
       get_training_region_breakdown: {
         Args: { training_type: string }
         Returns: {
@@ -7196,6 +7116,39 @@ export type Database = {
           store_count: number
         }[]
       }
+      get_training_region_breakdown_filtered:
+        | {
+            Args: { training: string; user_uuid: string }
+            Returns: {
+              avg_completion: number
+              market_count: number
+              region_group: string
+              store_count: number
+            }[]
+          }
+        | {
+            Args: { access_level?: string; training_type: string }
+            Returns: {
+              avg_completion: number
+              market_count: number
+              region_group: string
+              store_count: number
+            }[]
+          }
+        | {
+            Args: {
+              access_level: string
+              training_type: string
+              user_markets?: string[]
+              user_stores?: string[]
+            }
+            Returns: {
+              avg_completion: number
+              market_count: number
+              region_group: string
+              store_count: number
+            }[]
+          }
       get_training_store_breakdown: {
         Args: { market_filter: string; training_type: string }
         Returns: {
@@ -7240,6 +7193,10 @@ export type Database = {
           scope_level: string
           store_numbers: string[]
         }[]
+      }
+      get_user_training_role_level: {
+        Args: { user_uuid: string }
+        Returns: string
       }
       has_portal_role: {
         Args: { _role_name: string; _user_id: string }
