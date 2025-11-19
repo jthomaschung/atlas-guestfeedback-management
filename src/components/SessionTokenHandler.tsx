@@ -3,10 +3,18 @@ import { extractTokensFromUrl, authenticateWithTokens, cleanUrlFromTokens, hasAu
 import { useAuth } from '@/hooks/useAuth';
 
 export function SessionTokenHandler() {
-  const { user, setIsProcessingTokens } = useAuth();
+  const { user, isProcessingTokens, setIsProcessingTokens } = useAuth();
 
   // Synchronously detect tokens on mount
   const [hasDetectedTokens] = useState(() => hasAuthTokensInUrl());
+
+  // Clear processing flag once user is authenticated
+  useEffect(() => {
+    if (isProcessingTokens && user) {
+      console.log('GUESTFEEDBACK SessionTokenHandler: Auth state updated, clearing processing flag');
+      setIsProcessingTokens(false);
+    }
+  }, [user, isProcessingTokens, setIsProcessingTokens]);
 
   useEffect(() => {
     // If tokens detected and no user, set processing flag immediately (synchronously)
@@ -41,13 +49,12 @@ export function SessionTokenHandler() {
             console.log('GUESTFEEDBACK SessionTokenHandler: Successfully authenticated with incoming tokens');
             // Clean the URL after successful authentication
             cleanUrlFromTokens();
-            // Keep processing state active briefly to allow auth state to update
-            setTimeout(() => setIsProcessingTokens(false), 500);
+            // Don't clear isProcessingTokens here - let the useEffect handle it when user state updates
           } else {
             console.error('GUESTFEEDBACK SessionTokenHandler: Failed to authenticate with incoming tokens');
             // Still clean the URL even if authentication failed
             cleanUrlFromTokens();
-            setIsProcessingTokens(false);
+            setIsProcessingTokens(false);  // Only clear on failure
           }
         }
       } else if (hasAuthTokensInUrl()) {
