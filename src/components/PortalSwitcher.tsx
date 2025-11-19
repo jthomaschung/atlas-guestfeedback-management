@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ChevronDown, Wrench, UtensilsCrossed, Users, MessageSquare, BarChart3 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { sessionTokenUtils } from '@/utils/sessionToken';
+import { createAuthenticatedUrl } from '@/utils/sessionToken';
 
 const portals = [
   {
@@ -93,7 +93,7 @@ export function PortalSwitcher() {
         console.log('🏢 Facilities-specific URL modification:', targetUrl);
       }
       
-      const authenticatedUrl = await sessionTokenUtils.createAuthenticatedUrl(targetUrl);
+      const authenticatedUrl = await createAuthenticatedUrl(targetUrl);
       console.log('✅ Authenticated URL created:', {
         originalUrl: portal.externalUrl,
         targetUrl,
