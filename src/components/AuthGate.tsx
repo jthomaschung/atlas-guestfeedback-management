@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserPermissions } from '@/hooks/useUserPermissions';
-import { sessionTokenUtils } from '@/utils/sessionToken';
+import { extractTokensFromUrl, authenticateWithTokens, cleanUrlFromTokens } from '@/utils/sessionToken';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { NotificationBell } from '@/components/NotificationBell';
@@ -39,13 +39,13 @@ export function AuthGate({ children }: AuthGateProps) {
       
       const processTokens = async () => {
         try {
-          const tokens = sessionTokenUtils.extractTokensFromUrl();
-          if (tokens && sessionTokenUtils.areTokensValid(tokens)) {
+          const tokens = extractTokensFromUrl();
+          if (tokens) {
             console.log('🚀 AUTHGATE: Processing tokens...');
-            const success = await sessionTokenUtils.authenticateWithTokens(tokens);
+            const success = await authenticateWithTokens(tokens);
             if (success) {
               console.log('✅ AUTHGATE: Token authentication successful');
-              sessionTokenUtils.cleanUrl();
+              cleanUrlFromTokens();
               setIsProcessingTokens(false);
             } else {
               console.error('❌ AUTHGATE: Token authentication failed');

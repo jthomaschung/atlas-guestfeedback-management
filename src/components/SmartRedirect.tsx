@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useUserPermissions } from '@/hooks/useUserPermissions';
 import { useAuth } from '@/hooks/useAuth';
-import { sessionTokenUtils } from '@/utils/sessionToken';
+import { createAuthenticatedUrl } from '@/utils/sessionToken';
 import { useEffect, useState } from 'react';
 import Index from '@/pages/Index';
 
@@ -17,7 +17,7 @@ export function SmartRedirect() {
 
   // Check if there are session tokens in the URL that need to be processed
   const urlParams = new URLSearchParams(window.location.search);
-  const hasSessionTokens = urlParams.has('__lovable_token') || (urlParams.has('access_token') && urlParams.has('refresh_token'));
+  const hasSessionTokens = urlParams.has('access_token') && urlParams.has('refresh_token');
 
   console.log('🔍 SmartRedirect: Session tokens check', {
     hasSessionTokens,
@@ -65,7 +65,7 @@ export function SmartRedirect() {
       setIsRedirecting(true);
       const redirectToFacilities = async () => {
         try {
-          const authenticatedUrl = await sessionTokenUtils.createAuthenticatedUrl('https://facilities.lovable.app');
+          const authenticatedUrl = await createAuthenticatedUrl('https://facilities.lovable.app');
           window.location.href = authenticatedUrl;
         } catch (error) {
           console.error('Error creating authenticated URL:', error);

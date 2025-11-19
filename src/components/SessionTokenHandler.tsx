@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
+import { extractTokensFromUrl, authenticateWithTokens, cleanUrlFromTokens, hasAuthTokensInUrl } from '@/utils/sessionToken';
 import { useAuth } from '@/hooks/useAuth';
-import { extractTokensFromLovableToken, authenticateWithTokens, cleanUrlFromTokens, hasAuthTokensInUrl } from '@/utils/sessionToken';
 
 export function SessionTokenHandler() {
   const { user, setIsProcessingTokens } = useAuth();
 
   useEffect(() => {
     const handleIncomingTokens = async () => {
-      console.log('GUESTFEEDBACK SessionTokenHandler: Checking for tokens...', {
-        hasUser: !!user,
+      console.log('GUESTFEEDBACK SessionTokenHandler: Checking for tokens...', { 
+        hasUser: !!user, 
         hasTokensInUrl: hasAuthTokensInUrl(),
         currentUrl: window.location.href,
         searchParams: window.location.search
@@ -16,14 +16,15 @@ export function SessionTokenHandler() {
 
       // Only process tokens if user is not already authenticated and tokens are present
       if (!user && hasAuthTokensInUrl()) {
-        const tokens = extractTokensFromLovableToken();
+        const tokens = extractTokensFromUrl();
         
         if (tokens) {
           setIsProcessingTokens(true);
           console.log('GUESTFEEDBACK SessionTokenHandler: Processing incoming session tokens...', {
-            hasAccessToken: !!tokens.access_token,
-            hasRefreshToken: !!tokens.refresh_token,
-            expiresAt: tokens.expires_at
+            hasAccessToken: !!tokens.accessToken,
+            hasRefreshToken: !!tokens.refreshToken,
+            accessTokenLength: tokens.accessToken?.length,
+            refreshTokenLength: tokens.refreshToken?.length
           });
           
           const success = await authenticateWithTokens(tokens);
