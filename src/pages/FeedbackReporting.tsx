@@ -130,7 +130,7 @@ const FeedbackReporting = () => {
   const calculateStats = (feedbacksToCalculate: CustomerFeedback[]): FeedbackReportingStats => {
     const total = feedbacksToCalculate.length;
     const pending = feedbacksToCalculate.filter(fb => fb.resolution_status === 'unopened');
-    const critical = feedbacksToCalculate.filter(fb => fb.priority === 'Critical');
+    const critical = feedbacksToCalculate.filter(fb => fb.priority === 'Critical' && fb.resolution_status !== 'resolved');
     
     // Calculate average response time for responded/resolved feedback
     const respondedFeedbacks = feedbacksToCalculate.filter(fb => 
