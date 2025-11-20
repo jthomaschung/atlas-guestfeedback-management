@@ -3367,6 +3367,7 @@ export type Database = {
           annual_salary: number | null
           applicant_email: string
           applicant_phone: string
+          application_source: string | null
           auto_insurance_carrier: string | null
           created_at: string
           date_of_birth: string | null
@@ -3421,6 +3422,7 @@ export type Database = {
           annual_salary?: number | null
           applicant_email: string
           applicant_phone: string
+          application_source?: string | null
           auto_insurance_carrier?: string | null
           created_at?: string
           date_of_birth?: string | null
@@ -3475,6 +3477,7 @@ export type Database = {
           annual_salary?: number | null
           applicant_email?: string
           applicant_phone?: string
+          application_source?: string | null
           auto_insurance_carrier?: string | null
           created_at?: string
           date_of_birth?: string | null
@@ -4370,6 +4373,7 @@ export type Database = {
           email: string
           first_name: string | null
           id: string
+          is_active: boolean
           last_name: string | null
           slack_user_id: string | null
           store_id: number | null
@@ -4382,6 +4386,7 @@ export type Database = {
           email: string
           first_name?: string | null
           id?: string
+          is_active?: boolean
           last_name?: string | null
           slack_user_id?: string | null
           store_id?: number | null
@@ -4394,6 +4399,7 @@ export type Database = {
           email?: string
           first_name?: string | null
           id?: string
+          is_active?: boolean
           last_name?: string | null
           slack_user_id?: string | null
           store_id?: number | null
@@ -6240,22 +6246,6 @@ export type Database = {
         Args: { target_store_number: string; target_user_id: string }
         Returns: undefined
       }
-      assign_portal_auth_role: {
-        Args: { p_assigned_by: string; p_role_id: string; p_user_id: string }
-        Returns: string
-      }
-      assign_portal_auth_scope: {
-        Args: {
-          p_assigned_by: string
-          p_market?: string
-          p_portal_id: string
-          p_region?: string
-          p_scope_level: string
-          p_store_number?: string
-          p_user_id: string
-        }
-        Returns: string
-      }
       calculate_completion_metrics: {
         Args: { p_batch_id: string; p_metric_date: string }
         Returns: undefined
@@ -7213,97 +7203,6 @@ export type Database = {
         Args: { p_notes?: string; p_notification_id: string; p_status: string }
         Returns: boolean
       }
-      query_portal_auth_access_definitions: {
-        Args: never
-        Returns: {
-          can_comment: boolean
-          can_edit: boolean
-          can_manage: boolean
-          can_view: boolean
-          id: string
-          portal_id: string
-          portal_role_id: string
-          role_display_name: string
-          role_name: string
-        }[]
-      }
-      query_portal_auth_audit_log: {
-        Args: { p_limit?: number }
-        Returns: {
-          change_details: Json
-          change_type: string
-          changed_by: string
-          created_at: string
-          id: string
-          portal_id: string
-          user_id: string
-        }[]
-      }
-      query_portal_auth_custom_permissions: {
-        Args: { p_user_id: string }
-        Returns: {
-          assigned_at: string
-          assigned_by: string
-          can_comment: boolean
-          can_edit: boolean
-          can_manage: boolean
-          can_view: boolean
-          id: string
-          portal_id: string
-          user_id: string
-        }[]
-      }
-      query_portal_auth_roles: {
-        Args: never
-        Returns: {
-          created_at: string
-          description: string
-          id: string
-          is_active: boolean
-          role_display_name: string
-          role_name: string
-        }[]
-      }
-      query_portal_auth_scope_assignments: {
-        Args: { p_user_id: string }
-        Returns: {
-          assigned_at: string
-          assigned_by: string
-          id: string
-          market: string
-          portal_id: string
-          region: string
-          scope_level: string
-          status: string
-          store_number: string
-          user_id: string
-        }[]
-      }
-      query_portal_auth_user_roles: {
-        Args: { p_user_id: string }
-        Returns: {
-          assigned_at: string
-          assigned_by: string
-          id: string
-          portal_role_id: string
-          role_description: string
-          role_display_name: string
-          role_is_active: boolean
-          role_name: string
-          user_id: string
-        }[]
-      }
-      query_portal_auth_users_with_roles: {
-        Args: never
-        Returns: {
-          display_name: string
-          email: string
-          first_name: string
-          last_name: string
-          portal_roles: Json
-          user_id: string
-        }[]
-      }
       refresh_wsr_analytics: { Args: never; Returns: undefined }
       remove_user_market_permission: {
         Args: { target_market_name: string; target_user_id: string }
@@ -7313,27 +7212,7 @@ export type Database = {
         Args: { target_store_number: string; target_user_id: string }
         Returns: undefined
       }
-      revoke_portal_auth_role: {
-        Args: { p_revoked_by: string; p_user_role_id: string }
-        Returns: boolean
-      }
-      revoke_portal_auth_scope: {
-        Args: { p_revoked_by: string; p_scope_id: string }
-        Returns: boolean
-      }
       rollback_work_orders_migration: { Args: never; Returns: undefined }
-      set_portal_auth_custom_permission: {
-        Args: {
-          p_can_comment: boolean
-          p_can_edit: boolean
-          p_can_manage: boolean
-          p_can_view: boolean
-          p_granted_by: string
-          p_portal_id: string
-          p_user_id: string
-        }
-        Returns: string
-      }
       submit_approval_request: {
         Args: { p_employee_id: string; p_template_item_id: string }
         Returns: string
