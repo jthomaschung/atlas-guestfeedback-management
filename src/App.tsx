@@ -16,8 +16,6 @@ import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import Welcome from '@/pages/Welcome';
 import Index from '@/pages/Index';
-import FacilitiesDashboard from '@/pages/FacilitiesDashboard';
-import SubmitWorkOrder from '@/pages/SubmitWorkOrder';
 import UserHierarchy from '@/pages/UserHierarchy';
 import ExecutiveOversight from '@/pages/ExecutiveOversight';
 
@@ -35,7 +33,6 @@ import EmailTemplates from '@/pages/EmailTemplates';
 import { AuthGate } from '@/components/AuthGate';
 
 import { SmartRedirect } from '@/components/SmartRedirect';
-import { FacilitiesRedirect } from '@/components/FacilitiesRedirect';
 import { FeedbackUpdater } from '@/components/FeedbackUpdater';
 
 const queryClient = new QueryClient();
@@ -153,23 +150,7 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
-               <Route 
-                path="/facilities" 
-                element={
-                  <ProtectedRoute>
-                    <Index />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/submit" 
-                element={
-                  <ProtectedRoute>
-                    <SubmitWorkOrder />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
+              <Route
                 path="/feedback-reporting" 
                 element={
                   <ProtectedRoute>

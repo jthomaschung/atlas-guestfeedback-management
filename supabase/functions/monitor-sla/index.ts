@@ -221,7 +221,7 @@ function buildEmailBody(
               </table>
               
               <div style="text-align: center; margin: 30px 0;">
-                <a href="https://frmjdxziwwlfpgevszga.supabase.co/functions/v1/redirect-to-work-order?feedback_id=${item.id}" 
+                <a href="https://guestfeedback.lovable.app/dashboard?feedbackId=${item.id}" 
                    style="display: inline-block; padding: 14px 32px; background-color: ${urgencyColor}; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
                   View Case Details
                 </a>

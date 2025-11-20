@@ -1,8 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useUserPermissions } from '@/hooks/useUserPermissions';
 import { useAuth } from '@/hooks/useAuth';
-import { createAuthenticatedUrl } from '@/utils/sessionToken';
-import { useEffect, useState } from 'react';
 import Index from '@/pages/Index';
 
 export function SmartRedirect() {
@@ -57,30 +55,16 @@ export function SmartRedirect() {
     return <Index />;
   }
 
-  const [isRedirecting, setIsRedirecting] = useState(false);
-  
-  useEffect(() => {
-    // If user has facilities access but not guest feedback, redirect to facilities app
-    if (permissions.canAccessFacilities && !permissions.canAccessGuestFeedback && !isRedirecting) {
-      setIsRedirecting(true);
-      const redirectToFacilities = async () => {
-        try {
-          const authenticatedUrl = await createAuthenticatedUrl('https://facilities.lovable.app');
-          window.location.href = authenticatedUrl;
-        } catch (error) {
-          console.error('Error creating authenticated URL:', error);
-          window.location.href = 'https://facilities.lovable.app';
-        }
-      };
-      redirectToFacilities();
-    }
-  }, [permissions.canAccessFacilities, permissions.canAccessGuestFeedback, isRedirecting]);
-
-  // If user has facilities access but not guest feedback, show redirecting message
+  // If user has facilities access only, show message to use portal switcher
   if (permissions.canAccessFacilities && !permissions.canAccessGuestFeedback) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-muted-foreground">Redirecting to Facilities...</div>
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-foreground mb-2">Access Facilities Portal</h2>
+          <p className="text-muted-foreground">
+            Please use the portal switcher in the top right to access the Facilities application.
+          </p>
+        </div>
       </div>
     );
   }
