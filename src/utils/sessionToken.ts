@@ -61,12 +61,43 @@ export function extractTokensFromUrl(): SessionTokens | null {
  */
 export async function authenticateWithTokens(tokens: SessionTokens): Promise<boolean> {
   try {
+    // Step 1: Set the session in the frontend
     const { data, error } = await supabase.auth.setSession({
       access_token: tokens.accessToken,
       refresh_token: tokens.refreshToken
     });
     
-    return !error && !!data.session;
+    if (error || !data.session) {
+      console.error('Failed to set session:', error);
+      return false;
+    }
+    
+    console.log('Frontend session set, verifying database session...');
+    
+    // Step 2: Wait for the database to recognize the session
+    // Try up to 5 times with 200ms delays (1 second total)
+    for (let attempt = 0; attempt < 5; attempt++) {
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      // Verify database can see our session by checking auth.uid()
+      const { data: testData, error: testError } = await supabase
+        .from('profiles')
+        .select('user_id')
+        .eq('user_id', data.session.user.id)
+        .limit(1);
+      
+      // If we get a result (or even an empty result), the session is working
+      // If we get an RLS error (PGRST301), the session isn't ready yet
+      if (!testError || testError.code !== 'PGRST301') {
+        console.log('Database session verified after', (attempt + 1) * 200, 'ms');
+        return true;
+      }
+      
+      console.log('Database session not ready, attempt', attempt + 1, 'of 5');
+    }
+    
+    console.warn('Database session verification timed out, proceeding anyway');
+    return true; // Proceed anyway after timeout
   } catch (error) {
     console.error('Error authenticating with tokens:', error);
     return false;
