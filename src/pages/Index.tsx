@@ -38,55 +38,23 @@ const Index = () => {
   const { permissions } = useUserPermissions();
 
   useEffect(() => {
-    const verifyAndFetchData = async () => {
-      if (authUser) {
-        console.log('Auth user available, verifying session...');
-        
-        // Verify session is established in database context
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session?.access_token) {
-          console.log('Session verified, fetching data...', {
-            userId: session.user.id,
-            hasAccessToken: true
-          });
-          fetchFeedbacks();
-          fetchPeriods();
-          fetchStores();
-        } else {
-          console.warn('Session not ready, retrying in 500ms...');
-          // Retry after brief delay
-          setTimeout(verifyAndFetchData, 500);
-        }
-      }
-    };
-    
-    verifyAndFetchData();
+    if (authUser) {
+      console.log('Auth user available, fetching data...', {
+        authUserId: authUser.id
+      });
+      fetchFeedbacks();
+      fetchPeriods();
+      fetchStores();
+    }
   }, [authUser]);
 
   const fetchFeedbacks = async () => {
     try {
       setLoading(true);
-      
-      // Verify session before querying
-      const { data: { session } } = await supabase.auth.getSession();
       console.log('Starting feedback fetch...', {
         hasAuthUser: !!authUser,
-        authUserId: authUser?.id,
-        hasSession: !!session,
-        sessionUserId: session?.user?.id
+        authUserId: authUser?.id
       });
-      
-      if (!session) {
-        console.error('No session found when attempting to fetch feedbacks');
-        toast({
-          variant: "destructive",
-          title: "Session Error",
-          description: "Authentication session not established. Please try refreshing the page."
-        });
-        setLoading(false);
-        return;
-      }
       
       const { data, error } = await supabase
         .from('customer_feedback')
@@ -418,7 +386,7 @@ const Index = () => {
             </div>
           </div>
           <div className="flex items-center justify-center h-64">
-            <div className="text-lg">Establishing connection and loading feedback...</div>
+            <div className="text-lg">Loading feedback...</div>
           </div>
         </div>
       </div>

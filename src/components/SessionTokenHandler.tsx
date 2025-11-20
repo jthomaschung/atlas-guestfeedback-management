@@ -46,12 +46,12 @@ export function SessionTokenHandler() {
           const success = await authenticateWithTokens(tokens);
           
           if (success) {
-            console.log('GUESTFEEDBACK SessionTokenHandler: Successfully authenticated with incoming tokens');
+            console.log('GUESTFEEDBACK SessionTokenHandler: Session authenticated and verified in database');
             // Clean the URL after successful authentication
             cleanUrlFromTokens();
             // Don't clear isProcessingTokens here - let the useEffect handle it when user state updates
           } else {
-            console.error('GUESTFEEDBACK SessionTokenHandler: Failed to authenticate with incoming tokens');
+            console.error('GUESTFEEDBACK SessionTokenHandler: Session verification failed');
             // Still clean the URL even if authentication failed
             cleanUrlFromTokens();
             setIsProcessingTokens(false);  // Only clear on failure
