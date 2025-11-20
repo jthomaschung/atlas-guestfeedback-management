@@ -82,7 +82,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
     
     setIsLoading(true);
     try {
-      // Load critical/escalated feedback with approval status
+      // Load critical/escalated feedback with approval status (exclude resolved)
       const { data: feedbacks, error: feedbackError } = await supabase
         .from('customer_feedback')
         .select(`
@@ -90,6 +90,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
           critical_feedback_approvals(*)
         `)
         .eq('priority', 'Critical')
+        .neq('resolution_status', 'resolved')
         .order('created_at', { ascending: false });
 
       if (feedbackError) throw feedbackError;
