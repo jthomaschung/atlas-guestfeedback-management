@@ -34,18 +34,26 @@ const Index = () => {
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const { toast } = useToast();
   const authContext = useAuth();
-  const { user, profile } = authContext || { user: null, profile: null };
+  const { user: authUser, profile } = authContext || { user: null, profile: null };
   const { permissions } = useUserPermissions();
 
   useEffect(() => {
-    fetchFeedbacks();
-    fetchPeriods();
-    fetchStores();
-  }, []);
+    if (authUser) {
+      console.log('Auth user available, fetching data...');
+      fetchFeedbacks();
+      fetchPeriods();
+      fetchStores();
+    }
+  }, [authUser]);
 
   const fetchFeedbacks = async () => {
     try {
       setLoading(true);
+      console.log('Starting feedback fetch...', {
+        hasAuthUser: !!authUser,
+        authUserId: authUser?.id
+      });
+      
       const { data, error } = await supabase
         .from('customer_feedback')
         .select('*')
@@ -60,6 +68,12 @@ const Index = () => {
           description: "Failed to load customer feedback"
         });
         return;
+      }
+
+      console.log(`Fetched ${data?.length || 0} feedbacks`);
+      
+      if (authUser && data?.length === 0) {
+        console.warn('User is authenticated but no feedback data returned - possible RLS issue');
       }
 
       // Map database records to CustomerFeedback interface
@@ -349,6 +363,14 @@ const Index = () => {
     setDateTo(undefined);
   };
 
+  if (!authUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-slate-600">Authenticating...</div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -377,7 +399,7 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold text-foreground">
-                Welcome, {profile?.display_name || profile?.first_name || user?.email?.split('@')[0] || 'User'}!
+                Welcome, {profile?.display_name || profile?.first_name || authUser?.email?.split('@')[0] || 'User'}!
               </h2>
               <p className="text-sm text-muted-foreground">
                 {permissions.isAdmin ? (
