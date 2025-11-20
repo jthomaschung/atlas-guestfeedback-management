@@ -10,7 +10,6 @@ const portals = [
     key: 'facilities',
     title: 'Facilities',
     icon: Wrench,
-    href: '/facilities',
     externalUrl: 'https://atlasfacilities.co/'
   },
   {
