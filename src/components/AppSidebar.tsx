@@ -120,7 +120,7 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3">
                       <MessageSquare className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
-                        <span className="font-semibold text-sm text-sidebar-foreground">Guest Feedback</span>
+                        <span className="font-bold text-sm text-sidebar-foreground">Guest Feedback</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
@@ -159,7 +159,7 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3">
                       <Shield className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
-                        <span className="font-semibold text-sm text-sidebar-foreground">Executive</span>
+                        <span className="font-bold text-sm text-sidebar-foreground">Executive</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
@@ -198,7 +198,7 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3">
                       <BookOpen className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
-                        <span className="font-semibold text-sm text-sidebar-foreground">Support</span>
+                        <span className="font-bold text-sm text-sidebar-foreground">Support</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
@@ -237,7 +237,7 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3">
                       <Archive className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
-                        <span className="font-semibold text-sm text-sidebar-foreground">Archive</span>
+                        <span className="font-bold text-sm text-sidebar-foreground">Archive</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
@@ -276,7 +276,7 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3">
                       <Settings className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
-                        <span className="font-semibold text-sm text-sidebar-foreground">Administration</span>
+                        <span className="font-bold text-sm text-sidebar-foreground">Administration</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
