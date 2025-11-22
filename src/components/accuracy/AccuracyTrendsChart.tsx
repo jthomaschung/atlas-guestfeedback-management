@@ -51,9 +51,10 @@ export function AccuracyTrendsChart({ feedbacks, periods, selectedPeriod }: Accu
           Accuracy Issues Trend
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={chartData}>
+      <CardContent className="overflow-x-auto">
+        <div className="min-w-[500px]">
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
               dataKey="periodName" 
@@ -85,6 +86,7 @@ export function AccuracyTrendsChart({ feedbacks, periods, selectedPeriod }: Accu
             />
           </LineChart>
         </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );

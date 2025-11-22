@@ -129,9 +129,10 @@ export function CategoryBreakdownChart({ className, feedbacks, onCategoryClick }
           Accuracy issues by district ({feedbacks.length} total items)
         </p>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="h-[400px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
+      <CardContent className="overflow-x-auto">
+        <div className="min-w-[600px]">
+          <ChartContainer config={chartConfig} className="h-[400px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
             <BarChart data={districtData} margin={{ top: 5, right: 30, left: 20, bottom: 80 }} onClick={handleBarClick}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis 
@@ -189,6 +190,7 @@ export function CategoryBreakdownChart({ className, feedbacks, onCategoryClick }
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
+        </div>
       </CardContent>
     </Card>
   );
