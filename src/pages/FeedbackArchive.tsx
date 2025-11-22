@@ -207,19 +207,18 @@ export default function FeedbackArchive() {
   return (
     <div className="space-y-6">
       <div className="space-y-6">
-        {/* Welcome Section */}
-        <div className="mb-4">
-          <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
-            Welcome, {profile?.first_name} {profile?.last_name}!
-          </h2>
-          <p className="text-muted-foreground mt-1">
+        {/* User Info */}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span>{profile?.first_name} {profile?.last_name}</span>
+          <span>•</span>
+          <span>
             {permissions.isAdmin 
-              ? "Administrator Access - All Markets & Stores"
+              ? "Admin Access"
               : permissions.isDirectorOrAbove
-              ? `${permissions.role} Access - ${permissions.markets.length > 0 ? permissions.markets.join(', ') : 'All Markets'}`
-              : `Store Access - ${permissions.stores.length > 0 ? permissions.stores.join(', ') : 'Limited Access'}`
+              ? `${permissions.role} Access`
+              : "Store Access"
             }
-          </p>
+          </span>
         </div>
 
         {/* Feedback Archive Header */}
