@@ -1,5 +1,6 @@
 import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive, UserCheck, TrendingUp, Shield, Target, BookOpen, Mail } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 import {
   Sidebar,
@@ -41,6 +42,7 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
+  const isMobile = useIsMobile();
 
   // Hide navigation on portal selection page
   if (currentPath === '/portal-selection') {
@@ -67,18 +69,20 @@ export function AppSidebar() {
   return (
     <Sidebar
       collapsible="icon"
+      className={isMobile ? "mobile-safe-area" : ""}
     >
-      <SidebarContent>
+      <SidebarContent className={isMobile ? "mobile-scroll" : ""}>
         <SidebarGroup>
           <SidebarGroupLabel>Guest Feedback</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {guestFeedbackItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild className="mobile-touch-target">
                     <NavLink to={item.url} end className={getNavCls}>
-                      <item.icon className="mr-2 h-4 w-4" />
-                      {state !== "collapsed" && <span>{item.title}</span>}
+                      <item.icon className={isMobile ? "h-5 w-5" : "mr-2 h-4 w-4"} />
+                      {!isMobile && state !== "collapsed" && <span>{item.title}</span>}
+                      {isMobile && <span className="ml-3">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -93,10 +97,11 @@ export function AppSidebar() {
             <SidebarMenu>
               {executiveItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild className="mobile-touch-target">
                     <NavLink to={item.url} end className={getNavCls}>
-                      <item.icon className="mr-2 h-4 w-4" />
-                      {state !== "collapsed" && <span>{item.title}</span>}
+                      <item.icon className={isMobile ? "h-5 w-5" : "mr-2 h-4 w-4"} />
+                      {!isMobile && state !== "collapsed" && <span>{item.title}</span>}
+                      {isMobile && <span className="ml-3">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -111,10 +116,11 @@ export function AppSidebar() {
             <SidebarMenu>
               {supportItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild className="mobile-touch-target">
                     <NavLink to={item.url} end className={getNavCls}>
-                      <item.icon className="mr-2 h-4 w-4" />
-                      {state !== "collapsed" && <span>{item.title}</span>}
+                      <item.icon className={isMobile ? "h-5 w-5" : "mr-2 h-4 w-4"} />
+                      {!isMobile && state !== "collapsed" && <span>{item.title}</span>}
+                      {isMobile && <span className="ml-3">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -128,10 +134,11 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton asChild className="mobile-touch-target">
                   <NavLink to="/feedback-archive" end className={getNavCls}>
-                    <Archive className="mr-2 h-4 w-4" />
-                    {state !== "collapsed" && <span>Feedback Archive</span>}
+                    <Archive className={isMobile ? "h-5 w-5" : "mr-2 h-4 w-4"} />
+                    {!isMobile && state !== "collapsed" && <span>Feedback Archive</span>}
+                    {isMobile && <span className="ml-3">Feedback Archive</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -145,10 +152,11 @@ export function AppSidebar() {
             <SidebarMenu>
               {adminItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild className="mobile-touch-target">
                     <NavLink to={item.url} end className={getNavCls}>
-                      <item.icon className="mr-2 h-4 w-4" />
-                      {state !== "collapsed" && <span>{item.title}</span>}
+                      <item.icon className={isMobile ? "h-5 w-5" : "mr-2 h-4 w-4"} />
+                      {!isMobile && state !== "collapsed" && <span>{item.title}</span>}
+                      {isMobile && <span className="ml-3">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

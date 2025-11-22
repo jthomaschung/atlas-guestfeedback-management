@@ -518,6 +518,7 @@ export type Database = {
           receipt_image_url: string
           store_number: string
           submission_type: string
+          submitted_by_user_id: string | null
           updated_at: string | null
         }
         Insert: {
@@ -532,6 +533,7 @@ export type Database = {
           receipt_image_url: string
           store_number: string
           submission_type?: string
+          submitted_by_user_id?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -546,6 +548,7 @@ export type Database = {
           receipt_image_url?: string
           store_number?: string
           submission_type?: string
+          submitted_by_user_id?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -2521,6 +2524,7 @@ export type Database = {
       house_account_customers: {
         Row: {
           created_at: string | null
+          created_by_user_id: string | null
           current_balance: number | null
           email: string | null
           id: string
@@ -2535,6 +2539,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          created_by_user_id?: string | null
           current_balance?: number | null
           email?: string | null
           id?: string
@@ -2549,6 +2554,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          created_by_user_id?: string | null
           current_balance?: number | null
           email?: string | null
           id?: string
@@ -2735,6 +2741,184 @@ export type Database = {
           notes?: string | null
           report_generated_date?: string | null
           total_records?: number | null
+        }
+        Relationships: []
+      }
+      incident_comments: {
+        Row: {
+          content: string
+          created_at: string | null
+          created_by: string | null
+          created_by_email: string | null
+          id: string
+          incident_id: string
+          is_internal: boolean | null
+          user_display_name: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          created_by?: string | null
+          created_by_email?: string | null
+          id?: string
+          incident_id: string
+          is_internal?: boolean | null
+          user_display_name?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          created_by?: string | null
+          created_by_email?: string | null
+          id?: string
+          incident_id?: string
+          is_internal?: boolean | null
+          user_display_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_comments_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incident_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_history: {
+        Row: {
+          action: string
+          changed_at: string | null
+          changed_by: string | null
+          changed_by_name: string | null
+          field_changed: string | null
+          id: string
+          incident_id: string
+          new_value: string | null
+          notes: string | null
+          old_value: string | null
+        }
+        Insert: {
+          action: string
+          changed_at?: string | null
+          changed_by?: string | null
+          changed_by_name?: string | null
+          field_changed?: string | null
+          id?: string
+          incident_id: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+        }
+        Update: {
+          action?: string
+          changed_at?: string | null
+          changed_by?: string | null
+          changed_by_name?: string | null
+          field_changed?: string | null
+          id?: string
+          incident_id?: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_history_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incident_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_reports: {
+        Row: {
+          body_part_injured: string
+          closed_at: string | null
+          closed_by: string | null
+          created_at: string | null
+          id: string
+          immediate_action_taken: string | null
+          incident_date: string
+          incident_details: string
+          incident_number: string
+          incident_time: string
+          incident_type: string
+          injured_employee_job_title: string
+          injured_employee_name: string
+          market: string
+          medical_facility_address: string | null
+          medical_facility_name: string | null
+          medical_treatment_sought: boolean
+          resolution_notes: string | null
+          severity_level: string
+          status: string
+          store_number: string
+          submission_date: string | null
+          submitted_by: string | null
+          submitter_name: string
+          submitter_type: string
+          updated_at: string | null
+          witnesses: Json | null
+        }
+        Insert: {
+          body_part_injured: string
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string | null
+          id?: string
+          immediate_action_taken?: string | null
+          incident_date: string
+          incident_details: string
+          incident_number: string
+          incident_time: string
+          incident_type: string
+          injured_employee_job_title: string
+          injured_employee_name: string
+          market: string
+          medical_facility_address?: string | null
+          medical_facility_name?: string | null
+          medical_treatment_sought?: boolean
+          resolution_notes?: string | null
+          severity_level: string
+          status?: string
+          store_number: string
+          submission_date?: string | null
+          submitted_by?: string | null
+          submitter_name: string
+          submitter_type: string
+          updated_at?: string | null
+          witnesses?: Json | null
+        }
+        Update: {
+          body_part_injured?: string
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string | null
+          id?: string
+          immediate_action_taken?: string | null
+          incident_date?: string
+          incident_details?: string
+          incident_number?: string
+          incident_time?: string
+          incident_type?: string
+          injured_employee_job_title?: string
+          injured_employee_name?: string
+          market?: string
+          medical_facility_address?: string | null
+          medical_facility_name?: string | null
+          medical_treatment_sought?: boolean
+          resolution_notes?: string | null
+          severity_level?: string
+          status?: string
+          store_number?: string
+          submission_date?: string | null
+          submitted_by?: string | null
+          submitter_name?: string
+          submitter_type?: string
+          updated_at?: string | null
+          witnesses?: Json | null
         }
         Relationships: []
       }
@@ -5188,10 +5372,12 @@ export type Database = {
       }
       user_permissions: {
         Row: {
+          can_access_accounting_dev: boolean | null
           can_access_catering_dev: boolean | null
           can_access_facilities_dev: boolean | null
           can_access_guest_feedback_dev: boolean | null
           can_access_hr_dev: boolean | null
+          can_access_incident_reporting: boolean | null
           can_access_kpi_dev: boolean | null
           can_access_training_dev: boolean | null
           created_at: string
@@ -5203,10 +5389,12 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          can_access_accounting_dev?: boolean | null
           can_access_catering_dev?: boolean | null
           can_access_facilities_dev?: boolean | null
           can_access_guest_feedback_dev?: boolean | null
           can_access_hr_dev?: boolean | null
+          can_access_incident_reporting?: boolean | null
           can_access_kpi_dev?: boolean | null
           can_access_training_dev?: boolean | null
           created_at?: string
@@ -5218,10 +5406,12 @@ export type Database = {
           user_id: string
         }
         Update: {
+          can_access_accounting_dev?: boolean | null
           can_access_catering_dev?: boolean | null
           can_access_facilities_dev?: boolean | null
           can_access_guest_feedback_dev?: boolean | null
           can_access_hr_dev?: boolean | null
+          can_access_incident_reporting?: boolean | null
           can_access_kpi_dev?: boolean | null
           can_access_training_dev?: boolean | null
           created_at?: string
@@ -6312,6 +6502,7 @@ export type Database = {
         Returns: string
       }
       generate_id_upload_token: { Args: never; Returns: string }
+      generate_incident_number: { Args: never; Returns: string }
       get_aggregated_customers: {
         Args: never
         Returns: {

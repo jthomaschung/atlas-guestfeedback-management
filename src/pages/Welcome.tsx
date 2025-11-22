@@ -129,7 +129,7 @@ export default function Welcome() {
                 {!showResetPassword ? (
                   <div className="space-y-4">
                     <form onSubmit={handleSignIn} className="space-y-4">
-                      <div className="space-y-2">
+                       <div className="space-y-2">
                         <Label htmlFor="signin-email">Email</Label>
                         <Input
                           id="signin-email"
@@ -137,7 +137,8 @@ export default function Welcome() {
                           type="email"
                           placeholder="your.name@atlaswe.com"
                           required
-                          className="bg-white"
+                          className="bg-white text-base"
+                          autoComplete="email"
                         />
                       </div>
                       <div className="space-y-2">
@@ -147,7 +148,8 @@ export default function Welcome() {
                           name="password"
                           type="password"
                           required
-                          className="bg-white"
+                          className="bg-white text-base"
+                          autoComplete="current-password"
                         />
                       </div>
                       {error && (
