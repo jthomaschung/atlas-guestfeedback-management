@@ -115,27 +115,25 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={guestFeedbackOpen} onOpenChange={setGuestFeedbackOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-hover hover:bg-sidebar-accent/60 rounded-xl py-3 px-4">
+                  <SidebarMenuButton className="w-full justify-between hover:bg-sidebar-hover py-2 px-3">
                     <div className="flex items-center gap-3">
-                      <div className="bg-sidebar-active p-2 rounded-lg shadow-sm">
-                        <MessageSquare className="h-5 w-5 text-sidebar-foreground" />
-                      </div>
+                      <MessageSquare className="h-5 w-5 text-muted-foreground" />
                       {state !== "collapsed" && (
-                        <span className="font-bold text-base text-sidebar-foreground">Guest Feedback</span>
+                        <span className="font-normal text-base text-sidebar-foreground">Guest Feedback</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
-                      <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${guestFeedbackOpen ? "" : "-rotate-90"}`} />
+                      <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${guestFeedbackOpen ? "" : "-rotate-90"}`} />
                     )}
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <SidebarMenu className="ml-6 mt-1 space-y-1">
+                  <SidebarMenu className="ml-8 mt-1 space-y-0.5">
                     {guestFeedbackItems.map((item) => (
                       <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild className="py-3 px-4">
+                        <SidebarMenuButton asChild className="py-2 px-3">
                           <NavLink to={item.url} end className={getNavCls}>
-                            <item.icon className="mr-3 h-5 w-5" />
+                            <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
                             {state !== "collapsed" && <span className="text-base">{item.title}</span>}
                           </NavLink>
                         </SidebarMenuButton>
@@ -156,27 +154,25 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={executiveOpen} onOpenChange={setExecutiveOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-hover hover:bg-sidebar-accent/60 rounded-xl py-3 px-4">
+                  <SidebarMenuButton className="w-full justify-between hover:bg-sidebar-hover py-2 px-3">
                     <div className="flex items-center gap-3">
-                      <div className="bg-sidebar-active p-2 rounded-lg shadow-sm">
-                        <Shield className="h-5 w-5 text-sidebar-foreground" />
-                      </div>
+                      <Shield className="h-5 w-5 text-muted-foreground" />
                       {state !== "collapsed" && (
-                        <span className="font-bold text-base text-sidebar-foreground">Executive</span>
+                        <span className="font-normal text-base text-sidebar-foreground">Executive</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
-                      <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${executiveOpen ? "" : "-rotate-90"}`} />
+                      <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${executiveOpen ? "" : "-rotate-90"}`} />
                     )}
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <SidebarMenu className="ml-6 mt-1 space-y-1">
+                  <SidebarMenu className="ml-8 mt-1 space-y-0.5">
                     {executiveItems.map((item) => (
                       <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild className="py-3 px-4">
+                        <SidebarMenuButton asChild className="py-2 px-3">
                           <NavLink to={item.url} end className={getNavCls}>
-                            <item.icon className="mr-3 h-5 w-5" />
+                            <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
                             {state !== "collapsed" && <span className="text-base">{item.title}</span>}
                           </NavLink>
                         </SidebarMenuButton>
@@ -197,27 +193,25 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={supportOpen} onOpenChange={setSupportOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-hover hover:bg-sidebar-accent/60 rounded-xl py-3 px-4">
+                  <SidebarMenuButton className="w-full justify-between hover:bg-sidebar-hover py-2 px-3">
                     <div className="flex items-center gap-3">
-                      <div className="bg-sidebar-active p-2 rounded-lg shadow-sm">
-                        <BookOpen className="h-5 w-5 text-sidebar-foreground" />
-                      </div>
+                      <BookOpen className="h-5 w-5 text-muted-foreground" />
                       {state !== "collapsed" && (
-                        <span className="font-bold text-base text-sidebar-foreground">Support</span>
+                        <span className="font-normal text-base text-sidebar-foreground">Support</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
-                      <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${supportOpen ? "" : "-rotate-90"}`} />
+                      <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${supportOpen ? "" : "-rotate-90"}`} />
                     )}
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <SidebarMenu className="ml-6 mt-1 space-y-1">
+                  <SidebarMenu className="ml-8 mt-1 space-y-0.5">
                     {supportItems.map((item) => (
                       <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild className="py-3 px-4">
+                        <SidebarMenuButton asChild className="py-2 px-3">
                           <NavLink to={item.url} end className={getNavCls}>
-                            <item.icon className="mr-3 h-5 w-5" />
+                            <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
                             {state !== "collapsed" && <span className="text-base">{item.title}</span>}
                           </NavLink>
                         </SidebarMenuButton>
@@ -238,27 +232,25 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={archiveOpen} onOpenChange={setArchiveOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-hover hover:bg-sidebar-accent/60 rounded-xl py-3 px-4">
+                  <SidebarMenuButton className="w-full justify-between hover:bg-sidebar-hover py-2 px-3">
                     <div className="flex items-center gap-3">
-                      <div className="bg-sidebar-active p-2 rounded-lg shadow-sm">
-                        <Archive className="h-5 w-5 text-sidebar-foreground" />
-                      </div>
+                      <Archive className="h-5 w-5 text-muted-foreground" />
                       {state !== "collapsed" && (
-                        <span className="font-bold text-base text-sidebar-foreground">Archive</span>
+                        <span className="font-normal text-base text-sidebar-foreground">Archive</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
-                      <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${archiveOpen ? "" : "-rotate-90"}`} />
+                      <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${archiveOpen ? "" : "-rotate-90"}`} />
                     )}
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <SidebarMenu className="ml-6 mt-1 space-y-1">
+                  <SidebarMenu className="ml-8 mt-1 space-y-0.5">
                     {archiveItems.map((item) => (
                       <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild className="py-3 px-4">
+                        <SidebarMenuButton asChild className="py-2 px-3">
                           <NavLink to={item.url} end className={getNavCls}>
-                            <item.icon className="mr-3 h-5 w-5" />
+                            <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
                             {state !== "collapsed" && <span className="text-base">{item.title}</span>}
                           </NavLink>
                         </SidebarMenuButton>
@@ -279,27 +271,25 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={adminOpen} onOpenChange={setAdminOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-hover hover:bg-sidebar-accent/60 rounded-xl py-3 px-4">
+                  <SidebarMenuButton className="w-full justify-between hover:bg-sidebar-hover py-2 px-3">
                     <div className="flex items-center gap-3">
-                      <div className="bg-sidebar-active p-2 rounded-lg shadow-sm">
-                        <Settings className="h-5 w-5 text-sidebar-foreground" />
-                      </div>
+                      <Settings className="h-5 w-5 text-muted-foreground" />
                       {state !== "collapsed" && (
-                        <span className="font-bold text-base text-sidebar-foreground">Administration</span>
+                        <span className="font-normal text-base text-sidebar-foreground">Administration</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
-                      <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${adminOpen ? "" : "-rotate-90"}`} />
+                      <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${adminOpen ? "" : "-rotate-90"}`} />
                     )}
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <SidebarMenu className="ml-6 mt-1 space-y-1">
+                  <SidebarMenu className="ml-8 mt-1 space-y-0.5">
                     {adminItems.map((item) => (
                       <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild className="py-3 px-4">
+                        <SidebarMenuButton asChild className="py-2 px-3">
                           <NavLink to={item.url} end className={getNavCls}>
-                            <item.icon className="mr-3 h-5 w-5" />
+                            <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
                             {state !== "collapsed" && <span className="text-base">{item.title}</span>}
                           </NavLink>
                         </SidebarMenuButton>
