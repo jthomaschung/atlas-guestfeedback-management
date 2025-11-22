@@ -442,8 +442,8 @@ const Index = () => {
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Customer Feedback Dashboard</h1>
-            <p className="text-sm sm:text-base text-muted-foreground mt-1">
+            <h1 className="text-xl sm:text-2xl font-semibold text-foreground">Customer Feedback Dashboard</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               Monitor and respond to customer feedback from Yelp, Qualtrics, and Jimmy John's channels
             </p>
           </div>
