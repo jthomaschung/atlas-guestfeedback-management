@@ -67,29 +67,29 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col">
-          <header className="h-16 flex items-center justify-between bg-white border-b border-slate-200 shadow-sm px-6 sticky top-0 z-40">
-            <div className="flex items-center gap-4">
-              <SidebarTrigger className="text-slate-700 hover:bg-slate-100 transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg" />
-              <div>
-                <h1 className="text-xl font-bold tracking-wide text-slate-700">Guest Feedback Portal</h1>
-                <p className="hidden lg:block text-xs text-slate-500">Real-time Customer Experience Management</p>
+          <header className="h-14 sm:h-16 flex items-center justify-between bg-atlas-dark border-b border-atlas-dark px-3 sm:px-6">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <SidebarTrigger className="text-atlas-dark-foreground hover:bg-atlas-red/10 hover:text-atlas-red transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center" />
+              <div className="text-atlas-dark-foreground">
+                <span className="text-lg sm:text-xl lg:text-2xl font-bold tracking-wide">ATLAS</span>
+                <span className="hidden sm:inline ml-2 text-xs sm:text-sm text-atlas-dark-foreground/80">Guest Feedback Portal</span>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <PortalSwitcher />
               <NotificationBell />
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={signOut}
-                className="text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-all duration-200 min-h-[44px] px-4 rounded-lg"
+                className="text-atlas-dark-foreground hover:text-atlas-red hover:bg-atlas-red/10 p-2 min-h-[44px] min-w-[44px]"
               >
-                <LogOut className="h-4 w-4 mr-2" />
+                <LogOut className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Logout</span>
               </Button>
             </div>
           </header>
-          <main className="flex-1 overflow-auto bg-slate-50 p-2 sm:p-4 md:p-6">
+          <main className="flex-1 overflow-auto bg-background p-2 sm:p-4 md:p-6">
             {children}
             <FeedbackButton />
           </main>

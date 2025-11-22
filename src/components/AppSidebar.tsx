@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive, UserCheck, TrendingUp, Shield, Target, BookOpen, Mail, ChevronDown, LayoutGrid } from "lucide-react";
+import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive, UserCheck, TrendingUp, Shield, Target, BookOpen, Mail } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -8,12 +7,13 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 
 const guestFeedbackItems = [
   { title: "Accuracy", url: "/accuracy", icon: Target },
@@ -44,27 +44,15 @@ export function AppSidebar() {
   const currentPath = location.pathname;
   const isMobile = useIsMobile();
 
-  // Check if any route in a group is active to auto-expand
-  const isGuestFeedbackActive = guestFeedbackItems.some(item => currentPath === item.url);
-  const isExecutiveActive = executiveItems.some(item => currentPath === item.url);
-  const isSupportActive = supportItems.some(item => currentPath === item.url);
-  const isArchiveActive = currentPath === '/feedback-archive';
-  const isAdminActive = adminItems.some(item => currentPath === item.url);
-
-  const [guestFeedbackOpen, setGuestFeedbackOpen] = useState(true);
-  const [executiveOpen, setExecutiveOpen] = useState(true);
-  const [supportOpen, setSupportOpen] = useState(true);
-  const [archiveOpen, setArchiveOpen] = useState(true);
-  const [adminOpen, setAdminOpen] = useState(true);
-
   // Hide navigation on portal selection page
   if (currentPath === '/portal-selection') {
     return (
-      <Sidebar collapsible="icon" className="border-r border-slate-200 bg-slate-50">
-        <SidebarContent className="bg-slate-50">
+      <Sidebar collapsible="icon">
+        <SidebarContent>
           <SidebarGroup>
+            <SidebarGroupLabel>Portal Selection</SidebarGroupLabel>
             <SidebarGroupContent>
-              <div className="p-4 text-sm text-slate-600">
+              <div className="p-4 text-sm text-muted-foreground">
                 Select a portal to view navigation options
               </div>
             </SidebarGroupContent>
@@ -74,203 +62,105 @@ export function AppSidebar() {
     );
   }
 
-  const getNavCls = ({ isActive }: { isActive: boolean }) => {
-    const base = "transition-all duration-200 font-semibold";
-    return isActive 
-      ? `${base} text-slate-900 border-l-2 border-slate-300` 
-      : `${base} text-slate-700 hover:bg-slate-100/30`;
-  };
+  const isActive = (path: string) => currentPath === path;
+  const getNavCls = ({ isActive }: { isActive: boolean }) =>
+    isActive ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent/50";
 
   return (
-    <Sidebar 
-      collapsible="icon" 
-      className={`border-r border-slate-200 bg-slate-50 ${isMobile ? "mobile-safe-area" : ""}`}
+    <Sidebar
+      collapsible="icon"
+      className={isMobile ? "mobile-safe-area" : ""}
     >
-      <SidebarContent className={`pt-4 bg-slate-50 ${isMobile ? "mobile-scroll" : ""}`}>
+      <SidebarContent className={isMobile ? "mobile-scroll" : ""}>
         <SidebarGroup>
+          <SidebarGroupLabel>Guest Feedback</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-1">
-              
-              {/* Guest Feedback Group */}
-              <Collapsible open={guestFeedbackOpen || isGuestFeedbackActive} onOpenChange={setGuestFeedbackOpen} className="transition-all duration-300">
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton className="w-full justify-between hover:bg-slate-100/50 py-2 px-3">
-                      <div className="flex items-center gap-3">
-                        <LayoutGrid className="h-5 w-5 text-slate-700" />
-                        {state !== "collapsed" && <span className="font-bold text-base text-slate-700">Guest Feedback</span>}
-                      </div>
-                      {state !== "collapsed" && (
-                        <ChevronDown className={`h-4 w-4 text-slate-700 transition-transform duration-200 ${guestFeedbackOpen || isGuestFeedbackActive ? "" : "-rotate-90"}`} />
-                      )}
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
+            <SidebarMenu>
+              {guestFeedbackItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild className="mobile-touch-target">
+                    <NavLink to={item.url} end className={getNavCls}>
+                      <item.icon className={isMobile ? "h-5 w-5" : "mr-2 h-4 w-4"} />
+                      {!isMobile && state !== "collapsed" && <span>{item.title}</span>}
+                      {isMobile && <span className="ml-3">{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
-                
-                {state !== "collapsed" && (
-                  <CollapsibleContent>
-                    <SidebarMenu className="ml-2 mt-1 space-y-1">
-                      {guestFeedbackItems.map((item) => (
-                        <SidebarMenuItem key={item.title}>
-                          <SidebarMenuButton asChild className={`py-2 px-3 ${isMobile ? "mobile-touch-target" : ""}`}>
-                            <NavLink to={item.url} end className={getNavCls}>
-                              <item.icon className="mr-3 h-5 w-5 text-slate-700" />
-                              <span className="text-base">{item.title}</span>
-                            </NavLink>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      ))}
-                    </SidebarMenu>
-                  </CollapsibleContent>
-                )}
-              </Collapsible>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-              {/* Spacer */}
-          <div className="h-1" />
-
-              {/* Executive Group */}
-              <Collapsible open={executiveOpen || isExecutiveActive} onOpenChange={setExecutiveOpen} className="transition-all duration-300">
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton className="w-full justify-between hover:bg-slate-100/50 py-2 px-3">
-                      <div className="flex items-center gap-3">
-                        <Shield className="h-5 w-5 text-slate-700" />
-                        {state !== "collapsed" && <span className="font-bold text-base text-slate-700">Executive</span>}
-                      </div>
-                      {state !== "collapsed" && (
-                        <ChevronDown className={`h-4 w-4 text-slate-700 transition-transform duration-200 ${executiveOpen || isExecutiveActive ? "" : "-rotate-90"}`} />
-                      )}
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
+        <SidebarGroup>
+          <SidebarGroupLabel>Executive</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {executiveItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild className="mobile-touch-target">
+                    <NavLink to={item.url} end className={getNavCls}>
+                      <item.icon className={isMobile ? "h-5 w-5" : "mr-2 h-4 w-4"} />
+                      {!isMobile && state !== "collapsed" && <span>{item.title}</span>}
+                      {isMobile && <span className="ml-3">{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
-                
-                {state !== "collapsed" && (
-                  <CollapsibleContent>
-                    <SidebarMenu className="ml-2 mt-1 space-y-1">
-                      {executiveItems.map((item) => (
-                        <SidebarMenuItem key={item.title}>
-                          <SidebarMenuButton asChild className={`py-2 px-3 ${isMobile ? "mobile-touch-target" : ""}`}>
-                            <NavLink to={item.url} end className={getNavCls}>
-                              <item.icon className="mr-3 h-5 w-5 text-slate-700" />
-                              <span className="text-base">{item.title}</span>
-                            </NavLink>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      ))}
-                    </SidebarMenu>
-                  </CollapsibleContent>
-                )}
-              </Collapsible>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-              {/* Spacer */}
-          <div className="h-1" />
-
-              {/* Support Group */}
-              <Collapsible open={supportOpen || isSupportActive} onOpenChange={setSupportOpen} className="transition-all duration-300">
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton className="w-full justify-between hover:bg-slate-100/50 py-2 px-3">
-                      <div className="flex items-center gap-3">
-                        <BookOpen className="h-5 w-5 text-slate-700" />
-                        {state !== "collapsed" && <span className="font-bold text-base text-slate-700">Support</span>}
-                      </div>
-                      {state !== "collapsed" && (
-                        <ChevronDown className={`h-4 w-4 text-slate-700 transition-transform duration-200 ${supportOpen || isSupportActive ? "" : "-rotate-90"}`} />
-                      )}
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
+        <SidebarGroup>
+          <SidebarGroupLabel>Support</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {supportItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild className="mobile-touch-target">
+                    <NavLink to={item.url} end className={getNavCls}>
+                      <item.icon className={isMobile ? "h-5 w-5" : "mr-2 h-4 w-4"} />
+                      {!isMobile && state !== "collapsed" && <span>{item.title}</span>}
+                      {isMobile && <span className="ml-3">{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
-                
-                {state !== "collapsed" && (
-                  <CollapsibleContent>
-                    <SidebarMenu className="ml-2 mt-1 space-y-1">
-                      {supportItems.map((item) => (
-                        <SidebarMenuItem key={item.title}>
-                          <SidebarMenuButton asChild className={`py-2 px-3 ${isMobile ? "mobile-touch-target" : ""}`}>
-                            <NavLink to={item.url} end className={getNavCls}>
-                              <item.icon className="mr-3 h-5 w-5 text-slate-700" />
-                              <span className="text-base">{item.title}</span>
-                            </NavLink>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      ))}
-                    </SidebarMenu>
-                  </CollapsibleContent>
-                )}
-              </Collapsible>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-              {/* Spacer */}
-          <div className="h-1" />
+        <SidebarGroup>
+          <SidebarGroupLabel>Archive</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild className="mobile-touch-target">
+                  <NavLink to="/feedback-archive" end className={getNavCls}>
+                    <Archive className={isMobile ? "h-5 w-5" : "mr-2 h-4 w-4"} />
+                    {!isMobile && state !== "collapsed" && <span>Feedback Archive</span>}
+                    {isMobile && <span className="ml-3">Feedback Archive</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-              {/* Archive Group */}
-              <Collapsible open={archiveOpen || isArchiveActive} onOpenChange={setArchiveOpen} className="transition-all duration-300">
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton className="w-full justify-between hover:bg-slate-100/50 py-2 px-3">
-                      <div className="flex items-center gap-3">
-                        <Archive className="h-5 w-5 text-slate-700" />
-                        {state !== "collapsed" && <span className="font-bold text-base text-slate-700">Archive</span>}
-                      </div>
-                      {state !== "collapsed" && (
-                        <ChevronDown className={`h-4 w-4 text-slate-700 transition-transform duration-200 ${archiveOpen || isArchiveActive ? "" : "-rotate-90"}`} />
-                      )}
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
+        <SidebarGroup>
+          <SidebarGroupLabel>Administration</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {adminItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild className="mobile-touch-target">
+                    <NavLink to={item.url} end className={getNavCls}>
+                      <item.icon className={isMobile ? "h-5 w-5" : "mr-2 h-4 w-4"} />
+                      {!isMobile && state !== "collapsed" && <span>{item.title}</span>}
+                      {isMobile && <span className="ml-3">{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
-                
-                {state !== "collapsed" && (
-                  <CollapsibleContent>
-                    <SidebarMenu className="ml-2 mt-1 space-y-1">
-                      <SidebarMenuItem>
-                        <SidebarMenuButton asChild className={`py-2 px-3 ${isMobile ? "mobile-touch-target" : ""}`}>
-                          <NavLink to="/feedback-archive" end className={getNavCls}>
-                            <Archive className="mr-3 h-5 w-5 text-slate-700" />
-                            <span className="text-base">Feedback Archive</span>
-                          </NavLink>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    </SidebarMenu>
-                  </CollapsibleContent>
-                )}
-              </Collapsible>
-
-              {/* Spacer */}
-              <div className="h-1" />
-
-              {/* Administration Group */}
-              <Collapsible open={adminOpen || isAdminActive} onOpenChange={setAdminOpen} className="transition-all duration-300">
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton className="w-full justify-between hover:bg-slate-100/50 py-2 px-3">
-                      <div className="flex items-center gap-3">
-                        <Settings className="h-5 w-5 text-slate-700" />
-                        {state !== "collapsed" && <span className="font-bold text-base text-slate-700">Administration</span>}
-                      </div>
-                      {state !== "collapsed" && (
-                        <ChevronDown className={`h-4 w-4 text-slate-700 transition-transform duration-200 ${adminOpen || isAdminActive ? "" : "-rotate-90"}`} />
-                      )}
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                </SidebarMenuItem>
-                
-                {state !== "collapsed" && (
-                  <CollapsibleContent>
-                    <SidebarMenu className="ml-2 mt-1 space-y-1">
-                      {adminItems.map((item) => (
-                        <SidebarMenuItem key={item.title}>
-                          <SidebarMenuButton asChild className={`py-2 px-3 ${isMobile ? "mobile-touch-target" : ""}`}>
-                            <NavLink to={item.url} end className={getNavCls}>
-                              <item.icon className="mr-3 h-5 w-5 text-slate-700" />
-                              <span className="text-base">{item.title}</span>
-                            </NavLink>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      ))}
-                    </SidebarMenu>
-                  </CollapsibleContent>
-                )}
-              </Collapsible>
-
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
