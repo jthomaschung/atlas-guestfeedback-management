@@ -107,6 +107,7 @@ export function AppSidebar() {
     <Sidebar
       collapsible="icon"
       className={`border-r border-sidebar-border bg-sidebar-background ${isMobile ? "mobile-safe-area" : ""}`}
+      style={{ "--sidebar-width": "240px", "--sidebar-width-icon": "72px" } as React.CSSProperties}
     >
       <SidebarContent className={`pt-4 ${isMobile ? "mobile-scroll" : ""}`}>
         {/* Guest Feedback - Collapsible Group */}
@@ -115,7 +116,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={guestFeedbackOpen} onOpenChange={setGuestFeedbackOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between hover:bg-sidebar-hover py-3 px-4">
+                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-3 px-4 shadow-sm transition-all duration-200">
                     <div className="flex items-center gap-3">
                       <MessageSquare className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
@@ -154,7 +155,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={executiveOpen} onOpenChange={setExecutiveOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between hover:bg-sidebar-hover py-3 px-4">
+                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-3 px-4 shadow-sm transition-all duration-200">
                     <div className="flex items-center gap-3">
                       <Shield className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
@@ -193,7 +194,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={supportOpen} onOpenChange={setSupportOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between hover:bg-sidebar-hover py-3 px-4">
+                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-3 px-4 shadow-sm transition-all duration-200">
                     <div className="flex items-center gap-3">
                       <BookOpen className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
@@ -232,7 +233,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={archiveOpen} onOpenChange={setArchiveOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between hover:bg-sidebar-hover py-3 px-4">
+                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-3 px-4 shadow-sm transition-all duration-200">
                     <div className="flex items-center gap-3">
                       <Archive className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
@@ -271,7 +272,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={adminOpen} onOpenChange={setAdminOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between hover:bg-sidebar-hover py-3 px-4">
+                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-3 px-4 shadow-sm transition-all duration-200">
                     <div className="flex items-center gap-3">
                       <Settings className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
