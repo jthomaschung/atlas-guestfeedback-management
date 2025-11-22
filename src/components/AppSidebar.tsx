@@ -120,7 +120,7 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3">
                       <MessageSquare className="h-5 w-5 text-muted-foreground" />
                       {state === "expanded" && (
-                        <span className="font-bold text-sm text-sidebar-foreground">Guest Feedback</span>
+                        <span className="font-semibold text-base text-sidebar-foreground">Guest Feedback</span>
                       )}
                     </div>
                     {state === "expanded" && (
@@ -136,7 +136,7 @@ export function AppSidebar() {
                           <SidebarMenuButton asChild className="py-2 px-3">
                             <NavLink to={item.url} end className={getNavCls}>
                               <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
-                              {state === "expanded" && <span className="text-sm text-muted-foreground">{item.title}</span>}
+                              {state === "expanded" && <span className="text-base text-muted-foreground">{item.title}</span>}
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -161,7 +161,7 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3">
                       <Shield className="h-5 w-5 text-muted-foreground" />
                       {state === "expanded" && (
-                        <span className="font-bold text-sm text-sidebar-foreground">Executive</span>
+                        <span className="font-semibold text-base text-sidebar-foreground">Executive</span>
                       )}
                     </div>
                     {state === "expanded" && (
@@ -177,7 +177,7 @@ export function AppSidebar() {
                           <SidebarMenuButton asChild className="py-2 px-3">
                             <NavLink to={item.url} end className={getNavCls}>
                               <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
-                              {state === "expanded" && <span className="text-sm text-muted-foreground">{item.title}</span>}
+                              {state === "expanded" && <span className="text-base text-muted-foreground">{item.title}</span>}
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -202,7 +202,7 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3">
                       <BookOpen className="h-5 w-5 text-muted-foreground" />
                       {state === "expanded" && (
-                        <span className="font-bold text-sm text-sidebar-foreground">Support</span>
+                        <span className="font-semibold text-base text-sidebar-foreground">Support</span>
                       )}
                     </div>
                     {state === "expanded" && (
@@ -218,7 +218,7 @@ export function AppSidebar() {
                           <SidebarMenuButton asChild className="py-2 px-3">
                             <NavLink to={item.url} end className={getNavCls}>
                               <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
-                              {state === "expanded" && <span className="text-sm text-muted-foreground">{item.title}</span>}
+                              {state === "expanded" && <span className="text-base text-muted-foreground">{item.title}</span>}
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -243,7 +243,7 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3">
                       <Archive className="h-5 w-5 text-muted-foreground" />
                       {state === "expanded" && (
-                        <span className="font-bold text-sm text-sidebar-foreground">Archive</span>
+                        <span className="font-semibold text-base text-sidebar-foreground">Archive</span>
                       )}
                     </div>
                     {state === "expanded" && (
@@ -259,7 +259,7 @@ export function AppSidebar() {
                           <SidebarMenuButton asChild className="py-2 px-3">
                             <NavLink to={item.url} end className={getNavCls}>
                               <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
-                              {state === "expanded" && <span className="text-sm text-muted-foreground">{item.title}</span>}
+                              {state === "expanded" && <span className="text-base text-muted-foreground">{item.title}</span>}
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -284,7 +284,7 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3">
                       <Settings className="h-5 w-5 text-muted-foreground" />
                       {state === "expanded" && (
-                        <span className="font-bold text-sm text-sidebar-foreground">Administration</span>
+                        <span className="font-semibold text-base text-sidebar-foreground">Administration</span>
                       )}
                     </div>
                     {state === "expanded" && (
@@ -300,7 +300,7 @@ export function AppSidebar() {
                           <SidebarMenuButton asChild className="py-2 px-3">
                             <NavLink to={item.url} end className={getNavCls}>
                               <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
-                              {state === "expanded" && <span className="text-sm text-muted-foreground">{item.title}</span>}
+                              {state === "expanded" && <span className="text-base text-muted-foreground">{item.title}</span>}
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
