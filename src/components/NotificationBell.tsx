@@ -143,9 +143,9 @@ export function NotificationBell() {
         <Button 
           variant="ghost" 
           size="icon"
-          className="relative hover:bg-atlas-red/10 hover:text-atlas-red transition-colors sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center"
+          className="relative text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-accent-foreground transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg"
         >
-          <Bell className="h-5 w-5 text-atlas-dark-foreground" />
+          <Bell className="h-4 w-4" />
           {count.total > 0 && (
             <Badge 
               variant="destructive" 

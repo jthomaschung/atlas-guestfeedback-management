@@ -139,7 +139,7 @@ export function PortalSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="gap-2 text-atlas-dark-foreground hover:bg-atlas-red/10 hover:text-atlas-red">
+        <Button variant="ghost" className="gap-2 text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-accent-foreground transition-all duration-200 min-h-[44px] px-4 rounded-lg">
           <CurrentIcon className="h-4 w-4" />
           <span className="hidden sm:inline">{currentPortal?.title}</span>
           <ChevronDown className="h-4 w-4" />
