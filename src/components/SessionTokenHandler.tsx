@@ -3,23 +3,25 @@ import { extractTokensFromUrl, authenticateWithTokens, cleanUrlFromTokens, hasAu
 import { useAuth } from '@/hooks/useAuth';
 
 export function SessionTokenHandler() {
-  const { user, isProcessingTokens, setIsProcessingTokens } = useAuth();
+  const { user, isProcessingTokens, setIsProcessingTokens, setIsSessionReady } = useAuth();
 
   // Synchronously detect tokens on mount
   const [hasDetectedTokens] = useState(() => hasAuthTokensInUrl());
 
-  // Clear processing flag once user is authenticated
+  // Clear processing flag and set session ready once user is authenticated
   useEffect(() => {
     if (isProcessingTokens && user) {
-      console.log('GUESTFEEDBACK SessionTokenHandler: Auth state updated, clearing processing flag');
+      console.log('GUESTFEEDBACK SessionTokenHandler: Auth state updated, clearing processing flag and setting session ready');
       setIsProcessingTokens(false);
+      setIsSessionReady(true);
     }
-  }, [user, isProcessingTokens, setIsProcessingTokens]);
+  }, [user, isProcessingTokens, setIsProcessingTokens, setIsSessionReady]);
 
   useEffect(() => {
-    // If tokens detected and no user, set processing flag immediately (synchronously)
+    // If tokens detected and no user, set processing flag and session not ready immediately (synchronously)
     if (hasDetectedTokens && !user) {
       setIsProcessingTokens(true);
+      setIsSessionReady(false);
     }
 
     const handleIncomingTokens = async () => {
@@ -36,6 +38,7 @@ export function SessionTokenHandler() {
         
         if (tokens) {
           setIsProcessingTokens(true);
+          setIsSessionReady(false);
           console.log('GUESTFEEDBACK SessionTokenHandler: Processing incoming session tokens...', {
             hasAccessToken: !!tokens.accessToken,
             hasRefreshToken: !!tokens.refreshToken,
@@ -49,12 +52,13 @@ export function SessionTokenHandler() {
             console.log('GUESTFEEDBACK SessionTokenHandler: Session authenticated and verified in database');
             // Clean the URL after successful authentication
             cleanUrlFromTokens();
-            // Don't clear isProcessingTokens here - let the useEffect handle it when user state updates
+            // Don't clear isProcessingTokens or set isSessionReady here - let the useEffect handle it when user state updates
           } else {
             console.error('GUESTFEEDBACK SessionTokenHandler: Session verification failed');
             // Still clean the URL even if authentication failed
             cleanUrlFromTokens();
-            setIsProcessingTokens(false);  // Only clear on failure
+            setIsProcessingTokens(false);
+            setIsSessionReady(true);  // Reset on failure
           }
         }
       } else if (hasAuthTokensInUrl()) {
