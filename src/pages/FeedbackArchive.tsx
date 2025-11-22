@@ -14,7 +14,7 @@ import { useUserPermissions } from '@/hooks/useUserPermissions';
 import { Loader2, Archive, Download } from 'lucide-react';
 
 export default function FeedbackArchive() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { toast } = useToast();
   const { permissions } = useUserPermissions();
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
@@ -206,24 +206,42 @@ export default function FeedbackArchive() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Archive className="h-8 w-8" />
-            Feedback Archive
-          </h1>
+      <div className="space-y-6">
+        {/* Welcome Section */}
+        <div className="mb-4">
+          <h2 className="text-3xl sm:text-4xl font-semibold text-foreground">
+            Welcome, {profile?.first_name} {profile?.last_name}!
+          </h2>
           <p className="text-muted-foreground mt-1">
-            Browse and manage resolved feedback cases
+            {permissions.isAdmin 
+              ? "Administrator Access - All Markets & Stores"
+              : permissions.isDirectorOrAbove
+              ? `${permissions.role} Access - ${permissions.markets.length > 0 ? permissions.markets.join(', ') : 'All Markets'}`
+              : `Store Access - ${permissions.stores.length > 0 ? permissions.stores.join(', ') : 'Limited Access'}`
+            }
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button onClick={exportToCSV} variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export CSV
-          </Button>
-          <Badge variant="secondary" className="text-sm">
-            {filteredFeedbacks.length} Resolved Cases
-          </Badge>
+
+        {/* Feedback Archive Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight flex items-center gap-2">
+              <Archive className="h-8 w-8" />
+              Feedback Archive
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Browse and manage resolved feedback cases
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button onClick={exportToCSV} variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </Button>
+            <Badge variant="secondary" className="text-sm">
+              {filteredFeedbacks.length} Resolved Cases
+            </Badge>
+          </div>
         </div>
       </div>
 
