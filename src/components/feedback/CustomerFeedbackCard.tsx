@@ -254,7 +254,7 @@ export function CustomerFeedbackCard({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute -right-1 -top-1 h-6 w-6 p-0 opacity-0 group-hover/feedback:opacity-100 transition-opacity"
+                    className="absolute -right-1 -top-1 h-6 w-6 p-0 opacity-0 group-hover/feedback:opacity-100 transition-opacity min-h-[44px] min-w-[44px] md:min-h-[32px] md:min-w-[32px]"
                     onClick={(e) => {
                       e.stopPropagation();
                       setIsEditingFeedback(true);
@@ -284,7 +284,7 @@ export function CustomerFeedbackCard({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 opacity-60 sm:opacity-0 group-hover:opacity-100 transition-opacity"
+              className="h-8 w-8 p-0 opacity-60 sm:opacity-0 group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px] md:min-h-[32px] md:min-w-[32px]"
               onClick={(e) => {
                 e.stopPropagation();
                 onViewDetails(feedback);
@@ -297,7 +297,7 @@ export function CustomerFeedbackCard({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0 opacity-60 sm:opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive"
+                className="h-8 w-8 p-0 opacity-60 sm:opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive min-h-[44px] min-w-[44px] md:min-h-[32px] md:min-w-[32px]"
                 onClick={(e) => {
                   e.stopPropagation();
                   onDelete(feedback);
