@@ -109,14 +109,14 @@ export function AppSidebar() {
       className={`border-r border-sidebar-border bg-sidebar-background ${isMobile ? "mobile-safe-area" : ""}`}
       style={{ "--sidebar-width": "240px", "--sidebar-width-icon": "72px" } as React.CSSProperties}
     >
-      <SidebarContent className={`pt-4 ${isMobile ? "mobile-scroll" : ""}`}>
+      <SidebarContent className={`pt-3 ${isMobile ? "mobile-scroll" : ""}`}>
         {/* Guest Feedback - Collapsible Group */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               <Collapsible open={guestFeedbackOpen} onOpenChange={setGuestFeedbackOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-3 px-4 shadow-sm transition-all duration-200">
+                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-2.5 px-3 shadow-sm transition-all duration-200">
                     <div className="flex items-center gap-3">
                       <MessageSquare className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
@@ -129,10 +129,10 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <SidebarMenu className="ml-8 mt-1 space-y-0.5">
+                  <SidebarMenu className="ml-4 mt-0.5 space-y-0">
                     {guestFeedbackItems.map((item) => (
                       <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild className="py-2.5 px-4">
+                        <SidebarMenuButton asChild className="py-2 px-3">
                           <NavLink to={item.url} end className={getNavCls}>
                             <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
                             {state !== "collapsed" && <span className="text-sm text-muted-foreground">{item.title}</span>}
@@ -147,7 +147,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <div className="h-4" />
+        <div className="h-2" />
 
         {/* Executive - Collapsible Group */}
         <SidebarGroup>
@@ -155,7 +155,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={executiveOpen} onOpenChange={setExecutiveOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-3 px-4 shadow-sm transition-all duration-200">
+                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-2.5 px-3 shadow-sm transition-all duration-200">
                     <div className="flex items-center gap-3">
                       <Shield className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
@@ -168,10 +168,10 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <SidebarMenu className="ml-8 mt-1 space-y-0.5">
+                  <SidebarMenu className="ml-4 mt-0.5 space-y-0">
                     {executiveItems.map((item) => (
                       <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild className="py-2.5 px-4">
+                        <SidebarMenuButton asChild className="py-2 px-3">
                           <NavLink to={item.url} end className={getNavCls}>
                             <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
                             {state !== "collapsed" && <span className="text-sm text-muted-foreground">{item.title}</span>}
@@ -194,7 +194,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={supportOpen} onOpenChange={setSupportOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-3 px-4 shadow-sm transition-all duration-200">
+                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-2.5 px-3 shadow-sm transition-all duration-200">
                     <div className="flex items-center gap-3">
                       <BookOpen className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
@@ -207,10 +207,10 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <SidebarMenu className="ml-8 mt-1 space-y-0.5">
+                  <SidebarMenu className="ml-4 mt-0.5 space-y-0">
                     {supportItems.map((item) => (
                       <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild className="py-2.5 px-4">
+                        <SidebarMenuButton asChild className="py-2 px-3">
                           <NavLink to={item.url} end className={getNavCls}>
                             <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
                             {state !== "collapsed" && <span className="text-sm text-muted-foreground">{item.title}</span>}
@@ -233,7 +233,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={archiveOpen} onOpenChange={setArchiveOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-3 px-4 shadow-sm transition-all duration-200">
+                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-2.5 px-3 shadow-sm transition-all duration-200">
                     <div className="flex items-center gap-3">
                       <Archive className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
@@ -246,10 +246,10 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <SidebarMenu className="ml-8 mt-1 space-y-0.5">
+                  <SidebarMenu className="ml-4 mt-0.5 space-y-0">
                     {archiveItems.map((item) => (
                       <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild className="py-2.5 px-4">
+                        <SidebarMenuButton asChild className="py-2 px-3">
                           <NavLink to={item.url} end className={getNavCls}>
                             <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
                             {state !== "collapsed" && <span className="text-sm text-muted-foreground">{item.title}</span>}
@@ -272,7 +272,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={adminOpen} onOpenChange={setAdminOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-3 px-4 shadow-sm transition-all duration-200">
+                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-2.5 px-3 shadow-sm transition-all duration-200">
                     <div className="flex items-center gap-3">
                       <Settings className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
@@ -285,10 +285,10 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <SidebarMenu className="ml-8 mt-1 space-y-0.5">
+                  <SidebarMenu className="ml-4 mt-0.5 space-y-0">
                     {adminItems.map((item) => (
                       <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild className="py-2.5 px-4">
+                        <SidebarMenuButton asChild className="py-2 px-3">
                           <NavLink to={item.url} end className={getNavCls}>
                             <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
                             {state !== "collapsed" && <span className="text-sm text-muted-foreground">{item.title}</span>}
