@@ -120,7 +120,7 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3">
                       <MessageSquare className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
-                        <span className="font-semibold text-base text-sidebar-foreground">Guest Feedback</span>
+                        <span className="font-semibold text-sm text-sidebar-foreground">Guest Feedback</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
@@ -135,7 +135,7 @@ export function AppSidebar() {
                         <SidebarMenuButton asChild className="py-2.5 px-4">
                           <NavLink to={item.url} end className={getNavCls}>
                             <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
-                            {state !== "collapsed" && <span className="text-base text-muted-foreground">{item.title}</span>}
+                            {state !== "collapsed" && <span className="text-sm text-muted-foreground">{item.title}</span>}
                           </NavLink>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
@@ -159,7 +159,7 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3">
                       <Shield className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
-                        <span className="font-semibold text-base text-sidebar-foreground">Executive</span>
+                        <span className="font-semibold text-sm text-sidebar-foreground">Executive</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
@@ -174,7 +174,7 @@ export function AppSidebar() {
                         <SidebarMenuButton asChild className="py-2.5 px-4">
                           <NavLink to={item.url} end className={getNavCls}>
                             <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
-                            {state !== "collapsed" && <span className="text-base text-muted-foreground">{item.title}</span>}
+                            {state !== "collapsed" && <span className="text-sm text-muted-foreground">{item.title}</span>}
                           </NavLink>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
@@ -198,7 +198,7 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3">
                       <BookOpen className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
-                        <span className="font-semibold text-base text-sidebar-foreground">Support</span>
+                        <span className="font-semibold text-sm text-sidebar-foreground">Support</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
@@ -213,7 +213,7 @@ export function AppSidebar() {
                         <SidebarMenuButton asChild className="py-2.5 px-4">
                           <NavLink to={item.url} end className={getNavCls}>
                             <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
-                            {state !== "collapsed" && <span className="text-base text-muted-foreground">{item.title}</span>}
+                            {state !== "collapsed" && <span className="text-sm text-muted-foreground">{item.title}</span>}
                           </NavLink>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
@@ -237,7 +237,7 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3">
                       <Archive className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
-                        <span className="font-semibold text-base text-sidebar-foreground">Archive</span>
+                        <span className="font-semibold text-sm text-sidebar-foreground">Archive</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
@@ -252,7 +252,7 @@ export function AppSidebar() {
                         <SidebarMenuButton asChild className="py-2.5 px-4">
                           <NavLink to={item.url} end className={getNavCls}>
                             <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
-                            {state !== "collapsed" && <span className="text-base text-muted-foreground">{item.title}</span>}
+                            {state !== "collapsed" && <span className="text-sm text-muted-foreground">{item.title}</span>}
                           </NavLink>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
@@ -276,7 +276,7 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3">
                       <Settings className="h-6 w-6 text-muted-foreground" />
                       {state !== "collapsed" && (
-                        <span className="font-semibold text-base text-sidebar-foreground">Administration</span>
+                        <span className="font-semibold text-sm text-sidebar-foreground">Administration</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
@@ -291,7 +291,7 @@ export function AppSidebar() {
                         <SidebarMenuButton asChild className="py-2.5 px-4">
                           <NavLink to={item.url} end className={getNavCls}>
                             <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
-                            {state !== "collapsed" && <span className="text-base text-muted-foreground">{item.title}</span>}
+                            {state !== "collapsed" && <span className="text-sm text-muted-foreground">{item.title}</span>}
                           </NavLink>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
