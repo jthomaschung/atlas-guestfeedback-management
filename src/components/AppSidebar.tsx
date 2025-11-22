@@ -116,9 +116,9 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={guestFeedbackOpen} onOpenChange={setGuestFeedbackOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-2.5 px-3 shadow-sm transition-all duration-200">
+                  <SidebarMenuButton className={`w-full ${state === "expanded" ? "justify-between" : "justify-center"} bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-2.5 px-3 shadow-sm transition-all duration-200`}>
                     <div className="flex items-center gap-3">
-                      <MessageSquare className="h-6 w-6 text-muted-foreground" />
+                      <MessageSquare className="h-5 w-5 text-muted-foreground" />
                       {state === "expanded" && (
                         <span className="font-bold text-sm text-sidebar-foreground">Guest Feedback</span>
                       )}
@@ -157,9 +157,9 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={executiveOpen} onOpenChange={setExecutiveOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-2.5 px-3 shadow-sm transition-all duration-200">
+                  <SidebarMenuButton className={`w-full ${state === "expanded" ? "justify-between" : "justify-center"} bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-2.5 px-3 shadow-sm transition-all duration-200`}>
                     <div className="flex items-center gap-3">
-                      <Shield className="h-6 w-6 text-muted-foreground" />
+                      <Shield className="h-5 w-5 text-muted-foreground" />
                       {state === "expanded" && (
                         <span className="font-bold text-sm text-sidebar-foreground">Executive</span>
                       )}
@@ -198,9 +198,9 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={supportOpen} onOpenChange={setSupportOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-2.5 px-3 shadow-sm transition-all duration-200">
+                  <SidebarMenuButton className={`w-full ${state === "expanded" ? "justify-between" : "justify-center"} bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-2.5 px-3 shadow-sm transition-all duration-200`}>
                     <div className="flex items-center gap-3">
-                      <BookOpen className="h-6 w-6 text-muted-foreground" />
+                      <BookOpen className="h-5 w-5 text-muted-foreground" />
                       {state === "expanded" && (
                         <span className="font-bold text-sm text-sidebar-foreground">Support</span>
                       )}
@@ -239,9 +239,9 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={archiveOpen} onOpenChange={setArchiveOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-2.5 px-3 shadow-sm transition-all duration-200">
+                  <SidebarMenuButton className={`w-full ${state === "expanded" ? "justify-between" : "justify-center"} bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-2.5 px-3 shadow-sm transition-all duration-200`}>
                     <div className="flex items-center gap-3">
-                      <Archive className="h-6 w-6 text-muted-foreground" />
+                      <Archive className="h-5 w-5 text-muted-foreground" />
                       {state === "expanded" && (
                         <span className="font-bold text-sm text-sidebar-foreground">Archive</span>
                       )}
@@ -280,9 +280,9 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={adminOpen} onOpenChange={setAdminOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-2.5 px-3 shadow-sm transition-all duration-200">
+                  <SidebarMenuButton className={`w-full ${state === "expanded" ? "justify-between" : "justify-center"} bg-sidebar-accent hover:bg-sidebar-hover rounded-xl py-2.5 px-3 shadow-sm transition-all duration-200`}>
                     <div className="flex items-center gap-3">
-                      <Settings className="h-6 w-6 text-muted-foreground" />
+                      <Settings className="h-5 w-5 text-muted-foreground" />
                       {state === "expanded" && (
                         <span className="font-bold text-sm text-sidebar-foreground">Administration</span>
                       )}
