@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { CustomerFeedback } from '@/types/feedback';
 import { CustomerFeedbackTable } from '@/components/feedback/CustomerFeedbackTable';
@@ -22,12 +22,31 @@ export default function FeedbackArchive() {
   const [loading, setLoading] = useState(true);
   const [selectedFeedback, setSelectedFeedback] = useState<CustomerFeedback | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     if (user?.email) {
       loadArchivedFeedback();
     }
   }, [user?.email]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+        setIsHeaderVisible(false);
+      } else {
+        setIsHeaderVisible(true);
+      }
+      
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const loadArchivedFeedback = async () => {
     try {
@@ -208,7 +227,7 @@ export default function FeedbackArchive() {
     <div className="space-y-6">
       <div className="space-y-6">
         {/* User Info */}
-        <div className="mb-2">
+        <div className={`mb-2 transition-all duration-300 ${isHeaderVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 h-0 overflow-hidden'}`}>
           <p className="text-sm text-foreground">
             Welcome, {profile?.first_name} {profile?.last_name}
           </p>
@@ -223,7 +242,7 @@ export default function FeedbackArchive() {
         </div>
 
         {/* Feedback Archive Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all duration-300 ${isHeaderVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 h-0 overflow-hidden'}`}>
           <div>
             <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight flex items-center gap-2">
               <Archive className="h-8 w-8" />
