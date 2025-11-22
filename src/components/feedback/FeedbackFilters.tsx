@@ -165,27 +165,27 @@ export function FeedbackFilters({
   };
 
   return (
-    <Card className="p-4 space-y-4">
+    <Card className="p-3 md:p-4 space-y-3 md:space-y-4">
       {/* Search and Toggle */}
-      <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5 md:h-4 md:w-4" />
           <Input
             placeholder="Search feedback, customer name, case number..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10"
+            className="pl-10 md:pl-10"
           />
         </div>
         
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center flex-wrap">
           <Button
             variant="outline"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 flex-1 sm:flex-none min-h-[48px] md:min-h-[40px]"
           >
-            <Filter className="h-4 w-4" />
-            Filters
+            <Filter className="h-5 w-5 md:h-4 md:w-4" />
+            <span>Filters</span>
             {activeFiltersCount > 0 && (
               <Badge variant="secondary" className="ml-1">
                 {activeFiltersCount}
@@ -195,20 +195,21 @@ export function FeedbackFilters({
           </Button>
           
           {activeFiltersCount > 0 && (
-            <Button variant="ghost" size="sm" onClick={onClearAllFilters}>
-              <X className="h-4 w-4 mr-1" />
-              Clear
+            <Button variant="ghost" size="sm" onClick={onClearAllFilters} className="min-h-[48px] md:min-h-[36px]">
+              <X className="h-5 w-5 md:h-4 md:w-4 mr-1" />
+              <span>Clear</span>
             </Button>
           )}
         </div>
       </div>
 
       {/* Sort Order */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         <Button
           variant={sortOrder === 'newest' ? 'default' : 'outline'}
           size="sm"
           onClick={() => onSortOrderChange('newest')}
+          className="flex-1 sm:flex-none"
         >
           Newest First
         </Button>
@@ -216,6 +217,7 @@ export function FeedbackFilters({
           variant={sortOrder === 'oldest' ? 'default' : 'outline'}
           size="sm"
           onClick={() => onSortOrderChange('oldest')}
+          className="flex-1 sm:flex-none"
         >
           Oldest First
         </Button>
@@ -223,7 +225,7 @@ export function FeedbackFilters({
 
       {/* Expanded Filters */}
       {isExpanded && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 pt-3 md:pt-4 border-t">
           {/* Status Filter */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
