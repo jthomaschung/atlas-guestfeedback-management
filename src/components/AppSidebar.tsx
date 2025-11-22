@@ -125,13 +125,13 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={statusOpen} onOpenChange={setStatusOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent/50 hover:bg-sidebar-accent rounded-xl py-3 px-4">
+                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-accent/80 rounded-xl py-3 px-4">
                     <div className="flex items-center gap-3">
-                      <div className="bg-sidebar-active p-2 rounded-lg shadow-sm">
+                      <div className="bg-white/80 p-2 rounded-lg shadow-sm">
                         <LayoutGrid className="h-5 w-5 text-sidebar-foreground" />
                       </div>
                       {state !== "collapsed" && (
-                        <span className="font-semibold text-base text-sidebar-accent-foreground">Status</span>
+                        <span className="font-bold text-base text-sidebar-foreground">Status</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
@@ -166,13 +166,13 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={reportsOpen} onOpenChange={setReportsOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent/50 hover:bg-sidebar-accent rounded-xl py-3 px-4">
+                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-accent/80 rounded-xl py-3 px-4">
                     <div className="flex items-center gap-3">
-                      <div className="bg-sidebar-active p-2 rounded-lg shadow-sm">
+                      <div className="bg-white/80 p-2 rounded-lg shadow-sm">
                         <FileText className="h-5 w-5 text-sidebar-foreground" />
                       </div>
                       {state !== "collapsed" && (
-                        <span className="font-semibold text-base text-sidebar-accent-foreground">Reports</span>
+                        <span className="font-bold text-base text-sidebar-foreground">Reports</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
@@ -207,13 +207,13 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible open={adminOpen} onOpenChange={setAdminOpen}>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent/50 hover:bg-sidebar-accent rounded-xl py-3 px-4">
+                  <SidebarMenuButton className="w-full justify-between bg-sidebar-accent hover:bg-sidebar-accent/80 rounded-xl py-3 px-4">
                     <div className="flex items-center gap-3">
-                      <div className="bg-sidebar-active p-2 rounded-lg shadow-sm">
+                      <div className="bg-white/80 p-2 rounded-lg shadow-sm">
                         <Settings className="h-5 w-5 text-sidebar-foreground" />
                       </div>
                       {state !== "collapsed" && (
-                        <span className="font-semibold text-base text-sidebar-accent-foreground">Administration</span>
+                        <span className="font-bold text-base text-sidebar-foreground">Administration</span>
                       )}
                     </div>
                     {state !== "collapsed" && (
