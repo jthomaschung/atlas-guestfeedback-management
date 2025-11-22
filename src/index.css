@@ -80,15 +80,17 @@ All colors MUST be HSL.
     /* Custom shadows */
     --shadow-yellow: 0 10px 25px -5px hsl(48 100% 80% / 0.4), 0 4px 6px -2px hsl(48 100% 80% / 0.2);
 
-    /* Atlas Sidebar - Dark Theme */
-    --sidebar-background: 210 15% 12%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 0 85% 45%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 210 15% 18%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 210 15% 18%;
-    --sidebar-ring: 0 85% 45%;
+    /* Atlas Sidebar - Light Theme */
+    --sidebar-background: 210 15% 97%;
+    --sidebar-foreground: 210 15% 25%;
+    --sidebar-primary: 210 100% 50%;
+    --sidebar-primary-foreground: 210 15% 100%;
+    --sidebar-accent: 210 15% 90%;
+    --sidebar-accent-foreground: 210 15% 15%;
+    --sidebar-border: 210 15% 85%;
+    --sidebar-ring: 210 100% 50%;
+    --sidebar-active: 210 15% 90%;
+    --sidebar-hover: 210 15% 93%;
   }
 
   .dark {
@@ -122,14 +124,16 @@ All colors MUST be HSL.
     --ring: 0 85% 50%;
 
     /* Atlas Dark Sidebar */
-    --sidebar-background: 210 15% 5%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 0 85% 50%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 210 15% 12%;
-    --sidebar-accent-foreground: 0 0% 90%;
-    --sidebar-border: 210 15% 12%;
-    --sidebar-ring: 0 85% 50%;
+    --sidebar-background: 210 15% 10%;
+    --sidebar-foreground: 210 15% 85%;
+    --sidebar-primary: 210 100% 50%;
+    --sidebar-primary-foreground: 210 15% 100%;
+    --sidebar-accent: 210 15% 15%;
+    --sidebar-accent-foreground: 210 15% 90%;
+    --sidebar-border: 210 15% 18%;
+    --sidebar-ring: 210 100% 50%;
+    --sidebar-active: 210 15% 18%;
+    --sidebar-hover: 210 15% 15%;
   }
 }
 
