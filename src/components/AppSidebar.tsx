@@ -107,7 +107,7 @@ export function AppSidebar() {
     <Sidebar
       collapsible="icon"
       className={`border-r border-sidebar-border bg-sidebar-background ${isMobile ? "mobile-safe-area" : ""}`}
-      style={{ "--sidebar-width": "240px", "--sidebar-width-icon": "72px" } as React.CSSProperties}
+      style={{ "--sidebar-width": "240px", "--sidebar-width-icon": "48px" } as React.CSSProperties}
     >
       <SidebarContent className={`pt-3 ${isMobile ? "mobile-scroll" : ""}`}>
         {/* Guest Feedback - Collapsible Group */}
