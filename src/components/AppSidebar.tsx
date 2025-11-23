@@ -126,7 +126,7 @@ export function AppSidebar() {
                         <MessageSquare className="h-5 w-5 text-sidebar-foreground" />
                       </div>
                       {state === "expanded" && (
-                        <span className="font-semibold text-base text-sidebar-accent-foreground">Guest Feedback</span>
+                        <span className="font-semibold text-sm text-sidebar-accent-foreground whitespace-nowrap">Guest Feedback</span>
                       )}
                     </div>
                     {state === "expanded" && (
@@ -174,7 +174,7 @@ export function AppSidebar() {
                         <Shield className="h-5 w-5 text-sidebar-foreground" />
                       </div>
                       {state === "expanded" && (
-                        <span className="font-semibold text-base text-sidebar-accent-foreground">Executive</span>
+                        <span className="font-semibold text-sm text-sidebar-accent-foreground whitespace-nowrap">Executive</span>
                       )}
                     </div>
                     {state === "expanded" && (
@@ -222,7 +222,7 @@ export function AppSidebar() {
                         <BookOpen className="h-5 w-5 text-sidebar-foreground" />
                       </div>
                       {state === "expanded" && (
-                        <span className="font-semibold text-base text-sidebar-accent-foreground">Support</span>
+                        <span className="font-semibold text-sm text-sidebar-accent-foreground whitespace-nowrap">Support</span>
                       )}
                     </div>
                     {state === "expanded" && (
@@ -270,7 +270,7 @@ export function AppSidebar() {
                         <Archive className="h-5 w-5 text-sidebar-foreground" />
                       </div>
                       {state === "expanded" && (
-                        <span className="font-semibold text-base text-sidebar-accent-foreground">Archive</span>
+                        <span className="font-semibold text-sm text-sidebar-accent-foreground whitespace-nowrap">Archive</span>
                       )}
                     </div>
                     {state === "expanded" && (
@@ -318,7 +318,7 @@ export function AppSidebar() {
                         <Settings className="h-5 w-5 text-sidebar-foreground" />
                       </div>
                       {state === "expanded" && (
-                        <span className="font-semibold text-base text-sidebar-accent-foreground">Administration</span>
+                        <span className="font-semibold text-sm text-sidebar-accent-foreground whitespace-nowrap">Administration</span>
                       )}
                     </div>
                     {state === "expanded" && (
