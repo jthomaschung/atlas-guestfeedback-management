@@ -69,7 +69,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
         <div className="flex-1 flex flex-col">
           <header className="h-16 flex items-center justify-between bg-sidebar-background border-b border-sidebar-border shadow-sm px-6">
             <div className="flex items-center gap-4">
-              <SidebarTrigger className="text-sidebar-foreground hover:bg-sidebar-hover transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg" />
+              <SidebarTrigger className="text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-accent-foreground transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg" />
               <div className="text-sidebar-accent-foreground">
                 <h1 className="text-xl font-bold tracking-wide">ATLAS</h1>
                 <p className="hidden lg:block text-xs text-sidebar-foreground">Guest Feedback Management Portal</p>
