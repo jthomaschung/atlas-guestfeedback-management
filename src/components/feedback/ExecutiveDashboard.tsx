@@ -371,6 +371,11 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
     return isExecutive;
   };
 
+  const hasAllApprovals = (feedback: CustomerFeedback) => {
+    const { ceoApproved, vpApproved, directorApproved, dmApproved } = getApprovalStatus(feedback);
+    return ceoApproved && vpApproved && directorApproved && dmApproved;
+  };
+
   const getSlaStatus = (feedback: CustomerFeedback) => {
     if (!feedback.sla_deadline) return { status: 'none', color: 'bg-gray-100' };
     
@@ -629,7 +634,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
                             <FileText className="h-4 w-4 mr-1" />
                             Add Notes
                           </Button>
-                          {canUserApprove(feedback, userRole) && (
+                          {canUserApprove(feedback, userRole) && !hasAllApprovals(feedback) && (
                             <Button
                               size="sm"
                               onClick={(e) => {
@@ -639,6 +644,21 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
                             >
                               <Eye className="h-4 w-4 mr-1" />
                               Approve ({userRole.toUpperCase()})
+                            </Button>
+                          )}
+                          {hasAllApprovals(feedback) && (
+                            <Button
+                              size="sm"
+                              variant="default"
+                              className="bg-green-600 hover:bg-green-700"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setPendingArchiveFeedbackId(feedback.id);
+                                setIsArchiveConfirmOpen(true);
+                              }}
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              Archive Case
                             </Button>
                           )}
                         </div>
