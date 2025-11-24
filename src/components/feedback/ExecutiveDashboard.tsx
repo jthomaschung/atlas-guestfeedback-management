@@ -8,6 +8,7 @@ import { MentionsTextarea } from '@/components/ui/mentions-textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -60,6 +61,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
   const [selectedRegion, setSelectedRegion] = useState<string>('all');
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [detailsFeedback, setDetailsFeedback] = useState<CustomerFeedback | null>(null);
+  const [selectedApprovalRole, setSelectedApprovalRole] = useState<string>('');
   
   const { user } = useAuth();
   const { toast } = useToast();
@@ -203,19 +205,17 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
     }
   };
 
-  const approveCriticalFeedback = async (feedbackId: string) => {
+  const approveCriticalFeedback = async (feedbackId: string, approvalRole: string) => {
+    if (!approvalRole) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please select a role to approve as",
+      });
+      return;
+    }
+
     try {
-      // Get user's role and profile from hierarchy
-      const { data: userHierarchy } = await supabase
-        .from('user_hierarchy')
-        .select('role')
-        .eq('user_id', user?.id)
-        .single();
-
-      if (!userHierarchy) {
-        throw new Error('User role not found');
-      }
-
       // Get user's profile for display name
       const { data: userProfile } = await supabase
         .from('profiles')
@@ -223,13 +223,13 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
         .eq('user_id', user?.id)
         .single();
 
-      // Insert approval record
+      // Insert approval record with selected role
       const { error: approvalError } = await supabase
         .from('critical_feedback_approvals')
         .insert({
           feedback_id: feedbackId,
           approver_user_id: user?.id,
-          approver_role: userHierarchy.role.toLowerCase(),
+          approver_role: approvalRole.toUpperCase(),
           executive_notes: executiveNotes || null
         });
 
@@ -240,7 +240,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
         const { data: notifData, error: notifError } = await supabase.functions.invoke('send-executive-approval-notification', {
           body: {
             feedbackId: feedbackId,
-            approverRole: userHierarchy.role,
+            approverRole: approvalRole.toUpperCase(),
             approverName: userProfile?.display_name || user?.email || 'Executive',
             approverUserId: user?.id,
             approverEmail: user?.email
@@ -292,7 +292,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
         const pending = ['ceo', 'vp', 'director', 'dm'].filter(role => !approvedRoles.has(role));
         toast({
           title: "Success",
-          description: `Critical feedback approved by ${userHierarchy.role.toUpperCase()}. Pending: ${pending.map(r => r.toUpperCase()).join(', ')}`,
+          description: `Critical feedback approved by ${approvalRole.toUpperCase()}. Pending: ${pending.map(r => r.toUpperCase()).join(', ')}`,
         });
       }
 
@@ -353,22 +353,26 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
     return { ceoApproved, vpApproved, directorApproved, dmApproved };
   };
 
+  const getAvailableApprovalRoles = (feedback: CustomerFeedback) => {
+    const { ceoApproved, vpApproved, directorApproved, dmApproved } = getApprovalStatus(feedback);
+    const available: string[] = [];
+    
+    if (!ceoApproved) available.push('CEO');
+    if (!vpApproved) available.push('VP');
+    if (!directorApproved) available.push('Director');
+    if (!dmApproved) available.push('DM');
+    
+    return available;
+  };
+
   const canUserApprove = (feedback: CustomerFeedback, userRole: string) => {
-    const approvals = (feedback as any).critical_feedback_approvals || [];
-    const hasUserApproved = approvals.some((a: any) => a.approver_user_id === user?.id);
-    
-    // Normalize the role to lowercase for comparison
     const normalizedRole = userRole.toLowerCase().trim();
-    
-    // Check if user already approved
-    if (hasUserApproved) {
-      return false;
-    }
-    
-    // Allow any executive role (CEO, VP, Director, DM, Admin) to approve at any time
     const isExecutive = ['ceo', 'vp', 'director', 'dm', 'admin'].includes(normalizedRole);
     
-    return isExecutive;
+    if (!isExecutive) return false;
+    
+    const availableRoles = getAvailableApprovalRoles(feedback);
+    return availableRoles.length > 0;
   };
 
   const hasAllApprovals = (feedback: CustomerFeedback) => {
@@ -635,16 +639,27 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
                             Add Notes
                           </Button>
                           {canUserApprove(feedback, userRole) && !hasAllApprovals(feedback) && (
-                            <Button
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                approveCriticalFeedback(feedback.id);
-                              }}
-                            >
-                              <Eye className="h-4 w-4 mr-1" />
-                              Approve ({userRole.toUpperCase()})
-                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button size="sm">
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  Approve As...
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent>
+                                {getAvailableApprovalRoles(feedback).map((role) => (
+                                  <DropdownMenuItem
+                                    key={role}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      approveCriticalFeedback(feedback.id, role);
+                                    }}
+                                  >
+                                    Approve as {role}
+                                  </DropdownMenuItem>
+                                ))}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           )}
                           {hasAllApprovals(feedback) && (
                             <Button
