@@ -2012,6 +2012,33 @@ export type Database = {
         }
         Relationships: []
       }
+      dmr_rate_history: {
+        Row: {
+          am_dmr_rate: number | null
+          changed_at: string | null
+          changed_by: string | null
+          id: string
+          pm_dmr_rate: number | null
+          store_number: string
+        }
+        Insert: {
+          am_dmr_rate?: number | null
+          changed_at?: string | null
+          changed_by?: string | null
+          id?: string
+          pm_dmr_rate?: number | null
+          store_number: string
+        }
+        Update: {
+          am_dmr_rate?: number | null
+          changed_at?: string | null
+          changed_by?: string | null
+          id?: string
+          pm_dmr_rate?: number | null
+          store_number?: string
+        }
+        Relationships: []
+      }
       email_campaigns: {
         Row: {
           content: Json
@@ -2976,6 +3003,33 @@ export type Database = {
         }
         Relationships: []
       }
+      labor_goal_history: {
+        Row: {
+          changed_at: string | null
+          changed_by: string
+          id: string
+          labor_goal: number
+          notes: string | null
+          store_number: string
+        }
+        Insert: {
+          changed_at?: string | null
+          changed_by: string
+          id?: string
+          labor_goal: number
+          notes?: string | null
+          store_number: string
+        }
+        Update: {
+          changed_at?: string | null
+          changed_by?: string
+          id?: string
+          labor_goal?: number
+          notes?: string | null
+          store_number?: string
+        }
+        Relationships: []
+      }
       manager_approval_notifications: {
         Row: {
           created_at: string
@@ -3045,9 +3099,16 @@ export type Database = {
           dm_name: string
           dm_position: string
           employee_id: string | null
+          fee_paid: boolean | null
+          host_email: string | null
+          host_name: string | null
+          hosting_fee: string | null
           id: string
+          is_external_candidate: boolean | null
           market: string
           position_name: string
+          pretest_deadline: string | null
+          pretest_score: number | null
           rejected_at: string | null
           rejection_reason: string | null
           request_notes: string | null
@@ -3058,10 +3119,15 @@ export type Database = {
           reviewed_by: string | null
           status: string
           store_number: string
+          trainee_completed: boolean | null
+          trainee_completed_at: string | null
           trainee_email: string
           trainee_fast_track_username: string
           trainee_home_store_number: string
           trainee_name: string
+          training_end_date: string | null
+          training_location: string | null
+          training_start_date: string | null
           updated_at: string
         }
         Insert: {
@@ -3071,9 +3137,16 @@ export type Database = {
           dm_name?: string
           dm_position?: string
           employee_id?: string | null
+          fee_paid?: boolean | null
+          host_email?: string | null
+          host_name?: string | null
+          hosting_fee?: string | null
           id?: string
+          is_external_candidate?: boolean | null
           market: string
           position_name: string
+          pretest_deadline?: string | null
+          pretest_score?: number | null
           rejected_at?: string | null
           rejection_reason?: string | null
           request_notes?: string | null
@@ -3084,10 +3157,15 @@ export type Database = {
           reviewed_by?: string | null
           status?: string
           store_number: string
+          trainee_completed?: boolean | null
+          trainee_completed_at?: string | null
           trainee_email?: string
           trainee_fast_track_username?: string
           trainee_home_store_number?: string
           trainee_name?: string
+          training_end_date?: string | null
+          training_location?: string | null
+          training_start_date?: string | null
           updated_at?: string
         }
         Update: {
@@ -3097,9 +3175,16 @@ export type Database = {
           dm_name?: string
           dm_position?: string
           employee_id?: string | null
+          fee_paid?: boolean | null
+          host_email?: string | null
+          host_name?: string | null
+          hosting_fee?: string | null
           id?: string
+          is_external_candidate?: boolean | null
           market?: string
           position_name?: string
+          pretest_deadline?: string | null
+          pretest_score?: number | null
           rejected_at?: string | null
           rejection_reason?: string | null
           request_notes?: string | null
@@ -3110,10 +3195,15 @@ export type Database = {
           reviewed_by?: string | null
           status?: string
           store_number?: string
+          trainee_completed?: boolean | null
+          trainee_completed_at?: string | null
           trainee_email?: string
           trainee_fast_track_username?: string
           trainee_home_store_number?: string
           trainee_name?: string
+          training_end_date?: string | null
+          training_location?: string | null
+          training_start_date?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -4550,6 +4640,42 @@ export type Database = {
         }
         Relationships: []
       }
+      prep_values: {
+        Row: {
+          bin_value: number
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          item_name: string
+          item_type: string
+          shift: string | null
+          store_number: string
+          updated_at: string | null
+        }
+        Insert: {
+          bin_value: number
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          item_name: string
+          item_type: string
+          shift?: string | null
+          store_number: string
+          updated_at?: string | null
+        }
+        Update: {
+          bin_value?: number
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          item_name?: string
+          item_type?: string
+          shift?: string | null
+          store_number?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -4901,13 +5027,16 @@ export type Database = {
       stores: {
         Row: {
           address: string | null
+          am_dmr_rate: number | null
           city: string | null
           created_at: string | null
           email: string | null
           entity: string | null
           is_active: boolean | null
+          labor_goal: number | null
           manager: string | null
           phone: string | null
+          pm_dmr_rate: number | null
           region: string | null
           state: string | null
           store_id: number
@@ -4917,13 +5046,16 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          am_dmr_rate?: number | null
           city?: string | null
           created_at?: string | null
           email?: string | null
           entity?: string | null
           is_active?: boolean | null
+          labor_goal?: number | null
           manager?: string | null
           phone?: string | null
+          pm_dmr_rate?: number | null
           region?: string | null
           state?: string | null
           store_id?: number
@@ -4933,13 +5065,16 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          am_dmr_rate?: number | null
           city?: string | null
           created_at?: string | null
           email?: string | null
           entity?: string | null
           is_active?: boolean | null
+          labor_goal?: number | null
           manager?: string | null
           phone?: string | null
+          pm_dmr_rate?: number | null
           region?: string | null
           state?: string | null
           store_id?: number
@@ -5096,6 +5231,7 @@ export type Database = {
         Row: {
           completion_pct: number | null
           employee_name: string | null
+          fasttrack_username: string | null
           id: number
           position: string | null
           source_type: string | null
@@ -5107,6 +5243,7 @@ export type Database = {
         Insert: {
           completion_pct?: number | null
           employee_name?: string | null
+          fasttrack_username?: string | null
           id?: number
           position?: string | null
           source_type?: string | null
@@ -5118,6 +5255,7 @@ export type Database = {
         Update: {
           completion_pct?: number | null
           employee_name?: string | null
+          fasttrack_username?: string | null
           id?: number
           position?: string | null
           source_type?: string | null
