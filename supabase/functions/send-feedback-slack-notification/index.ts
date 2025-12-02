@@ -501,7 +501,7 @@ const handler = async (req: Request): Promise<Response> => {
                   personalizations: [{
                     to: [{ email: taggedUser.email }]
                   }],
-                  from: { email: 'guestexperience@panerabread.com', name: 'Guest Feedback' },
+                  from: { email: 'guest.feedback@atlaswe.com', name: 'Guest Feedback' },
                   subject: `You've been tagged in Case ${feedback.case_number}`,
                   content: [{
                     type: 'text/html',
