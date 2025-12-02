@@ -485,6 +485,83 @@ const handler = async (req: Request): Promise<Response> => {
           } else {
             console.log(`✅ In-app notification created for ${taggedUser.email}`);
           }
+          
+          // Send email notification via SendGrid
+          const sendgridApiKey = Deno.env.get('SENDGRID_API_KEY');
+          if (sendgridApiKey && taggedUser.email) {
+            try {
+              console.log(`📧 Sending tag notification email to ${taggedUser.email}`);
+              const emailResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${sendgridApiKey}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  personalizations: [{
+                    to: [{ email: taggedUser.email }]
+                  }],
+                  from: { email: 'guestexperience@panerabread.com', name: 'Guest Feedback' },
+                  subject: `You've been tagged in Case ${feedback.case_number}`,
+                  content: [{
+                    type: 'text/html',
+                    value: `
+                      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                        <div style="background: #dc2626; padding: 20px; text-align: center;">
+                          <h1 style="color: white; margin: 0;">🏷️ You've Been Tagged</h1>
+                        </div>
+                        <div style="padding: 30px; background: #f9fafb;">
+                          <p style="font-size: 16px; color: #374151;">
+                            <strong>${taggerName}</strong> tagged you in a customer feedback note.
+                          </p>
+                          <div style="background: white; border-radius: 8px; padding: 20px; margin: 20px 0; border-left: 4px solid #dc2626;">
+                            <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
+                              <strong>Case:</strong> ${feedback.case_number}
+                            </p>
+                            <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
+                              <strong>Store:</strong> #${feedback.store_number} (${feedback.market})
+                            </p>
+                            <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
+                              <strong>Category:</strong> ${feedback.complaint_category}
+                            </p>
+                            <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
+                              <strong>Priority:</strong> ${feedback.priority}
+                            </p>
+                          </div>
+                          <div style="background: #fef3c7; border-radius: 8px; padding: 15px; margin: 20px 0;">
+                            <p style="margin: 0; font-size: 14px; color: #92400e;">
+                              <strong>💬 Note:</strong><br/>
+                              ${note || 'No additional note provided.'}
+                            </p>
+                          </div>
+                          <div style="text-align: center; margin-top: 30px;">
+                            <a href="${frontendUrl}/customer-feedback" 
+                               style="background: #dc2626; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+                              View Feedback
+                            </a>
+                          </div>
+                        </div>
+                        <div style="background: #e5e7eb; padding: 15px; text-align: center; font-size: 12px; color: #6b7280;">
+                          Guest Feedback Management System
+                        </div>
+                      </div>
+                    `
+                  }]
+                })
+              });
+              
+              if (emailResponse.ok) {
+                console.log(`✅ Tag notification email sent to ${taggedUser.email}`);
+              } else {
+                const errorText = await emailResponse.text();
+                console.error(`❌ SendGrid error: ${emailResponse.status} - ${errorText}`);
+              }
+            } catch (emailError) {
+              console.error('❌ Error sending tag notification email:', emailError);
+            }
+          } else {
+            console.log('⚠️ SendGrid not configured or no email - skipping email notification');
+          }
         }
         break;
 
