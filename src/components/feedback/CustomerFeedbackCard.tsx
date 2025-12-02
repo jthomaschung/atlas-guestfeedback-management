@@ -162,27 +162,42 @@ export function CustomerFeedbackCard({
     }
   };
 
+  const isEscalated = feedback.resolution_status === 'escalated';
+
   return (
     <Card className={cn(
       "group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer",
-      isUrgent && "ring-2 ring-red-200 dark:ring-red-800/50",
+      isEscalated && "bg-red-600 dark:bg-red-700 border-red-600 dark:border-red-700",
+      !isEscalated && isUrgent && "ring-2 ring-red-200 dark:ring-red-800/50",
       feedback.resolution_status === 'resolved' && "opacity-75"
     )} onClick={() => onViewDetails(feedback)}>
-      <CardHeader className="pb-3">
+      <CardHeader className={cn("pb-3", isEscalated && "text-white")}>
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <Badge variant="outline" className="font-medium">
+              <Badge variant="outline" className={cn(
+                "font-medium",
+                isEscalated && "bg-white/20 border-white/30 text-white"
+              )}>
                 Store #{feedback.store_number}
               </Badge>
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className={cn(
+                "text-xs",
+                isEscalated && "bg-white/20 text-white"
+              )}>
                 {feedback.market}
               </Badge>
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className={cn(
+                "text-xs",
+                isEscalated && "bg-white/20 border-white/30 text-white"
+              )}>
                 {channelLabels[feedback.channel as keyof typeof channelLabels] || feedback.channel}
               </Badge>
               {feedback.case_number && (
-                <Badge variant="outline" className="text-xs flex items-center gap-1">
+                <Badge variant="outline" className={cn(
+                  "text-xs flex items-center gap-1",
+                  isEscalated && "bg-white/20 border-white/30 text-white"
+                )}>
                   <Hash className="h-3 w-3" />
                   {feedback.case_number}
                 </Badge>
@@ -196,7 +211,10 @@ export function CustomerFeedbackCard({
                   onValueChange={handleCategoryChange}
                   disabled={isUpdatingCategory}
                 >
-                  <SelectTrigger className="h-8 text-sm font-semibold border border-border px-2 focus:ring-2 focus:ring-offset-1 bg-background hover:bg-muted transition-colors rounded-md">
+                  <SelectTrigger className={cn(
+                    "h-8 text-sm font-semibold border border-border px-2 focus:ring-2 focus:ring-offset-1 bg-background hover:bg-muted transition-colors rounded-md",
+                    isEscalated && "bg-white/20 border-white/30 text-white hover:bg-white/30"
+                  )}>
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent className="z-50 bg-popover border border-border shadow-lg">
@@ -209,7 +227,10 @@ export function CustomerFeedbackCard({
                 </Select>
               </div>
             ) : (
-              <h3 className="font-semibold text-sm text-foreground leading-tight mb-1">
+              <h3 className={cn(
+                "font-semibold text-sm leading-tight mb-1",
+                isEscalated ? "text-white" : "text-foreground"
+              )}>
                 {categoryLabels[feedback.complaint_category as keyof typeof categoryLabels] || feedback.complaint_category}
               </h3>
             )}
@@ -246,8 +267,11 @@ export function CustomerFeedbackCard({
                 </div>
               </div>
             ) : (
-              <div className="relative group/feedback">
-                <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+            <div className="relative group/feedback">
+                <p className={cn(
+                  "text-sm line-clamp-2 leading-relaxed",
+                  isEscalated ? "text-white/90" : "text-muted-foreground"
+                )}>
                   {feedback.feedback_text}
                 </p>
                 {isAdmin && (
@@ -272,7 +296,10 @@ export function CustomerFeedbackCard({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 opacity-60 sm:opacity-0 group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px] sm:min-h-[32px] sm:min-w-[32px]"
+              className={cn(
+                "h-8 w-8 p-0 opacity-60 sm:opacity-0 group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px] sm:min-h-[32px] sm:min-w-[32px]",
+                isEscalated && "text-white hover:bg-white/20"
+              )}
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit(feedback);
@@ -284,7 +311,10 @@ export function CustomerFeedbackCard({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 opacity-60 sm:opacity-0 group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px] md:min-h-[32px] md:min-w-[32px]"
+              className={cn(
+                "h-8 w-8 p-0 opacity-60 sm:opacity-0 group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px] md:min-h-[32px] md:min-w-[32px]",
+                isEscalated && "text-white hover:bg-white/20"
+              )}
               onClick={(e) => {
                 e.stopPropagation();
                 onViewDetails(feedback);
@@ -297,7 +327,10 @@ export function CustomerFeedbackCard({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0 opacity-60 sm:opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive min-h-[44px] min-w-[44px] md:min-h-[32px] md:min-w-[32px]"
+                className={cn(
+                  "h-8 w-8 p-0 opacity-60 sm:opacity-0 group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px] md:min-h-[32px] md:min-w-[32px]",
+                  isEscalated ? "text-white hover:bg-white/20" : "hover:text-destructive"
+                )}
                 onClick={(e) => {
                   e.stopPropagation();
                   onDelete(feedback);
@@ -311,14 +344,16 @@ export function CustomerFeedbackCard({
         </div>
       </CardHeader>
       
-      <CardContent className="pt-0">
+      <CardContent className={cn("pt-0", isEscalated && "text-white")}>
         <div className="space-y-3">
           {/* Status and Priority Row */}
           <div className="flex items-center gap-2 flex-wrap min-h-[28px]">
             <Badge 
               className={cn(
                 "transition-colors whitespace-nowrap",
-                statusColors[feedback.resolution_status as keyof typeof statusColors]
+                isEscalated 
+                  ? "bg-white text-red-600 font-semibold" 
+                  : statusColors[feedback.resolution_status as keyof typeof statusColors]
               )}
             >
               {feedback.resolution_status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
@@ -327,7 +362,9 @@ export function CustomerFeedbackCard({
             <Badge 
               className={cn(
                 "transition-colors flex items-center gap-1",
-                priorityColors[feedback.priority as keyof typeof priorityColors]
+                isEscalated 
+                  ? "bg-white/20 border-white/30 text-white" 
+                  : priorityColors[feedback.priority as keyof typeof priorityColors]
               )}
             >
               {PriorityIcon && <PriorityIcon className="h-3 w-3" />}
@@ -335,7 +372,10 @@ export function CustomerFeedbackCard({
             </Badge>
             
             {feedback.rating && (
-              <Badge variant="outline" className="text-xs flex items-center gap-1">
+              <Badge variant="outline" className={cn(
+                "text-xs flex items-center gap-1",
+                isEscalated && "bg-white/20 border-white/30 text-white"
+              )}>
                 <Star className="h-3 w-3 fill-current" />
                 {feedback.rating}/5
               </Badge>
@@ -358,21 +398,33 @@ export function CustomerFeedbackCard({
           
           {/* Time & Order Information */}
           {(feedback.time_of_day || feedback.order_number || feedback.period) && (
-            <div className="flex flex-wrap gap-3 text-xs">
+            <div className={cn(
+              "flex flex-wrap gap-3 text-xs",
+              isEscalated ? "text-white/80" : "text-muted-foreground"
+            )}>
               {feedback.time_of_day && (
-                <div className="flex items-center gap-1.5 text-muted-foreground">
+                <div className={cn(
+                  "flex items-center gap-1.5",
+                  isEscalated ? "text-white/80" : "text-muted-foreground"
+                )}>
                   <Clock className="h-3 w-3" />
                   <span>{feedback.time_of_day}</span>
                 </div>
               )}
               {feedback.order_number && (
-                <div className="flex items-center gap-1.5 text-muted-foreground">
+                <div className={cn(
+                  "flex items-center gap-1.5",
+                  isEscalated ? "text-white/80" : "text-muted-foreground"
+                )}>
                   <Hash className="h-3 w-3" />
                   <span className="font-mono">{feedback.order_number}</span>
                 </div>
               )}
               {feedback.period && (
-                <div className="flex items-center gap-1.5 text-muted-foreground">
+                <div className={cn(
+                  "flex items-center gap-1.5",
+                  isEscalated ? "text-white/80" : "text-muted-foreground"
+                )}>
                   <Calendar className="h-3 w-3" />
                   <span>Period {feedback.period}</span>
                 </div>
@@ -381,7 +433,10 @@ export function CustomerFeedbackCard({
           )}
 
           {/* Meta Information */}
-          <div className="flex flex-col gap-2 text-xs text-muted-foreground">
+          <div className={cn(
+            "flex flex-col gap-2 text-xs",
+            isEscalated ? "text-white/80" : "text-muted-foreground"
+          )}>
             <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
               <div className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
