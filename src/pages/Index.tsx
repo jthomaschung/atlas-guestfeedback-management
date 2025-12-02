@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
+  const [allFeedbacks, setAllFeedbacks] = useState<CustomerFeedback[]>([]); // For charts - includes resolved
   const [periods, setPeriods] = useState<Array<{ id: string; name: string; start_date: string; end_date: string }>>([]);
   const [stores, setStores] = useState<Array<{ store_number: string }>>([]);
   const [loading, setLoading] = useState(true);
@@ -146,10 +147,10 @@ const Index = () => {
         authUserId: authUser?.id
       });
       
+      // Fetch ALL feedback (including resolved) for charts
       const { data, error } = await supabase
         .from('customer_feedback')
         .select('*')
-        .neq('resolution_status', 'resolved')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -193,7 +194,12 @@ const Index = () => {
         viewed: item.viewed || false
       }));
 
-      setFeedbacks(mappedFeedbacks);
+      // Store ALL feedbacks for charts
+      setAllFeedbacks(mappedFeedbacks);
+      
+      // Filter out resolved for the table/dashboard
+      const activeFeedbacks = mappedFeedbacks.filter(fb => fb.resolution_status !== 'resolved');
+      setFeedbacks(activeFeedbacks);
     } catch (error) {
       console.error('Error fetching feedback:', error);
       toast({
@@ -318,6 +324,45 @@ const Index = () => {
       return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
     });
   }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, sortOrder, dateFrom, dateTo]);
+
+  // Chart feedbacks - includes ALL feedback (including resolved) filtered by date/period only
+  const chartFeedbacks = useMemo(() => {
+    return allFeedbacks.filter(fb => {
+      // Period filter
+      let matchesPeriod = true;
+      if (periodFilter.length > 0) {
+        const selectedPeriods = periods.filter(p => periodFilter.includes(p.id));
+        if (selectedPeriods.length > 0) {
+          const feedbackDate = new Date(fb.feedback_date);
+          matchesPeriod = selectedPeriods.some(period => {
+            const periodStart = new Date(period.start_date);
+            const periodEnd = new Date(period.end_date);
+            return feedbackDate >= periodStart && feedbackDate <= periodEnd;
+          });
+        }
+      }
+      
+      // Date range filter
+      let matchesDateRange = true;
+      if (dateFrom || dateTo) {
+        const feedbackDate = new Date(fb.feedback_date + 'T00:00:00');
+        
+        if (dateFrom) {
+          const fromDate = new Date(dateFrom);
+          fromDate.setHours(0, 0, 0, 0);
+          if (feedbackDate < fromDate) matchesDateRange = false;
+        }
+        
+        if (dateTo) {
+          const toDate = new Date(dateTo);
+          toDate.setHours(23, 59, 59, 999);
+          if (feedbackDate > toDate) matchesDateRange = false;
+        }
+      }
+      
+      return matchesPeriod && matchesDateRange;
+    });
+  }, [allFeedbacks, periodFilter, periods, dateFrom, dateTo]);
 
   // Get available filter options
   const availableStores = useMemo(() => {
@@ -561,7 +606,7 @@ const Index = () => {
 
         <CategoryBreakdownChart 
           className="mb-6" 
-          feedbacks={filteredFeedbacks}
+          feedbacks={chartFeedbacks}
           onCategoryClick={(market) => {
             // Toggle market filter - if already selected, clear it; otherwise set it
             if (marketFilter.length === 1 && marketFilter[0] === market) {
