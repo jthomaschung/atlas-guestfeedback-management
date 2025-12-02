@@ -7,12 +7,16 @@ const corsHeaders = {
 };
 
 interface SlackNotificationRequest {
-  type: 'new_feedback' | 'tagged' | 'sla_warning' | 'sla_exceeded' | 'critical_escalation' | 'customer_response' | 'reassignment' | 'store_alert';
+  type: 'new_feedback' | 'tagged' | 'sla_warning' | 'sla_exceeded' | 'critical_escalation' | 'customer_response' | 'reassignment' | 'store_alert' | 'feedback_status_change';
   feedbackId: string;
   taggedDisplayName?: string;
   taggerUserId?: string;
   note?: string;
   hoursRemaining?: number;
+  // Status change fields
+  changedByUserId?: string;
+  oldStatus?: string;
+  newStatus?: string;
 }
 
 // Reusable function to send Slack DM
@@ -341,6 +345,105 @@ function buildStoreAlertBlocks(storeNumber: string, market: string, criticalCoun
   ];
 }
 
+// Build Slack blocks for feedback status change
+function buildStatusChangeBlocks(feedback: any, changerName: string, oldStatus: string, newStatus: string, frontendUrl: string): any[] {
+  const statusEmoji = newStatus === 'resolved' ? '✅' : 
+                      newStatus === 'escalated' ? '🚨' : 
+                      newStatus === 'responded' ? '💬' : '📝';
+  
+  return [
+    {
+      type: "header",
+      text: {
+        type: "plain_text",
+        text: `${statusEmoji} Feedback Status Updated`,
+        emoji: true
+      }
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `Case *${feedback.case_number}* status changed from *${oldStatus}* to *${newStatus}*`
+      }
+    },
+    {
+      type: "section",
+      fields: [
+        { type: "mrkdwn", text: `*Store:*\n#${feedback.store_number} (${feedback.market})` },
+        { type: "mrkdwn", text: `*Changed By:*\n${changerName}` },
+        { type: "mrkdwn", text: `*Category:*\n${feedback.complaint_category}` },
+        { type: "mrkdwn", text: `*Priority:*\n${feedback.priority}` },
+      ]
+    },
+    ...(feedback.customer_name ? [{
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*Customer:*\n${feedback.customer_name}${feedback.customer_email ? ` (${feedback.customer_email})` : ''}`
+      }
+    }] : []),
+    {
+      type: "actions",
+      elements: [
+        {
+          type: "button",
+          text: { type: "plain_text", text: "View Details", emoji: true },
+          url: `${frontendUrl}/?feedbackId=${feedback.id}`
+        }
+      ]
+    }
+  ];
+}
+
+// Build email HTML for feedback status change
+function buildStatusChangeEmailHtml(feedback: any, changerName: string, oldStatus: string, newStatus: string, frontendUrl: string): string {
+  const statusEmoji = newStatus === 'resolved' ? '✅' : 
+                      newStatus === 'escalated' ? '🚨' : 
+                      newStatus === 'responded' ? '💬' : '📝';
+  
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background: #2563eb; padding: 20px; text-align: center;">
+        <h1 style="color: white; margin: 0;">${statusEmoji} Feedback Status Updated</h1>
+      </div>
+      <div style="padding: 30px; background: #f9fafb;">
+        <p style="font-size: 16px; color: #374151;">
+          Case <strong>${feedback.case_number}</strong> has been updated by <strong>${changerName}</strong>.
+        </p>
+        <div style="background: white; border-radius: 8px; padding: 20px; margin: 20px 0; border-left: 4px solid #2563eb;">
+          <p style="margin: 0 0 15px 0; font-size: 18px; color: #1f2937;">
+            <strong>Status:</strong> ${oldStatus} → <span style="color: ${newStatus === 'resolved' ? '#16a34a' : newStatus === 'escalated' ? '#dc2626' : '#2563eb'}; font-weight: bold;">${newStatus}</span>
+          </p>
+          <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
+            <strong>Store:</strong> #${feedback.store_number} (${feedback.market})
+          </p>
+          <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
+            <strong>Category:</strong> ${feedback.complaint_category}
+          </p>
+          <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
+            <strong>Priority:</strong> ${feedback.priority}
+          </p>
+          ${feedback.customer_name ? `
+          <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
+            <strong>Customer:</strong> ${feedback.customer_name}
+          </p>
+          ` : ''}
+        </div>
+        <div style="text-align: center; margin-top: 30px;">
+          <a href="${frontendUrl}/?feedbackId=${feedback.id}" 
+             style="background: #2563eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+            View Feedback Details
+          </a>
+        </div>
+      </div>
+      <div style="background: #e5e7eb; padding: 15px; text-align: center; font-size: 12px; color: #6b7280;">
+        Guest Feedback Management System
+      </div>
+    </div>
+  `;
+}
+
 const handler = async (req: Request): Promise<Response> => {
   console.log('Feedback Slack notification function called');
   
@@ -371,8 +474,8 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
-    const { type, feedbackId, taggedDisplayName, taggerUserId, note, hoursRemaining }: SlackNotificationRequest = await req.json();
-    console.log('📨 Notification request:', { type, feedbackId, taggedDisplayName, taggerUserId, noteLength: note?.length });
+    const { type, feedbackId, taggedDisplayName, taggerUserId, note, hoursRemaining, changedByUserId, oldStatus, newStatus }: SlackNotificationRequest = await req.json();
+    console.log('📨 Notification request:', { type, feedbackId, taggedDisplayName, taggerUserId, noteLength: note?.length, changedByUserId, oldStatus, newStatus });
 
     // Get feedback details
     const { data: feedback, error: feedbackError } = await supabase
@@ -659,6 +762,129 @@ const handler = async (req: Request): Promise<Response> => {
 
           blocks = buildStoreAlertBlocks(feedback.store_number, feedback.market, count, frontendUrl);
           fallbackText = `ALERT: Store #${feedback.store_number} has ${count} critical issues today`;
+        }
+        break;
+
+      case 'feedback_status_change':
+        console.log(`📝 Processing feedback status change notification`);
+        
+        // Get the name of the user who made the change
+        let changerName = 'Unknown User';
+        if (changedByUserId) {
+          const { data: changerProfile } = await supabase
+            .from('profiles')
+            .select('display_name, email')
+            .eq('user_id', changedByUserId)
+            .single();
+          changerName = changerProfile?.display_name || 'Unknown User';
+        }
+        
+        const sendgridApiKey = Deno.env.get('SENDGRID_API_KEY');
+        
+        // Send notification to assignee (if different from change maker)
+        if (feedback.assignee) {
+          console.log(`📧 Looking up assignee: ${feedback.assignee}`);
+          
+          const { data: assigneeProfile } = await supabase
+            .from('profiles')
+            .select('user_id, email, display_name')
+            .ilike('display_name', `%${feedback.assignee}%`)
+            .limit(1)
+            .single();
+          
+          if (assigneeProfile && assigneeProfile.user_id !== changedByUserId) {
+            console.log(`✅ Found assignee: ${assigneeProfile.display_name} (${assigneeProfile.email})`);
+            
+            // Build notification content for assignee
+            blocks = buildStatusChangeBlocks(feedback, changerName, oldStatus || 'unknown', newStatus || 'unknown', frontendUrl);
+            fallbackText = `Case ${feedback.case_number} status changed to ${newStatus}`;
+            recipients = [assigneeProfile];
+            
+            // Create in-app notification for assignee
+            const { error: notifError } = await supabase
+              .from('notification_log')
+              .insert({
+                recipient_email: assigneeProfile.email,
+                notification_type: 'feedback_status_change',
+                feedback_id: feedbackId,
+                message: `Case ${feedback.case_number} status changed from "${oldStatus}" to "${newStatus}" by ${changerName}`,
+                tagger_name: changerName,
+                status: 'sent',
+                sent_at: new Date().toISOString()
+              });
+            
+            if (notifError) {
+              console.error('❌ Error creating in-app notification for assignee:', notifError);
+            } else {
+              console.log(`✅ In-app notification created for assignee: ${assigneeProfile.email}`);
+            }
+            
+            // Send email to assignee
+            if (sendgridApiKey && assigneeProfile.email) {
+              try {
+                console.log(`📧 Sending status change email to assignee: ${assigneeProfile.email}`);
+                const emailHtml = buildStatusChangeEmailHtml(feedback, changerName, oldStatus || 'unknown', newStatus || 'unknown', frontendUrl);
+                
+                const emailResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${sendgridApiKey}`,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    personalizations: [{
+                      to: [{ email: assigneeProfile.email }]
+                    }],
+                    from: { email: 'guest.feedback@atlaswe.com', name: 'Guest Feedback' },
+                    subject: `Case ${feedback.case_number} - Status Updated to ${newStatus}`,
+                    content: [{
+                      type: 'text/html',
+                      value: emailHtml
+                    }]
+                  })
+                });
+                
+                if (emailResponse.ok) {
+                  console.log(`✅ Status change email sent to assignee: ${assigneeProfile.email}`);
+                } else {
+                  const errorText = await emailResponse.text();
+                  console.error(`❌ SendGrid error for assignee: ${emailResponse.status} - ${errorText}`);
+                }
+              } catch (emailError) {
+                console.error('❌ Error sending status change email to assignee:', emailError);
+              }
+            }
+          } else if (assigneeProfile?.user_id === changedByUserId) {
+            console.log(`⏭️ Skipping assignee notification - they made the change`);
+          }
+        }
+        
+        // Create in-app notification for the change maker (confirmation)
+        if (changedByUserId) {
+          const { data: changerProfile } = await supabase
+            .from('profiles')
+            .select('email')
+            .eq('user_id', changedByUserId)
+            .single();
+          
+          if (changerProfile?.email) {
+            const { error: changerNotifError } = await supabase
+              .from('notification_log')
+              .insert({
+                recipient_email: changerProfile.email,
+                notification_type: 'feedback_status_change_confirmation',
+                feedback_id: feedbackId,
+                message: `You updated Case ${feedback.case_number} status to "${newStatus}"`,
+                status: 'sent',
+                sent_at: new Date().toISOString()
+              });
+            
+            if (changerNotifError) {
+              console.error('❌ Error creating confirmation notification:', changerNotifError);
+            } else {
+              console.log(`✅ Confirmation notification created for change maker: ${changerProfile.email}`);
+            }
+          }
         }
         break;
     }
