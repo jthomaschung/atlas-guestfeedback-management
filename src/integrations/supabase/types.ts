@@ -2872,12 +2872,17 @@ export type Database = {
           incident_number: string
           incident_time: string
           incident_type: string
+          injured_employee_email: string | null
           injured_employee_job_title: string
           injured_employee_name: string
+          injured_employee_phone: string | null
           market: string
           medical_facility_address: string | null
           medical_facility_name: string | null
           medical_treatment_sought: boolean
+          parties_involved: string | null
+          police_report_filed: boolean | null
+          police_report_number: string | null
           resolution_notes: string | null
           severity_level: string
           status: string
@@ -2901,12 +2906,17 @@ export type Database = {
           incident_number: string
           incident_time: string
           incident_type: string
+          injured_employee_email?: string | null
           injured_employee_job_title: string
           injured_employee_name: string
+          injured_employee_phone?: string | null
           market: string
           medical_facility_address?: string | null
           medical_facility_name?: string | null
           medical_treatment_sought?: boolean
+          parties_involved?: string | null
+          police_report_filed?: boolean | null
+          police_report_number?: string | null
           resolution_notes?: string | null
           severity_level: string
           status?: string
@@ -2930,12 +2940,17 @@ export type Database = {
           incident_number?: string
           incident_time?: string
           incident_type?: string
+          injured_employee_email?: string | null
           injured_employee_job_title?: string
           injured_employee_name?: string
+          injured_employee_phone?: string | null
           market?: string
           medical_facility_address?: string | null
           medical_facility_name?: string | null
           medical_treatment_sought?: boolean
+          parties_involved?: string | null
+          police_report_filed?: boolean | null
+          police_report_number?: string | null
           resolution_notes?: string | null
           severity_level?: string
           status?: string

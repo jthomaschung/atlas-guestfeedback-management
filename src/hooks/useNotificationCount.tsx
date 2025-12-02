@@ -33,7 +33,7 @@ export function useNotificationCount() {
         return;
       }
 
-      const taggedCount = notifications?.filter(n => n.notification_type === 'tagged').length || 0;
+      const taggedCount = notifications?.filter(n => n.notification_type === 'tagged' || n.notification_type === 'feedback_mention').length || 0;
       const completedCount = notifications?.filter(n => n.notification_type === 'completion').length || 0;
       
       setCount({
