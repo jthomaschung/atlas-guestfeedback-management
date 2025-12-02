@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { CustomerFeedbackTable } from "@/components/feedback/CustomerFeedbackTable";
 import { FeedbackDetailsDialog } from "@/components/feedback/FeedbackDetailsDialog";
@@ -15,6 +15,7 @@ export default function CustomerFeedbackPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   const { permissions } = useUserPermissions();
+  const processedFeedbackIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     document.title = 'Customer Feedback - Atlas';
@@ -27,69 +28,86 @@ export default function CustomerFeedbackPage() {
   // Handle feedbackId query param to auto-open specific feedback
   useEffect(() => {
     const feedbackId = searchParams.get('feedbackId');
-    console.log('🔔 Checking for feedbackId:', feedbackId, 'feedbacks count:', feedbacks.length);
     
-    if (!feedbackId) return;
-    
-    // First try to find in loaded feedbacks
-    if (feedbacks.length > 0) {
-      const found = feedbacks.find(f => f.id === feedbackId);
-      console.log('🔔 Found feedback in list:', found?.id);
-      
-      if (found) {
-        setSelectedFeedback(found);
-        setIsDetailsOpen(true);
-        setSearchParams({}, { replace: true });
-        return;
-      }
+    // Skip if no feedbackId or already processed this one
+    if (!feedbackId || processedFeedbackIdRef.current === feedbackId) {
+      return;
     }
     
-    // If not found in list, fetch directly
-    const fetchSpecificFeedback = async () => {
-      console.log('🔔 Fetching feedback directly:', feedbackId);
-      const { data, error } = await supabase
-        .from('customer_feedback')
-        .select('*')
-        .eq('id', feedbackId)
-        .single();
-      
-      if (error) {
-        console.error('🔔 Error fetching feedback:', error);
-        return;
+    console.log('🔔 Processing feedbackId from URL:', feedbackId);
+    
+    // Mark as processing immediately to prevent duplicate fetches
+    processedFeedbackIdRef.current = feedbackId;
+    
+    const openFeedbackById = async () => {
+      // First check if it's in the already-loaded feedbacks
+      if (feedbacks.length > 0) {
+        const found = feedbacks.find(f => f.id === feedbackId);
+        if (found) {
+          console.log('🔔 Found feedback in loaded list:', found.case_number);
+          setSelectedFeedback(found);
+          setIsDetailsOpen(true);
+          setSearchParams({}, { replace: true });
+          return;
+        }
       }
       
-      if (data) {
-        console.log('🔔 Fetched feedback:', data.case_number);
-        const mappedFeedback: CustomerFeedback = {
-          id: data.id,
-          feedback_date: data.feedback_date,
-          complaint_category: data.complaint_category as CustomerFeedback['complaint_category'],
-          channel: data.channel as CustomerFeedback['channel'],
-          rating: data.rating,
-          resolution_status: (data.resolution_status || 'unopened') as CustomerFeedback['resolution_status'],
-          resolution_notes: data.resolution_notes,
-          store_number: data.store_number,
-          market: data.market,
-          case_number: data.case_number,
-          customer_name: data.customer_name,
-          customer_email: data.customer_email,
-          customer_phone: data.customer_phone,
-          feedback_text: data.feedback_text,
-          user_id: data.user_id,
-          created_at: data.created_at,
-          updated_at: data.updated_at,
-          priority: (data.priority || 'Low') as CustomerFeedback['priority'],
-          assignee: data.assignee || 'Unassigned',
-          viewed: data.viewed || false
-        };
-        setSelectedFeedback(mappedFeedback);
-        setIsDetailsOpen(true);
+      // Fetch directly from database
+      console.log('🔔 Fetching feedback directly from database:', feedbackId);
+      try {
+        const { data, error } = await supabase
+          .from('customer_feedback')
+          .select('*')
+          .eq('id', feedbackId)
+          .single();
+        
+        if (error) {
+          console.error('🔔 Error fetching feedback:', error);
+          toast({
+            title: 'Error',
+            description: 'Could not find the feedback you were looking for',
+            variant: 'destructive'
+          });
+          setSearchParams({}, { replace: true });
+          return;
+        }
+        
+        if (data) {
+          console.log('🔔 Successfully fetched feedback:', data.case_number);
+          const mappedFeedback: CustomerFeedback = {
+            id: data.id,
+            feedback_date: data.feedback_date,
+            complaint_category: data.complaint_category as CustomerFeedback['complaint_category'],
+            channel: data.channel as CustomerFeedback['channel'],
+            rating: data.rating,
+            resolution_status: (data.resolution_status || 'unopened') as CustomerFeedback['resolution_status'],
+            resolution_notes: data.resolution_notes,
+            store_number: data.store_number,
+            market: data.market,
+            case_number: data.case_number,
+            customer_name: data.customer_name,
+            customer_email: data.customer_email,
+            customer_phone: data.customer_phone,
+            feedback_text: data.feedback_text,
+            user_id: data.user_id,
+            created_at: data.created_at,
+            updated_at: data.updated_at,
+            priority: (data.priority || 'Low') as CustomerFeedback['priority'],
+            assignee: data.assignee || 'Unassigned',
+            viewed: data.viewed || false
+          };
+          setSelectedFeedback(mappedFeedback);
+          setIsDetailsOpen(true);
+          setSearchParams({}, { replace: true });
+        }
+      } catch (err) {
+        console.error('🔔 Exception fetching feedback:', err);
         setSearchParams({}, { replace: true });
       }
     };
     
-    fetchSpecificFeedback();
-  }, [searchParams, setSearchParams, feedbacks]);
+    openFeedbackById();
+  }, [searchParams, setSearchParams, feedbacks, toast]);
 
   const fetchFeedbacks = async () => {
     try {
