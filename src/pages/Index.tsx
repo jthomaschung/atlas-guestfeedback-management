@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { CustomerFeedback } from "@/types/feedback";
 import { CustomerFeedbackTable } from "@/components/feedback/CustomerFeedbackTable";
 import { CustomerFeedbackStats } from "@/components/feedback/CustomerFeedbackStats";
@@ -32,10 +33,93 @@ const Index = () => {
   const [dateFrom, setDateFrom] = useState<Date | undefined>();
   const [dateTo, setDateTo] = useState<Date | undefined>();
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const processedFeedbackIdRef = useRef<string | null>(null);
   const { toast } = useToast();
   const authContext = useAuth();
   const { user: authUser, profile, isSessionReady } = authContext || { user: null, profile: null, isSessionReady: false };
   const { permissions } = useUserPermissions();
+
+  // Handle feedbackId query param to auto-open specific feedback
+  useEffect(() => {
+    const feedbackId = searchParams.get('feedbackId');
+    
+    if (!feedbackId || processedFeedbackIdRef.current === feedbackId) {
+      return;
+    }
+    
+    console.log('🔔 Processing feedbackId from URL:', feedbackId);
+    processedFeedbackIdRef.current = feedbackId;
+    
+    const openFeedbackById = async () => {
+      // First check if it's in the already-loaded feedbacks
+      if (feedbacks.length > 0) {
+        const found = feedbacks.find(f => f.id === feedbackId);
+        if (found) {
+          console.log('🔔 Found feedback in loaded list:', found.case_number);
+          setSelectedFeedback(found);
+          setIsDialogOpen(true);
+          setSearchParams({}, { replace: true });
+          return;
+        }
+      }
+      
+      // Fetch directly from database (may be archived or filtered out)
+      console.log('🔔 Fetching feedback directly from database:', feedbackId);
+      try {
+        const { data, error } = await supabase
+          .from('customer_feedback')
+          .select('*')
+          .eq('id', feedbackId)
+          .single();
+        
+        if (error) {
+          console.error('🔔 Error fetching feedback:', error);
+          toast({
+            title: 'Error',
+            description: 'Could not find the feedback you were looking for',
+            variant: 'destructive'
+          });
+          setSearchParams({}, { replace: true });
+          return;
+        }
+        
+        if (data) {
+          console.log('🔔 Successfully fetched feedback:', data.case_number);
+          const mappedFeedback: CustomerFeedback = {
+            id: data.id,
+            feedback_date: data.feedback_date,
+            complaint_category: data.complaint_category as CustomerFeedback['complaint_category'],
+            channel: data.channel as CustomerFeedback['channel'],
+            rating: data.rating,
+            resolution_status: (data.resolution_status || 'unopened') as CustomerFeedback['resolution_status'],
+            resolution_notes: data.resolution_notes,
+            store_number: data.store_number,
+            market: data.market,
+            case_number: data.case_number,
+            customer_name: data.customer_name,
+            customer_email: data.customer_email,
+            customer_phone: data.customer_phone,
+            feedback_text: data.feedback_text,
+            user_id: data.user_id,
+            created_at: data.created_at,
+            updated_at: data.updated_at,
+            priority: (data.priority || 'Low') as CustomerFeedback['priority'],
+            assignee: data.assignee || 'Unassigned',
+            viewed: data.viewed || false
+          };
+          setSelectedFeedback(mappedFeedback);
+          setIsDialogOpen(true);
+          setSearchParams({}, { replace: true });
+        }
+      } catch (err) {
+        console.error('🔔 Exception fetching feedback:', err);
+        setSearchParams({}, { replace: true });
+      }
+    };
+    
+    openFeedbackById();
+  }, [searchParams, setSearchParams, feedbacks, toast]);
 
   useEffect(() => {
     if (authUser && isSessionReady) {
