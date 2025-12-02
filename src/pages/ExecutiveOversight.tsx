@@ -19,28 +19,33 @@ export default function ExecutiveOversight() {
       if (!user) return;
 
       try {
-        const { data: hierarchy, error } = await supabase
+        // Fetch all roles for the user (they may have multiple)
+        const { data: hierarchyData, error } = await supabase
           .from('user_hierarchy')
           .select('role')
-          .eq('user_id', user.id)
-          .single();
+          .eq('user_id', user.id);
 
         if (error) {
           console.error('Error checking user role:', error);
           return;
         }
 
-        const role = hierarchy?.role?.toLowerCase() || '';
-        console.log('🎯 Executive Oversight - User Role:', {
-          rawRole: hierarchy?.role,
-          normalizedRole: role,
+        // Get all roles and check if any is an executive role
+        const executiveRoles = ['admin', 'director', 'vp', 'ceo'];
+        const userRoles = hierarchyData?.map(h => h.role?.toLowerCase() || '') || [];
+        
+        // Find the highest-level executive role for display
+        const executiveRole = userRoles.find(r => executiveRoles.includes(r)) || userRoles[0] || '';
+        
+        console.log('🎯 Executive Oversight - User Roles:', {
+          rawRoles: hierarchyData?.map(h => h.role),
+          normalizedRoles: userRoles,
+          selectedRole: executiveRole,
           userId: user.id
         });
-        setUserRole(role);
         
-        // Check if user has executive privileges
-        const executiveRoles = ['admin', 'director', 'vp', 'ceo'];
-        setIsExecutive(executiveRoles.includes(role));
+        setUserRole(executiveRole);
+        setIsExecutive(userRoles.some(r => executiveRoles.includes(r)));
       } catch (error) {
         console.error('Error in checkExecutiveStatus:', error);
       }
