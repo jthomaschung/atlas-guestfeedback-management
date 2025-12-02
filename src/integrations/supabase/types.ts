@@ -2882,6 +2882,12 @@ export type Database = {
           medical_facility_address: string | null
           medical_facility_name: string | null
           medical_treatment_sought: boolean
+          other_party_email: string | null
+          other_party_insurance_company: string | null
+          other_party_name: string | null
+          other_party_phone: string | null
+          other_party_policy_number: string | null
+          other_party_vehicle: string | null
           parties_involved: string | null
           police_report_filed: boolean | null
           police_report_number: string | null
@@ -2918,6 +2924,12 @@ export type Database = {
           medical_facility_address?: string | null
           medical_facility_name?: string | null
           medical_treatment_sought?: boolean
+          other_party_email?: string | null
+          other_party_insurance_company?: string | null
+          other_party_name?: string | null
+          other_party_phone?: string | null
+          other_party_policy_number?: string | null
+          other_party_vehicle?: string | null
           parties_involved?: string | null
           police_report_filed?: boolean | null
           police_report_number?: string | null
@@ -2954,6 +2966,12 @@ export type Database = {
           medical_facility_address?: string | null
           medical_facility_name?: string | null
           medical_treatment_sought?: boolean
+          other_party_email?: string | null
+          other_party_insurance_company?: string | null
+          other_party_name?: string | null
+          other_party_phone?: string | null
+          other_party_policy_number?: string | null
+          other_party_vehicle?: string | null
           parties_involved?: string | null
           police_report_filed?: boolean | null
           police_report_number?: string | null
