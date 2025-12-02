@@ -14,35 +14,44 @@ export function useNotificationCount() {
   const { user } = useAuth();
 
   const fetchNotificationCount = async () => {
-    if (!user?.email) return;
+    if (!user?.email) {
+      console.log('📬 No user email, skipping notification count');
+      return;
+    }
 
     try {
       setLoading(true);
       
-      // Get notification count for tagged and completed work orders
+      console.log('📬 Fetching notifications for:', user.email);
+      
+      // Get all unread notifications for this user
       const { data: notifications, error } = await supabase
         .from('notification_log')
         .select('notification_type')
         .eq('recipient_email', user.email)
         .eq('status', 'sent')
         .is('read_at', null)
-        .gte('sent_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()); // Last 7 days
+        .gte('sent_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
 
       if (error) {
-        console.error('Error fetching notification count:', error);
+        console.error('📬 Error fetching notification count:', error);
         return;
       }
 
-      const taggedCount = notifications?.filter(n => n.notification_type === 'tagged' || n.notification_type === 'feedback_mention').length || 0;
-      const completedCount = notifications?.filter(n => n.notification_type === 'completion').length || 0;
+      console.log('📬 Raw notifications:', notifications);
+
+      // Count all notification types
+      const total = notifications?.length || 0;
+      
+      console.log('📬 Total unread notifications:', total);
       
       setCount({
-        tagged: taggedCount,
-        completed: completedCount,
-        total: taggedCount + completedCount
+        tagged: total,
+        completed: 0,
+        total: total
       });
     } catch (error) {
-      console.error('Error in fetchNotificationCount:', error);
+      console.error('📬 Error in fetchNotificationCount:', error);
     } finally {
       setLoading(false);
     }
