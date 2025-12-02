@@ -13,12 +13,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface Notification {
   id: string;
   sent_at: string;
   notification_type: string;
   status: string;
+  message?: string;
+  tagger_name?: string;
+  feedback_id?: string;
 }
 
 export function NotificationBell() {
@@ -27,6 +31,7 @@ export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const fetchRecentNotifications = async () => {
     if (!user?.email) return;
@@ -34,7 +39,7 @@ export function NotificationBell() {
     try {
       const { data: notificationData, error: notificationError } = await supabase
         .from('notification_log')
-        .select('*')
+        .select('id, sent_at, notification_type, status, message, tagger_name, feedback_id')
         .eq('recipient_email', user.email)
         .eq('status', 'sent')
         .is('read_at', null)
@@ -75,6 +80,11 @@ export function NotificationBell() {
     await markNotificationAsRead(notification.id);
     setIsOpen(false);
     refresh();
+    
+    // Navigate to feedback if it's a feedback-related notification
+    if (notification.feedback_id && notification.notification_type === 'feedback_mention') {
+      navigate('/customer-feedback');
+    }
   };
 
   const markNotificationAsRead = async (notificationId: string) => {
@@ -192,7 +202,7 @@ export function NotificationBell() {
                     className="p-4 hover:bg-accent/50 cursor-pointer transition-colors"
                     onClick={() => handleNotificationClick(notification)}
                   >
-                    <div className="flex justify-between items-start mb-2">
+                    <div className="flex justify-between items-start mb-1">
                       <p className="font-medium text-sm">
                         {getNotificationTitle(notification.notification_type)}
                       </p>
@@ -208,6 +218,16 @@ export function NotificationBell() {
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
+                    {notification.tagger_name && (
+                      <p className="text-xs text-foreground mb-1">
+                        by <span className="font-medium">{notification.tagger_name}</span>
+                      </p>
+                    )}
+                    {notification.message && (
+                      <p className="text-xs text-muted-foreground line-clamp-2 mb-1">
+                        "{notification.message.substring(0, 100)}{notification.message.length > 100 ? '...' : ''}"
+                      </p>
+                    )}
                     <p className="text-xs text-muted-foreground">
                       {format(new Date(notification.sent_at), 'MMM d, h:mm a')}
                     </p>

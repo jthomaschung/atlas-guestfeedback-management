@@ -466,6 +466,25 @@ const handler = async (req: Request): Promise<Response> => {
           blocks = buildTaggedBlocks(feedback, taggerName, note || '', frontendUrl);
           fallbackText = `You've been tagged in case ${feedback.case_number}`;
           console.log(`✅ Ready to send notification to ${taggedUser.email}`);
+          
+          // Create in-app notification
+          const { error: notificationError } = await supabase
+            .from('notification_log')
+            .insert({
+              recipient_email: taggedUser.email,
+              notification_type: 'feedback_mention',
+              feedback_id: feedbackId,
+              message: note || '',
+              tagger_name: taggerName,
+              status: 'sent',
+              sent_at: new Date().toISOString()
+            });
+          
+          if (notificationError) {
+            console.error('❌ Error creating in-app notification:', notificationError);
+          } else {
+            console.log(`✅ In-app notification created for ${taggedUser.email}`);
+          }
         }
         break;
 

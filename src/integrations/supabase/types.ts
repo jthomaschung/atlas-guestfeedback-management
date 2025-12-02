@@ -4029,35 +4029,52 @@ export type Database = {
       notification_log: {
         Row: {
           error_message: string | null
+          feedback_id: string | null
           id: string
+          message: string | null
           notification_type: string
           read_at: string | null
           recipient_email: string
           sent_at: string
           status: string | null
+          tagger_name: string | null
           work_order_id: string | null
         }
         Insert: {
           error_message?: string | null
+          feedback_id?: string | null
           id?: string
+          message?: string | null
           notification_type: string
           read_at?: string | null
           recipient_email: string
           sent_at?: string
           status?: string | null
+          tagger_name?: string | null
           work_order_id?: string | null
         }
         Update: {
           error_message?: string | null
+          feedback_id?: string | null
           id?: string
+          message?: string | null
           notification_type?: string
           read_at?: string | null
           recipient_email?: string
           sent_at?: string
           status?: string | null
+          tagger_name?: string | null
           work_order_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "notification_log_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "customer_feedback"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notification_preferences: {
         Row: {
