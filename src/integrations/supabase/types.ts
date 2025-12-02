@@ -2964,6 +2964,104 @@ export type Database = {
         }
         Relationships: []
       }
+      incident_workflow_tasks: {
+        Row: {
+          clinic_call_notes: string | null
+          clinic_called: boolean | null
+          clinic_called_at: string | null
+          clinic_called_by: string | null
+          created_at: string | null
+          dwc_form_number: string | null
+          employee_contacted: boolean | null
+          employee_contacted_at: string | null
+          employee_contacted_by: string | null
+          employee_interviewed: boolean | null
+          employee_interviewed_at: string | null
+          employee_interviewed_by: string | null
+          id: string
+          incident_id: string
+          interview_notes: string | null
+          invoice_total_amount: number | null
+          invoices_collected: boolean | null
+          invoices_collected_at: string | null
+          invoices_collected_by: string | null
+          invoices_under_threshold: boolean | null
+          medical_outcome: string | null
+          medical_outcome_at: string | null
+          medical_outcome_by: string | null
+          updated_at: string | null
+          witnesses_interviewed: boolean | null
+          witnesses_interviewed_at: string | null
+          witnesses_interviewed_by: string | null
+        }
+        Insert: {
+          clinic_call_notes?: string | null
+          clinic_called?: boolean | null
+          clinic_called_at?: string | null
+          clinic_called_by?: string | null
+          created_at?: string | null
+          dwc_form_number?: string | null
+          employee_contacted?: boolean | null
+          employee_contacted_at?: string | null
+          employee_contacted_by?: string | null
+          employee_interviewed?: boolean | null
+          employee_interviewed_at?: string | null
+          employee_interviewed_by?: string | null
+          id?: string
+          incident_id: string
+          interview_notes?: string | null
+          invoice_total_amount?: number | null
+          invoices_collected?: boolean | null
+          invoices_collected_at?: string | null
+          invoices_collected_by?: string | null
+          invoices_under_threshold?: boolean | null
+          medical_outcome?: string | null
+          medical_outcome_at?: string | null
+          medical_outcome_by?: string | null
+          updated_at?: string | null
+          witnesses_interviewed?: boolean | null
+          witnesses_interviewed_at?: string | null
+          witnesses_interviewed_by?: string | null
+        }
+        Update: {
+          clinic_call_notes?: string | null
+          clinic_called?: boolean | null
+          clinic_called_at?: string | null
+          clinic_called_by?: string | null
+          created_at?: string | null
+          dwc_form_number?: string | null
+          employee_contacted?: boolean | null
+          employee_contacted_at?: string | null
+          employee_contacted_by?: string | null
+          employee_interviewed?: boolean | null
+          employee_interviewed_at?: string | null
+          employee_interviewed_by?: string | null
+          id?: string
+          incident_id?: string
+          interview_notes?: string | null
+          invoice_total_amount?: number | null
+          invoices_collected?: boolean | null
+          invoices_collected_at?: string | null
+          invoices_collected_by?: string | null
+          invoices_under_threshold?: boolean | null
+          medical_outcome?: string | null
+          medical_outcome_at?: string | null
+          medical_outcome_by?: string | null
+          updated_at?: string | null
+          witnesses_interviewed?: boolean | null
+          witnesses_interviewed_at?: string | null
+          witnesses_interviewed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_workflow_tasks_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: true
+            referencedRelation: "incident_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       internal_feedback: {
         Row: {
           archived: boolean
