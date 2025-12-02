@@ -1186,6 +1186,12 @@ Customer Service Team`);
     if (!feedback) return;
 
     setIsLoading(true);
+    
+    // Detect what changed
+    const statusChanged = status !== feedback.resolution_status;
+    const assigneeChanged = assignee !== feedback.assignee;
+    const oldStatus = feedback.resolution_status;
+    
     try {
       const { error } = await supabase
         .from('customer_feedback')
@@ -1202,9 +1208,36 @@ Customer Service Team`);
 
       if (error) throw error;
 
+      // Send notifications if status changed
+      if (statusChanged && user?.id) {
+        console.log(`📨 Status changed from "${oldStatus}" to "${status}" - sending notifications`);
+        
+        try {
+          const { error: notifError } = await supabase.functions.invoke('send-feedback-slack-notification', {
+            body: {
+              type: 'feedback_status_change',
+              feedbackId: feedback.id,
+              changedByUserId: user.id,
+              oldStatus: oldStatus,
+              newStatus: status,
+            }
+          });
+          
+          if (notifError) {
+            console.error('❌ Error sending status change notifications:', notifError);
+          } else {
+            console.log('✅ Status change notifications sent successfully');
+          }
+        } catch (notifErr) {
+          console.error('❌ Exception sending status change notifications:', notifErr);
+        }
+      }
+
       toast({
         title: "Feedback Updated",
-        description: "The feedback has been successfully updated.",
+        description: statusChanged 
+          ? `Status changed to "${status}". Notifications sent to assigned user.`
+          : "The feedback has been successfully updated.",
       });
 
       onUpdate();
