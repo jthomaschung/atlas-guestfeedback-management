@@ -2865,6 +2865,7 @@ export type Database = {
           closed_at: string | null
           closed_by: string | null
           created_at: string | null
+          has_injury: boolean | null
           id: string
           immediate_action_taken: string | null
           incident_date: string
@@ -2876,6 +2877,7 @@ export type Database = {
           injured_employee_job_title: string
           injured_employee_name: string
           injured_employee_phone: string | null
+          injury_description: string | null
           market: string
           medical_facility_address: string | null
           medical_facility_name: string | null
@@ -2899,6 +2901,7 @@ export type Database = {
           closed_at?: string | null
           closed_by?: string | null
           created_at?: string | null
+          has_injury?: boolean | null
           id?: string
           immediate_action_taken?: string | null
           incident_date: string
@@ -2910,6 +2913,7 @@ export type Database = {
           injured_employee_job_title: string
           injured_employee_name: string
           injured_employee_phone?: string | null
+          injury_description?: string | null
           market: string
           medical_facility_address?: string | null
           medical_facility_name?: string | null
@@ -2933,6 +2937,7 @@ export type Database = {
           closed_at?: string | null
           closed_by?: string | null
           created_at?: string | null
+          has_injury?: boolean | null
           id?: string
           immediate_action_taken?: string | null
           incident_date?: string
@@ -2944,6 +2949,7 @@ export type Database = {
           injured_employee_job_title?: string
           injured_employee_name?: string
           injured_employee_phone?: string | null
+          injury_description?: string | null
           market?: string
           medical_facility_address?: string | null
           medical_facility_name?: string | null
