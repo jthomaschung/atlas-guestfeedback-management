@@ -37,25 +37,28 @@ export function useFeedbackNotifications() {
     }
   };
 
-  const sendTaggedSlackNotification = async (feedbackId: string, taggedDisplayName: string, note: string) => {
+  const sendTaggedSlackNotification = async (feedbackId: string, taggedDisplayName: string, note: string, taggerUserId?: string) => {
     try {
-      const { error } = await supabase.functions.invoke('send-feedback-slack-notification', {
+      console.log('🏷️ Sending tagged notification:', { feedbackId, taggedDisplayName, taggerUserId, notePreview: note.substring(0, 50) });
+      
+      const { data, error } = await supabase.functions.invoke('send-feedback-slack-notification', {
         body: {
           type: 'tagged',
           feedbackId,
           taggedDisplayName,
+          taggerUserId,
           note
         }
       });
 
       if (error) {
-        console.error('Error sending tagged Slack notification:', error);
+        console.error('❌ Error sending tagged Slack notification:', error);
         return;
       }
 
-      console.log('✅ Tagged Slack notification sent');
+      console.log('✅ Tagged Slack notification response:', data);
     } catch (error) {
-      console.error('Error sending tagged Slack notification:', error);
+      console.error('❌ Error sending tagged Slack notification:', error);
     }
   };
 

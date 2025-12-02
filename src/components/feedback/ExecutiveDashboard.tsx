@@ -168,7 +168,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
         const displayName = match[1].trim();
         if (displayName) {
           try {
-            await sendTaggedSlackNotification(selectedFeedback.id, displayName, executiveNotes);
+            await sendTaggedSlackNotification(selectedFeedback.id, displayName, executiveNotes, user?.id);
             mentionCount++;
             console.log(`✅ Slack notification sent for @${displayName}`);
           } catch (notificationError) {
