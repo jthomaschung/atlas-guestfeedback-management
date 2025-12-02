@@ -290,7 +290,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
       
       for (const mentionedName of mentions) {
         try {
-          await sendTaggedSlackNotification(feedback.id, mentionedName, newNoteText);
+          await sendTaggedSlackNotification(feedback.id, mentionedName, newNoteText, user.id);
           mentionCount++;
           console.log(`✅ Slack notification sent for @${mentionedName}`);
         } catch (notificationError) {

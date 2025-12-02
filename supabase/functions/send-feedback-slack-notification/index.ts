@@ -10,6 +10,7 @@ interface SlackNotificationRequest {
   type: 'new_feedback' | 'tagged' | 'sla_warning' | 'sla_exceeded' | 'critical_escalation' | 'customer_response' | 'reassignment' | 'store_alert';
   feedbackId: string;
   taggedDisplayName?: string;
+  taggerUserId?: string;
   note?: string;
   hoursRemaining?: number;
 }
@@ -370,8 +371,8 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
-    const { type, feedbackId, taggedDisplayName, note, hoursRemaining }: SlackNotificationRequest = await req.json();
-    console.log('Notification request:', { type, feedbackId, taggedDisplayName });
+    const { type, feedbackId, taggedDisplayName, taggerUserId, note, hoursRemaining }: SlackNotificationRequest = await req.json();
+    console.log('📨 Notification request:', { type, feedbackId, taggedDisplayName, taggerUserId, noteLength: note?.length });
 
     // Get feedback details
     const { data: feedback, error: feedbackError } = await supabase
@@ -417,30 +418,54 @@ const handler = async (req: Request): Promise<Response> => {
         break;
 
       case 'tagged':
-        // Find user by display name (with wildcard matching for partial names)
-        const { data: taggedUser } = await supabase
+        console.log(`🏷️ Processing tagged notification for: "${taggedDisplayName}"`);
+        
+        // Find user by display name - try exact match first, then partial
+        let taggedUser = null;
+        
+        // Try exact match first
+        const { data: exactMatch, error: exactError } = await supabase
           .from('profiles')
           .select('user_id, email, display_name')
-          .ilike('display_name', `%${taggedDisplayName}%`)
-          .single();
+          .eq('display_name', taggedDisplayName)
+          .limit(1);
+        
+        if (exactMatch && exactMatch.length > 0) {
+          taggedUser = exactMatch[0];
+          console.log(`✅ Found exact match: ${taggedUser.display_name} (${taggedUser.email})`);
+        } else {
+          // Try partial match
+          const { data: partialMatch, error: partialError } = await supabase
+            .from('profiles')
+            .select('user_id, email, display_name')
+            .ilike('display_name', `%${taggedDisplayName}%`)
+            .limit(1);
+          
+          if (partialMatch && partialMatch.length > 0) {
+            taggedUser = partialMatch[0];
+            console.log(`✅ Found partial match: ${taggedUser.display_name} (${taggedUser.email})`);
+          } else {
+            console.warn(`⚠️ No user found matching display_name: "${taggedDisplayName}"`);
+            console.log(`📝 Exact error: ${exactError?.message}, Partial error: ${partialError?.message}`);
+          }
+        }
 
         if (taggedUser) {
           recipients = [taggedUser];
-          console.log(`✅ Found tagged user: ${taggedUser.display_name} (${taggedUser.email})`);
           
-          // Get tagger name
+          // Get tagger name - use taggerUserId if provided, otherwise fall back to feedback creator
+          const taggerId = taggerUserId || feedback.user_id;
           const { data: taggerData } = await supabase
             .from('profiles')
             .select('display_name')
-            .eq('user_id', feedback.user_id)
+            .eq('user_id', taggerId)
             .single();
           
-          console.log(`🔨 Building blocks for tagger: ${taggerData?.display_name || 'Someone'}, note length: ${(note || '').length}`);
-          blocks = buildTaggedBlocks(feedback, taggerData?.display_name || 'Someone', note || '', frontendUrl);
+          const taggerName = taggerData?.display_name || 'Someone';
+          console.log(`🔨 Building blocks - tagger: ${taggerName}, note preview: "${(note || '').substring(0, 50)}..."`);
+          blocks = buildTaggedBlocks(feedback, taggerName, note || '', frontendUrl);
           fallbackText = `You've been tagged in case ${feedback.case_number}`;
-          console.log(`✅ Blocks built (${blocks.length} blocks), fallback: "${fallbackText}"`);
-        } else {
-          console.warn(`⚠️ No user found matching: ${taggedDisplayName}`);
+          console.log(`✅ Ready to send notification to ${taggedUser.email}`);
         }
         break;
 
