@@ -27,16 +27,69 @@ export default function CustomerFeedbackPage() {
   // Handle feedbackId query param to auto-open specific feedback
   useEffect(() => {
     const feedbackId = searchParams.get('feedbackId');
-    if (feedbackId && feedbacks.length > 0) {
+    console.log('🔔 Checking for feedbackId:', feedbackId, 'feedbacks count:', feedbacks.length);
+    
+    if (!feedbackId) return;
+    
+    // First try to find in loaded feedbacks
+    if (feedbacks.length > 0) {
       const found = feedbacks.find(f => f.id === feedbackId);
+      console.log('🔔 Found feedback in list:', found?.id);
+      
       if (found) {
         setSelectedFeedback(found);
         setIsDetailsOpen(true);
-        // Clear the query param after opening
         setSearchParams({}, { replace: true });
+        return;
       }
     }
-  }, [feedbacks, searchParams, setSearchParams]);
+    
+    // If not found in list, fetch directly
+    const fetchSpecificFeedback = async () => {
+      console.log('🔔 Fetching feedback directly:', feedbackId);
+      const { data, error } = await supabase
+        .from('customer_feedback')
+        .select('*')
+        .eq('id', feedbackId)
+        .single();
+      
+      if (error) {
+        console.error('🔔 Error fetching feedback:', error);
+        return;
+      }
+      
+      if (data) {
+        console.log('🔔 Fetched feedback:', data.case_number);
+        const mappedFeedback: CustomerFeedback = {
+          id: data.id,
+          feedback_date: data.feedback_date,
+          complaint_category: data.complaint_category as CustomerFeedback['complaint_category'],
+          channel: data.channel as CustomerFeedback['channel'],
+          rating: data.rating,
+          resolution_status: (data.resolution_status || 'unopened') as CustomerFeedback['resolution_status'],
+          resolution_notes: data.resolution_notes,
+          store_number: data.store_number,
+          market: data.market,
+          case_number: data.case_number,
+          customer_name: data.customer_name,
+          customer_email: data.customer_email,
+          customer_phone: data.customer_phone,
+          feedback_text: data.feedback_text,
+          user_id: data.user_id,
+          created_at: data.created_at,
+          updated_at: data.updated_at,
+          priority: (data.priority || 'Low') as CustomerFeedback['priority'],
+          assignee: data.assignee || 'Unassigned',
+          viewed: data.viewed || false
+        };
+        setSelectedFeedback(mappedFeedback);
+        setIsDetailsOpen(true);
+        setSearchParams({}, { replace: true });
+      }
+    };
+    
+    fetchSpecificFeedback();
+  }, [searchParams, setSearchParams, feedbacks]);
 
   const fetchFeedbacks = async () => {
     try {
