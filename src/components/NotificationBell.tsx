@@ -82,12 +82,16 @@ export function NotificationBell() {
     setIsOpen(false);
     refresh();
     
-    // Navigate to feedback with feedbackId param to auto-open the details
-    // Use window.location to force a full navigation when already on the same route
+    // Navigate to dashboard with feedbackId param to auto-open the details
     if (notification.feedback_id && notification.notification_type === 'feedback_mention') {
-      const targetUrl = `/customer-feedback?feedbackId=${notification.feedback_id}`;
+      const targetUrl = `/?feedbackId=${notification.feedback_id}`;
       console.log('🔔 Navigating to:', targetUrl);
-      window.location.href = targetUrl;
+      // Use navigate for SPA navigation, but force reload if already on root
+      if (window.location.pathname === '/') {
+        window.location.href = targetUrl;
+      } else {
+        navigate(targetUrl);
+      }
     }
   };
 
