@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { CustomerFeedbackTable } from "@/components/feedback/CustomerFeedbackTable";
+import { FeedbackDetailsDialog } from "@/components/feedback/FeedbackDetailsDialog";
 import { CustomerFeedback } from "@/types/feedback";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -8,6 +10,9 @@ import { useUserPermissions } from "@/hooks/useUserPermissions";
 export default function CustomerFeedbackPage() {
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedFeedback, setSelectedFeedback] = useState<CustomerFeedback | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
   const { permissions } = useUserPermissions();
 
@@ -18,6 +23,20 @@ export default function CustomerFeedbackPage() {
   useEffect(() => {
     fetchFeedbacks();
   }, []);
+
+  // Handle feedbackId query param to auto-open specific feedback
+  useEffect(() => {
+    const feedbackId = searchParams.get('feedbackId');
+    if (feedbackId && feedbacks.length > 0) {
+      const found = feedbacks.find(f => f.id === feedbackId);
+      if (found) {
+        setSelectedFeedback(found);
+        setIsDetailsOpen(true);
+        // Clear the query param after opening
+        setSearchParams({}, { replace: true });
+      }
+    }
+  }, [feedbacks, searchParams, setSearchParams]);
 
   const fetchFeedbacks = async () => {
     try {
@@ -91,7 +110,13 @@ export default function CustomerFeedbackPage() {
   };
 
   const handleViewDetails = (feedback: CustomerFeedback) => {
-    console.log("View feedback details:", feedback);
+    setSelectedFeedback(feedback);
+    setIsDetailsOpen(true);
+  };
+
+  const handleCloseDetails = () => {
+    setIsDetailsOpen(false);
+    setSelectedFeedback(null);
   };
 
   const handleCategoryChange = (feedback: CustomerFeedback, newCategory: string) => {
@@ -170,6 +195,13 @@ export default function CustomerFeedbackPage() {
         onCategoryChange={handleCategoryChange}
         isAdmin={permissions.isAdmin}
         canEditCategory={permissions.isAdmin}
+      />
+
+      <FeedbackDetailsDialog
+        feedback={selectedFeedback}
+        isOpen={isDetailsOpen}
+        onClose={handleCloseDetails}
+        onUpdate={fetchFeedbacks}
       />
     </div>
   );

@@ -81,9 +81,9 @@ export function NotificationBell() {
     setIsOpen(false);
     refresh();
     
-    // Navigate to feedback if it's a feedback-related notification
+    // Navigate to feedback with feedbackId param to auto-open the details
     if (notification.feedback_id && notification.notification_type === 'feedback_mention') {
-      navigate('/customer-feedback');
+      navigate(`/customer-feedback?feedbackId=${notification.feedback_id}`);
     }
   };
 
