@@ -77,13 +77,17 @@ export function NotificationBell() {
   };
 
   const handleNotificationClick = async (notification: Notification) => {
+    console.log('🔔 Notification clicked:', notification);
     await markNotificationAsRead(notification.id);
     setIsOpen(false);
     refresh();
     
     // Navigate to feedback with feedbackId param to auto-open the details
+    // Use window.location to force a full navigation when already on the same route
     if (notification.feedback_id && notification.notification_type === 'feedback_mention') {
-      navigate(`/customer-feedback?feedbackId=${notification.feedback_id}`);
+      const targetUrl = `/customer-feedback?feedbackId=${notification.feedback_id}`;
+      console.log('🔔 Navigating to:', targetUrl);
+      window.location.href = targetUrl;
     }
   };
 
