@@ -3030,6 +3030,228 @@ export type Database = {
         }
         Relationships: []
       }
+      management_training_items: {
+        Row: {
+          created_at: string | null
+          day_category: string
+          day_number: number
+          id: string
+          is_active: boolean | null
+          is_observation_item: boolean | null
+          item_order: number
+          item_text: string
+          level_id: string
+          requires_dm_signoff: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          day_category: string
+          day_number: number
+          id?: string
+          is_active?: boolean | null
+          is_observation_item?: boolean | null
+          item_order: number
+          item_text: string
+          level_id: string
+          requires_dm_signoff?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          day_category?: string
+          day_number?: number
+          id?: string
+          is_active?: boolean | null
+          is_observation_item?: boolean | null
+          item_order?: number
+          item_text?: string
+          level_id?: string
+          requires_dm_signoff?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "management_training_items_level_id_fkey"
+            columns: ["level_id"]
+            isOneToOne: false
+            referencedRelation: "management_training_levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      management_training_levels: {
+        Row: {
+          created_at: string | null
+          display_order: number
+          id: string
+          is_active: boolean | null
+          level_code: string
+          level_name: string
+          prerequisite_level_id: string | null
+          prerequisite_trainings: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_order: number
+          id?: string
+          is_active?: boolean | null
+          level_code: string
+          level_name: string
+          prerequisite_level_id?: string | null
+          prerequisite_trainings?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number
+          id?: string
+          is_active?: boolean | null
+          level_code?: string
+          level_name?: string
+          prerequisite_level_id?: string | null
+          prerequisite_trainings?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "management_training_levels_prerequisite_level_id_fkey"
+            columns: ["prerequisite_level_id"]
+            isOneToOne: false
+            referencedRelation: "management_training_levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      management_training_progress: {
+        Row: {
+          created_at: string | null
+          dm_approved: boolean | null
+          dm_approved_at: string | null
+          dm_approved_by: string | null
+          id: string
+          manager_approved: boolean | null
+          manager_approved_at: string | null
+          manager_approved_by: string | null
+          notes: string | null
+          registration_id: string
+          trainee_completed: boolean | null
+          trainee_completed_at: string | null
+          training_item_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          dm_approved?: boolean | null
+          dm_approved_at?: string | null
+          dm_approved_by?: string | null
+          id?: string
+          manager_approved?: boolean | null
+          manager_approved_at?: string | null
+          manager_approved_by?: string | null
+          notes?: string | null
+          registration_id: string
+          trainee_completed?: boolean | null
+          trainee_completed_at?: string | null
+          training_item_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          dm_approved?: boolean | null
+          dm_approved_at?: string | null
+          dm_approved_by?: string | null
+          id?: string
+          manager_approved?: boolean | null
+          manager_approved_at?: string | null
+          manager_approved_by?: string | null
+          notes?: string | null
+          registration_id?: string
+          trainee_completed?: boolean | null
+          trainee_completed_at?: string | null
+          training_item_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "management_training_progress_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "management_training_registrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "management_training_progress_training_item_id_fkey"
+            columns: ["training_item_id"]
+            isOneToOne: false
+            referencedRelation: "management_training_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      management_training_registrations: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          employee_email: string
+          employee_id: string | null
+          employee_name: string
+          id: string
+          level_id: string
+          manager_approved_at: string | null
+          manager_approved_by: string | null
+          registered_at: string | null
+          registered_by: string | null
+          rejection_reason: string | null
+          status: string
+          store_number: string
+          updated_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          employee_email: string
+          employee_id?: string | null
+          employee_name: string
+          id?: string
+          level_id: string
+          manager_approved_at?: string | null
+          manager_approved_by?: string | null
+          registered_at?: string | null
+          registered_by?: string | null
+          rejection_reason?: string | null
+          status?: string
+          store_number: string
+          updated_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          employee_email?: string
+          employee_id?: string | null
+          employee_name?: string
+          id?: string
+          level_id?: string
+          manager_approved_at?: string | null
+          manager_approved_by?: string | null
+          registered_at?: string | null
+          registered_by?: string | null
+          rejection_reason?: string | null
+          status?: string
+          store_number?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "management_training_registrations_level_id_fkey"
+            columns: ["level_id"]
+            isOneToOne: false
+            referencedRelation: "management_training_levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       manager_approval_notifications: {
         Row: {
           created_at: string
