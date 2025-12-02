@@ -341,19 +341,36 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
 
   // Check acknowledgment status - use useCallback to memoize
   const checkAcknowledgmentStatus = useCallback(async () => {
-    if (!feedback?.id || !user?.id) {
-      console.log('❌ ACK CHECK: Missing data', { feedbackId: feedback?.id, userId: user?.id });
+    if (!feedback?.id || !user?.id || !permissions?.role) {
+      console.log('❌ ACK CHECK: Missing data', { feedbackId: feedback?.id, userId: user?.id, role: permissions?.role });
       return;
     }
     
     try {
-      console.log('🔍 ACK CHECK: Starting check...', { feedbackId: feedback.id, userId: user.id });
+      // Map user role to approval role
+      const userRole = permissions.role.toLowerCase();
+      const roleMapping: Record<string, string> = {
+        'admin': 'ceo',
+        'ceo': 'ceo',
+        'vp': 'vp',
+        'director': 'director',
+        'dm': 'dm'
+      };
+      const approvalRole = roleMapping[userRole];
       
+      if (!approvalRole) {
+        console.log('❌ ACK CHECK: No valid approval role for', userRole);
+        return;
+      }
+      
+      console.log('🔍 ACK CHECK: Starting check...', { feedbackId: feedback.id, approvalRole });
+      
+      // Check if this role has already approved
       const { data, error } = await supabase
         .from('critical_feedback_approvals')
         .select('*')
         .eq('feedback_id', feedback.id)
-        .eq('approver_user_id', user.id)
+        .eq('approver_role', approvalRole)
         .maybeSingle();
       
       if (error) {
@@ -366,7 +383,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
     } catch (error) {
       console.error('❌ ACK CHECK: Exception', error);
     }
-  }, [feedback?.id, user?.id]);
+  }, [feedback?.id, user?.id, permissions?.role]);
 
   // Generate email content based on template
   const generateEmailContent = (template: string) => {
@@ -1085,30 +1102,58 @@ Customer Service Team`);
     
     setIsLoading(true);
     try {
-      // Get user role
+      // Get user role - map to approval role
       const userRole = permissions?.role?.toLowerCase();
       
-      if (!userRole || !['dm', 'director', 'vp', 'ceo', 'admin'].includes(userRole)) {
+      // Map user roles to approval roles
+      const roleMapping: Record<string, string> = {
+        'admin': 'ceo', // Admin can approve as CEO
+        'ceo': 'ceo',
+        'vp': 'vp',
+        'director': 'director',
+        'dm': 'dm'
+      };
+      
+      const approvalRole = roleMapping[userRole || ''];
+      
+      if (!approvalRole) {
         toast({
           title: "Error",
           description: "You don't have permission to acknowledge critical feedback.",
           variant: "destructive",
         });
+        setIsLoading(false);
         return;
       }
 
-      console.log('💾 ACK SAVE: Inserting acknowledgment...', { feedbackId: feedback.id, userId: user?.id, role: userRole });
+      console.log('💾 ACK SAVE: Inserting acknowledgment...', { feedbackId: feedback.id, userId: user?.id, userRole, approvalRole });
 
-      // Insert approval record (ignore if already exists)
+      // Check if this role has already approved (unique constraint is feedback_id + approver_role)
+      const { data: existingApproval } = await supabase
+        .from('critical_feedback_approvals')
+        .select('id')
+        .eq('feedback_id', feedback.id)
+        .eq('approver_role', approvalRole)
+        .maybeSingle();
+
+      if (existingApproval) {
+        toast({
+          title: "Already Acknowledged",
+          description: `This feedback has already been acknowledged by a ${approvalRole.toUpperCase()}.`,
+        });
+        setHasAcknowledged(true);
+        setIsLoading(false);
+        return;
+      }
+
+      // Insert approval record
       const { error } = await supabase
         .from('critical_feedback_approvals')
-        .upsert({
+        .insert({
           feedback_id: feedback.id,
           approver_user_id: user?.id,
-          approver_role: userRole,
-        }, {
-          onConflict: 'feedback_id,approver_user_id',
-          ignoreDuplicates: true
+          approver_role: approvalRole,
+          approved_at: new Date().toISOString(),
         });
 
       if (error) {
@@ -1121,10 +1166,9 @@ Customer Service Team`);
       
       toast({
         title: "Critical Feedback Acknowledged",
-        description: `You have acknowledged this critical feedback as ${userRole.toUpperCase()}.`,
+        description: `You have acknowledged this critical feedback as ${approvalRole.toUpperCase()}.`,
       });
       
-      // Don't re-check - we already know it succeeded
       onUpdate();
     } catch (error) {
       console.error('Error acknowledging critical feedback:', error);
