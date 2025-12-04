@@ -2192,6 +2192,93 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_relations_reports: {
+        Row: {
+          assigned_to: string | null
+          category: string | null
+          claimant_position: string | null
+          created_at: string
+          created_by: string | null
+          details: string | null
+          harassment_type: string | null
+          id: string
+          incident_date: string | null
+          incident_time: string | null
+          internal_notes: string | null
+          is_anonymous: boolean
+          others_positions: string | null
+          persons_involved: string | null
+          report_number: string
+          reported_employees: Json | null
+          reporter_email: string | null
+          reporter_name: string | null
+          reporter_phone: string | null
+          source: string | null
+          status: string
+          store_number: string | null
+          sub_category: string | null
+          submitted_at: string
+          updated_at: string
+          witnesses: Json | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          category?: string | null
+          claimant_position?: string | null
+          created_at?: string
+          created_by?: string | null
+          details?: string | null
+          harassment_type?: string | null
+          id?: string
+          incident_date?: string | null
+          incident_time?: string | null
+          internal_notes?: string | null
+          is_anonymous?: boolean
+          others_positions?: string | null
+          persons_involved?: string | null
+          report_number: string
+          reported_employees?: Json | null
+          reporter_email?: string | null
+          reporter_name?: string | null
+          reporter_phone?: string | null
+          source?: string | null
+          status?: string
+          store_number?: string | null
+          sub_category?: string | null
+          submitted_at?: string
+          updated_at?: string
+          witnesses?: Json | null
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: string | null
+          claimant_position?: string | null
+          created_at?: string
+          created_by?: string | null
+          details?: string | null
+          harassment_type?: string | null
+          id?: string
+          incident_date?: string | null
+          incident_time?: string | null
+          internal_notes?: string | null
+          is_anonymous?: boolean
+          others_positions?: string | null
+          persons_involved?: string | null
+          report_number?: string
+          reported_employees?: Json | null
+          reporter_email?: string | null
+          reporter_name?: string | null
+          reporter_phone?: string | null
+          source?: string | null
+          status?: string
+          store_number?: string | null
+          sub_category?: string | null
+          submitted_at?: string
+          updated_at?: string
+          witnesses?: Json | null
+        }
+        Relationships: []
+      }
       employee_training_completions: {
         Row: {
           completed_date: string | null
@@ -2324,6 +2411,380 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_store_monthly_spending"
             referencedColumns: ["store_number"]
+          },
+        ]
+      }
+      er_case_attachments: {
+        Row: {
+          created_at: string
+          description: string | null
+          file_name: string
+          file_type: string
+          file_url: string
+          id: string
+          report_id: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          file_name: string
+          file_type: string
+          file_url: string
+          id?: string
+          report_id: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          file_name?: string
+          file_type?: string
+          file_url?: string
+          id?: string
+          report_id?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "er_case_attachments_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "employee_relations_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      er_interview_attachments: {
+        Row: {
+          created_at: string
+          description: string | null
+          file_name: string
+          file_type: string
+          file_url: string
+          id: string
+          interview_id: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          file_name: string
+          file_type: string
+          file_url: string
+          id?: string
+          interview_id: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          file_name?: string
+          file_type?: string
+          file_url?: string
+          id?: string
+          interview_id?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "er_interview_attachments_interview_id_fkey"
+            columns: ["interview_id"]
+            isOneToOne: false
+            referencedRelation: "er_interviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      er_interviews: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          employee_name: string | null
+          hr_employee_name: string | null
+          id: string
+          interview_date: string
+          interview_party_type: string | null
+          interview_time: string | null
+          interview_type: string
+          notes: string | null
+          report_id: string
+          updated_at: string
+          witness_names: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          employee_name?: string | null
+          hr_employee_name?: string | null
+          id?: string
+          interview_date: string
+          interview_party_type?: string | null
+          interview_time?: string | null
+          interview_type: string
+          notes?: string | null
+          report_id: string
+          updated_at?: string
+          witness_names?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          employee_name?: string | null
+          hr_employee_name?: string | null
+          id?: string
+          interview_date?: string
+          interview_party_type?: string | null
+          interview_time?: string | null
+          interview_type?: string
+          notes?: string | null
+          report_id?: string
+          updated_at?: string
+          witness_names?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "er_interviews_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "employee_relations_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      er_workflow_tasks: {
+        Row: {
+          accused_interview_at: string | null
+          accused_interview_by: string | null
+          accused_interview_completed: boolean | null
+          ada_process_at: string | null
+          ada_process_by: string | null
+          ada_process_started: boolean | null
+          claimant_interview_at: string | null
+          claimant_interview_by: string | null
+          claimant_interview_completed: boolean | null
+          corrective_action_at: string | null
+          corrective_action_by: string | null
+          corrective_action_completed: boolean | null
+          corrective_action_notes: string | null
+          created_at: string | null
+          determine_findings_at: string | null
+          determine_findings_by: string | null
+          determine_findings_completed: boolean | null
+          determine_findings_notes: string | null
+          docs_collected: boolean | null
+          docs_collected_at: string | null
+          docs_collected_by: string | null
+          docs_no_docs_reason: string | null
+          document_closure_at: string | null
+          document_closure_by: string | null
+          document_closure_completed: boolean | null
+          document_corrective_action_at: string | null
+          document_corrective_action_by: string | null
+          document_corrective_action_completed: boolean | null
+          document_outcome_at: string | null
+          document_outcome_by: string | null
+          document_outcome_completed: boolean | null
+          employee_contacted: boolean | null
+          employee_contacted_at: string | null
+          employee_contacted_by: string | null
+          followup_checkin_at: string | null
+          followup_checkin_by: string | null
+          followup_checkin_completed: boolean | null
+          hazard_correction_at: string | null
+          hazard_correction_by: string | null
+          hazard_correction_initiated: boolean | null
+          hazard_correction_notes: string | null
+          id: string
+          mediation_at: string | null
+          mediation_by: string | null
+          mediation_completed: boolean | null
+          no_corrective_action_reason: string | null
+          other_parties_interview_at: string | null
+          other_parties_interview_by: string | null
+          other_parties_interview_completed: boolean | null
+          outcome_determined_at: string | null
+          outcome_determined_by: string | null
+          outcome_determined_completed: boolean | null
+          policy_compliance_at: string | null
+          policy_compliance_by: string | null
+          policy_compliance_verified: boolean | null
+          report_id: string
+          resolution_determined_at: string | null
+          resolution_determined_by: string | null
+          resolution_determined_completed: boolean | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          review_attendance_records_at: string | null
+          review_attendance_records_by: string | null
+          review_attendance_records_completed: boolean | null
+          review_documentation_at: string | null
+          review_documentation_by: string | null
+          review_documentation_completed: boolean | null
+          safety_resolved_at: string | null
+          safety_resolved_by: string | null
+          safety_resolved_confirmed: boolean | null
+          safety_resolved_notes: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          accused_interview_at?: string | null
+          accused_interview_by?: string | null
+          accused_interview_completed?: boolean | null
+          ada_process_at?: string | null
+          ada_process_by?: string | null
+          ada_process_started?: boolean | null
+          claimant_interview_at?: string | null
+          claimant_interview_by?: string | null
+          claimant_interview_completed?: boolean | null
+          corrective_action_at?: string | null
+          corrective_action_by?: string | null
+          corrective_action_completed?: boolean | null
+          corrective_action_notes?: string | null
+          created_at?: string | null
+          determine_findings_at?: string | null
+          determine_findings_by?: string | null
+          determine_findings_completed?: boolean | null
+          determine_findings_notes?: string | null
+          docs_collected?: boolean | null
+          docs_collected_at?: string | null
+          docs_collected_by?: string | null
+          docs_no_docs_reason?: string | null
+          document_closure_at?: string | null
+          document_closure_by?: string | null
+          document_closure_completed?: boolean | null
+          document_corrective_action_at?: string | null
+          document_corrective_action_by?: string | null
+          document_corrective_action_completed?: boolean | null
+          document_outcome_at?: string | null
+          document_outcome_by?: string | null
+          document_outcome_completed?: boolean | null
+          employee_contacted?: boolean | null
+          employee_contacted_at?: string | null
+          employee_contacted_by?: string | null
+          followup_checkin_at?: string | null
+          followup_checkin_by?: string | null
+          followup_checkin_completed?: boolean | null
+          hazard_correction_at?: string | null
+          hazard_correction_by?: string | null
+          hazard_correction_initiated?: boolean | null
+          hazard_correction_notes?: string | null
+          id?: string
+          mediation_at?: string | null
+          mediation_by?: string | null
+          mediation_completed?: boolean | null
+          no_corrective_action_reason?: string | null
+          other_parties_interview_at?: string | null
+          other_parties_interview_by?: string | null
+          other_parties_interview_completed?: boolean | null
+          outcome_determined_at?: string | null
+          outcome_determined_by?: string | null
+          outcome_determined_completed?: boolean | null
+          policy_compliance_at?: string | null
+          policy_compliance_by?: string | null
+          policy_compliance_verified?: boolean | null
+          report_id: string
+          resolution_determined_at?: string | null
+          resolution_determined_by?: string | null
+          resolution_determined_completed?: boolean | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          review_attendance_records_at?: string | null
+          review_attendance_records_by?: string | null
+          review_attendance_records_completed?: boolean | null
+          review_documentation_at?: string | null
+          review_documentation_by?: string | null
+          review_documentation_completed?: boolean | null
+          safety_resolved_at?: string | null
+          safety_resolved_by?: string | null
+          safety_resolved_confirmed?: boolean | null
+          safety_resolved_notes?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          accused_interview_at?: string | null
+          accused_interview_by?: string | null
+          accused_interview_completed?: boolean | null
+          ada_process_at?: string | null
+          ada_process_by?: string | null
+          ada_process_started?: boolean | null
+          claimant_interview_at?: string | null
+          claimant_interview_by?: string | null
+          claimant_interview_completed?: boolean | null
+          corrective_action_at?: string | null
+          corrective_action_by?: string | null
+          corrective_action_completed?: boolean | null
+          corrective_action_notes?: string | null
+          created_at?: string | null
+          determine_findings_at?: string | null
+          determine_findings_by?: string | null
+          determine_findings_completed?: boolean | null
+          determine_findings_notes?: string | null
+          docs_collected?: boolean | null
+          docs_collected_at?: string | null
+          docs_collected_by?: string | null
+          docs_no_docs_reason?: string | null
+          document_closure_at?: string | null
+          document_closure_by?: string | null
+          document_closure_completed?: boolean | null
+          document_corrective_action_at?: string | null
+          document_corrective_action_by?: string | null
+          document_corrective_action_completed?: boolean | null
+          document_outcome_at?: string | null
+          document_outcome_by?: string | null
+          document_outcome_completed?: boolean | null
+          employee_contacted?: boolean | null
+          employee_contacted_at?: string | null
+          employee_contacted_by?: string | null
+          followup_checkin_at?: string | null
+          followup_checkin_by?: string | null
+          followup_checkin_completed?: boolean | null
+          hazard_correction_at?: string | null
+          hazard_correction_by?: string | null
+          hazard_correction_initiated?: boolean | null
+          hazard_correction_notes?: string | null
+          id?: string
+          mediation_at?: string | null
+          mediation_by?: string | null
+          mediation_completed?: boolean | null
+          no_corrective_action_reason?: string | null
+          other_parties_interview_at?: string | null
+          other_parties_interview_by?: string | null
+          other_parties_interview_completed?: boolean | null
+          outcome_determined_at?: string | null
+          outcome_determined_by?: string | null
+          outcome_determined_completed?: boolean | null
+          policy_compliance_at?: string | null
+          policy_compliance_by?: string | null
+          policy_compliance_verified?: boolean | null
+          report_id?: string
+          resolution_determined_at?: string | null
+          resolution_determined_by?: string | null
+          resolution_determined_completed?: boolean | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          review_attendance_records_at?: string | null
+          review_attendance_records_by?: string | null
+          review_attendance_records_completed?: boolean | null
+          review_documentation_at?: string | null
+          review_documentation_by?: string | null
+          review_documentation_completed?: boolean | null
+          safety_resolved_at?: string | null
+          safety_resolved_by?: string | null
+          safety_resolved_confirmed?: boolean | null
+          safety_resolved_notes?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "er_workflow_tasks_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: true
+            referencedRelation: "employee_relations_reports"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2897,7 +3358,9 @@ export type Database = {
           store_number: string
           submission_date: string | null
           submitted_by: string | null
+          submitter_email: string | null
           submitter_name: string
+          submitter_phone: string | null
           submitter_type: string
           updated_at: string | null
           witnesses: Json | null
@@ -2939,7 +3402,9 @@ export type Database = {
           store_number: string
           submission_date?: string | null
           submitted_by?: string | null
+          submitter_email?: string | null
           submitter_name: string
+          submitter_phone?: string | null
           submitter_type: string
           updated_at?: string | null
           witnesses?: Json | null
@@ -2981,7 +3446,9 @@ export type Database = {
           store_number?: string
           submission_date?: string | null
           submitted_by?: string | null
+          submitter_email?: string | null
           submitter_name?: string
+          submitter_phone?: string | null
           submitter_type?: string
           updated_at?: string | null
           witnesses?: Json | null
@@ -2994,6 +3461,10 @@ export type Database = {
           clinic_called: boolean | null
           clinic_called_at: string | null
           clinic_called_by: string | null
+          closeout_complete: boolean | null
+          closeout_complete_at: string | null
+          closeout_complete_by: string | null
+          closeout_type: string | null
           created_at: string | null
           dwc_form_number: string | null
           employee_contacted: boolean | null
@@ -3004,6 +3475,7 @@ export type Database = {
           employee_interviewed_by: string | null
           id: string
           incident_id: string
+          insurance_claim_number: string | null
           interview_notes: string | null
           invoice_total_amount: number | null
           invoices_collected: boolean | null
@@ -3013,7 +3485,25 @@ export type Database = {
           medical_outcome: string | null
           medical_outcome_at: string | null
           medical_outcome_by: string | null
+          police_report_verified: boolean | null
+          police_report_verified_at: string | null
+          police_report_verified_by: string | null
+          rca_completed: boolean | null
+          rca_completed_at: string | null
+          rca_completed_by: string | null
+          rca_employee_rushing: boolean | null
+          rca_employee_trained: boolean | null
+          rca_equipment_used: string | null
+          rca_manager_interviewed: boolean | null
+          rca_manager_interviewed_at: string | null
+          rca_manager_interviewed_by: string | null
+          rca_ppe_required_missing: boolean | null
+          rca_surface_wet: boolean | null
           updated_at: string | null
+          wc_form_number_entered: string | null
+          wc_form_submitted: boolean | null
+          wc_form_submitted_at: string | null
+          wc_form_submitted_by: string | null
           witnesses_interviewed: boolean | null
           witnesses_interviewed_at: string | null
           witnesses_interviewed_by: string | null
@@ -3023,6 +3513,10 @@ export type Database = {
           clinic_called?: boolean | null
           clinic_called_at?: string | null
           clinic_called_by?: string | null
+          closeout_complete?: boolean | null
+          closeout_complete_at?: string | null
+          closeout_complete_by?: string | null
+          closeout_type?: string | null
           created_at?: string | null
           dwc_form_number?: string | null
           employee_contacted?: boolean | null
@@ -3033,6 +3527,7 @@ export type Database = {
           employee_interviewed_by?: string | null
           id?: string
           incident_id: string
+          insurance_claim_number?: string | null
           interview_notes?: string | null
           invoice_total_amount?: number | null
           invoices_collected?: boolean | null
@@ -3042,7 +3537,25 @@ export type Database = {
           medical_outcome?: string | null
           medical_outcome_at?: string | null
           medical_outcome_by?: string | null
+          police_report_verified?: boolean | null
+          police_report_verified_at?: string | null
+          police_report_verified_by?: string | null
+          rca_completed?: boolean | null
+          rca_completed_at?: string | null
+          rca_completed_by?: string | null
+          rca_employee_rushing?: boolean | null
+          rca_employee_trained?: boolean | null
+          rca_equipment_used?: string | null
+          rca_manager_interviewed?: boolean | null
+          rca_manager_interviewed_at?: string | null
+          rca_manager_interviewed_by?: string | null
+          rca_ppe_required_missing?: boolean | null
+          rca_surface_wet?: boolean | null
           updated_at?: string | null
+          wc_form_number_entered?: string | null
+          wc_form_submitted?: boolean | null
+          wc_form_submitted_at?: string | null
+          wc_form_submitted_by?: string | null
           witnesses_interviewed?: boolean | null
           witnesses_interviewed_at?: string | null
           witnesses_interviewed_by?: string | null
@@ -3052,6 +3565,10 @@ export type Database = {
           clinic_called?: boolean | null
           clinic_called_at?: string | null
           clinic_called_by?: string | null
+          closeout_complete?: boolean | null
+          closeout_complete_at?: string | null
+          closeout_complete_by?: string | null
+          closeout_type?: string | null
           created_at?: string | null
           dwc_form_number?: string | null
           employee_contacted?: boolean | null
@@ -3062,6 +3579,7 @@ export type Database = {
           employee_interviewed_by?: string | null
           id?: string
           incident_id?: string
+          insurance_claim_number?: string | null
           interview_notes?: string | null
           invoice_total_amount?: number | null
           invoices_collected?: boolean | null
@@ -3071,7 +3589,25 @@ export type Database = {
           medical_outcome?: string | null
           medical_outcome_at?: string | null
           medical_outcome_by?: string | null
+          police_report_verified?: boolean | null
+          police_report_verified_at?: string | null
+          police_report_verified_by?: string | null
+          rca_completed?: boolean | null
+          rca_completed_at?: string | null
+          rca_completed_by?: string | null
+          rca_employee_rushing?: boolean | null
+          rca_employee_trained?: boolean | null
+          rca_equipment_used?: string | null
+          rca_manager_interviewed?: boolean | null
+          rca_manager_interviewed_at?: string | null
+          rca_manager_interviewed_by?: string | null
+          rca_ppe_required_missing?: boolean | null
+          rca_surface_wet?: boolean | null
           updated_at?: string | null
+          wc_form_number_entered?: string | null
+          wc_form_submitted?: boolean | null
+          wc_form_submitted_at?: string | null
+          wc_form_submitted_by?: string | null
           witnesses_interviewed?: boolean | null
           witnesses_interviewed_at?: string | null
           witnesses_interviewed_by?: string | null
@@ -3785,6 +4321,8 @@ export type Database = {
           drivers_license_verified_at: string | null
           emergency_contacts_complete: boolean | null
           emergency_contacts_completed_at: string | null
+          fast_track_complete: boolean | null
+          fast_track_completed_at: string | null
           fhc_complete: boolean | null
           fhc_completed_at: string | null
           handbook_signed: boolean | null
@@ -3827,6 +4365,8 @@ export type Database = {
           review_documents_completed_at: string | null
           servsafe_complete: boolean | null
           servsafe_completed_at: string | null
+          supervisor_harassment_training_complete: boolean | null
+          supervisor_harassment_training_completed_at: string | null
           tax_withholding_complete: boolean | null
           tax_withholding_completed_at: string | null
           updated_at: string
@@ -3860,6 +4400,8 @@ export type Database = {
           drivers_license_verified_at?: string | null
           emergency_contacts_complete?: boolean | null
           emergency_contacts_completed_at?: string | null
+          fast_track_complete?: boolean | null
+          fast_track_completed_at?: string | null
           fhc_complete?: boolean | null
           fhc_completed_at?: string | null
           handbook_signed?: boolean | null
@@ -3902,6 +4444,8 @@ export type Database = {
           review_documents_completed_at?: string | null
           servsafe_complete?: boolean | null
           servsafe_completed_at?: string | null
+          supervisor_harassment_training_complete?: boolean | null
+          supervisor_harassment_training_completed_at?: string | null
           tax_withholding_complete?: boolean | null
           tax_withholding_completed_at?: string | null
           updated_at?: string
@@ -3935,6 +4479,8 @@ export type Database = {
           drivers_license_verified_at?: string | null
           emergency_contacts_complete?: boolean | null
           emergency_contacts_completed_at?: string | null
+          fast_track_complete?: boolean | null
+          fast_track_completed_at?: string | null
           fhc_complete?: boolean | null
           fhc_completed_at?: string | null
           handbook_signed?: boolean | null
@@ -3977,6 +4523,8 @@ export type Database = {
           review_documents_completed_at?: string | null
           servsafe_complete?: boolean | null
           servsafe_completed_at?: string | null
+          supervisor_harassment_training_complete?: boolean | null
+          supervisor_harassment_training_completed_at?: string | null
           tax_withholding_complete?: boolean | null
           tax_withholding_completed_at?: string | null
           updated_at?: string
@@ -3997,11 +4545,13 @@ export type Database = {
       }
       new_hire_submissions: {
         Row: {
+          address: string | null
           annual_salary: number | null
           applicant_email: string
           applicant_phone: string
           application_source: string | null
           auto_insurance_carrier: string | null
+          city: string | null
           created_at: string
           date_of_birth: string | null
           drivers_license_number: string | null
@@ -4042,6 +4592,8 @@ export type Database = {
           servsafe_expiration: string | null
           servsafe_number: string | null
           sign_on_bonus: string | null
+          ssn_last_4: string | null
+          state: string | null
           state_of_residence: string | null
           status: string | null
           store_number: string
@@ -4050,13 +4602,16 @@ export type Database = {
           wage: number
           wage_within_scale: string | null
           will_be_driving: boolean | null
+          zip: string | null
         }
         Insert: {
+          address?: string | null
           annual_salary?: number | null
           applicant_email: string
           applicant_phone: string
           application_source?: string | null
           auto_insurance_carrier?: string | null
+          city?: string | null
           created_at?: string
           date_of_birth?: string | null
           drivers_license_number?: string | null
@@ -4097,6 +4652,8 @@ export type Database = {
           servsafe_expiration?: string | null
           servsafe_number?: string | null
           sign_on_bonus?: string | null
+          ssn_last_4?: string | null
+          state?: string | null
           state_of_residence?: string | null
           status?: string | null
           store_number: string
@@ -4105,13 +4662,16 @@ export type Database = {
           wage: number
           wage_within_scale?: string | null
           will_be_driving?: boolean | null
+          zip?: string | null
         }
         Update: {
+          address?: string | null
           annual_salary?: number | null
           applicant_email?: string
           applicant_phone?: string
           application_source?: string | null
           auto_insurance_carrier?: string | null
+          city?: string | null
           created_at?: string
           date_of_birth?: string | null
           drivers_license_number?: string | null
@@ -4152,6 +4712,8 @@ export type Database = {
           servsafe_expiration?: string | null
           servsafe_number?: string | null
           sign_on_bonus?: string | null
+          ssn_last_4?: string | null
+          state?: string | null
           state_of_residence?: string | null
           status?: string | null
           store_number?: string
@@ -4160,6 +4722,7 @@ export type Database = {
           wage?: number
           wage_within_scale?: string | null
           will_be_driving?: boolean | null
+          zip?: string | null
         }
         Relationships: []
       }
@@ -7922,6 +8485,74 @@ export type Database = {
         Args: { p_employee_id: string; p_template_item_id: string }
         Returns: string
       }
+      submit_employee_relations_report:
+        | {
+            Args: {
+              p_category?: string
+              p_details?: string
+              p_harassment_type?: string
+              p_incident_date?: string
+              p_incident_time?: string
+              p_is_anonymous?: boolean
+              p_persons_involved?: string
+              p_reporter_email?: string
+              p_reporter_name?: string
+              p_reporter_phone?: string
+              p_store_number?: string
+              p_sub_category?: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_attendance_documentation?: string
+              p_attendance_issue_type?: string
+              p_attendance_medical_related?: boolean
+              p_attendance_requested_accommodation?: string
+              p_category: string
+              p_conflict_ongoing?: boolean
+              p_conflict_requested_resolution?: string
+              p_conflict_type?: string
+              p_description?: string
+              p_discrimination_reason?: string
+              p_discrimination_types?: Json
+              p_harassment_frequency?: string
+              p_harassment_impact?: string
+              p_harassment_types?: Json
+              p_incident_date?: string
+              p_incident_time?: string
+              p_is_anonymous?: boolean
+              p_misconduct_financial_amount?: number
+              p_misconduct_financial_loss?: boolean
+              p_misconduct_types?: Json
+              p_persons_involved?: Json
+              p_policy_repeated_issue?: boolean
+              p_policy_violated?: string
+              p_policy_violation_description?: string
+              p_reported_employees?: Json
+              p_reporter_email?: string
+              p_reporter_name?: string
+              p_reporter_phone?: string
+              p_reporter_position?: string
+              p_retaliation_original_activity?: string
+              p_retaliation_original_date?: string
+              p_retaliation_types?: Json
+              p_safety_any_injuries?: boolean
+              p_safety_hazard_present?: boolean
+              p_safety_hazard_types?: Json
+              p_safety_immediate_actions?: string
+              p_safety_injury_description?: string
+              p_safety_involves_person?: boolean
+              p_source?: string
+              p_store_number?: string
+              p_sub_category?: string
+              p_witnesses?: Json
+            }
+            Returns: {
+              report_id: string
+              report_number: string
+            }[]
+          }
       user_has_market_access: {
         Args: { target_market: string; user_id: string }
         Returns: boolean
