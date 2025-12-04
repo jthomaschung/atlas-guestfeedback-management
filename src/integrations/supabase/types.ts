@@ -3350,6 +3350,7 @@ export type Database = {
           other_party_policy_number: string | null
           other_party_vehicle: string | null
           parties_involved: string | null
+          police_report_agency: string | null
           police_report_filed: boolean | null
           police_report_number: string | null
           resolution_notes: string | null
@@ -3394,6 +3395,7 @@ export type Database = {
           other_party_policy_number?: string | null
           other_party_vehicle?: string | null
           parties_involved?: string | null
+          police_report_agency?: string | null
           police_report_filed?: boolean | null
           police_report_number?: string | null
           resolution_notes?: string | null
@@ -3438,6 +3440,7 @@ export type Database = {
           other_party_policy_number?: string | null
           other_party_vehicle?: string | null
           parties_involved?: string | null
+          police_report_agency?: string | null
           police_report_filed?: boolean | null
           police_report_number?: string | null
           resolution_notes?: string | null
