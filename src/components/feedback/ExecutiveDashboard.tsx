@@ -623,21 +623,8 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
                           <strong>Escalated:</strong> {timeSinceEscalation}h ago
                         </p>
                       </div>
-                      <div className="flex flex-col space-y-2">
-                        <div className="flex space-x-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedFeedback(feedback);
-                              setExecutiveNotes(feedback.executive_notes || '');
-                              setIsNotesDialogOpen(true);
-                            }}
-                          >
-                            <FileText className="h-4 w-4 mr-1" />
-                            Add Notes
-                          </Button>
+                        <div className="flex flex-col space-y-2">
+                          <div className="flex space-x-2">
                           {canUserApprove(feedback, userRole) && !hasAllApprovals(feedback) && (
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
