@@ -607,8 +607,18 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
     return lines.join('\n');
   };
 
+  // Check if feedback is critical or escalated - requires custom message only
+  const isCriticalOrEscalated = feedback?.priority === 'Critical' || 
+                                 feedback?.resolution_status === 'escalated';
+
   // Auto-select template based on feedback category
   useEffect(() => {
+    // For critical/escalated feedback, always force custom template
+    if (isCriticalOrEscalated) {
+      setSelectedTemplate('custom');
+      return;
+    }
+
     if (feedback?.complaint_category) {
       const category = feedback.complaint_category.toLowerCase();
       
@@ -642,7 +652,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
         setSelectedTemplate('acknowledgment');
       }
     }
-  }, [feedback?.complaint_category]);
+  }, [feedback?.complaint_category, isCriticalOrEscalated]);
 
   // Update editable email content when template or placeholders change
   useEffect(() => {
@@ -1363,63 +1373,76 @@ Customer Service Team`);
                       ) : (
                         <div className="space-y-3 w-full">
                           {/* Template Selection */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-muted/50">
-                            <div className="space-y-2">
-                              <Label htmlFor="template-select">Email Template</Label>
-                              <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select template" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="acknowledgment">Acknowledgment</SelectItem>
-                                  <SelectItem value="slow_service">Slow Service</SelectItem>
-                                  <SelectItem value="sandwich_wrong">Sandwich Made Wrong</SelectItem>
-                                  <SelectItem value="missing_item">Missing Item</SelectItem>
-                                  <SelectItem value="bread_quality">Bread Quality</SelectItem>
-                                  <SelectItem value="product_quality">Product Quality</SelectItem>
-                                  <SelectItem value="out_of_bread">Out of Bread</SelectItem>
-                                  <SelectItem value="out_of_product">Out of Product</SelectItem>
-                                  <SelectItem value="closed_early">Closed Early</SelectItem>
-                                  <SelectItem value="praise">Praise</SelectItem>
-                                  <SelectItem value="credit_card">Credit Card Issue</SelectItem>
-                                  <SelectItem value="cleanliness">Cleanliness</SelectItem>
-                                  <SelectItem value="loyalty_issues">Loyalty Program Issues</SelectItem>
-                                  <SelectItem value="food_poisoning">Possible Food Poisoning</SelectItem>
-                                  <SelectItem value="resolution">Resolution Update</SelectItem>
-                                  <SelectItem value="escalation">Escalation Notice</SelectItem>
-                                  <SelectItem value="custom">Custom Message</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            {/* Template-specific fields */}
-                            {selectedTemplate === 'resolution' && (
-                              <div className="space-y-3">
-                                <div className="space-y-2">
-                                  <Label htmlFor="action-taken">Action Taken</Label>
-                                  <Textarea
-                                    id="action-taken"
-                                    value={emailActionTaken}
-                                    onChange={(e) => setEmailActionTaken(e.target.value)}
-                                    placeholder="Describe what action was taken..."
-                                    rows={2}
-                                    className="resize-none text-sm"
-                                  />
-                                </div>
-                                <div className="space-y-2">
-                                  <Label htmlFor="resolution-notes">Resolution Notes</Label>
-                                  <Textarea
-                                    id="resolution-notes"
-                                    value={emailResolutionNotes}
-                                    onChange={(e) => setEmailResolutionNotes(e.target.value)}
-                                    placeholder="Additional resolution details..."
-                                    rows={2}
-                                    className="resize-none text-sm"
-                                  />
-                                </div>
+                          {isCriticalOrEscalated ? (
+                            <div className="p-4 border rounded-lg bg-amber-50 border-amber-200">
+                              <div className="flex items-center gap-2 text-amber-800">
+                                <AlertTriangle className="w-4 h-4" />
+                                <span className="font-medium">Custom Message Required</span>
                               </div>
-                            )}
-                          </div>
+                              <p className="text-sm text-amber-700 mt-1">
+                                Templates are not available for critical or escalated feedback. 
+                                Please compose a custom message below.
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-muted/50">
+                              <div className="space-y-2">
+                                <Label htmlFor="template-select">Email Template</Label>
+                                <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select template" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="acknowledgment">Acknowledgment</SelectItem>
+                                    <SelectItem value="slow_service">Slow Service</SelectItem>
+                                    <SelectItem value="sandwich_wrong">Sandwich Made Wrong</SelectItem>
+                                    <SelectItem value="missing_item">Missing Item</SelectItem>
+                                    <SelectItem value="bread_quality">Bread Quality</SelectItem>
+                                    <SelectItem value="product_quality">Product Quality</SelectItem>
+                                    <SelectItem value="out_of_bread">Out of Bread</SelectItem>
+                                    <SelectItem value="out_of_product">Out of Product</SelectItem>
+                                    <SelectItem value="closed_early">Closed Early</SelectItem>
+                                    <SelectItem value="praise">Praise</SelectItem>
+                                    <SelectItem value="credit_card">Credit Card Issue</SelectItem>
+                                    <SelectItem value="cleanliness">Cleanliness</SelectItem>
+                                    <SelectItem value="loyalty_issues">Loyalty Program Issues</SelectItem>
+                                    <SelectItem value="food_poisoning">Possible Food Poisoning</SelectItem>
+                                    <SelectItem value="resolution">Resolution Update</SelectItem>
+                                    <SelectItem value="escalation">Escalation Notice</SelectItem>
+                                    <SelectItem value="custom">Custom Message</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              {/* Template-specific fields */}
+                              {selectedTemplate === 'resolution' && (
+                                <div className="space-y-3">
+                                  <div className="space-y-2">
+                                    <Label htmlFor="action-taken">Action Taken</Label>
+                                    <Textarea
+                                      id="action-taken"
+                                      value={emailActionTaken}
+                                      onChange={(e) => setEmailActionTaken(e.target.value)}
+                                      placeholder="Describe what action was taken..."
+                                      rows={2}
+                                      className="resize-none text-sm"
+                                    />
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label htmlFor="resolution-notes">Resolution Notes</Label>
+                                    <Textarea
+                                      id="resolution-notes"
+                                      value={emailResolutionNotes}
+                                      onChange={(e) => setEmailResolutionNotes(e.target.value)}
+                                      placeholder="Additional resolution details..."
+                                      rows={2}
+                                      className="resize-none text-sm"
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
 
                           {/* Email Preview */}
                           <Card className="p-4 bg-muted/30 border-2">
