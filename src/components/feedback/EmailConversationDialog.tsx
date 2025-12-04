@@ -51,8 +51,18 @@ export function EmailConversationDialog({
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
+  // Check if feedback is critical or escalated - requires custom message only
+  const isCriticalOrEscalated = feedback?.priority === 'Critical' || 
+                                 feedback?.resolution_status === 'escalated';
+
   // Auto-select template based on feedback category
   useEffect(() => {
+    // For critical/escalated feedback, always force custom template
+    if (isCriticalOrEscalated) {
+      setSelectedTemplate('custom');
+      return;
+    }
+
     if (feedback?.complaint_category) {
       const category = feedback.complaint_category.toLowerCase();
       
@@ -86,7 +96,7 @@ export function EmailConversationDialog({
         setSelectedTemplate('acknowledgment');
       }
     }
-  }, [feedback]);
+  }, [feedback, isCriticalOrEscalated]);
 
   useEffect(() => {
     if (isOpen && feedbackId) {
@@ -368,148 +378,161 @@ export function EmailConversationDialog({
             )}
 
             {/* Template Selection */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-gray-50">
-              <div className="space-y-2">
-                <Label htmlFor="template-select">Email Template</Label>
-                <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select template" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="acknowledgment">
-                      <div className="flex items-center gap-2">
-                        {getTemplateIcon('acknowledgment')}
-                        Acknowledgment
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="slow_service">
-                      <div className="flex items-center gap-2">
-                        {getTemplateIcon('slow_service')}
-                        Slow Service
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="sandwich_wrong">
-                      <div className="flex items-center gap-2">
-                        {getTemplateIcon('sandwich_wrong')}
-                        Sandwich Made Wrong
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="missing_item">
-                      <div className="flex items-center gap-2">
-                        {getTemplateIcon('missing_item')}
-                        Missing Item
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="bread_quality">
-                      <div className="flex items-center gap-2">
-                        {getTemplateIcon('bread_quality')}
-                        Bread Quality
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="product_quality">
-                      <div className="flex items-center gap-2">
-                        {getTemplateIcon('product_quality')}
-                        Product Quality
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="out_of_bread">
-                      <div className="flex items-center gap-2">
-                        {getTemplateIcon('out_of_bread')}
-                        Out of Bread
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="out_of_product">
-                      <div className="flex items-center gap-2">
-                        {getTemplateIcon('out_of_product')}
-                        Out of Product
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="closed_early">
-                      <div className="flex items-center gap-2">
-                        {getTemplateIcon('closed_early')}
-                        Closed Early
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="praise">
-                      <div className="flex items-center gap-2">
-                        {getTemplateIcon('praise')}
-                        Praise
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="credit_card">
-                      <div className="flex items-center gap-2">
-                        {getTemplateIcon('credit_card')}
-                        Credit Card Issue
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="cleanliness">
-                      <div className="flex items-center gap-2">
-                        {getTemplateIcon('cleanliness')}
-                        Cleanliness
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="loyalty_issues">
-                      <div className="flex items-center gap-2">
-                        {getTemplateIcon('loyalty_issues')}
-                        Loyalty Program Issues
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="food_poisoning">
-                      <div className="flex items-center gap-2">
-                        {getTemplateIcon('food_poisoning')}
-                        Possible Food Poisoning
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="resolution">
-                      <div className="flex items-center gap-2">
-                        {getTemplateIcon('resolution')}
-                        Resolution Update
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="escalation">
-                      <div className="flex items-center gap-2">
-                        {getTemplateIcon('escalation')}
-                        Escalation Notice
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="custom">
-                      <div className="flex items-center gap-2">
-                        {getTemplateIcon('custom')}
-                        Custom Message
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Template-specific fields */}
-              {selectedTemplate === 'resolution' && (
-                <div className="space-y-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="action-taken">Action Taken</Label>
-                    <Textarea
-                      id="action-taken"
-                      value={actionTaken}
-                      onChange={(e) => setActionTaken(e.target.value)}
-                      placeholder="Describe what action was taken..."
-                      rows={2}
-                      className="resize-none text-sm"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="resolution-notes">Resolution Notes</Label>
-                    <Textarea
-                      id="resolution-notes"
-                      value={resolutionNotes}
-                      onChange={(e) => setResolutionNotes(e.target.value)}
-                      placeholder="Additional resolution details..."
-                      rows={2}
-                      className="resize-none text-sm"
-                    />
-                  </div>
+            {isCriticalOrEscalated ? (
+              <div className="p-4 border rounded-lg bg-amber-50 border-amber-200">
+                <div className="flex items-center gap-2 text-amber-800">
+                  <AlertTriangle className="w-4 h-4" />
+                  <span className="font-medium">Custom Message Required</span>
                 </div>
-              )}
-            </div>
+                <p className="text-sm text-amber-700 mt-1">
+                  Templates are not available for critical or escalated feedback. 
+                  Please compose a custom message below.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-muted/50">
+                <div className="space-y-2">
+                  <Label htmlFor="template-select">Email Template</Label>
+                  <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select template" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="acknowledgment">
+                        <div className="flex items-center gap-2">
+                          {getTemplateIcon('acknowledgment')}
+                          Acknowledgment
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="slow_service">
+                        <div className="flex items-center gap-2">
+                          {getTemplateIcon('slow_service')}
+                          Slow Service
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="sandwich_wrong">
+                        <div className="flex items-center gap-2">
+                          {getTemplateIcon('sandwich_wrong')}
+                          Sandwich Made Wrong
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="missing_item">
+                        <div className="flex items-center gap-2">
+                          {getTemplateIcon('missing_item')}
+                          Missing Item
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="bread_quality">
+                        <div className="flex items-center gap-2">
+                          {getTemplateIcon('bread_quality')}
+                          Bread Quality
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="product_quality">
+                        <div className="flex items-center gap-2">
+                          {getTemplateIcon('product_quality')}
+                          Product Quality
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="out_of_bread">
+                        <div className="flex items-center gap-2">
+                          {getTemplateIcon('out_of_bread')}
+                          Out of Bread
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="out_of_product">
+                        <div className="flex items-center gap-2">
+                          {getTemplateIcon('out_of_product')}
+                          Out of Product
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="closed_early">
+                        <div className="flex items-center gap-2">
+                          {getTemplateIcon('closed_early')}
+                          Closed Early
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="praise">
+                        <div className="flex items-center gap-2">
+                          {getTemplateIcon('praise')}
+                          Praise
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="credit_card">
+                        <div className="flex items-center gap-2">
+                          {getTemplateIcon('credit_card')}
+                          Credit Card Issue
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="cleanliness">
+                        <div className="flex items-center gap-2">
+                          {getTemplateIcon('cleanliness')}
+                          Cleanliness
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="loyalty_issues">
+                        <div className="flex items-center gap-2">
+                          {getTemplateIcon('loyalty_issues')}
+                          Loyalty Program Issues
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="food_poisoning">
+                        <div className="flex items-center gap-2">
+                          {getTemplateIcon('food_poisoning')}
+                          Possible Food Poisoning
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="resolution">
+                        <div className="flex items-center gap-2">
+                          {getTemplateIcon('resolution')}
+                          Resolution Update
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="escalation">
+                        <div className="flex items-center gap-2">
+                          {getTemplateIcon('escalation')}
+                          Escalation Notice
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="custom">
+                        <div className="flex items-center gap-2">
+                          {getTemplateIcon('custom')}
+                          Custom Message
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Template-specific fields */}
+                {selectedTemplate === 'resolution' && (
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="action-taken">Action Taken</Label>
+                      <Textarea
+                        id="action-taken"
+                        value={actionTaken}
+                        onChange={(e) => setActionTaken(e.target.value)}
+                        placeholder="Describe what action was taken..."
+                        rows={2}
+                        className="resize-none text-sm"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="resolution-notes">Resolution Notes</Label>
+                      <Textarea
+                        id="resolution-notes"
+                        value={resolutionNotes}
+                        onChange={(e) => setResolutionNotes(e.target.value)}
+                        placeholder="Additional resolution details..."
+                        rows={2}
+                        className="resize-none text-sm"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Custom message area - only show for custom template or if user wants to add personal note */}
             <div className="space-y-2">
