@@ -406,6 +406,59 @@ const FeedbackReporting = () => {
       {/* Complaint Trends Chart */}
       <ComplaintTrendsChart />
 
+      {/* Feedback by Category Bar Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Feedback by Category</CardTitle>
+          <CardDescription>
+            Distribution of feedback by complaint category type
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer
+            config={{
+              count: {
+                label: "Feedback Count",
+                color: "hsl(var(--primary))",
+              },
+            }}
+            className="h-[350px] w-full"
+          >
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart 
+                data={Object.entries(stats.categoryDistribution)
+                  .sort(([,a], [,b]) => b - a)
+                  .map(([category, count]) => ({
+                    category,
+                    count
+                  }))}
+                layout="vertical"
+                margin={{ left: 120, right: 20, top: 10, bottom: 10 }}
+              >
+                <XAxis 
+                  type="number"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis 
+                  type="category"
+                  dataKey="category"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  width={110}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="count" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </CardContent>
+      </Card>
+
       {/* Charts - Stacked Vertically */}
       <div className="space-y-8">
         {/* Side by side charts */}
