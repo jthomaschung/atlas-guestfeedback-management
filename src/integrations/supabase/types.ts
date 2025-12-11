@@ -3232,6 +3232,50 @@ export type Database = {
         }
         Relationships: []
       }
+      incident_attachments: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          file_name: string
+          file_type: string
+          file_url: string
+          id: string
+          incident_id: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          file_name: string
+          file_type: string
+          file_url: string
+          id?: string
+          incident_id: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          file_name?: string
+          file_type?: string
+          file_url?: string
+          id?: string
+          incident_id?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_attachments_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incident_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       incident_comments: {
         Row: {
           content: string
@@ -3355,6 +3399,7 @@ export type Database = {
           police_report_number: string | null
           resolution_notes: string | null
           severity_level: string
+          source: string | null
           status: string
           store_number: string
           submission_date: string | null
@@ -3400,6 +3445,7 @@ export type Database = {
           police_report_number?: string | null
           resolution_notes?: string | null
           severity_level: string
+          source?: string | null
           status?: string
           store_number: string
           submission_date?: string | null
@@ -3445,6 +3491,7 @@ export type Database = {
           police_report_number?: string | null
           resolution_notes?: string | null
           severity_level?: string
+          source?: string | null
           status?: string
           store_number?: string
           submission_date?: string | null
@@ -3491,17 +3538,22 @@ export type Database = {
           police_report_verified: boolean | null
           police_report_verified_at: string | null
           police_report_verified_by: string | null
+          rca_comments: string | null
           rca_completed: boolean | null
           rca_completed_at: string | null
           rca_completed_by: string | null
           rca_employee_rushing: boolean | null
           rca_employee_trained: boolean | null
           rca_equipment_used: string | null
+          rca_equipment_working_order: boolean | null
           rca_manager_interviewed: boolean | null
           rca_manager_interviewed_at: string | null
           rca_manager_interviewed_by: string | null
+          rca_ppe_required: boolean | null
           rca_ppe_required_missing: boolean | null
+          rca_ppe_used: boolean | null
           rca_surface_wet: boolean | null
+          rca_work_area_lit: boolean | null
           updated_at: string | null
           wc_form_number_entered: string | null
           wc_form_submitted: boolean | null
@@ -3543,17 +3595,22 @@ export type Database = {
           police_report_verified?: boolean | null
           police_report_verified_at?: string | null
           police_report_verified_by?: string | null
+          rca_comments?: string | null
           rca_completed?: boolean | null
           rca_completed_at?: string | null
           rca_completed_by?: string | null
           rca_employee_rushing?: boolean | null
           rca_employee_trained?: boolean | null
           rca_equipment_used?: string | null
+          rca_equipment_working_order?: boolean | null
           rca_manager_interviewed?: boolean | null
           rca_manager_interviewed_at?: string | null
           rca_manager_interviewed_by?: string | null
+          rca_ppe_required?: boolean | null
           rca_ppe_required_missing?: boolean | null
+          rca_ppe_used?: boolean | null
           rca_surface_wet?: boolean | null
+          rca_work_area_lit?: boolean | null
           updated_at?: string | null
           wc_form_number_entered?: string | null
           wc_form_submitted?: boolean | null
@@ -3595,17 +3652,22 @@ export type Database = {
           police_report_verified?: boolean | null
           police_report_verified_at?: string | null
           police_report_verified_by?: string | null
+          rca_comments?: string | null
           rca_completed?: boolean | null
           rca_completed_at?: string | null
           rca_completed_by?: string | null
           rca_employee_rushing?: boolean | null
           rca_employee_trained?: boolean | null
           rca_equipment_used?: string | null
+          rca_equipment_working_order?: boolean | null
           rca_manager_interviewed?: boolean | null
           rca_manager_interviewed_at?: string | null
           rca_manager_interviewed_by?: string | null
+          rca_ppe_required?: boolean | null
           rca_ppe_required_missing?: boolean | null
+          rca_ppe_used?: boolean | null
           rca_surface_wet?: boolean | null
+          rca_work_area_lit?: boolean | null
           updated_at?: string | null
           wc_form_number_entered?: string | null
           wc_form_submitted?: boolean | null
@@ -5913,6 +5975,66 @@ export type Database = {
           updated_at?: string | null
           upload_notes?: string | null
           uploaded_by?: string | null
+        }
+        Relationships: []
+      }
+      shift_deposits: {
+        Row: {
+          bank_deposit_id: string | null
+          business_date: string
+          closed_at: string | null
+          closed_by: string | null
+          created_at: string | null
+          created_by_user_id: string | null
+          deposit_amount: number
+          dual_custody_sheet_url: string
+          expected_deposit: number
+          id: string
+          notes: string | null
+          shift_type: string
+          signer_1_name: string
+          signer_2_name: string
+          status: string
+          store_number: string
+          variance: number
+        }
+        Insert: {
+          bank_deposit_id?: string | null
+          business_date: string
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string | null
+          created_by_user_id?: string | null
+          deposit_amount: number
+          dual_custody_sheet_url: string
+          expected_deposit?: number
+          id?: string
+          notes?: string | null
+          shift_type: string
+          signer_1_name: string
+          signer_2_name: string
+          status?: string
+          store_number: string
+          variance?: number
+        }
+        Update: {
+          bank_deposit_id?: string | null
+          business_date?: string
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string | null
+          created_by_user_id?: string | null
+          deposit_amount?: number
+          dual_custody_sheet_url?: string
+          expected_deposit?: number
+          id?: string
+          notes?: string | null
+          shift_type?: string
+          signer_1_name?: string
+          signer_2_name?: string
+          status?: string
+          store_number?: string
+          variance?: number
         }
         Relationships: []
       }
@@ -8296,7 +8418,7 @@ export type Database = {
             }[]
           }
         | {
-            Args: { store_num: string; target_category?: string }
+            Args: { module_id?: string; store_num: string }
             Returns: {
               completed_date: string
               employee_id: string
@@ -8307,7 +8429,7 @@ export type Database = {
             }[]
           }
         | {
-            Args: { module_id?: string; store_num: string }
+            Args: { store_num: string; target_category?: string }
             Returns: {
               completed_date: string
               employee_id: string
