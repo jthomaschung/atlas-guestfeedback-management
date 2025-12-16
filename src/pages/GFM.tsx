@@ -14,8 +14,7 @@ import { Loader2 } from 'lucide-react';
 export default function GFM() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
-  const [processingFeedbacks, setProcessingFeedbacks] = useState<CustomerFeedback[]>([]);
+  const [allFeedbacks, setAllFeedbacks] = useState<CustomerFeedback[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFeedback, setSelectedFeedback] = useState<CustomerFeedback | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
@@ -81,12 +80,7 @@ export default function GFM() {
         priority: item.priority as CustomerFeedback['priority']
       })) || [];
 
-      // Separate processing tickets from others
-      const processing = formattedData.filter(f => f.resolution_status === 'processing');
-      const others = formattedData.filter(f => f.resolution_status !== 'processing');
-
-      setProcessingFeedbacks(processing);
-      setFeedbacks(others);
+      setAllFeedbacks(formattedData);
     } catch (error) {
       console.error('Error loading GFM feedback:', error);
       toast({
@@ -99,9 +93,9 @@ export default function GFM() {
     }
   };
 
-  // Filter feedbacks
+  // Filter all feedbacks
   const filteredFeedbacks = useMemo(() => {
-    let filtered = feedbacks.filter(fb => {
+    let filtered = allFeedbacks.filter(fb => {
       const matchesSearch = !searchTerm || 
         fb.feedback_text?.toLowerCase().includes(searchTerm.toLowerCase()) || 
         fb.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -166,21 +160,30 @@ export default function GFM() {
       const dateB = new Date(b.feedback_date).getTime();
       return dateB - dateA;
     });
-  }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, dateFrom, dateTo]);
+  }, [allFeedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, dateFrom, dateTo]);
 
-  // Get available filter options
+  // Separate processing from active
+  const processingFeedbacks = useMemo(() => {
+    return filteredFeedbacks.filter(f => f.resolution_status === 'processing');
+  }, [filteredFeedbacks]);
+
+  const activeFeedbacks = useMemo(() => {
+    return filteredFeedbacks.filter(f => f.resolution_status !== 'processing');
+  }, [filteredFeedbacks]);
+
+  // Get available filter options from all feedbacks
   const availableStores = useMemo(() => {
-    return [...new Set(feedbacks.map(fb => fb.store_number))].sort();
-  }, [feedbacks]);
+    return [...new Set(allFeedbacks.map(fb => fb.store_number))].sort();
+  }, [allFeedbacks]);
 
   const availableMarkets = useMemo(() => {
     const normalizeMarket = (market: string) => market.replace(/([A-Z]+)(\d+)/, '$1 $2');
-    return [...new Set(feedbacks.map(fb => normalizeMarket(fb.market)))].sort();
-  }, [feedbacks]);
+    return [...new Set(allFeedbacks.map(fb => normalizeMarket(fb.market)))].sort();
+  }, [allFeedbacks]);
 
   const availableAssignees = useMemo(() => {
-    return [...new Set(feedbacks.map(fb => fb.assignee).filter(Boolean))].sort() as string[];
-  }, [feedbacks]);
+    return [...new Set(allFeedbacks.map(fb => fb.assignee).filter(Boolean))].sort() as string[];
+  }, [allFeedbacks]);
 
   const clearFilters = () => {
     setSearchTerm('');
@@ -256,11 +259,52 @@ export default function GFM() {
           </p>
         </div>
         <Badge variant="secondary" className="text-sm">
-          {filteredFeedbacks.length + processingFeedbacks.length} Total Cases
+          {filteredFeedbacks.length} Total Cases
         </Badge>
       </div>
 
-      <CustomerFeedbackStats feedbacks={[...processingFeedbacks, ...filteredFeedbacks]} />
+      <CustomerFeedbackStats feedbacks={filteredFeedbacks} />
+
+      {/* Filters Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Filters</CardTitle>
+          <CardDescription>
+            Filter feedback cases by various criteria
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <FeedbackReportingFilters
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+            priorityFilter={priorityFilter}
+            onPriorityFilterChange={setPriorityFilter}
+            categoryFilter={categoryFilter}
+            onCategoryFilterChange={setCategoryFilter}
+            channelFilter={channelFilter}
+            onChannelFilterChange={setChannelFilter}
+            storeFilter={storeFilter}
+            onStoreFilterChange={setStoreFilter}
+            marketFilter={marketFilter}
+            onMarketFilterChange={setMarketFilter}
+            assigneeFilter={assigneeFilter}
+            onAssigneeFilterChange={setAssigneeFilter}
+            periodFilter={periodFilter}
+            onPeriodFilterChange={setPeriodFilter}
+            dateFrom={dateFrom}
+            onDateFromChange={setDateFrom}
+            dateTo={dateTo}
+            onDateToChange={setDateTo}
+            availableStores={availableStores}
+            availableMarkets={availableMarkets}
+            availableAssignees={availableAssignees}
+            availablePeriods={periods}
+            onClearFilters={clearFilters}
+          />
+        </CardContent>
+      </Card>
 
       {/* Processing Section */}
       {processingFeedbacks.length > 0 && (
@@ -288,60 +332,32 @@ export default function GFM() {
       )}
 
       {/* Active Cases Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Active Feedback Cases</CardTitle>
-          <CardDescription>
-            Feedback assigned to guestfeedback@atlaswe.com that requires attention
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <FeedbackReportingFilters
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              statusFilter={statusFilter}
-              onStatusFilterChange={setStatusFilter}
-              priorityFilter={priorityFilter}
-              onPriorityFilterChange={setPriorityFilter}
-              categoryFilter={categoryFilter}
-              onCategoryFilterChange={setCategoryFilter}
-              channelFilter={channelFilter}
-              onChannelFilterChange={setChannelFilter}
-              storeFilter={storeFilter}
-              onStoreFilterChange={setStoreFilter}
-              marketFilter={marketFilter}
-              onMarketFilterChange={setMarketFilter}
-              assigneeFilter={assigneeFilter}
-              onAssigneeFilterChange={setAssigneeFilter}
-              periodFilter={periodFilter}
-              onPeriodFilterChange={setPeriodFilter}
-              dateFrom={dateFrom}
-              onDateFromChange={setDateFrom}
-              dateTo={dateTo}
-              onDateToChange={setDateTo}
-              availableStores={availableStores}
-              availableMarkets={availableMarkets}
-              availableAssignees={availableAssignees}
-              availablePeriods={periods}
-              onClearFilters={clearFilters}
+      {activeFeedbacks.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Active Feedback Cases</CardTitle>
+            <CardDescription>
+              Feedback assigned to guestfeedback@atlaswe.com that requires attention
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CustomerFeedbackTable
+              feedbacks={activeFeedbacks}
+              onEdit={handleEdit}
+              onViewDetails={handleViewDetails}
+              canEditCategory={false}
             />
-            
-            {filteredFeedbacks.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">No active feedback cases found.</p>
-              </div>
-            ) : (
-              <CustomerFeedbackTable
-                feedbacks={filteredFeedbacks}
-                onEdit={handleEdit}
-                onViewDetails={handleViewDetails}
-                canEditCategory={false}
-              />
-            )}
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
+
+      {filteredFeedbacks.length === 0 && (
+        <Card>
+          <CardContent className="py-8">
+            <p className="text-center text-muted-foreground">No feedback cases found matching your filters.</p>
+          </CardContent>
+        </Card>
+      )}
 
       {selectedFeedback && (
         <FeedbackDetailsDialog
