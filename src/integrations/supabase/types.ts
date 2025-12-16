@@ -6787,6 +6787,7 @@ export type Database = {
       work_orders: {
         Row: {
           assignee: string | null
+          awaiting_response: boolean | null
           completed_at: string | null
           cost: number | null
           created_at: string
@@ -6818,6 +6819,7 @@ export type Database = {
         }
         Insert: {
           assignee?: string | null
+          awaiting_response?: boolean | null
           completed_at?: string | null
           cost?: number | null
           created_at?: string
@@ -6849,6 +6851,7 @@ export type Database = {
         }
         Update: {
           assignee?: string | null
+          awaiting_response?: boolean | null
           completed_at?: string | null
           cost?: number | null
           created_at?: string
