@@ -274,6 +274,48 @@ export type Database = {
           },
         ]
       }
+      api_key_registry: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          is_required: boolean | null
+          key_name: string
+          notes: string | null
+          purpose: string | null
+          service_name: string
+          storage_location: string | null
+          updated_at: string | null
+          used_by: string[] | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_required?: boolean | null
+          key_name: string
+          notes?: string | null
+          purpose?: string | null
+          service_name: string
+          storage_location?: string | null
+          updated_at?: string | null
+          used_by?: string[] | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_required?: boolean | null
+          key_name?: string
+          notes?: string | null
+          purpose?: string | null
+          service_name?: string
+          storage_location?: string | null
+          updated_at?: string | null
+          used_by?: string[] | null
+        }
+        Relationships: []
+      }
       audit_log: {
         Row: {
           action: string
@@ -3399,6 +3441,7 @@ export type Database = {
           police_report_number: string | null
           resolution_notes: string | null
           severity_level: string
+          shift_start_time: string | null
           source: string | null
           status: string
           store_number: string
@@ -3408,6 +3451,7 @@ export type Database = {
           submitter_name: string
           submitter_phone: string | null
           submitter_type: string
+          time_missed_due_to_injury: string | null
           updated_at: string | null
           witnesses: Json | null
         }
@@ -3445,6 +3489,7 @@ export type Database = {
           police_report_number?: string | null
           resolution_notes?: string | null
           severity_level: string
+          shift_start_time?: string | null
           source?: string | null
           status?: string
           store_number: string
@@ -3454,6 +3499,7 @@ export type Database = {
           submitter_name: string
           submitter_phone?: string | null
           submitter_type: string
+          time_missed_due_to_injury?: string | null
           updated_at?: string | null
           witnesses?: Json | null
         }
@@ -3491,6 +3537,7 @@ export type Database = {
           police_report_number?: string | null
           resolution_notes?: string | null
           severity_level?: string
+          shift_start_time?: string | null
           source?: string | null
           status?: string
           store_number?: string
@@ -3500,6 +3547,7 @@ export type Database = {
           submitter_name?: string
           submitter_phone?: string | null
           submitter_type?: string
+          time_missed_due_to_injury?: string | null
           updated_at?: string | null
           witnesses?: Json | null
         }
@@ -3517,6 +3565,9 @@ export type Database = {
           closeout_type: string | null
           created_at: string | null
           dwc_form_number: string | null
+          dwc_form_sent_to_employee: boolean | null
+          dwc_form_sent_to_employee_at: string | null
+          dwc_form_sent_to_employee_by: string | null
           employee_contacted: boolean | null
           employee_contacted_at: string | null
           employee_contacted_by: string | null
@@ -3574,6 +3625,9 @@ export type Database = {
           closeout_type?: string | null
           created_at?: string | null
           dwc_form_number?: string | null
+          dwc_form_sent_to_employee?: boolean | null
+          dwc_form_sent_to_employee_at?: string | null
+          dwc_form_sent_to_employee_by?: string | null
           employee_contacted?: boolean | null
           employee_contacted_at?: string | null
           employee_contacted_by?: string | null
@@ -3631,6 +3685,9 @@ export type Database = {
           closeout_type?: string | null
           created_at?: string | null
           dwc_form_number?: string | null
+          dwc_form_sent_to_employee?: boolean | null
+          dwc_form_sent_to_employee_at?: string | null
+          dwc_form_sent_to_employee_by?: string | null
           employee_contacted?: boolean | null
           employee_contacted_at?: string | null
           employee_contacted_by?: string | null
@@ -5784,6 +5841,39 @@ export type Database = {
             referencedColumns: ["order_id"]
           },
         ]
+      }
+      role_definitions: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          display_name: string
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          role_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          display_name: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          role_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          display_name?: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          role_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       sales_funnel_activities: {
         Row: {
@@ -8590,6 +8680,7 @@ export type Database = {
       is_executive: { Args: { user_uuid: string }; Returns: boolean }
       is_jsonb_array_of_strings: { Args: { j: Json }; Returns: boolean }
       is_portal_master_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_role_admin: { Args: { _user_id: string }; Returns: boolean }
       jsonb_try_parse: { Args: { txt: string }; Returns: Json }
       normalize_market: { Args: { market_name: string }; Returns: string }
       process_approval: {
