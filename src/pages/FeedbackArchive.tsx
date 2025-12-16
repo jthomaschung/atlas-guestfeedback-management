@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { CustomerFeedback } from '@/types/feedback';
 import { CustomerFeedbackTable } from '@/components/feedback/CustomerFeedbackTable';
-import { SimpleFeedbackFilters } from '@/components/feedback/SimpleFeedbackFilters';
+import { FeedbackReportingFilters } from '@/components/feedback/FeedbackReportingFilters';
 import { FeedbackDetailsDialog } from '@/components/feedback/FeedbackDetailsDialog';
 import { CustomerFeedbackStats } from '@/components/feedback/CustomerFeedbackStats';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,22 +12,45 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useUserPermissions } from '@/hooks/useUserPermissions';
 import { Loader2, Archive, Download } from 'lucide-react';
+import { Period } from '@/types/period';
 
 export default function FeedbackArchive() {
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const { permissions } = useUserPermissions();
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
-  const [filteredFeedbacks, setFilteredFeedbacks] = useState<CustomerFeedback[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFeedback, setSelectedFeedback] = useState<CustomerFeedback | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string[]>([]);
+  const [priorityFilter, setPriorityFilter] = useState<string[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
+  const [channelFilter, setChannelFilter] = useState<string[]>([]);
+  const [storeFilter, setStoreFilter] = useState<string[]>([]);
+  const [marketFilter, setMarketFilter] = useState<string[]>([]);
+  const [assigneeFilter, setAssigneeFilter] = useState<string[]>([]);
+  const [periodFilter, setPeriodFilter] = useState<string[]>([]);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+  const [periods, setPeriods] = useState<Period[]>([]);
 
   useEffect(() => {
     if (user?.email) {
       loadArchivedFeedback();
+      loadPeriods();
     }
   }, [user?.email]);
+
+  const loadPeriods = async () => {
+    const { data } = await supabase
+      .from('periods')
+      .select('*')
+      .order('start_date', { ascending: false });
+    if (data) setPeriods(data);
+  };
 
   const loadArchivedFeedback = async () => {
     try {
@@ -52,7 +75,6 @@ export default function FeedbackArchive() {
       })) || [];
 
       setFeedbacks(formattedData);
-      setFilteredFeedbacks(formattedData);
     } catch (error) {
       console.error('Error loading archived feedback:', error);
       toast({
@@ -64,6 +86,72 @@ export default function FeedbackArchive() {
       setLoading(false);
     }
   };
+
+  // Derived filter options
+  const availableStores = useMemo(() => [...new Set(feedbacks.map(f => f.store_number))].sort(), [feedbacks]);
+  const availableMarkets = useMemo(() => [...new Set(feedbacks.map(f => f.market))].sort(), [feedbacks]);
+  const availableAssignees = useMemo(() => [...new Set(feedbacks.map(f => f.assignee).filter(Boolean))].sort() as string[], [feedbacks]);
+
+  // Filtered feedbacks
+  const filteredFeedbacks = useMemo(() => {
+    return feedbacks.filter(feedback => {
+      // Search filter
+      if (searchTerm) {
+        const search = searchTerm.toLowerCase();
+        const matchesSearch = 
+          feedback.case_number?.toLowerCase().includes(search) ||
+          feedback.customer_name?.toLowerCase().includes(search) ||
+          feedback.customer_email?.toLowerCase().includes(search) ||
+          feedback.feedback_text?.toLowerCase().includes(search) ||
+          feedback.store_number?.toLowerCase().includes(search);
+        if (!matchesSearch) return false;
+      }
+
+      // Status filter
+      if (statusFilter.length > 0 && !statusFilter.includes(feedback.resolution_status || '')) return false;
+
+      // Priority filter
+      if (priorityFilter.length > 0 && !priorityFilter.includes(feedback.priority || '')) return false;
+
+      // Category filter
+      if (categoryFilter.length > 0 && !categoryFilter.includes(feedback.complaint_category || '')) return false;
+
+      // Channel filter
+      if (channelFilter.length > 0 && !channelFilter.includes(feedback.channel || '')) return false;
+
+      // Store filter
+      if (storeFilter.length > 0 && !storeFilter.includes(feedback.store_number)) return false;
+
+      // Market filter
+      if (marketFilter.length > 0 && !marketFilter.includes(feedback.market)) return false;
+
+      // Assignee filter
+      if (assigneeFilter.length > 0 && !assigneeFilter.includes(feedback.assignee || '')) return false;
+
+      // Period filter
+      if (periodFilter.length > 0) {
+        const matchesPeriod = periodFilter.some(periodName => {
+          const period = periods.find(p => p.name === periodName);
+          if (!period) return false;
+          const feedbackDate = new Date(feedback.feedback_date);
+          return feedbackDate >= new Date(period.start_date) && feedbackDate <= new Date(period.end_date);
+        });
+        if (!matchesPeriod) return false;
+      }
+
+      // Date range filter
+      if (dateFrom) {
+        const feedbackDate = new Date(feedback.feedback_date);
+        if (feedbackDate < dateFrom) return false;
+      }
+      if (dateTo) {
+        const feedbackDate = new Date(feedback.feedback_date);
+        if (feedbackDate > dateTo) return false;
+      }
+
+      return true;
+    });
+  }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, dateFrom, dateTo, periods]);
 
   const handleViewDetails = (feedback: CustomerFeedback) => {
     setSelectedFeedback(feedback);
@@ -256,9 +344,46 @@ export default function FeedbackArchive() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <SimpleFeedbackFilters 
-              feedbacks={feedbacks}
-              onFilter={setFilteredFeedbacks}
+            <FeedbackReportingFilters
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              statusFilter={statusFilter}
+              onStatusFilterChange={setStatusFilter}
+              priorityFilter={priorityFilter}
+              onPriorityFilterChange={setPriorityFilter}
+              categoryFilter={categoryFilter}
+              onCategoryFilterChange={setCategoryFilter}
+              channelFilter={channelFilter}
+              onChannelFilterChange={setChannelFilter}
+              storeFilter={storeFilter}
+              onStoreFilterChange={setStoreFilter}
+              marketFilter={marketFilter}
+              onMarketFilterChange={setMarketFilter}
+              assigneeFilter={assigneeFilter}
+              onAssigneeFilterChange={setAssigneeFilter}
+              periodFilter={periodFilter}
+              onPeriodFilterChange={setPeriodFilter}
+              dateFrom={dateFrom}
+              onDateFromChange={setDateFrom}
+              dateTo={dateTo}
+              onDateToChange={setDateTo}
+              availableStores={availableStores}
+              availableMarkets={availableMarkets}
+              availableAssignees={availableAssignees}
+              availablePeriods={periods.map(p => ({ id: p.id, name: p.name, start_date: p.start_date, end_date: p.end_date }))}
+              onClearFilters={() => {
+                setSearchTerm('');
+                setStatusFilter([]);
+                setPriorityFilter([]);
+                setCategoryFilter([]);
+                setChannelFilter([]);
+                setStoreFilter([]);
+                setMarketFilter([]);
+                setAssigneeFilter([]);
+                setPeriodFilter([]);
+                setDateFrom(undefined);
+                setDateTo(undefined);
+              }}
             />
             
             {filteredFeedbacks.length === 0 ? (
