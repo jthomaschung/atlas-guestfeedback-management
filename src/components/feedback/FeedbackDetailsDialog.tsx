@@ -1212,6 +1212,7 @@ Customer Service Team`);
           complaint_category: category,
           store_number: storeNumber,
           market: market,
+          customer_called: customerCalled,
           updated_at: new Date().toISOString(),
         })
         .eq('id', feedback.id);
