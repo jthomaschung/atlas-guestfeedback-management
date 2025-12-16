@@ -454,7 +454,8 @@ const Index = () => {
           updated_at: data.updated_at,
           priority: (data.priority || 'Low') as CustomerFeedback['priority'],
           assignee: data.assignee || 'Unassigned',
-          viewed: data.viewed || false
+          viewed: data.viewed || false,
+          customer_called: data.customer_called || false
         };
 
         // If feedback is resolved, remove it from dashboard
