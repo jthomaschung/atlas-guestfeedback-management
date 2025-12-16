@@ -325,9 +325,30 @@ const Index = () => {
     });
   }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, sortOrder, dateFrom, dateTo]);
 
-  // Chart feedbacks - includes ALL feedback (including resolved) filtered by date/period only
+  // Chart feedbacks - includes ALL feedback (including resolved) filtered by ALL active filters
   const chartFeedbacks = useMemo(() => {
     return allFeedbacks.filter(fb => {
+      const matchesSearch = !searchTerm || 
+                           fb.feedback_text?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           fb.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           fb.case_number?.includes(searchTerm) ||
+                           fb.store_number?.includes(searchTerm);
+      const matchesStatus = statusFilter.length === 0 || statusFilter.includes(fb.resolution_status);
+      const matchesPriority = priorityFilter.length === 0 || priorityFilter.includes(fb.priority);
+      const matchesCategory = categoryFilter.length === 0 || categoryFilter.some(cat => {
+        if (!cat) return false;
+        const categoryLower = fb.complaint_category?.toLowerCase() || '';
+        const filterLower = cat.toLowerCase();
+        return categoryLower.includes(filterLower) || filterLower.includes(categoryLower);
+      });
+      const matchesChannel = channelFilter.length === 0 || channelFilter.includes(fb.channel);
+      const matchesStore = storeFilter.length === 0 || storeFilter.includes(fb.store_number);
+      const normalizedMarket = fb.market.replace(/([A-Z]+)(\d+)/, '$1 $2');
+      const matchesMarket = marketFilter.length === 0 || marketFilter.includes(normalizedMarket);
+      const matchesAssignee = assigneeFilter.length === 0 || 
+                             (assigneeFilter.includes('unassigned') && (!fb.assignee || fb.assignee === 'Unassigned')) ||
+                             (fb.assignee && assigneeFilter.includes(fb.assignee));
+
       // Period filter
       let matchesPeriod = true;
       if (periodFilter.length > 0) {
@@ -360,9 +381,11 @@ const Index = () => {
         }
       }
       
-      return matchesPeriod && matchesDateRange;
+      return matchesSearch && matchesStatus && matchesPriority && matchesCategory && 
+             matchesChannel && matchesStore && matchesMarket && matchesAssignee && 
+             matchesPeriod && matchesDateRange;
     });
-  }, [allFeedbacks, periodFilter, periods, dateFrom, dateTo]);
+  }, [allFeedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, dateFrom, dateTo]);
 
   // Get available filter options
   const availableStores = useMemo(() => {
