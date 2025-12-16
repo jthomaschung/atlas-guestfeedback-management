@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { CustomerFeedback } from '@/types/feedback';
 import { CustomerFeedbackTable } from '@/components/feedback/CustomerFeedbackTable';
-import { SimpleFeedbackFilters } from '@/components/feedback/SimpleFeedbackFilters';
+import { FeedbackReportingFilters } from '@/components/feedback/FeedbackReportingFilters';
 import { FeedbackDetailsDialog } from '@/components/feedback/FeedbackDetailsDialog';
 import { CustomerFeedbackStats } from '@/components/feedback/CustomerFeedbackStats';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,15 +15,48 @@ export default function GFM() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
-  const [filteredFeedbacks, setFilteredFeedbacks] = useState<CustomerFeedback[]>([]);
   const [processingFeedbacks, setProcessingFeedbacks] = useState<CustomerFeedback[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFeedback, setSelectedFeedback] = useState<CustomerFeedback | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string[]>([]);
+  const [priorityFilter, setPriorityFilter] = useState<string[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
+  const [channelFilter, setChannelFilter] = useState<string[]>([]);
+  const [storeFilter, setStoreFilter] = useState<string[]>([]);
+  const [marketFilter, setMarketFilter] = useState<string[]>([]);
+  const [assigneeFilter, setAssigneeFilter] = useState<string[]>([]);
+  const [periodFilter, setPeriodFilter] = useState<string[]>([]);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>();
+  const [dateTo, setDateTo] = useState<Date | undefined>();
+  const [periods, setPeriods] = useState<Array<{ id: string; name: string; start_date: string; end_date: string }>>([]);
 
   useEffect(() => {
     loadGFMFeedback();
+    fetchPeriods();
   }, []);
+
+  const fetchPeriods = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('periods')
+        .select('*')
+        .eq('year', 2025)
+        .order('period_number');
+
+      if (error) {
+        console.error('Error fetching periods:', error);
+        return;
+      }
+
+      setPeriods(data || []);
+    } catch (error) {
+      console.error('Error fetching periods:', error);
+    }
+  };
 
   const loadGFMFeedback = async () => {
     try {
@@ -54,7 +87,6 @@ export default function GFM() {
 
       setProcessingFeedbacks(processing);
       setFeedbacks(others);
-      setFilteredFeedbacks(others);
     } catch (error) {
       console.error('Error loading GFM feedback:', error);
       toast({
@@ -67,6 +99,103 @@ export default function GFM() {
     }
   };
 
+  // Filter feedbacks
+  const filteredFeedbacks = useMemo(() => {
+    let filtered = feedbacks.filter(fb => {
+      const matchesSearch = !searchTerm || 
+        fb.feedback_text?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        fb.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        fb.case_number?.includes(searchTerm) ||
+        fb.store_number?.includes(searchTerm);
+      const matchesStatus = statusFilter.length === 0 || statusFilter.includes(fb.resolution_status);
+      const matchesPriority = priorityFilter.length === 0 || priorityFilter.includes(fb.priority);
+      const matchesCategory = categoryFilter.length === 0 || categoryFilter.some(cat => {
+        if (!cat) return false;
+        const categoryLower = fb.complaint_category?.toLowerCase() || '';
+        const filterLower = cat.toLowerCase();
+        return categoryLower.includes(filterLower) || filterLower.includes(categoryLower);
+      });
+      const matchesChannel = channelFilter.length === 0 || channelFilter.includes(fb.channel);
+      const matchesStore = storeFilter.length === 0 || storeFilter.includes(fb.store_number);
+      const normalizedMarket = fb.market.replace(/([A-Z]+)(\d+)/, '$1 $2');
+      const matchesMarket = marketFilter.length === 0 || marketFilter.includes(normalizedMarket);
+      const matchesAssignee = assigneeFilter.length === 0 || 
+        (assigneeFilter.includes('unassigned') && (!fb.assignee || fb.assignee === 'Unassigned')) ||
+        (fb.assignee && assigneeFilter.includes(fb.assignee));
+      
+      // Period filter
+      let matchesPeriod = true;
+      if (periodFilter.length > 0) {
+        const selectedPeriods = periods.filter(p => periodFilter.includes(p.id));
+        if (selectedPeriods.length > 0) {
+          const feedbackDate = new Date(fb.feedback_date);
+          matchesPeriod = selectedPeriods.some(period => {
+            const periodStart = new Date(period.start_date);
+            const periodEnd = new Date(period.end_date);
+            return feedbackDate >= periodStart && feedbackDate <= periodEnd;
+          });
+        }
+      }
+      
+      // Date range filter
+      let matchesDateRange = true;
+      if (dateFrom || dateTo) {
+        const feedbackDate = new Date(fb.feedback_date + 'T00:00:00');
+        
+        if (dateFrom) {
+          const fromDate = new Date(dateFrom);
+          fromDate.setHours(0, 0, 0, 0);
+          if (feedbackDate < fromDate) matchesDateRange = false;
+        }
+        
+        if (dateTo) {
+          const toDate = new Date(dateTo);
+          toDate.setHours(23, 59, 59, 999);
+          if (feedbackDate > toDate) matchesDateRange = false;
+        }
+      }
+      
+      return matchesSearch && matchesStatus && matchesPriority && matchesCategory && 
+             matchesChannel && matchesStore && matchesMarket && matchesAssignee && 
+             matchesPeriod && matchesDateRange;
+    });
+
+    // Sort by newest first
+    return [...filtered].sort((a, b) => {
+      const dateA = new Date(a.feedback_date).getTime();
+      const dateB = new Date(b.feedback_date).getTime();
+      return dateB - dateA;
+    });
+  }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, dateFrom, dateTo]);
+
+  // Get available filter options
+  const availableStores = useMemo(() => {
+    return [...new Set(feedbacks.map(fb => fb.store_number))].sort();
+  }, [feedbacks]);
+
+  const availableMarkets = useMemo(() => {
+    const normalizeMarket = (market: string) => market.replace(/([A-Z]+)(\d+)/, '$1 $2');
+    return [...new Set(feedbacks.map(fb => normalizeMarket(fb.market)))].sort();
+  }, [feedbacks]);
+
+  const availableAssignees = useMemo(() => {
+    return [...new Set(feedbacks.map(fb => fb.assignee).filter(Boolean))].sort() as string[];
+  }, [feedbacks]);
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setStatusFilter([]);
+    setPriorityFilter([]);
+    setCategoryFilter([]);
+    setChannelFilter([]);
+    setStoreFilter([]);
+    setMarketFilter([]);
+    setAssigneeFilter([]);
+    setPeriodFilter([]);
+    setDateFrom(undefined);
+    setDateTo(undefined);
+  };
+
   const handleEdit = (feedback: CustomerFeedback) => {
     setSelectedFeedback(feedback);
     setDetailsDialogOpen(true);
@@ -76,7 +205,6 @@ export default function GFM() {
     setSelectedFeedback(feedback);
     setDetailsDialogOpen(true);
   };
-
 
   const handleSaveFeedback = async (updatedFeedback: CustomerFeedback) => {
     try {
@@ -169,9 +297,34 @@ export default function GFM() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <SimpleFeedbackFilters 
-              feedbacks={feedbacks}
-              onFilter={setFilteredFeedbacks}
+            <FeedbackReportingFilters
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              statusFilter={statusFilter}
+              onStatusFilterChange={setStatusFilter}
+              priorityFilter={priorityFilter}
+              onPriorityFilterChange={setPriorityFilter}
+              categoryFilter={categoryFilter}
+              onCategoryFilterChange={setCategoryFilter}
+              channelFilter={channelFilter}
+              onChannelFilterChange={setChannelFilter}
+              storeFilter={storeFilter}
+              onStoreFilterChange={setStoreFilter}
+              marketFilter={marketFilter}
+              onMarketFilterChange={setMarketFilter}
+              assigneeFilter={assigneeFilter}
+              onAssigneeFilterChange={setAssigneeFilter}
+              periodFilter={periodFilter}
+              onPeriodFilterChange={setPeriodFilter}
+              dateFrom={dateFrom}
+              onDateFromChange={setDateFrom}
+              dateTo={dateTo}
+              onDateToChange={setDateTo}
+              availableStores={availableStores}
+              availableMarkets={availableMarkets}
+              availableAssignees={availableAssignees}
+              availablePeriods={periods}
+              onClearFilters={clearFilters}
             />
             
             {filteredFeedbacks.length === 0 ? (
