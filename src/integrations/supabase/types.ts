@@ -353,22 +353,7 @@ export type Database = {
           user_agent?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "audit_log_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "audit_log_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "v_employee_expense_summary"
-            referencedColumns: ["profile_id"]
-          },
-        ]
+        Relationships: []
       }
       campaign_recipients: {
         Row: {
@@ -2234,6 +2219,70 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_patch_awards: {
+        Row: {
+          awarded_at: string
+          awarded_by: string | null
+          created_at: string
+          employee_id: string | null
+          employee_name: string
+          id: string
+          notes: string | null
+          patch_id: string
+          region: string | null
+          store_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          awarded_at?: string
+          awarded_by?: string | null
+          created_at?: string
+          employee_id?: string | null
+          employee_name: string
+          id?: string
+          notes?: string | null
+          patch_id: string
+          region?: string | null
+          store_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          awarded_at?: string
+          awarded_by?: string | null
+          created_at?: string
+          employee_id?: string | null
+          employee_name?: string
+          id?: string
+          notes?: string | null
+          patch_id?: string
+          region?: string | null
+          store_number?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_patch_awards_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "certified_managers_registry"
+            referencedColumns: ["employee_id"]
+          },
+          {
+            foreignKeyName: "employee_patch_awards_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_patch_awards_patch_id_fkey"
+            columns: ["patch_id"]
+            isOneToOne: false
+            referencedRelation: "certification_patches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_relations_reports: {
         Row: {
           assigned_to: string | null
@@ -2260,6 +2309,8 @@ export type Database = {
           store_number: string | null
           sub_category: string | null
           submitted_at: string
+          transferred_from_id: string | null
+          transferred_from_type: string | null
           updated_at: string
           witnesses: Json | null
         }
@@ -2288,6 +2339,8 @@ export type Database = {
           store_number?: string | null
           sub_category?: string | null
           submitted_at?: string
+          transferred_from_id?: string | null
+          transferred_from_type?: string | null
           updated_at?: string
           witnesses?: Json | null
         }
@@ -2316,6 +2369,8 @@ export type Database = {
           store_number?: string | null
           sub_category?: string | null
           submitted_at?: string
+          transferred_from_id?: string | null
+          transferred_from_type?: string | null
           updated_at?: string
           witnesses?: Json | null
         }
@@ -3185,6 +3240,8 @@ export type Database = {
       hr_notification_log: {
         Row: {
           created_at: string
+          email_body: string | null
+          email_subject: string | null
           error_message: string | null
           id: string
           notification_type: string
@@ -3196,6 +3253,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          email_body?: string | null
+          email_subject?: string | null
           error_message?: string | null
           id?: string
           notification_type: string
@@ -3207,6 +3266,8 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          email_body?: string | null
+          email_subject?: string | null
           error_message?: string | null
           id?: string
           notification_type?: string
@@ -3271,6 +3332,45 @@ export type Database = {
           notes?: string | null
           report_generated_date?: string | null
           total_records?: number | null
+        }
+        Relationships: []
+      }
+      in_app_notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          link_url: string | null
+          message: string
+          notification_type: string
+          related_entity_id: string | null
+          related_entity_type: string | null
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          link_url?: string | null
+          message: string
+          notification_type?: string
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+          title: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          link_url?: string | null
+          message?: string
+          notification_type?: string
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+          title?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -3408,27 +3508,31 @@ export type Database = {
       }
       incident_reports: {
         Row: {
-          body_part_injured: string
+          body_part_injured: string | null
           closed_at: string | null
           closed_by: string | null
           created_at: string | null
+          customer_email: string | null
+          customer_name: string | null
+          customer_phone: string | null
           has_injury: boolean | null
           id: string
           immediate_action_taken: string | null
+          incident_category: string | null
           incident_date: string
           incident_details: string
           incident_number: string
           incident_time: string
           incident_type: string
           injured_employee_email: string | null
-          injured_employee_job_title: string
-          injured_employee_name: string
+          injured_employee_job_title: string | null
+          injured_employee_name: string | null
           injured_employee_phone: string | null
           injury_description: string | null
           market: string
           medical_facility_address: string | null
           medical_facility_name: string | null
-          medical_treatment_sought: boolean
+          medical_treatment_sought: boolean | null
           other_party_email: string | null
           other_party_insurance_company: string | null
           other_party_name: string | null
@@ -3452,31 +3556,37 @@ export type Database = {
           submitter_phone: string | null
           submitter_type: string
           time_missed_due_to_injury: string | null
+          transferred_from_id: string | null
+          transferred_from_type: string | null
           updated_at: string | null
           witnesses: Json | null
         }
         Insert: {
-          body_part_injured: string
+          body_part_injured?: string | null
           closed_at?: string | null
           closed_by?: string | null
           created_at?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
           has_injury?: boolean | null
           id?: string
           immediate_action_taken?: string | null
+          incident_category?: string | null
           incident_date: string
           incident_details: string
           incident_number: string
           incident_time: string
           incident_type: string
           injured_employee_email?: string | null
-          injured_employee_job_title: string
-          injured_employee_name: string
+          injured_employee_job_title?: string | null
+          injured_employee_name?: string | null
           injured_employee_phone?: string | null
           injury_description?: string | null
           market: string
           medical_facility_address?: string | null
           medical_facility_name?: string | null
-          medical_treatment_sought?: boolean
+          medical_treatment_sought?: boolean | null
           other_party_email?: string | null
           other_party_insurance_company?: string | null
           other_party_name?: string | null
@@ -3500,31 +3610,37 @@ export type Database = {
           submitter_phone?: string | null
           submitter_type: string
           time_missed_due_to_injury?: string | null
+          transferred_from_id?: string | null
+          transferred_from_type?: string | null
           updated_at?: string | null
           witnesses?: Json | null
         }
         Update: {
-          body_part_injured?: string
+          body_part_injured?: string | null
           closed_at?: string | null
           closed_by?: string | null
           created_at?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
           has_injury?: boolean | null
           id?: string
           immediate_action_taken?: string | null
+          incident_category?: string | null
           incident_date?: string
           incident_details?: string
           incident_number?: string
           incident_time?: string
           incident_type?: string
           injured_employee_email?: string | null
-          injured_employee_job_title?: string
-          injured_employee_name?: string
+          injured_employee_job_title?: string | null
+          injured_employee_name?: string | null
           injured_employee_phone?: string | null
           injury_description?: string | null
           market?: string
           medical_facility_address?: string | null
           medical_facility_name?: string | null
-          medical_treatment_sought?: boolean
+          medical_treatment_sought?: boolean | null
           other_party_email?: string | null
           other_party_insurance_company?: string | null
           other_party_name?: string | null
@@ -3548,6 +3664,8 @@ export type Database = {
           submitter_phone?: string | null
           submitter_type?: string
           time_missed_due_to_injury?: string | null
+          transferred_from_id?: string | null
+          transferred_from_type?: string | null
           updated_at?: string | null
           witnesses?: Json | null
         }
@@ -4417,6 +4535,72 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_test_results: {
+        Row: {
+          completed_at: string
+          created_at: string
+          employee_email: string | null
+          employee_name: string
+          id: string
+          incorrect_items: Json | null
+          market: string | null
+          passed: boolean
+          percentage: number
+          profile_id: string | null
+          score: number
+          store_number: string
+          time_taken_seconds: number | null
+          total_questions: number
+        }
+        Insert: {
+          completed_at?: string
+          created_at?: string
+          employee_email?: string | null
+          employee_name: string
+          id?: string
+          incorrect_items?: Json | null
+          market?: string | null
+          passed: boolean
+          percentage: number
+          profile_id?: string | null
+          score: number
+          store_number: string
+          time_taken_seconds?: number | null
+          total_questions?: number
+        }
+        Update: {
+          completed_at?: string
+          created_at?: string
+          employee_email?: string | null
+          employee_name?: string
+          id?: string
+          incorrect_items?: Json | null
+          market?: string | null
+          passed?: boolean
+          percentage?: number
+          profile_id?: string | null
+          score?: number
+          store_number?: string
+          time_taken_seconds?: number | null
+          total_questions?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_test_results_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "menu_test_results_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
       new_hire_setup_tasks: {
         Row: {
           adp_employee_id: string | null
@@ -4464,6 +4648,8 @@ export type Database = {
           i9_list_c_document_type: string | null
           i9_list_c_expiration: string | null
           i9_list_c_issuing_authority: string | null
+          i9_section2_complete: boolean | null
+          i9_section2_completed_at: string | null
           i9_video_call_complete: boolean | null
           id: string
           insurance_card_verified: boolean | null
@@ -4543,6 +4729,8 @@ export type Database = {
           i9_list_c_document_type?: string | null
           i9_list_c_expiration?: string | null
           i9_list_c_issuing_authority?: string | null
+          i9_section2_complete?: boolean | null
+          i9_section2_completed_at?: string | null
           i9_video_call_complete?: boolean | null
           id?: string
           insurance_card_verified?: boolean | null
@@ -4622,6 +4810,8 @@ export type Database = {
           i9_list_c_document_type?: string | null
           i9_list_c_expiration?: string | null
           i9_list_c_issuing_authority?: string | null
+          i9_section2_complete?: boolean | null
+          i9_section2_completed_at?: string | null
           i9_video_call_complete?: boolean | null
           id?: string
           insurance_card_verified?: boolean | null
@@ -5124,6 +5314,75 @@ export type Database = {
         }
         Relationships: []
       }
+      patch_shipments: {
+        Row: {
+          carrier: string | null
+          city: string | null
+          created_at: string
+          created_by: string | null
+          delivered_at: string | null
+          id: string
+          market: string | null
+          notes: string | null
+          patch_type: string
+          recipient_name: string | null
+          region: string | null
+          shipped_at: string | null
+          shipping_address: string | null
+          state: string | null
+          status: string
+          store_name: string | null
+          store_number: string
+          tracking_number: string | null
+          updated_at: string
+          zip: string | null
+        }
+        Insert: {
+          carrier?: string | null
+          city?: string | null
+          created_at?: string
+          created_by?: string | null
+          delivered_at?: string | null
+          id?: string
+          market?: string | null
+          notes?: string | null
+          patch_type?: string
+          recipient_name?: string | null
+          region?: string | null
+          shipped_at?: string | null
+          shipping_address?: string | null
+          state?: string | null
+          status?: string
+          store_name?: string | null
+          store_number: string
+          tracking_number?: string | null
+          updated_at?: string
+          zip?: string | null
+        }
+        Update: {
+          carrier?: string | null
+          city?: string | null
+          created_at?: string
+          created_by?: string | null
+          delivered_at?: string | null
+          id?: string
+          market?: string | null
+          notes?: string | null
+          patch_type?: string
+          recipient_name?: string | null
+          region?: string | null
+          shipped_at?: string | null
+          shipping_address?: string | null
+          state?: string | null
+          status?: string
+          store_name?: string | null
+          store_number?: string
+          tracking_number?: string | null
+          updated_at?: string
+          zip?: string | null
+        }
+        Relationships: []
+      }
       payroll_ticket_comments: {
         Row: {
           attachments: Json | null
@@ -5264,6 +5523,11 @@ export type Database = {
           submitted_by: string | null
           submitter_type: string
           ticket_number: string
+          transfer_notes: string | null
+          transferred_at: string | null
+          transferred_by: string | null
+          transferred_to_id: string | null
+          transferred_to_type: string | null
           updated_at: string
           urgency_level: Database["public"]["Enums"]["ticket_urgency"]
           verification_method: string | null
@@ -5305,6 +5569,11 @@ export type Database = {
           submitted_by?: string | null
           submitter_type: string
           ticket_number?: string
+          transfer_notes?: string | null
+          transferred_at?: string | null
+          transferred_by?: string | null
+          transferred_to_id?: string | null
+          transferred_to_type?: string | null
           updated_at?: string
           urgency_level?: Database["public"]["Enums"]["ticket_urgency"]
           verification_method?: string | null
@@ -5346,6 +5615,11 @@ export type Database = {
           submitted_by?: string | null
           submitter_type?: string
           ticket_number?: string
+          transfer_notes?: string | null
+          transferred_at?: string | null
+          transferred_by?: string | null
+          transferred_to_id?: string | null
+          transferred_to_type?: string | null
           updated_at?: string
           urgency_level?: Database["public"]["Enums"]["ticket_urgency"]
           verification_method?: string | null
@@ -5491,74 +5765,6 @@ export type Database = {
         }
         Relationships: []
       }
-      portal_access_definitions: {
-        Row: {
-          access_scope: Database["public"]["Enums"]["access_scope_type"] | null
-          can_edit: boolean | null
-          can_manage: boolean | null
-          can_view: boolean | null
-          created_at: string
-          id: string
-          portal_id: string
-          portal_role_id: string
-        }
-        Insert: {
-          access_scope?: Database["public"]["Enums"]["access_scope_type"] | null
-          can_edit?: boolean | null
-          can_manage?: boolean | null
-          can_view?: boolean | null
-          created_at?: string
-          id?: string
-          portal_id: string
-          portal_role_id: string
-        }
-        Update: {
-          access_scope?: Database["public"]["Enums"]["access_scope_type"] | null
-          can_edit?: boolean | null
-          can_manage?: boolean | null
-          can_view?: boolean | null
-          created_at?: string
-          id?: string
-          portal_id?: string
-          portal_role_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "portal_access_definitions_portal_role_id_fkey"
-            columns: ["portal_role_id"]
-            isOneToOne: false
-            referencedRelation: "portal_roles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      portal_roles: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          is_active: boolean | null
-          role_display_name: string
-          role_name: Database["public"]["Enums"]["portal_role_type"]
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          is_active?: boolean | null
-          role_display_name: string
-          role_name: Database["public"]["Enums"]["portal_role_type"]
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          is_active?: boolean | null
-          role_display_name?: string
-          role_name?: Database["public"]["Enums"]["portal_role_type"]
-        }
-        Relationships: []
-      }
       portal_scope_assignments: {
         Row: {
           created_at: string | null
@@ -5592,6 +5798,27 @@ export type Database = {
           store_number?: string | null
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      portals: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          name?: string
         }
         Relationships: []
       }
@@ -6010,6 +6237,7 @@ export type Database = {
           employee_id: string | null
           employee_name: string
           expires_at: string
+          google_drive_file_id: string | null
           id: string
           is_california_employee: boolean | null
           is_new_hire_completion: boolean | null
@@ -6031,6 +6259,7 @@ export type Database = {
           employee_id?: string | null
           employee_name: string
           expires_at: string
+          google_drive_file_id?: string | null
           id?: string
           is_california_employee?: boolean | null
           is_new_hire_completion?: boolean | null
@@ -6052,6 +6281,7 @@ export type Database = {
           employee_id?: string | null
           employee_name?: string
           expires_at?: string
+          google_drive_file_id?: string | null
           id?: string
           is_california_employee?: boolean | null
           is_new_hire_completion?: boolean | null
@@ -6540,6 +6770,59 @@ export type Database = {
         }
         Relationships: []
       }
+      training_renewal_notifications: {
+        Row: {
+          completion_id: string | null
+          created_at: string | null
+          days_until_expiration: number | null
+          email_status: string | null
+          employee_name: string
+          error_message: string | null
+          expires_at: string
+          id: string
+          notification_type: string
+          recipients: Json
+          sent_at: string | null
+          store_number: string | null
+        }
+        Insert: {
+          completion_id?: string | null
+          created_at?: string | null
+          days_until_expiration?: number | null
+          email_status?: string | null
+          employee_name: string
+          error_message?: string | null
+          expires_at: string
+          id?: string
+          notification_type: string
+          recipients?: Json
+          sent_at?: string | null
+          store_number?: string | null
+        }
+        Update: {
+          completion_id?: string | null
+          created_at?: string | null
+          days_until_expiration?: number | null
+          email_status?: string | null
+          employee_name?: string
+          error_message?: string | null
+          expires_at?: string
+          id?: string
+          notification_type?: string
+          recipients?: Json
+          sent_at?: string | null
+          store_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_renewal_notifications_completion_id_fkey"
+            columns: ["completion_id"]
+            isOneToOne: false
+            referencedRelation: "sexual_harassment_training_completions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       training_store_avg: {
         Row: {
           avg_completion: number | null
@@ -6662,6 +6945,33 @@ export type Database = {
           },
         ]
       }
+      user_notification_preferences: {
+        Row: {
+          created_at: string | null
+          email_notifications: boolean | null
+          id: string
+          in_app_notifications: boolean | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          in_app_notifications?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          in_app_notifications?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_permissions: {
         Row: {
           can_access_accounting_dev: boolean | null
@@ -6716,6 +7026,35 @@ export type Database = {
         }
         Relationships: []
       }
+      user_portal_access: {
+        Row: {
+          created_at: string
+          id: string
+          portal_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          portal_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          portal_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_portal_access_portal_id_fkey"
+            columns: ["portal_id"]
+            isOneToOne: false
+            referencedRelation: "portals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_portal_roles: {
         Row: {
           assigned_at: string
@@ -6738,15 +7077,7 @@ export type Database = {
           portal_role_id?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_portal_roles_portal_role_id_fkey"
-            columns: ["portal_role_id"]
-            isOneToOne: false
-            referencedRelation: "portal_roles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_store_permissions: {
         Row: {
@@ -6800,6 +7131,8 @@ export type Database = {
           image_url: string | null
           image_urls: Json | null
           is_recurring: boolean | null
+          last_opened_at: string | null
+          last_opened_by: string | null
           market: string
           notes: string[] | null
           parts_delivery_date: string | null
@@ -6832,6 +7165,8 @@ export type Database = {
           image_url?: string | null
           image_urls?: Json | null
           is_recurring?: boolean | null
+          last_opened_at?: string | null
+          last_opened_by?: string | null
           market: string
           notes?: string[] | null
           parts_delivery_date?: string | null
@@ -6864,6 +7199,8 @@ export type Database = {
           image_url?: string | null
           image_urls?: Json | null
           is_recurring?: boolean | null
+          last_opened_at?: string | null
+          last_opened_by?: string | null
           market?: string
           notes?: string[] | null
           parts_delivery_date?: string | null
@@ -6986,6 +7323,95 @@ export type Database = {
           viewed?: boolean | null
         }
         Relationships: []
+      }
+      workflow_configurations: {
+        Row: {
+          category_key: string
+          category_label: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          module: string
+          updated_at: string
+        }
+        Insert: {
+          category_key: string
+          category_label: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          module: string
+          updated_at?: string
+        }
+        Update: {
+          category_key?: string
+          category_label?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          module?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      workflow_steps: {
+        Row: {
+          at_field: string
+          by_field: string
+          completed_field: string
+          created_at: string
+          has_notes_field: boolean | null
+          id: string
+          is_active: boolean | null
+          is_required: boolean | null
+          notes_field: string | null
+          step_key: string
+          step_label: string
+          step_order: number
+          updated_at: string
+          workflow_id: string
+        }
+        Insert: {
+          at_field: string
+          by_field: string
+          completed_field: string
+          created_at?: string
+          has_notes_field?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          is_required?: boolean | null
+          notes_field?: string | null
+          step_key: string
+          step_label: string
+          step_order: number
+          updated_at?: string
+          workflow_id: string
+        }
+        Update: {
+          at_field?: string
+          by_field?: string
+          completed_field?: string
+          created_at?: string
+          has_notes_field?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          is_required?: boolean | null
+          notes_field?: string | null
+          step_key?: string
+          step_label?: string
+          step_order?: number
+          updated_at?: string
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_steps_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_configurations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       wsr_dmr: {
         Row: {
@@ -7756,6 +8182,10 @@ export type Database = {
         Args: { feedback_id_param: string }
         Returns: boolean
       }
+      check_notification_sent: {
+        Args: { p_completion_id: string; p_notification_type: string }
+        Returns: boolean
+      }
       check_red_carpet_badge: {
         Args: { period_uuid: string; user_uuid: string }
         Returns: boolean
@@ -8058,51 +8488,44 @@ export type Database = {
           user_id: string
         }[]
       }
-      get_harassment_training_by_market: {
-        Args: { p_state: string }
+      get_expiring_training_completions: {
+        Args: { days_threshold?: number }
         Returns: {
-          completed: number
+          completion_id: string
+          days_until_expiration: number
+          dm_email: string
+          employee_name: string
+          expires_at: string
+          store_email: string
+          store_number: string
+          training_type: string
+        }[]
+      }
+      get_harassment_training_by_market: {
+        Args: { p_region: string }
+        Returns: {
+          completed_current: number
           compliance_rate: number
-          expired: number
-          expiring_soon: number
           market: string
-          not_completed: number
           total_employees: number
         }[]
       }
       get_harassment_training_by_region: {
         Args: never
         Returns: {
-          completed: number
+          completed_current: number
+          completed_expired: number
           compliance_rate: number
-          expired: number
-          expiring_soon: number
           not_completed: number
           region: string
-          total_employees: number
-        }[]
-      }
-      get_harassment_training_by_state: {
-        Args: { p_region: string }
-        Returns: {
-          completed: number
-          compliance_rate: number
-          expired: number
-          expiring_soon: number
-          is_california: boolean
-          not_completed: number
-          state: string
           total_employees: number
         }[]
       }
       get_harassment_training_by_store: {
         Args: { p_market: string }
         Returns: {
-          completed: number
+          completed_current: number
           compliance_rate: number
-          expired: number
-          expiring_soon: number
-          not_completed: number
           store_name: string
           store_number: string
           total_employees: number
@@ -8111,12 +8534,9 @@ export type Database = {
       get_harassment_training_company_overview: {
         Args: never
         Returns: {
-          california_current: number
-          california_employees: number
           completed_current: number
+          completed_expired: number
           compliance_rate: number
-          expired: number
-          expiring_soon: number
           not_completed: number
           total_employees: number
         }[]
@@ -8125,12 +8545,10 @@ export type Database = {
         Args: { p_store_number: string }
         Returns: {
           certificate_url: string
-          completion_date: string
-          days_until_expiration: number
-          employee_id: string
+          completed_date: string
+          days_remaining: number
           employee_name: string
           expires_at: string
-          is_california_employee: boolean
           position_name: string
           status: string
           training_type: string
@@ -8258,6 +8676,74 @@ export type Database = {
       get_market_r2r_completion_rate: {
         Args: { target_market: string }
         Returns: number
+      }
+      get_menu_test_company_avg: {
+        Args: never
+        Returns: {
+          avg_score: number
+          completion_rate: number
+          total_employees: number
+          total_tests: number
+          unique_employees: number
+        }[]
+      }
+      get_menu_test_employee_list: {
+        Args: { store_filter: string }
+        Returns: {
+          completed_at: string
+          employee_id: string
+          employee_name: string
+          passed: boolean
+          percentage: number
+          score: number
+          time_taken_seconds: number
+          total_questions: number
+        }[]
+      }
+      get_menu_test_market_breakdown: {
+        Args: { region_group_filter: string }
+        Returns: {
+          avg_score: number
+          market: string
+          store_count: number
+          total_employees: number
+          total_tests: number
+          unique_employees: number
+        }[]
+      }
+      get_menu_test_region_breakdown: {
+        Args: never
+        Returns: {
+          avg_score: number
+          market_count: number
+          region_group: string
+          store_count: number
+          total_employees: number
+          total_tests: number
+          unique_employees: number
+        }[]
+      }
+      get_menu_test_store_breakdown: {
+        Args: { market_filter: string }
+        Returns: {
+          avg_score: number
+          pass_rate: number
+          store_name: string
+          store_number: string
+          total_employees: number
+          total_tests: number
+          unique_employees: number
+        }[]
+      }
+      get_million_dollar_stores: {
+        Args: { target_year?: number }
+        Returns: {
+          mid_year_royalty: number
+          projected_annual: number
+          qualification_type: string
+          store_number: string
+          total_royalty: number
+        }[]
       }
       get_pending_approvals_for_user: {
         Args: { user_uuid: string }
@@ -8673,6 +9159,21 @@ export type Database = {
       get_user_training_role_level: {
         Args: { user_uuid: string }
         Returns: string
+      }
+      get_users_with_access_summary: {
+        Args: { page_number?: number; page_size?: number; search_term?: string }
+        Returns: {
+          display_name: string
+          email: string
+          first_name: string
+          last_name: string
+          portal_count: number
+          role_display_name: string
+          role_id: string
+          role_name: string
+          total_count: number
+          user_id: string
+        }[]
       }
       has_portal_role: {
         Args: { _role_name: string; _user_id: string }
