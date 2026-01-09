@@ -69,12 +69,14 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   // Render the protected content with layout
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-atlas-dark">
-        <AppSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
-          <header className="relative h-16 flex items-center justify-between bg-atlas-dark px-6 z-40 shadow-md shrink-0">
-            {/* Red accent line at top */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
+      <div className="min-h-screen flex flex-col w-full">
+        {/* Single red accent bar across entire top */}
+        <div className="h-1 bg-primary w-full shrink-0" />
+        
+        <div className="flex flex-1">
+          <AppSidebar />
+          <div className="flex-1 flex flex-col min-w-0">
+            <header className="h-[60px] flex items-center justify-between bg-atlas-dark px-6 z-40 shadow-md shrink-0">
             
             <div className="flex items-center gap-6">
               <SidebarTrigger className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg" />
@@ -106,10 +108,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
               </Button>
             </div>
           </header>
-          <main className="flex-1 overflow-auto bg-background p-2 sm:p-4 md:p-6">
-            {children}
-            <FeedbackButton />
-          </main>
+            <main className="flex-1 overflow-auto bg-background p-2 sm:p-4 md:p-6">
+              {children}
+              <FeedbackButton />
+            </main>
+          </div>
         </div>
       </div>
     </SidebarProvider>
