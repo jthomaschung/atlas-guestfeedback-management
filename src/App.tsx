@@ -13,7 +13,7 @@ import { NotificationBell } from '@/components/NotificationBell';
 import { FeedbackButton } from '@/components/FeedbackButton';
 import { PortalSwitcher } from '@/components/PortalSwitcher';
 import { Button } from '@/components/ui/button';
-import { LogOut } from 'lucide-react';
+import { LogOut, Home } from 'lucide-react';
 import Welcome from '@/pages/Welcome';
 import Index from '@/pages/Index';
 import UserHierarchy from '@/pages/UserHierarchy';
@@ -77,6 +77,15 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => window.location.href = 'https://atlas-masterportal.lovable.app/'}
+                className="text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-accent-foreground transition-all duration-200 min-h-[44px] px-4 rounded-lg"
+              >
+                <Home className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Home</span>
+              </Button>
               <PortalSwitcher />
               <NotificationBell />
               <Button 
