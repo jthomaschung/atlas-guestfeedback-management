@@ -574,25 +574,26 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Banner - ATLAS Portal Branding */}
-      <div className="bg-black py-8 px-6 mb-6">
-        <div className="text-center">
-          <img 
-            src="/lovable-uploads/9faa62d6-a114-492a-88df-c8401b255bd5.png" 
-            alt="Atlas Logo" 
-            className="w-16 h-16 mx-auto mb-4"
-          />
-          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-wide mb-2">
-            GUEST FEEDBACK PORTAL
-          </h1>
-          <div className="w-16 h-1 bg-red-600 mx-auto mb-3"></div>
-          <p className="text-gray-400 text-sm">
-            Manage and resolve customer feedback efficiently
-          </p>
+      <div className="container mx-auto px-3 sm:px-6 max-w-7xl">
+        {/* Hero Banner - ATLAS Portal Branding - aligned with content */}
+        <div className="bg-black py-8 px-6 mb-6 rounded-lg mt-4">
+          <div className="text-center">
+            <img 
+              src="/lovable-uploads/9faa62d6-a114-492a-88df-c8401b255bd5.png" 
+              alt="Atlas Logo" 
+              className="w-16 h-16 mx-auto mb-4"
+            />
+            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-wide mb-2">
+              GUEST FEEDBACK PORTAL
+            </h1>
+            <div className="w-16 h-1 bg-red-600 mx-auto mb-3"></div>
+            <p className="text-gray-400 text-sm">
+              Manage and resolve customer feedback efficiently
+            </p>
+          </div>
         </div>
-      </div>
 
-      <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl">
+        <div className="space-y-4 sm:space-y-6">
         {/* Welcome Message */}
         <div className="mb-2">
           <p className="text-sm text-foreground">
@@ -712,6 +713,7 @@ const Index = () => {
           }}
           onUpdate={handleFeedbackUpdate}
         />
+        </div>
       </div>
     </div>
   );

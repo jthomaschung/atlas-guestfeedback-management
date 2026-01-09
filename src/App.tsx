@@ -69,7 +69,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   // Render the protected content with layout
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
+      <div className="min-h-screen flex w-full bg-atlas-dark">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
           <header className="relative h-16 flex items-center justify-between bg-atlas-dark px-6 z-40 shadow-md shrink-0">
