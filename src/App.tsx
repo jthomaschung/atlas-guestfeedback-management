@@ -76,7 +76,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
             {/* Red accent line at top */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6">
               <SidebarTrigger className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg" />
               <div>
                 <h1 className="text-xl font-bold tracking-wide text-white">ATLAS</h1>
