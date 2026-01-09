@@ -31,6 +31,7 @@ import Accuracy from '@/pages/Accuracy';
 import Training from '@/pages/Training';
 import EmailTemplates from '@/pages/EmailTemplates';
 import { AuthGate } from '@/components/AuthGate';
+import { PortalGate } from '@/auth/PortalGate';
 
 import { SmartRedirect } from '@/components/SmartRedirect';
 import { FeedbackUpdater } from '@/components/FeedbackUpdater';
@@ -121,11 +122,16 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <AuthProvider>
-          <SessionTokenHandler />
-          <FeedbackUpdater />
-          <Router>
-            <Routes>
+        <PortalGate
+          portalKey="guest_feedback"
+          masterLoginUrl="https://atlas-masterportal.lovable.app/welcome"
+          masterHomeUrl="https://atlas-masterportal.lovable.app/"
+        >
+          <AuthProvider>
+            <SessionTokenHandler />
+            <FeedbackUpdater />
+            <Router>
+              <Routes>
               <Route 
                 path="/welcome" 
                 element={
@@ -258,10 +264,11 @@ function App() {
                 } 
               />
             </Routes>
-            <Toaster />
-            <Sonner />
-          </Router>
-        </AuthProvider>
+              <Toaster />
+              <Sonner />
+            </Router>
+          </AuthProvider>
+        </PortalGate>
       </TooltipProvider>
     </QueryClientProvider>
   );
