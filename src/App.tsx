@@ -73,9 +73,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
         {/* Single red accent bar across entire top */}
         <div className="h-1 bg-primary w-full shrink-0" />
         
-        <div className="flex flex-1">
+        <div className="flex flex-1 gap-0">
           <AppSidebar />
-          <div className="flex-1 flex flex-col min-w-0">
+          <div className="flex-1 flex flex-col min-w-0 border-l-0">
             <header className="h-[60px] flex items-center justify-between bg-atlas-dark px-6 z-40 shadow-md shrink-0">
             
             <div className="flex items-center gap-6">
