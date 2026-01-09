@@ -107,13 +107,15 @@ export function AppSidebar() {
   return (
     <Sidebar
       collapsible="icon"
-      className={`border-r border-sidebar-border bg-sidebar-background ${isMobile ? "mobile-safe-area" : ""}`}
+      className={`bg-sidebar-background ${isMobile ? "mobile-safe-area" : ""}`}
       style={{ "--sidebar-width": "240px", "--sidebar-width-icon": "48px" } as React.CSSProperties}
     >
       {/* ATLAS Branding Header with dark background and red accent */}
       <div className={`relative bg-atlas-dark text-white h-16 flex items-center ${state === "collapsed" ? "justify-center" : "justify-start px-4"}`}>
         {/* Red accent line at top */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
+        {/* Right edge mask to hide any border seam */}
+        <div className="absolute top-0 right-0 h-full w-px bg-atlas-dark" />
         
         <div className="flex items-center gap-3">
           <img 
