@@ -547,6 +547,9 @@ export type Database = {
           submission_type: string
           submitted_by_user_id: string | null
           updated_at: string | null
+          validated_amount: number | null
+          validated_at: string | null
+          validated_by_user_id: string | null
         }
         Insert: {
           business_date: string
@@ -562,6 +565,9 @@ export type Database = {
           submission_type?: string
           submitted_by_user_id?: string | null
           updated_at?: string | null
+          validated_amount?: number | null
+          validated_at?: string | null
+          validated_by_user_id?: string | null
         }
         Update: {
           business_date?: string
@@ -577,6 +583,9 @@ export type Database = {
           submission_type?: string
           submitted_by_user_id?: string | null
           updated_at?: string | null
+          validated_amount?: number | null
+          validated_at?: string | null
+          validated_by_user_id?: string | null
         }
         Relationships: [
           {
@@ -1837,6 +1846,149 @@ export type Database = {
         }
         Relationships: []
       }
+      deposit_edit_history: {
+        Row: {
+          approved_at: string | null
+          approved_by_name: string
+          approved_by_user_id: string | null
+          business_date: string
+          created_at: string | null
+          deposit_id: string
+          deposit_type: string
+          edit_request_id: string | null
+          field_name: string
+          id: string
+          new_value: string | null
+          old_value: string | null
+          request_reason: string
+          requested_by_name: string
+          store_number: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by_name: string
+          approved_by_user_id?: string | null
+          business_date: string
+          created_at?: string | null
+          deposit_id: string
+          deposit_type: string
+          edit_request_id?: string | null
+          field_name: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          request_reason: string
+          requested_by_name: string
+          store_number: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by_name?: string
+          approved_by_user_id?: string | null
+          business_date?: string
+          created_at?: string | null
+          deposit_id?: string
+          deposit_type?: string
+          edit_request_id?: string | null
+          field_name?: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          request_reason?: string
+          requested_by_name?: string
+          store_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deposit_edit_history_edit_request_id_fkey"
+            columns: ["edit_request_id"]
+            isOneToOne: false
+            referencedRelation: "deposit_edit_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deposit_edit_requests: {
+        Row: {
+          business_date: string
+          cash_deposit_id: string | null
+          created_at: string | null
+          deposit_type: string
+          id: string
+          original_values: Json
+          reason: string
+          requested_at: string | null
+          requested_by_name: string
+          requested_by_user_id: string | null
+          requested_values: Json
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by_name: string | null
+          reviewed_by_user_id: string | null
+          shift_deposit_id: string | null
+          status: string | null
+          store_number: string
+          updated_at: string | null
+        }
+        Insert: {
+          business_date: string
+          cash_deposit_id?: string | null
+          created_at?: string | null
+          deposit_type: string
+          id?: string
+          original_values: Json
+          reason: string
+          requested_at?: string | null
+          requested_by_name: string
+          requested_by_user_id?: string | null
+          requested_values: Json
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by_name?: string | null
+          reviewed_by_user_id?: string | null
+          shift_deposit_id?: string | null
+          status?: string | null
+          store_number: string
+          updated_at?: string | null
+        }
+        Update: {
+          business_date?: string
+          cash_deposit_id?: string | null
+          created_at?: string | null
+          deposit_type?: string
+          id?: string
+          original_values?: Json
+          reason?: string
+          requested_at?: string | null
+          requested_by_name?: string
+          requested_by_user_id?: string | null
+          requested_values?: Json
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by_name?: string | null
+          reviewed_by_user_id?: string | null
+          shift_deposit_id?: string | null
+          status?: string | null
+          store_number?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deposit_edit_requests_cash_deposit_id_fkey"
+            columns: ["cash_deposit_id"]
+            isOneToOne: false
+            referencedRelation: "cash_deposits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deposit_edit_requests_shift_deposit_id_fkey"
+            columns: ["shift_deposit_id"]
+            isOneToOne: false
+            referencedRelation: "shift_deposits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deposit_reconciliation_history: {
         Row: {
           action: string
@@ -1903,6 +2055,11 @@ export type Database = {
       deposit_reconciliations: {
         Row: {
           actual_deposit: number | null
+          approval_notes: string | null
+          approval_status: string | null
+          approved_at: string | null
+          approved_by_name: string | null
+          approved_by_user_id: string | null
           business_date: string
           created_at: string | null
           deposit_count: number | null
@@ -1922,10 +2079,17 @@ export type Database = {
           updated_at: string | null
           variance: number | null
           variance_amount: number | null
+          variance_category: string | null
           variance_explained: number | null
+          variance_explanation: string | null
         }
         Insert: {
           actual_deposit?: number | null
+          approval_notes?: string | null
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by_name?: string | null
+          approved_by_user_id?: string | null
           business_date: string
           created_at?: string | null
           deposit_count?: number | null
@@ -1945,10 +2109,17 @@ export type Database = {
           updated_at?: string | null
           variance?: number | null
           variance_amount?: number | null
+          variance_category?: string | null
           variance_explained?: number | null
+          variance_explanation?: string | null
         }
         Update: {
           actual_deposit?: number | null
+          approval_notes?: string | null
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by_name?: string | null
+          approved_by_user_id?: string | null
           business_date?: string
           created_at?: string | null
           deposit_count?: number | null
@@ -1968,7 +2139,9 @@ export type Database = {
           updated_at?: string | null
           variance?: number | null
           variance_amount?: number | null
+          variance_category?: string | null
           variance_explained?: number | null
+          variance_explanation?: string | null
         }
         Relationships: [
           {
@@ -2545,6 +2718,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "er_case_attachments_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "employee_relations_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      er_comments: {
+        Row: {
+          author_name: string | null
+          content: string
+          created_at: string
+          email_sent: boolean | null
+          id: string
+          is_internal: boolean
+          report_id: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          author_name?: string | null
+          content: string
+          created_at?: string
+          email_sent?: boolean | null
+          id?: string
+          is_internal?: boolean
+          report_id: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          author_name?: string | null
+          content?: string
+          created_at?: string
+          email_sent?: boolean | null
+          id?: string
+          is_internal?: boolean
+          report_id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "er_comments_report_id_fkey"
             columns: ["report_id"]
             isOneToOne: false
             referencedRelation: "employee_relations_reports"
@@ -5502,6 +5719,7 @@ export type Database = {
           expected_resolution_date: string | null
           hr_specialist: string | null
           id: string
+          identity_verified: boolean | null
           internal_notes: string[] | null
           main_category: string | null
           manager_email: string | null
@@ -5514,8 +5732,11 @@ export type Database = {
           pay_period_end: string | null
           pay_period_start: string | null
           payroll_id: string | null
+          prevention_method: string | null
           resolution_notes: string | null
+          resolution_type: string | null
           resolved_at: string | null
+          root_cause: string | null
           ssn_last_four: string | null
           status: Database["public"]["Enums"]["ticket_status"]
           store_number: string
@@ -5531,6 +5752,7 @@ export type Database = {
           updated_at: string
           urgency_level: Database["public"]["Enums"]["ticket_urgency"]
           verification_method: string | null
+          was_preventable: string | null
         }
         Insert: {
           acknowledgment_confirmed?: boolean | null
@@ -5548,6 +5770,7 @@ export type Database = {
           expected_resolution_date?: string | null
           hr_specialist?: string | null
           id?: string
+          identity_verified?: boolean | null
           internal_notes?: string[] | null
           main_category?: string | null
           manager_email?: string | null
@@ -5560,8 +5783,11 @@ export type Database = {
           pay_period_end?: string | null
           pay_period_start?: string | null
           payroll_id?: string | null
+          prevention_method?: string | null
           resolution_notes?: string | null
+          resolution_type?: string | null
           resolved_at?: string | null
+          root_cause?: string | null
           ssn_last_four?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
           store_number: string
@@ -5577,6 +5803,7 @@ export type Database = {
           updated_at?: string
           urgency_level?: Database["public"]["Enums"]["ticket_urgency"]
           verification_method?: string | null
+          was_preventable?: string | null
         }
         Update: {
           acknowledgment_confirmed?: boolean | null
@@ -5594,6 +5821,7 @@ export type Database = {
           expected_resolution_date?: string | null
           hr_specialist?: string | null
           id?: string
+          identity_verified?: boolean | null
           internal_notes?: string[] | null
           main_category?: string | null
           manager_email?: string | null
@@ -5606,8 +5834,11 @@ export type Database = {
           pay_period_end?: string | null
           pay_period_start?: string | null
           payroll_id?: string | null
+          prevention_method?: string | null
           resolution_notes?: string | null
+          resolution_type?: string | null
           resolved_at?: string | null
+          root_cause?: string | null
           ssn_last_four?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
           store_number?: string
@@ -5623,6 +5854,7 @@ export type Database = {
           updated_at?: string
           urgency_level?: Database["public"]["Enums"]["ticket_urgency"]
           verification_method?: string | null
+          was_preventable?: string | null
         }
         Relationships: [
           {
@@ -8701,13 +8933,11 @@ export type Database = {
         }[]
       }
       get_menu_test_market_breakdown: {
-        Args: { region_group_filter: string }
+        Args: { region_filter: string }
         Returns: {
           avg_score: number
           market: string
           store_count: number
-          total_employees: number
-          total_tests: number
           unique_employees: number
         }[]
       }
@@ -9273,6 +9503,30 @@ export type Database = {
               report_number: string
             }[]
           }
+        | {
+            Args: {
+              p_category: string
+              p_details?: string
+              p_harassment_type?: string
+              p_incident_date?: string
+              p_incident_time?: string
+              p_is_anonymous?: boolean
+              p_persons_involved?: string
+              p_reported_employees?: Json
+              p_reporter_email?: string
+              p_reporter_name?: string
+              p_reporter_phone?: string
+              p_reporter_position?: string
+              p_source?: string
+              p_store_number?: string
+              p_sub_category?: string
+              p_witnesses?: Json
+            }
+            Returns: {
+              report_id: string
+              report_number: string
+            }[]
+          }
       user_has_market_access: {
         Args: { target_market: string; user_id: string }
         Returns: boolean
@@ -9329,6 +9583,9 @@ export type Database = {
         | "resolved"
         | "rejected_by_manager"
         | "closed"
+        | "new"
+        | "open"
+        | "on_hold"
       ticket_urgency: "critical" | "high" | "medium" | "low"
       training_status: "Completed" | "In Progress" | "Not Started"
     }
@@ -9494,6 +9751,9 @@ export const Constants = {
         "resolved",
         "rejected_by_manager",
         "closed",
+        "new",
+        "open",
+        "on_hold",
       ],
       ticket_urgency: ["critical", "high", "medium", "low"],
       training_status: ["Completed", "In Progress", "Not Started"],
