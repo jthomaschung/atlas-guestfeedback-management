@@ -110,22 +110,23 @@ export function AppSidebar() {
       className={`border-r border-sidebar-border bg-sidebar-background ${isMobile ? "mobile-safe-area" : ""}`}
       style={{ "--sidebar-width": "240px", "--sidebar-width-icon": "48px" } as React.CSSProperties}
     >
-      {/* ATLAS Branding Header with red top border */}
-      <div className="border-t-2 border-t-red-600">
-        <div className={`${state === "collapsed" ? "px-2 py-4" : "px-4 py-4"} border-b border-sidebar-border`}>
-          <div className={`flex items-center ${state === "collapsed" ? "justify-center" : "gap-3"}`}>
-            <img 
-              src="/lovable-uploads/9faa62d6-a114-492a-88df-c8401b255bd5.png" 
-              alt="Atlas Logo" 
-              className={state === "collapsed" ? "w-8 h-8" : "w-10 h-10"}
-            />
-            {state === "expanded" && (
-              <div>
-                <h2 className="font-bold text-sidebar-accent-foreground">ATLAS</h2>
-                <p className="text-xs text-sidebar-foreground">Guest Feedback</p>
-              </div>
-            )}
-          </div>
+      {/* ATLAS Branding Header with dark background and red accent */}
+      <div className={`relative bg-atlas-dark text-white h-16 flex items-center ${state === "collapsed" ? "justify-center" : "justify-start px-4"}`}>
+        {/* Red accent line at top */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
+        
+        <div className="flex items-center gap-3">
+          <img 
+            src="/lovable-uploads/9faa62d6-a114-492a-88df-c8401b255bd5.png" 
+            alt="Atlas Logo" 
+            className="w-8 h-8"
+          />
+          {state === "expanded" && (
+            <div>
+              <h2 className="font-bold text-sm tracking-wide">ATLAS</h2>
+              <p className="text-xs text-gray-400">Guest Feedback</p>
+            </div>
+          )}
         </div>
       </div>
       <SidebarContent className={`pt-3 ${isMobile ? "mobile-scroll" : ""}`}>
