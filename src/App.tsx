@@ -68,7 +68,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col">
-          <header className="h-16 flex items-center justify-between bg-sidebar-background border-b border-sidebar-border shadow-sm px-6">
+          <header className="h-16 flex items-center justify-between bg-sidebar-background border-b border-sidebar-border border-t-2 border-t-red-600 shadow-sm px-6">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-accent-foreground transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg" />
               <div className="flex items-center gap-3">
@@ -79,7 +79,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
                 />
                 <div>
                   <h1 className="text-lg font-bold tracking-wide text-sidebar-accent-foreground">ATLAS</h1>
-                  <p className="hidden lg:block text-xs text-sidebar-foreground">Guest Feedback</p>
+                  <p className="hidden lg:block text-xs text-sidebar-foreground">Guest Feedback Dashboard</p>
                 </div>
               </div>
             </div>

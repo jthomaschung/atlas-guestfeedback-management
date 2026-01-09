@@ -110,14 +110,14 @@ export function AppSidebar() {
       className={`border-r border-sidebar-border bg-sidebar-background ${isMobile ? "mobile-safe-area" : ""}`}
       style={{ "--sidebar-width": "240px", "--sidebar-width-icon": "48px" } as React.CSSProperties}
     >
-      <SidebarContent className={`pt-3 ${isMobile ? "mobile-scroll" : ""}`}>
-        {/* ATLAS Branding Header */}
-        <div className="px-4 pb-4 border-b border-sidebar-border mb-4">
-          <div className="flex items-center gap-3">
+      {/* ATLAS Branding Header with red top border */}
+      <div className="border-t-2 border-t-red-600">
+        <div className={`${state === "collapsed" ? "px-2 py-4" : "px-4 py-4"} border-b border-sidebar-border`}>
+          <div className={`flex items-center ${state === "collapsed" ? "justify-center" : "gap-3"}`}>
             <img 
               src="/lovable-uploads/9faa62d6-a114-492a-88df-c8401b255bd5.png" 
               alt="Atlas Logo" 
-              className="w-10 h-10"
+              className={state === "collapsed" ? "w-8 h-8" : "w-10 h-10"}
             />
             {state === "expanded" && (
               <div>
@@ -127,6 +127,8 @@ export function AppSidebar() {
             )}
           </div>
         </div>
+      </div>
+      <SidebarContent className={`pt-3 ${isMobile ? "mobile-scroll" : ""}`}>
 
         {/* Guest Feedback - Collapsible Group */}
         <SidebarGroup>
