@@ -62,13 +62,17 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return null;
   }
 
+  const handleSignOut = () => {
+    signOut();
+  };
+
   // Render the protected content with layout
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <AppSidebar />
-        <div className="flex-1 flex flex-col">
-          <header className="relative h-16 flex items-center justify-between bg-atlas-dark px-6 sticky top-0 z-50 shadow-md">
+        <div className="flex-1 flex flex-col min-w-0">
+          <header className="relative h-16 flex items-center justify-between bg-atlas-dark px-6 z-40 shadow-md shrink-0">
             {/* Red accent line at top */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
             
@@ -94,7 +98,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={signOut}
+                onClick={handleSignOut}
                 className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-200 min-h-[44px] px-4 rounded-lg"
               >
                 <LogOut className="h-4 w-4 mr-2" />
