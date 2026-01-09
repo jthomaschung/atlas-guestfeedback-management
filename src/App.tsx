@@ -14,7 +14,6 @@ import { FeedbackButton } from '@/components/FeedbackButton';
 import { PortalSwitcher } from '@/components/PortalSwitcher';
 import { Button } from '@/components/ui/button';
 import { LogOut, Home } from 'lucide-react';
-import Welcome from '@/pages/Welcome';
 import Index from '@/pages/Index';
 import UserHierarchy from '@/pages/UserHierarchy';
 import ExecutiveOversight from '@/pages/ExecutiveOversight';
@@ -57,9 +56,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const urlParams = new URLSearchParams(window.location.search);
   const hasTokensInUrl = urlParams.has('access_token') && urlParams.has('refresh_token');
 
-  // Redirect to welcome if no user and no tokens in URL
+  // Redirect to master portal if no user and no tokens in URL
   if (!user && !hasTokensInUrl) {
-    return <Navigate to="/welcome" replace />;
+    window.location.href = 'https://atlas-masterportal.lovable.app/welcome';
+    return null;
   }
 
   // Render the protected content with layout
@@ -71,9 +71,16 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
           <header className="h-16 flex items-center justify-between bg-sidebar-background border-b border-sidebar-border shadow-sm px-6">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-accent-foreground transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg" />
-              <div className="text-sidebar-accent-foreground">
-                <h1 className="text-xl font-bold tracking-wide">ATLAS</h1>
-                <p className="hidden lg:block text-xs text-sidebar-foreground">Guest Feedback Management Portal</p>
+              <div className="flex items-center gap-3">
+                <img 
+                  src="/lovable-uploads/9faa62d6-a114-492a-88df-c8401b255bd5.png" 
+                  alt="Atlas Logo" 
+                  className="w-8 h-8"
+                />
+                <div>
+                  <h1 className="text-lg font-bold tracking-wide text-sidebar-accent-foreground">ATLAS</h1>
+                  <p className="hidden lg:block text-xs text-sidebar-foreground">Guest Feedback</p>
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -109,23 +116,6 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   );
 }
 
-function PublicRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
-  
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-slate-600">Loading...</div>
-      </div>
-    );
-  }
-  
-  if (user) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return <>{children}</>;
-}
 
 function App() {
   return (
@@ -141,14 +131,6 @@ function App() {
             <FeedbackUpdater />
             <Router>
               <Routes>
-              <Route 
-                path="/welcome" 
-                element={
-                  <PublicRoute>
-                    <Welcome />
-                  </PublicRoute>
-                } 
-              />
               <Route 
                 path="/summary" 
                 element={

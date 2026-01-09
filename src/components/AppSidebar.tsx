@@ -111,6 +111,23 @@ export function AppSidebar() {
       style={{ "--sidebar-width": "240px", "--sidebar-width-icon": "48px" } as React.CSSProperties}
     >
       <SidebarContent className={`pt-3 ${isMobile ? "mobile-scroll" : ""}`}>
+        {/* ATLAS Branding Header */}
+        <div className="px-4 pb-4 border-b border-sidebar-border mb-4">
+          <div className="flex items-center gap-3">
+            <img 
+              src="/lovable-uploads/9faa62d6-a114-492a-88df-c8401b255bd5.png" 
+              alt="Atlas Logo" 
+              className="w-10 h-10"
+            />
+            {state === "expanded" && (
+              <div>
+                <h2 className="font-bold text-sidebar-accent-foreground">ATLAS</h2>
+                <p className="text-xs text-sidebar-foreground">Guest Feedback</p>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Guest Feedback - Collapsible Group */}
         <SidebarGroup>
           <SidebarGroupContent>
