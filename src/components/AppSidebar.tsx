@@ -107,7 +107,7 @@ export function AppSidebar() {
   return (
     <Sidebar
       collapsible="icon"
-      className={`bg-sidebar-background ${isMobile ? "mobile-safe-area" : ""}`}
+      className={`bg-sidebar-background border-r-0 ${isMobile ? "mobile-safe-area" : ""}`}
       style={{ "--sidebar-width": "240px", "--sidebar-width-icon": "48px" } as React.CSSProperties}
     >
       {/* ATLAS Branding Header with dark background - red accent now at app level */}
