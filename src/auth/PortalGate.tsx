@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
 import { hasPortalAccess, type PortalAccessResult } from "./hasPortalAccess";
 import type { PortalKey } from "./portalKeys";
+import {
+  hasAuthTokensInUrl,
+  extractTokensFromUrl,
+  authenticateWithTokens,
+  cleanUrlFromTokens,
+} from "@/utils/sessionToken";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LogIn, Home, Loader2, ShieldX } from "lucide-react";
+import { Home, Loader2, ShieldX } from "lucide-react";
 
 interface PortalGateProps {
   portalKey: PortalKey;
@@ -26,8 +32,35 @@ export function PortalGate({
 
     async function checkAccess() {
       setIsChecking(true);
+
+      // Step 1: Check for incoming tokens from master portal and process them first
+      if (hasAuthTokensInUrl()) {
+        console.log("PortalGate: Found auth tokens in URL, processing...");
+        const tokens = extractTokensFromUrl();
+        if (tokens) {
+          const authenticated = await authenticateWithTokens(tokens);
+          if (authenticated) {
+            console.log("PortalGate: Successfully authenticated with tokens");
+            cleanUrlFromTokens();
+          } else {
+            console.warn("PortalGate: Failed to authenticate with tokens");
+          }
+        }
+      }
+
+      // Step 2: Now check portal access (session should be established if tokens were valid)
       const result = await hasPortalAccess(portalKey);
+      
       if (mounted) {
+        // Step 3: If no session and no tokens in URL, auto-redirect to master login
+        if (result.ok === false && result.reason === "no_session") {
+          console.log("PortalGate: No session found, redirecting to master portal login");
+          // Add return URL so user can come back after login
+          const returnUrl = encodeURIComponent(window.location.href);
+          window.location.href = `${masterLoginUrl}?returnUrl=${returnUrl}`;
+          return;
+        }
+
         setAccessResult(result);
         setIsChecking(false);
       }
@@ -38,9 +71,9 @@ export function PortalGate({
     return () => {
       mounted = false;
     };
-  }, [portalKey]);
+  }, [portalKey, masterLoginUrl]);
 
-  // Loading state
+  // Loading state (including while redirecting)
   if (isChecking || accessResult === null) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -57,35 +90,7 @@ export function PortalGate({
     return <>{children}</>;
   }
 
-  // TypeScript now knows accessResult is PortalAccessFailure
-  // No session - Login required
-  if (accessResult.reason === "no_session") {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <LogIn className="h-6 w-6 text-primary" />
-            </div>
-            <CardTitle className="text-xl">Login Required</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-muted-foreground">
-              Please sign in to access the Guest Feedback portal.
-            </p>
-            <Button asChild className="w-full">
-              <a href={masterLoginUrl}>
-                <LogIn className="h-4 w-4 mr-2" />
-                Sign In
-              </a>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // No access or error
+  // No access (user is logged in but doesn't have portal access)
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
