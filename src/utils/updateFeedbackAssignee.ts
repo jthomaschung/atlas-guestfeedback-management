@@ -43,7 +43,5 @@ export async function updateFeedbackAssigneeOnce() {
   }
 }
 
-// Self-invoke safely (non-blocking)
-updateFeedbackAssigneeOnce().then((result) => {
-  console.log('Update result:', result);
-});
+// Note: This function is called by FeedbackUpdater component when user is authenticated
+// Do NOT self-invoke here as it causes race conditions with session initialization
