@@ -110,9 +110,15 @@ export function AppSidebar() {
       className={`bg-sidebar-background border-r-0 ${isMobile ? "mobile-safe-area" : ""}`}
       style={{ "--sidebar-width": "240px", "--sidebar-width-icon": "48px" } as React.CSSProperties}
     >
-      {/* ATLAS Branding Header with dark background - red accent now at app level */}
-      <div className={`bg-atlas-dark text-white h-[60px] flex items-center ${state === "collapsed" ? "justify-center px-2" : "justify-start px-6"}`}>
-        <div className="flex items-center gap-4">
+      {/* ATLAS Branding Header with dark background */}
+      <div className={cn(
+        "relative bg-atlas-dark text-white h-16 flex items-center justify-center",
+        state === "expanded" && "px-4 justify-start"
+      )}>
+        {/* Red accent line at top */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
+        
+        <div className="flex items-center gap-3">
           <img 
             src="/lovable-uploads/9faa62d6-a114-492a-88df-c8401b255bd5.png" 
             alt="Atlas Logo" 
