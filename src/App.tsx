@@ -68,19 +68,15 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col">
-          <header className="h-16 flex items-center justify-between bg-sidebar-background border-b border-sidebar-border border-t-2 border-t-red-600 shadow-sm px-6">
+          <header className="relative h-16 flex items-center justify-between bg-atlas-dark px-6 sticky top-0 z-50 shadow-md">
+            {/* Red accent line at top */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
+            
             <div className="flex items-center gap-4">
-              <SidebarTrigger className="text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-accent-foreground transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg" />
-              <div className="flex items-center gap-3">
-                <img 
-                  src="/lovable-uploads/9faa62d6-a114-492a-88df-c8401b255bd5.png" 
-                  alt="Atlas Logo" 
-                  className="w-8 h-8"
-                />
-                <div>
-                  <h1 className="text-lg font-bold tracking-wide text-sidebar-accent-foreground">ATLAS</h1>
-                  <p className="hidden lg:block text-xs text-sidebar-foreground">Guest Feedback Dashboard</p>
-                </div>
+              <SidebarTrigger className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg" />
+              <div>
+                <h1 className="text-xl font-bold tracking-wide text-white">ATLAS</h1>
+                <p className="hidden lg:block text-xs text-gray-400">Guest Feedback Dashboard</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -88,7 +84,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => window.location.href = 'https://atlas-masterportal.lovable.app/'}
-                className="text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-accent-foreground transition-all duration-200 min-h-[44px] px-4 rounded-lg"
+                className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-200 min-h-[44px] px-4 rounded-lg"
               >
                 <Home className="h-4 w-4 mr-2" />
                 <span className="hidden sm:inline">Home</span>
@@ -99,10 +95,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
                 variant="ghost" 
                 size="sm" 
                 onClick={signOut}
-                className="text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-accent-foreground transition-all duration-200 min-h-[44px] px-4 rounded-lg"
+                className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-200 min-h-[44px] px-4 rounded-lg"
               >
                 <LogOut className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Logout</span>
+                <span className="hidden sm:inline">Sign Out</span>
               </Button>
             </div>
           </header>
