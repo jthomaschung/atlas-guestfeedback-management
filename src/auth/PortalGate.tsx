@@ -38,10 +38,18 @@ export function PortalGate({
         console.log("PortalGate: Found auth tokens in URL, processing...");
         const tokens = extractTokensFromUrl();
         if (tokens) {
-          const authenticated = await authenticateWithTokens(tokens);
-          if (authenticated) {
+          const authResult = await authenticateWithTokens(tokens);
+          if (authResult.success && authResult.session) {
             console.log("PortalGate: Successfully authenticated with tokens");
             cleanUrlFromTokens();
+            
+            // Pass the session directly to avoid race condition with SDK cache
+            const result = await hasPortalAccess(portalKey, authResult.session);
+            if (mounted) {
+              setAccessResult(result);
+              setIsChecking(false);
+            }
+            return; // Early exit - we already checked access
           } else {
             console.warn("PortalGate: Failed to authenticate with tokens");
           }

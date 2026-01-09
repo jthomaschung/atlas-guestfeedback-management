@@ -5,16 +5,26 @@ export type PortalAccessSuccess = { ok: true };
 export type PortalAccessFailure = { ok: false; reason: "no_session" | "no_access" | "error" };
 export type PortalAccessResult = PortalAccessSuccess | PortalAccessFailure;
 
-export async function hasPortalAccess(portalKey: PortalKey): Promise<PortalAccessResult> {
+export async function hasPortalAccess(
+  portalKey: PortalKey,
+  providedSession?: { user: { id: string } }
+): Promise<PortalAccessResult> {
   try {
-    // Get current session
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    // Use provided session if available (avoids race condition after setSession)
+    // Otherwise get current session from SDK
+    let userId: string;
+    
+    if (providedSession) {
+      userId = providedSession.user.id;
+    } else {
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
 
-    if (sessionError || !sessionData.session) {
-      return { ok: false, reason: "no_session" };
+      if (sessionError || !sessionData.session) {
+        return { ok: false, reason: "no_session" };
+      }
+      
+      userId = sessionData.session.user.id;
     }
-
-    const userId = sessionData.session.user.id;
 
     // Look up portal ID from portals table where key = portalKey
     const { data: portal, error: portalError } = await supabase

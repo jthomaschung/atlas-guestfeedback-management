@@ -56,10 +56,15 @@ export function extractTokensFromUrl(): SessionTokens | null {
   };
 }
 
+export interface AuthenticateResult {
+  success: boolean;
+  session?: { user: { id: string } };
+}
+
 /**
  * Authenticate with incoming tokens
  */
-export async function authenticateWithTokens(tokens: SessionTokens): Promise<boolean> {
+export async function authenticateWithTokens(tokens: SessionTokens): Promise<AuthenticateResult> {
   try {
     // Step 1: Set the session in the frontend
     const { data, error } = await supabase.auth.setSession({
@@ -69,7 +74,7 @@ export async function authenticateWithTokens(tokens: SessionTokens): Promise<boo
     
     if (error || !data.session) {
       console.error('Failed to set session:', error);
-      return false;
+      return { success: false };
     }
     
     console.log('Frontend session set, verifying database session...');
@@ -90,17 +95,17 @@ export async function authenticateWithTokens(tokens: SessionTokens): Promise<boo
       // If we get an RLS error (PGRST301), the session isn't ready yet
       if (!testError || testError.code !== 'PGRST301') {
         console.log('Database session verified after', (attempt + 1) * 200, 'ms');
-        return true;
+        return { success: true, session: data.session };
       }
       
       console.log('Database session not ready, attempt', attempt + 1, 'of 5');
     }
     
     console.warn('Database session verification timed out, proceeding anyway');
-    return true; // Proceed anyway after timeout
+    return { success: true, session: data.session }; // Proceed anyway after timeout
   } catch (error) {
     console.error('Error authenticating with tokens:', error);
-    return false;
+    return { success: false };
   }
 }
 
