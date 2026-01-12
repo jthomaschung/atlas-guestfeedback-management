@@ -6549,6 +6549,7 @@ export type Database = {
           status: string
           store_number: string
           variance: number
+          variance_category: string | null
         }
         Insert: {
           bank_deposit_id?: string | null
@@ -6568,6 +6569,7 @@ export type Database = {
           status?: string
           store_number: string
           variance?: number
+          variance_category?: string | null
         }
         Update: {
           bank_deposit_id?: string | null
@@ -6587,6 +6589,7 @@ export type Database = {
           status?: string
           store_number?: string
           variance?: number
+          variance_category?: string | null
         }
         Relationships: []
       }
