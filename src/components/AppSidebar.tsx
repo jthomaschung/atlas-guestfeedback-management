@@ -114,7 +114,7 @@ export function AppSidebar() {
       <div className={cn(
         "relative bg-atlas-dark text-white h-16 flex items-center justify-center",
         "after:absolute after:top-0 after:right-0 after:w-1 after:h-full after:bg-atlas-dark",
-        state === "expanded" && "px-4 justify-start"
+        state === "expanded" && "px-3 justify-start"
       )}>
         {/* Red accent line at top */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
