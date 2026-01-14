@@ -3728,6 +3728,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           created_by_email: string | null
+          email_sent: boolean | null
           id: string
           incident_id: string
           is_internal: boolean | null
@@ -3738,6 +3739,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           created_by_email?: string | null
+          email_sent?: boolean | null
           id?: string
           incident_id: string
           is_internal?: boolean | null
@@ -3748,6 +3750,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           created_by_email?: string | null
+          email_sent?: boolean | null
           id?: string
           incident_id?: string
           is_internal?: boolean | null
