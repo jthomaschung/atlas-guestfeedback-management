@@ -45,7 +45,8 @@ export default function Accuracy() {
     const { data, error } = await supabase
       .from('periods')
       .select('*')
-      .eq('year', 2025)
+      .in('year', [2025, 2026])
+      .order('year', { ascending: false })
       .order('period_number', { ascending: false });
     
     if (data && data.length > 0) {
