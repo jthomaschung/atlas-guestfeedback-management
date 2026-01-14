@@ -2482,8 +2482,13 @@ export type Database = {
           store_number: string | null
           sub_category: string | null
           submitted_at: string
+          transfer_notes: string | null
+          transferred_at: string | null
+          transferred_by: string | null
           transferred_from_id: string | null
           transferred_from_type: string | null
+          transferred_to_id: string | null
+          transferred_to_type: string | null
           updated_at: string
           witnesses: Json | null
         }
@@ -2512,8 +2517,13 @@ export type Database = {
           store_number?: string | null
           sub_category?: string | null
           submitted_at?: string
+          transfer_notes?: string | null
+          transferred_at?: string | null
+          transferred_by?: string | null
           transferred_from_id?: string | null
           transferred_from_type?: string | null
+          transferred_to_id?: string | null
+          transferred_to_type?: string | null
           updated_at?: string
           witnesses?: Json | null
         }
@@ -2542,8 +2552,13 @@ export type Database = {
           store_number?: string | null
           sub_category?: string | null
           submitted_at?: string
+          transfer_notes?: string | null
+          transferred_at?: string | null
+          transferred_by?: string | null
           transferred_from_id?: string | null
           transferred_from_type?: string | null
+          transferred_to_id?: string | null
+          transferred_to_type?: string | null
           updated_at?: string
           witnesses?: Json | null
         }
@@ -2877,6 +2892,10 @@ export type Database = {
           claimant_interview_at: string | null
           claimant_interview_by: string | null
           claimant_interview_completed: boolean | null
+          claimant_interview_na: boolean | null
+          claimant_interview_na_at: string | null
+          claimant_interview_na_by: string | null
+          claimant_interview_na_reason: string | null
           corrective_action_at: string | null
           corrective_action_by: string | null
           corrective_action_completed: boolean | null
@@ -2899,9 +2918,17 @@ export type Database = {
           document_outcome_at: string | null
           document_outcome_by: string | null
           document_outcome_completed: boolean | null
+          documents_collected_na: boolean | null
+          documents_collected_na_at: string | null
+          documents_collected_na_by: string | null
+          documents_collected_na_reason: string | null
           employee_contacted: boolean | null
           employee_contacted_at: string | null
           employee_contacted_by: string | null
+          findings_determined_na: boolean | null
+          findings_determined_na_at: string | null
+          findings_determined_na_by: string | null
+          findings_determined_na_reason: string | null
           followup_checkin_at: string | null
           followup_checkin_by: string | null
           followup_checkin_completed: boolean | null
@@ -2927,9 +2954,17 @@ export type Database = {
           resolution_determined_at: string | null
           resolution_determined_by: string | null
           resolution_determined_completed: boolean | null
+          resolution_na: boolean | null
+          resolution_na_at: string | null
+          resolution_na_by: string | null
+          resolution_na_reason: string | null
           resolution_notes: string | null
           resolved_at: string | null
           resolved_by: string | null
+          respondent_interview_na: boolean | null
+          respondent_interview_na_at: string | null
+          respondent_interview_na_by: string | null
+          respondent_interview_na_reason: string | null
           review_attendance_records_at: string | null
           review_attendance_records_by: string | null
           review_attendance_records_completed: boolean | null
@@ -2941,6 +2976,10 @@ export type Database = {
           safety_resolved_confirmed: boolean | null
           safety_resolved_notes: string | null
           updated_at: string | null
+          witness_interview_na: boolean | null
+          witness_interview_na_at: string | null
+          witness_interview_na_by: string | null
+          witness_interview_na_reason: string | null
         }
         Insert: {
           accused_interview_at?: string | null
@@ -2952,6 +2991,10 @@ export type Database = {
           claimant_interview_at?: string | null
           claimant_interview_by?: string | null
           claimant_interview_completed?: boolean | null
+          claimant_interview_na?: boolean | null
+          claimant_interview_na_at?: string | null
+          claimant_interview_na_by?: string | null
+          claimant_interview_na_reason?: string | null
           corrective_action_at?: string | null
           corrective_action_by?: string | null
           corrective_action_completed?: boolean | null
@@ -2974,9 +3017,17 @@ export type Database = {
           document_outcome_at?: string | null
           document_outcome_by?: string | null
           document_outcome_completed?: boolean | null
+          documents_collected_na?: boolean | null
+          documents_collected_na_at?: string | null
+          documents_collected_na_by?: string | null
+          documents_collected_na_reason?: string | null
           employee_contacted?: boolean | null
           employee_contacted_at?: string | null
           employee_contacted_by?: string | null
+          findings_determined_na?: boolean | null
+          findings_determined_na_at?: string | null
+          findings_determined_na_by?: string | null
+          findings_determined_na_reason?: string | null
           followup_checkin_at?: string | null
           followup_checkin_by?: string | null
           followup_checkin_completed?: boolean | null
@@ -3002,9 +3053,17 @@ export type Database = {
           resolution_determined_at?: string | null
           resolution_determined_by?: string | null
           resolution_determined_completed?: boolean | null
+          resolution_na?: boolean | null
+          resolution_na_at?: string | null
+          resolution_na_by?: string | null
+          resolution_na_reason?: string | null
           resolution_notes?: string | null
           resolved_at?: string | null
           resolved_by?: string | null
+          respondent_interview_na?: boolean | null
+          respondent_interview_na_at?: string | null
+          respondent_interview_na_by?: string | null
+          respondent_interview_na_reason?: string | null
           review_attendance_records_at?: string | null
           review_attendance_records_by?: string | null
           review_attendance_records_completed?: boolean | null
@@ -3016,6 +3075,10 @@ export type Database = {
           safety_resolved_confirmed?: boolean | null
           safety_resolved_notes?: string | null
           updated_at?: string | null
+          witness_interview_na?: boolean | null
+          witness_interview_na_at?: string | null
+          witness_interview_na_by?: string | null
+          witness_interview_na_reason?: string | null
         }
         Update: {
           accused_interview_at?: string | null
@@ -3027,6 +3090,10 @@ export type Database = {
           claimant_interview_at?: string | null
           claimant_interview_by?: string | null
           claimant_interview_completed?: boolean | null
+          claimant_interview_na?: boolean | null
+          claimant_interview_na_at?: string | null
+          claimant_interview_na_by?: string | null
+          claimant_interview_na_reason?: string | null
           corrective_action_at?: string | null
           corrective_action_by?: string | null
           corrective_action_completed?: boolean | null
@@ -3049,9 +3116,17 @@ export type Database = {
           document_outcome_at?: string | null
           document_outcome_by?: string | null
           document_outcome_completed?: boolean | null
+          documents_collected_na?: boolean | null
+          documents_collected_na_at?: string | null
+          documents_collected_na_by?: string | null
+          documents_collected_na_reason?: string | null
           employee_contacted?: boolean | null
           employee_contacted_at?: string | null
           employee_contacted_by?: string | null
+          findings_determined_na?: boolean | null
+          findings_determined_na_at?: string | null
+          findings_determined_na_by?: string | null
+          findings_determined_na_reason?: string | null
           followup_checkin_at?: string | null
           followup_checkin_by?: string | null
           followup_checkin_completed?: boolean | null
@@ -3077,9 +3152,17 @@ export type Database = {
           resolution_determined_at?: string | null
           resolution_determined_by?: string | null
           resolution_determined_completed?: boolean | null
+          resolution_na?: boolean | null
+          resolution_na_at?: string | null
+          resolution_na_by?: string | null
+          resolution_na_reason?: string | null
           resolution_notes?: string | null
           resolved_at?: string | null
           resolved_by?: string | null
+          respondent_interview_na?: boolean | null
+          respondent_interview_na_at?: string | null
+          respondent_interview_na_by?: string | null
+          respondent_interview_na_reason?: string | null
           review_attendance_records_at?: string | null
           review_attendance_records_by?: string | null
           review_attendance_records_completed?: boolean | null
@@ -3091,6 +3174,10 @@ export type Database = {
           safety_resolved_confirmed?: boolean | null
           safety_resolved_notes?: string | null
           updated_at?: string | null
+          witness_interview_na?: boolean | null
+          witness_interview_na_at?: string | null
+          witness_interview_na_by?: string | null
+          witness_interview_na_reason?: string | null
         }
         Relationships: [
           {
@@ -3773,8 +3860,13 @@ export type Database = {
           submitter_phone: string | null
           submitter_type: string
           time_missed_due_to_injury: string | null
+          transfer_notes: string | null
+          transferred_at: string | null
+          transferred_by: string | null
           transferred_from_id: string | null
           transferred_from_type: string | null
+          transferred_to_id: string | null
+          transferred_to_type: string | null
           updated_at: string | null
           witnesses: Json | null
         }
@@ -3827,8 +3919,13 @@ export type Database = {
           submitter_phone?: string | null
           submitter_type: string
           time_missed_due_to_injury?: string | null
+          transfer_notes?: string | null
+          transferred_at?: string | null
+          transferred_by?: string | null
           transferred_from_id?: string | null
           transferred_from_type?: string | null
+          transferred_to_id?: string | null
+          transferred_to_type?: string | null
           updated_at?: string | null
           witnesses?: Json | null
         }
@@ -3881,8 +3978,13 @@ export type Database = {
           submitter_phone?: string | null
           submitter_type?: string
           time_missed_due_to_injury?: string | null
+          transfer_notes?: string | null
+          transferred_at?: string | null
+          transferred_by?: string | null
           transferred_from_id?: string | null
           transferred_from_type?: string | null
+          transferred_to_id?: string | null
+          transferred_to_type?: string | null
           updated_at?: string | null
           witnesses?: Json | null
         }
@@ -7216,6 +7318,7 @@ export type Database = {
           can_access_hr_dev: boolean | null
           can_access_incident_reporting: boolean | null
           can_access_kpi_dev: boolean | null
+          can_access_manager_payroll_dashboard: boolean | null
           can_access_training_dev: boolean | null
           created_at: string
           id: string
@@ -7233,6 +7336,7 @@ export type Database = {
           can_access_hr_dev?: boolean | null
           can_access_incident_reporting?: boolean | null
           can_access_kpi_dev?: boolean | null
+          can_access_manager_payroll_dashboard?: boolean | null
           can_access_training_dev?: boolean | null
           created_at?: string
           id?: string
@@ -7250,6 +7354,7 @@ export type Database = {
           can_access_hr_dev?: boolean | null
           can_access_incident_reporting?: boolean | null
           can_access_kpi_dev?: boolean | null
+          can_access_manager_payroll_dashboard?: boolean | null
           can_access_training_dev?: boolean | null
           created_at?: string
           id?: string
