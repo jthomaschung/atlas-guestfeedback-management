@@ -3999,11 +3999,23 @@ export type Database = {
           clinic_called: boolean | null
           clinic_called_at: string | null
           clinic_called_by: string | null
+          clinic_called_na: boolean | null
+          clinic_called_na_at: string | null
+          clinic_called_na_by: string | null
+          clinic_called_na_reason: string | null
           closeout_complete: boolean | null
           closeout_complete_at: string | null
           closeout_complete_by: string | null
+          closeout_na: boolean | null
+          closeout_na_at: string | null
+          closeout_na_by: string | null
+          closeout_na_reason: string | null
           closeout_type: string | null
           created_at: string | null
+          dwc_form_na: boolean | null
+          dwc_form_na_at: string | null
+          dwc_form_na_by: string | null
+          dwc_form_na_reason: string | null
           dwc_form_number: string | null
           dwc_form_sent_to_employee: boolean | null
           dwc_form_sent_to_employee_at: string | null
@@ -4011,9 +4023,17 @@ export type Database = {
           employee_contacted: boolean | null
           employee_contacted_at: string | null
           employee_contacted_by: string | null
+          employee_contacted_na: boolean | null
+          employee_contacted_na_at: string | null
+          employee_contacted_na_by: string | null
+          employee_contacted_na_reason: string | null
           employee_interviewed: boolean | null
           employee_interviewed_at: string | null
           employee_interviewed_by: string | null
+          employee_interviewed_na: boolean | null
+          employee_interviewed_na_at: string | null
+          employee_interviewed_na_by: string | null
+          employee_interviewed_na_reason: string | null
           id: string
           incident_id: string
           insurance_claim_number: string | null
@@ -4022,6 +4042,10 @@ export type Database = {
           invoices_collected: boolean | null
           invoices_collected_at: string | null
           invoices_collected_by: string | null
+          invoices_collected_na: boolean | null
+          invoices_collected_na_at: string | null
+          invoices_collected_na_by: string | null
+          invoices_collected_na_reason: string | null
           invoices_under_threshold: boolean | null
           medical_outcome: string | null
           medical_outcome_at: string | null
@@ -4029,6 +4053,10 @@ export type Database = {
           police_report_verified: boolean | null
           police_report_verified_at: string | null
           police_report_verified_by: string | null
+          police_report_verified_na: boolean | null
+          police_report_verified_na_at: string | null
+          police_report_verified_na_by: string | null
+          police_report_verified_na_reason: string | null
           rca_comments: string | null
           rca_completed: boolean | null
           rca_completed_at: string | null
@@ -4040,12 +4068,20 @@ export type Database = {
           rca_manager_interviewed: boolean | null
           rca_manager_interviewed_at: string | null
           rca_manager_interviewed_by: string | null
+          rca_na: boolean | null
+          rca_na_at: string | null
+          rca_na_by: string | null
+          rca_na_reason: string | null
           rca_ppe_required: boolean | null
           rca_ppe_required_missing: boolean | null
           rca_ppe_used: boolean | null
           rca_surface_wet: boolean | null
           rca_work_area_lit: boolean | null
           updated_at: string | null
+          wc_form_na: boolean | null
+          wc_form_na_at: string | null
+          wc_form_na_by: string | null
+          wc_form_na_reason: string | null
           wc_form_number_entered: string | null
           wc_form_submitted: boolean | null
           wc_form_submitted_at: string | null
@@ -4053,17 +4089,33 @@ export type Database = {
           witnesses_interviewed: boolean | null
           witnesses_interviewed_at: string | null
           witnesses_interviewed_by: string | null
+          witnesses_interviewed_na: boolean | null
+          witnesses_interviewed_na_at: string | null
+          witnesses_interviewed_na_by: string | null
+          witnesses_interviewed_na_reason: string | null
         }
         Insert: {
           clinic_call_notes?: string | null
           clinic_called?: boolean | null
           clinic_called_at?: string | null
           clinic_called_by?: string | null
+          clinic_called_na?: boolean | null
+          clinic_called_na_at?: string | null
+          clinic_called_na_by?: string | null
+          clinic_called_na_reason?: string | null
           closeout_complete?: boolean | null
           closeout_complete_at?: string | null
           closeout_complete_by?: string | null
+          closeout_na?: boolean | null
+          closeout_na_at?: string | null
+          closeout_na_by?: string | null
+          closeout_na_reason?: string | null
           closeout_type?: string | null
           created_at?: string | null
+          dwc_form_na?: boolean | null
+          dwc_form_na_at?: string | null
+          dwc_form_na_by?: string | null
+          dwc_form_na_reason?: string | null
           dwc_form_number?: string | null
           dwc_form_sent_to_employee?: boolean | null
           dwc_form_sent_to_employee_at?: string | null
@@ -4071,9 +4123,17 @@ export type Database = {
           employee_contacted?: boolean | null
           employee_contacted_at?: string | null
           employee_contacted_by?: string | null
+          employee_contacted_na?: boolean | null
+          employee_contacted_na_at?: string | null
+          employee_contacted_na_by?: string | null
+          employee_contacted_na_reason?: string | null
           employee_interviewed?: boolean | null
           employee_interviewed_at?: string | null
           employee_interviewed_by?: string | null
+          employee_interviewed_na?: boolean | null
+          employee_interviewed_na_at?: string | null
+          employee_interviewed_na_by?: string | null
+          employee_interviewed_na_reason?: string | null
           id?: string
           incident_id: string
           insurance_claim_number?: string | null
@@ -4082,6 +4142,10 @@ export type Database = {
           invoices_collected?: boolean | null
           invoices_collected_at?: string | null
           invoices_collected_by?: string | null
+          invoices_collected_na?: boolean | null
+          invoices_collected_na_at?: string | null
+          invoices_collected_na_by?: string | null
+          invoices_collected_na_reason?: string | null
           invoices_under_threshold?: boolean | null
           medical_outcome?: string | null
           medical_outcome_at?: string | null
@@ -4089,6 +4153,10 @@ export type Database = {
           police_report_verified?: boolean | null
           police_report_verified_at?: string | null
           police_report_verified_by?: string | null
+          police_report_verified_na?: boolean | null
+          police_report_verified_na_at?: string | null
+          police_report_verified_na_by?: string | null
+          police_report_verified_na_reason?: string | null
           rca_comments?: string | null
           rca_completed?: boolean | null
           rca_completed_at?: string | null
@@ -4100,12 +4168,20 @@ export type Database = {
           rca_manager_interviewed?: boolean | null
           rca_manager_interviewed_at?: string | null
           rca_manager_interviewed_by?: string | null
+          rca_na?: boolean | null
+          rca_na_at?: string | null
+          rca_na_by?: string | null
+          rca_na_reason?: string | null
           rca_ppe_required?: boolean | null
           rca_ppe_required_missing?: boolean | null
           rca_ppe_used?: boolean | null
           rca_surface_wet?: boolean | null
           rca_work_area_lit?: boolean | null
           updated_at?: string | null
+          wc_form_na?: boolean | null
+          wc_form_na_at?: string | null
+          wc_form_na_by?: string | null
+          wc_form_na_reason?: string | null
           wc_form_number_entered?: string | null
           wc_form_submitted?: boolean | null
           wc_form_submitted_at?: string | null
@@ -4113,17 +4189,33 @@ export type Database = {
           witnesses_interviewed?: boolean | null
           witnesses_interviewed_at?: string | null
           witnesses_interviewed_by?: string | null
+          witnesses_interviewed_na?: boolean | null
+          witnesses_interviewed_na_at?: string | null
+          witnesses_interviewed_na_by?: string | null
+          witnesses_interviewed_na_reason?: string | null
         }
         Update: {
           clinic_call_notes?: string | null
           clinic_called?: boolean | null
           clinic_called_at?: string | null
           clinic_called_by?: string | null
+          clinic_called_na?: boolean | null
+          clinic_called_na_at?: string | null
+          clinic_called_na_by?: string | null
+          clinic_called_na_reason?: string | null
           closeout_complete?: boolean | null
           closeout_complete_at?: string | null
           closeout_complete_by?: string | null
+          closeout_na?: boolean | null
+          closeout_na_at?: string | null
+          closeout_na_by?: string | null
+          closeout_na_reason?: string | null
           closeout_type?: string | null
           created_at?: string | null
+          dwc_form_na?: boolean | null
+          dwc_form_na_at?: string | null
+          dwc_form_na_by?: string | null
+          dwc_form_na_reason?: string | null
           dwc_form_number?: string | null
           dwc_form_sent_to_employee?: boolean | null
           dwc_form_sent_to_employee_at?: string | null
@@ -4131,9 +4223,17 @@ export type Database = {
           employee_contacted?: boolean | null
           employee_contacted_at?: string | null
           employee_contacted_by?: string | null
+          employee_contacted_na?: boolean | null
+          employee_contacted_na_at?: string | null
+          employee_contacted_na_by?: string | null
+          employee_contacted_na_reason?: string | null
           employee_interviewed?: boolean | null
           employee_interviewed_at?: string | null
           employee_interviewed_by?: string | null
+          employee_interviewed_na?: boolean | null
+          employee_interviewed_na_at?: string | null
+          employee_interviewed_na_by?: string | null
+          employee_interviewed_na_reason?: string | null
           id?: string
           incident_id?: string
           insurance_claim_number?: string | null
@@ -4142,6 +4242,10 @@ export type Database = {
           invoices_collected?: boolean | null
           invoices_collected_at?: string | null
           invoices_collected_by?: string | null
+          invoices_collected_na?: boolean | null
+          invoices_collected_na_at?: string | null
+          invoices_collected_na_by?: string | null
+          invoices_collected_na_reason?: string | null
           invoices_under_threshold?: boolean | null
           medical_outcome?: string | null
           medical_outcome_at?: string | null
@@ -4149,6 +4253,10 @@ export type Database = {
           police_report_verified?: boolean | null
           police_report_verified_at?: string | null
           police_report_verified_by?: string | null
+          police_report_verified_na?: boolean | null
+          police_report_verified_na_at?: string | null
+          police_report_verified_na_by?: string | null
+          police_report_verified_na_reason?: string | null
           rca_comments?: string | null
           rca_completed?: boolean | null
           rca_completed_at?: string | null
@@ -4160,12 +4268,20 @@ export type Database = {
           rca_manager_interviewed?: boolean | null
           rca_manager_interviewed_at?: string | null
           rca_manager_interviewed_by?: string | null
+          rca_na?: boolean | null
+          rca_na_at?: string | null
+          rca_na_by?: string | null
+          rca_na_reason?: string | null
           rca_ppe_required?: boolean | null
           rca_ppe_required_missing?: boolean | null
           rca_ppe_used?: boolean | null
           rca_surface_wet?: boolean | null
           rca_work_area_lit?: boolean | null
           updated_at?: string | null
+          wc_form_na?: boolean | null
+          wc_form_na_at?: string | null
+          wc_form_na_by?: string | null
+          wc_form_na_reason?: string | null
           wc_form_number_entered?: string | null
           wc_form_submitted?: boolean | null
           wc_form_submitted_at?: string | null
@@ -4173,6 +4289,10 @@ export type Database = {
           witnesses_interviewed?: boolean | null
           witnesses_interviewed_at?: string | null
           witnesses_interviewed_by?: string | null
+          witnesses_interviewed_na?: boolean | null
+          witnesses_interviewed_na_at?: string | null
+          witnesses_interviewed_na_by?: string | null
+          witnesses_interviewed_na_reason?: string | null
         }
         Relationships: [
           {
