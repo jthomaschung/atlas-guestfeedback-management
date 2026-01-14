@@ -218,8 +218,9 @@ const FeedbackReporting = () => {
       const { data: periodsData, error: periodsError } = await supabase
         .from('periods')
         .select('*')
-        .eq('year', 2025)
-        .order('period_number');
+        .in('year', [2025, 2026])
+        .order('year', { ascending: false })
+        .order('period_number', { ascending: false });
 
       if (periodsError) {
         console.error('Error fetching periods:', periodsError);

@@ -73,7 +73,8 @@ export function ComplaintTrendsChart({ className, feedbacks = [], periods = [] }
       const { data: periodsData, error: periodsError } = await supabase
         .from('periods')
         .select('*')
-        .eq('year', 2025)
+        .in('year', [2025, 2026])
+        .order('year')
         .order('period_number');
 
       if (periodsError) throw periodsError;
@@ -136,7 +137,8 @@ export function ComplaintTrendsChart({ className, feedbacks = [], periods = [] }
       const { data: periodsData, error: periodsError } = await supabase
         .from('periods')
         .select('*')
-        .eq('year', 2025)
+        .in('year', [2025, 2026])
+        .order('year')
         .order('period_number');
 
       if (periodsError) throw periodsError;
