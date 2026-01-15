@@ -7,6 +7,12 @@
   border-right: none !important;
 }
 
+/* Ensure sidebar header aligns with global header */
+[data-sidebar="sidebar"] > *:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */

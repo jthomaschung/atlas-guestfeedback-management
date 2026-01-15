@@ -71,8 +71,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <div className="min-h-screen flex w-full overflow-hidden">
         <AppSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
-          <header className="relative h-16 flex items-center justify-between bg-atlas-dark pl-3 pr-6 sticky top-0 z-50 shadow-md -ml-px">
+        <div className="flex-1 flex flex-col min-w-0 pt-0">
+          <header className="relative h-16 flex items-center justify-between bg-atlas-dark pl-3 pr-6 sticky top-0 z-50 shadow-md -ml-px mt-0">
             {/* Red accent line at top */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
             
