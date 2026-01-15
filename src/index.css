@@ -7,8 +7,8 @@
   border-right: none !important;
   background: linear-gradient(to bottom, 
     hsl(210 15% 12%) 0, 
-    hsl(210 15% 12%) 64px,
-    hsl(220 14% 96%) 64px,
+    hsl(210 15% 12%) 68px,
+    hsl(220 14% 96%) 68px,
     hsl(220 14% 96%) 100%
   ) !important;
 }
