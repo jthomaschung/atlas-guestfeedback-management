@@ -112,7 +112,7 @@ export function AppSidebar() {
     >
       {/* ATLAS Branding Header with dark background - matches main header */}
       <div className={cn(
-        "relative bg-atlas-dark text-white h-16 flex items-center justify-center mt-0 pt-0 sticky top-1 z-40",
+        "relative bg-atlas-dark text-white h-16 flex items-center justify-center mt-0 pt-0",
         state === "expanded" && "px-3 justify-start"
       )}>
         
