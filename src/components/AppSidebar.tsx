@@ -132,7 +132,7 @@ export function AppSidebar() {
           )}
         </div>
       </div>
-      <SidebarContent className={`mt-0 pt-0 ${isMobile ? "mobile-scroll" : ""}`}>
+      <SidebarContent className={`mt-0 pt-0 bg-sidebar ${isMobile ? "mobile-scroll" : ""}`}>
 
         {/* Guest Feedback - Collapsible Group */}
         <SidebarGroup>
