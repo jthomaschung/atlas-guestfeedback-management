@@ -111,11 +111,11 @@ export function AppSidebar() {
       style={{ "--sidebar-width": "240px", "--sidebar-width-icon": "48px" } as React.CSSProperties}
     >
       {/* ATLAS Branding Header with dark background */}
-      <div className={cn(
-        "relative bg-atlas-dark text-white h-16 flex items-center justify-center",
-        "after:absolute after:top-0 after:right-0 after:w-1 after:h-full after:bg-atlas-dark",
-        state === "expanded" && "px-3 justify-start"
-      )}>
+        <div className={cn(
+          "relative bg-atlas-dark text-white h-16 flex items-center justify-center mt-0 pt-0",
+          "after:absolute after:top-0 after:right-0 after:w-1 after:h-full after:bg-atlas-dark",
+          state === "expanded" && "px-3 justify-start"
+        )}>
         {/* Red accent line at top */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
         
