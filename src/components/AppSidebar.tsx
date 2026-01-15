@@ -115,6 +115,8 @@ export function AppSidebar() {
         "relative bg-atlas-dark text-white h-16 flex items-center justify-center mt-0 pt-0",
         state === "expanded" && "px-3 justify-start"
       )}>
+        {/* Red accent line at top - matches main header */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-primary z-10" />
         
         <div className="flex items-center gap-3">
           <img 
