@@ -13,18 +13,6 @@
   padding-top: 0 !important;
 }
 
-/* Create seamless header connection bridge */
-[data-sidebar="sidebar"] > *:first-child::after {
-  content: '';
-  position: absolute;
-  right: -2px;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background-color: hsl(210 15% 12%);
-  z-index: 51;
-}
-
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
