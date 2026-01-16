@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, TrendingUp, Clock, CheckCircle, Loader2, AlertTriangle, MessageSquare } from "lucide-react";
 import { CustomerFeedback } from "@/types/feedback";
-import { FeedbackReportingFilters } from "@/components/feedback/FeedbackReportingFilters";
+import { FeedbackReportingFilters, ORDER_ISSUES_CATEGORIES } from "@/components/feedback/FeedbackReportingFilters";
 import { ComplaintTrendsChart } from "@/components/feedback/ComplaintTrendsChart";
 import { StoreCategoryTable } from "@/components/feedback/StoreCategoryTable";
 import { useAuth } from "@/hooks/useAuth";
@@ -45,7 +45,15 @@ const Summary = () => {
       const matchesStatus = statusFilter.length === 0 || statusFilter.includes(fb.resolution_status);
       const matchesPriority = priorityFilter.length === 0 || priorityFilter.includes(fb.priority);
       const matchesCategory = categoryFilter.length === 0 || 
-                             categoryFilter.some(cat => cat.toLowerCase() === fb.complaint_category.toLowerCase());
+                             categoryFilter.some(cat => {
+                               const catLower = cat.toLowerCase();
+                               const fbCatLower = fb.complaint_category.toLowerCase();
+                               // Handle "Order Issues" composite category
+                               if (catLower === 'order issues') {
+                                 return ORDER_ISSUES_CATEGORIES.includes(fbCatLower);
+                               }
+                               return catLower === fbCatLower;
+                             });
       const matchesChannel = channelFilter.length === 0 || channelFilter.includes(fb.channel);
       const matchesStore = storeFilter.length === 0 || storeFilter.includes(fb.store_number);
       // Normalize market for comparison (e.g., "NE4" -> "NE 4")
