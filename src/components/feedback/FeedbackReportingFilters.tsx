@@ -57,16 +57,18 @@ const categoryOptions = [
   { value: 'Bread Quality', label: 'Bread Quality' },
   { value: 'Cleanliness', label: 'Cleanliness' },
   { value: 'Closed Early', label: 'Closed Early' },
-  { value: 'Missing Items', label: 'Missing Items' },
+  { value: 'Order Issues', label: 'Order Issues' },
   { value: 'Other', label: 'Other' },
   { value: 'Out of Product', label: 'Out of Product' },
   { value: 'Praise', label: 'Praise' },
   { value: 'Pricing Issue', label: 'Pricing Issue' },
   { value: 'Product Issue', label: 'Product Issue' },
   { value: 'Rude Service', label: 'Rude Service' },
-  { value: 'Sandwich Made Wrong', label: 'Sandwich Made Wrong' },
   { value: 'Slow Service', label: 'Slow Service' },
 ];
+
+// Order Issues combines: Sandwich Made Wrong, Sandwich Issue, Missing Items
+export const ORDER_ISSUES_CATEGORIES = ['sandwich made wrong', 'sandwich issue', 'missing items', 'missing item'];
 
 const channelOptions = [
   { value: 'yelp', label: 'Yelp' },
