@@ -67,8 +67,8 @@ const categoryOptions = [
   { value: 'Slow Service', label: 'Slow Service' },
 ];
 
-// Order Issues combines: Sandwich Made Wrong, Sandwich Issue, Missing Items
-export const ORDER_ISSUES_CATEGORIES = ['sandwich made wrong', 'sandwich issue', 'missing items', 'missing item'];
+// Order Issues combines: Sandwich Made Wrong, Missing Item/Items (case-insensitive)
+export const ORDER_ISSUES_CATEGORIES = ['sandwich made wrong', 'missing item', 'missing items'];
 
 const channelOptions = [
   { value: 'yelp', label: 'Yelp' },

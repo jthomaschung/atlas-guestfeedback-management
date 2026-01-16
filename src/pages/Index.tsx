@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { CustomerFeedback } from "@/types/feedback";
 import { CustomerFeedbackTable } from "@/components/feedback/CustomerFeedbackTable";
 import { CustomerFeedbackStats } from "@/components/feedback/CustomerFeedbackStats";
-import { FeedbackReportingFilters } from "@/components/feedback/FeedbackReportingFilters";
+import { FeedbackReportingFilters, ORDER_ISSUES_CATEGORIES } from "@/components/feedback/FeedbackReportingFilters";
 import { FeedbackDetailsDialog } from "@/components/feedback/FeedbackDetailsDialog";
 import { ComplaintTrendsChart } from "@/components/feedback/ComplaintTrendsChart";
 import { CategoryBreakdownChart } from "@/components/feedback/CategoryBreakdownChart";
@@ -268,8 +268,11 @@ const Index = () => {
         if (!cat) return false;
         const categoryLower = fb.complaint_category?.toLowerCase() || '';
         const filterLower = cat.toLowerCase();
-        // Bidirectional matching: check if either contains the other
-        return categoryLower.includes(filterLower) || filterLower.includes(categoryLower);
+        // Handle "Order Issues" composite category
+        if (filterLower === 'order issues') {
+          return ORDER_ISSUES_CATEGORIES.includes(categoryLower);
+        }
+        return categoryLower === filterLower || categoryLower.includes(filterLower) || filterLower.includes(categoryLower);
       });
       const matchesChannel = channelFilter.length === 0 || channelFilter.includes(fb.channel);
       const matchesStore = storeFilter.length === 0 || storeFilter.includes(fb.store_number);
@@ -340,7 +343,11 @@ const Index = () => {
         if (!cat) return false;
         const categoryLower = fb.complaint_category?.toLowerCase() || '';
         const filterLower = cat.toLowerCase();
-        return categoryLower.includes(filterLower) || filterLower.includes(categoryLower);
+        // Handle "Order Issues" composite category
+        if (filterLower === 'order issues') {
+          return ORDER_ISSUES_CATEGORIES.includes(categoryLower);
+        }
+        return categoryLower === filterLower || categoryLower.includes(filterLower) || filterLower.includes(categoryLower);
       });
       const matchesChannel = channelFilter.length === 0 || channelFilter.includes(fb.channel);
       const matchesStore = storeFilter.length === 0 || storeFilter.includes(fb.store_number);
