@@ -6385,6 +6385,47 @@ export type Database = {
         }
         Relationships: []
       }
+      praise_comments: {
+        Row: {
+          content: string
+          created_at: string | null
+          feedback_id: string
+          id: string
+          updated_at: string | null
+          user_email: string | null
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          feedback_id: string
+          id?: string
+          updated_at?: string | null
+          user_email?: string | null
+          user_id: string
+          user_name: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          feedback_id?: string
+          id?: string
+          updated_at?: string | null
+          user_email?: string | null
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "praise_comments_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "customer_feedback"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prep_values: {
         Row: {
           bin_value: number

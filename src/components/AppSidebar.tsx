@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive, UserCheck, TrendingUp, Shield, Target, BookOpen, Mail, Clock, FileText, CheckCircle, FileX, LayoutGrid, ChevronDown, Headphones } from "lucide-react";
+import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive, UserCheck, TrendingUp, Shield, Target, BookOpen, Mail, Clock, FileText, CheckCircle, FileX, LayoutGrid, ChevronDown, Headphones, Star } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -25,6 +25,7 @@ const guestFeedbackItems = [
   { title: "Accuracy", url: "/accuracy", icon: Target },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Feedback Reporting", url: "/feedback-reporting", icon: TrendingUp },
+  { title: "Praise Board", url: "/praise-board", icon: Star },
   { title: "Summary", url: "/summary", icon: BarChart3 },
 ];
 
