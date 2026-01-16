@@ -1,14 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { CustomerFeedback } from "@/types/feedback";
 import { PraiseCard } from "@/components/praise/PraiseCard";
 import { PraiseStats } from "@/components/praise/PraiseStats";
+import { AddPraiseDialog } from "@/components/praise/AddPraiseDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Star, Search, Sparkles } from "lucide-react";
+import { Star, Search, Sparkles, Plus } from "lucide-react";
 import { format, subDays } from "date-fns";
 
 type PraiseComment = {
@@ -30,60 +32,61 @@ export default function PraiseBoard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [marketFilter, setMarketFilter] = useState("all");
   const [markets, setMarkets] = useState<string[]>([]);
+  const [showAddPraise, setShowAddPraise] = useState(false);
 
   // Fetch praises (feedback with "Praise" category)
-  useEffect(() => {
-    const fetchPraises = async () => {
-      setLoading(true);
-      
-      const thirtyDaysAgo = format(subDays(new Date(), 30), 'yyyy-MM-dd');
-      
-      const { data, error } = await supabase
-        .from('customer_feedback')
-        .select('*')
-        .ilike('complaint_category', '%praise%')
-        .gte('feedback_date', thirtyDaysAgo)
-        .order('created_at', { ascending: false })
-        .limit(100);
+  const fetchPraises = useCallback(async () => {
+    setLoading(true);
+    
+    const thirtyDaysAgo = format(subDays(new Date(), 30), 'yyyy-MM-dd');
+    
+    const { data, error } = await supabase
+      .from('customer_feedback')
+      .select('*')
+      .ilike('complaint_category', '%praise%')
+      .gte('feedback_date', thirtyDaysAgo)
+      .order('created_at', { ascending: false })
+      .limit(100);
 
-      if (error) {
-        console.error('Error fetching praises:', error);
-      } else if (data) {
-        setPraises(data as CustomerFeedback[]);
-        
-        // Extract unique markets
-        const uniqueMarkets = [...new Set(data.map(p => p.market).filter(Boolean))];
-        setMarkets(uniqueMarkets);
-        
-        // Fetch comments for all praises
-        const feedbackIds = data.map(p => p.id);
-        if (feedbackIds.length > 0) {
-          const { data: commentsData, error: commentsError } = await supabase
-            .from('praise_comments')
-            .select('*')
-            .in('feedback_id', feedbackIds)
-            .order('created_at', { ascending: true });
+    if (error) {
+      console.error('Error fetching praises:', error);
+    } else if (data) {
+      setPraises(data as CustomerFeedback[]);
+      
+      // Extract unique markets
+      const uniqueMarkets = [...new Set(data.map(p => p.market).filter(Boolean))];
+      setMarkets(uniqueMarkets);
+      
+      // Fetch comments for all praises
+      const feedbackIds = data.map(p => p.id);
+      if (feedbackIds.length > 0) {
+        const { data: commentsData, error: commentsError } = await supabase
+          .from('praise_comments')
+          .select('*')
+          .in('feedback_id', feedbackIds)
+          .order('created_at', { ascending: true });
 
-          if (!commentsError && commentsData) {
-            // Group comments by feedback_id
-            const groupedComments: Record<string, PraiseComment[]> = {};
-            commentsData.forEach((comment) => {
-              const typedComment = comment as PraiseComment;
-              if (!groupedComments[typedComment.feedback_id]) {
-                groupedComments[typedComment.feedback_id] = [];
-              }
-              groupedComments[typedComment.feedback_id].push(typedComment);
-            });
-            setComments(groupedComments);
-          }
+        if (!commentsError && commentsData) {
+          // Group comments by feedback_id
+          const groupedComments: Record<string, PraiseComment[]> = {};
+          commentsData.forEach((comment) => {
+            const typedComment = comment as PraiseComment;
+            if (!groupedComments[typedComment.feedback_id]) {
+              groupedComments[typedComment.feedback_id] = [];
+            }
+            groupedComments[typedComment.feedback_id].push(typedComment);
+          });
+          setComments(groupedComments);
         }
       }
-      
-      setLoading(false);
-    };
-
-    fetchPraises();
+    }
+    
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    fetchPraises();
+  }, [fetchPraises]);
 
   // Filter praises
   const filteredPraises = praises.filter(praise => {
@@ -142,18 +145,35 @@ export default function PraiseBoard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <div className="p-3 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl shadow-lg">
-          <Star className="h-8 w-8 text-white fill-white" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl shadow-lg">
+            <Star className="h-8 w-8 text-white fill-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+              Praise Board
+              <Sparkles className="h-6 w-6 text-amber-500" />
+            </h1>
+            <p className="text-muted-foreground">Celebrating exceptional service and happy customers</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-            Praise Board
-            <Sparkles className="h-6 w-6 text-amber-500" />
-          </h1>
-          <p className="text-muted-foreground">Celebrating exceptional service and happy customers</p>
-        </div>
+        <Button
+          onClick={() => setShowAddPraise(true)}
+          className="bg-amber-500 hover:bg-amber-600 text-white"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Praise
+        </Button>
       </div>
+
+      {/* Add Praise Dialog */}
+      <AddPraiseDialog
+        open={showAddPraise}
+        onClose={() => setShowAddPraise(false)}
+        onSuccess={fetchPraises}
+        markets={markets}
+      />
 
       {/* Stats */}
       <PraiseStats praises={praises} comments={comments} />
