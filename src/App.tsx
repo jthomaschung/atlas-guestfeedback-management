@@ -29,6 +29,7 @@ import InternalFeedback from '@/pages/InternalFeedback';
 import Accuracy from '@/pages/Accuracy';
 import Training from '@/pages/Training';
 import EmailTemplates from '@/pages/EmailTemplates';
+import PraiseBoard from '@/pages/PraiseBoard';
 import { AuthGate } from '@/components/AuthGate';
 import { PortalGate } from '@/auth/PortalGate';
 
@@ -232,6 +233,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <EmailTemplates />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/praise-board" 
+                element={
+                  <ProtectedRoute>
+                    <PraiseBoard />
                   </ProtectedRoute>
                 } 
               />
