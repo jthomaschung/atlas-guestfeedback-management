@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      accounting_settings: {
+        Row: {
+          description: string | null
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          setting_key: string
+          setting_value: Json
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       achievements: {
         Row: {
           badge_icon: string
@@ -355,6 +382,89 @@ export type Database = {
         }
         Relationships: []
       }
+      bonus_eligibility_results: {
+        Row: {
+          am_completion: number | null
+          calculated_at: string
+          driver_completion: number | null
+          gm_completion: number | null
+          id: string
+          is_eligible: boolean | null
+          location_id: string
+          location_type: string
+          overall_avg: number | null
+          period_id: string
+          r2r_completion: number | null
+          sl_completion: number | null
+        }
+        Insert: {
+          am_completion?: number | null
+          calculated_at?: string
+          driver_completion?: number | null
+          gm_completion?: number | null
+          id?: string
+          is_eligible?: boolean | null
+          location_id: string
+          location_type: string
+          overall_avg?: number | null
+          period_id: string
+          r2r_completion?: number | null
+          sl_completion?: number | null
+        }
+        Update: {
+          am_completion?: number | null
+          calculated_at?: string
+          driver_completion?: number | null
+          gm_completion?: number | null
+          id?: string
+          is_eligible?: boolean | null
+          location_id?: string
+          location_type?: string
+          overall_avg?: number | null
+          period_id?: string
+          r2r_completion?: number | null
+          sl_completion?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bonus_eligibility_results_period_id_fkey"
+            columns: ["period_id"]
+            isOneToOne: false
+            referencedRelation: "bonus_periods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bonus_periods: {
+        Row: {
+          created_at: string
+          end_date: string
+          id: string
+          is_active: boolean | null
+          period_name: string
+          start_date: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_date: string
+          id?: string
+          is_active?: boolean | null
+          period_name: string
+          start_date: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string
+          id?: string
+          is_active?: boolean | null
+          period_name?: string
+          start_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       campaign_recipients: {
         Row: {
           bounced_at: string | null
@@ -543,6 +653,11 @@ export type Database = {
           id: string
           notes: string | null
           receipt_image_url: string
+          resolution_notes: string | null
+          resolution_status: string | null
+          resolved_at: string | null
+          resolved_by_name: string | null
+          resolved_by_user_id: string | null
           store_number: string
           submission_type: string
           submitted_by_user_id: string | null
@@ -561,6 +676,11 @@ export type Database = {
           id?: string
           notes?: string | null
           receipt_image_url: string
+          resolution_notes?: string | null
+          resolution_status?: string | null
+          resolved_at?: string | null
+          resolved_by_name?: string | null
+          resolved_by_user_id?: string | null
           store_number: string
           submission_type?: string
           submitted_by_user_id?: string | null
@@ -579,6 +699,11 @@ export type Database = {
           id?: string
           notes?: string | null
           receipt_image_url?: string
+          resolution_notes?: string | null
+          resolution_status?: string | null
+          resolved_at?: string | null
+          resolved_by_name?: string | null
+          resolved_by_user_id?: string | null
           store_number?: string
           submission_type?: string
           submitted_by_user_id?: string | null
@@ -3410,6 +3535,81 @@ export type Database = {
           },
         ]
       }
+      harassment_test_results: {
+        Row: {
+          completed_at: string
+          created_at: string
+          employee_email: string | null
+          employee_name: string
+          id: string
+          incorrect_items: Json | null
+          is_supervisor: boolean
+          market: string | null
+          passed: boolean
+          percentage: number
+          profile_id: string | null
+          score: number
+          state: string
+          store_number: string
+          time_taken_seconds: number | null
+          total_questions: number
+          training_version: string | null
+        }
+        Insert: {
+          completed_at?: string
+          created_at?: string
+          employee_email?: string | null
+          employee_name: string
+          id?: string
+          incorrect_items?: Json | null
+          is_supervisor?: boolean
+          market?: string | null
+          passed: boolean
+          percentage: number
+          profile_id?: string | null
+          score: number
+          state: string
+          store_number: string
+          time_taken_seconds?: number | null
+          total_questions: number
+          training_version?: string | null
+        }
+        Update: {
+          completed_at?: string
+          created_at?: string
+          employee_email?: string | null
+          employee_name?: string
+          id?: string
+          incorrect_items?: Json | null
+          is_supervisor?: boolean
+          market?: string | null
+          passed?: boolean
+          percentage?: number
+          profile_id?: string | null
+          score?: number
+          state?: string
+          store_number?: string
+          time_taken_seconds?: number | null
+          total_questions?: number
+          training_version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "harassment_test_results_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "harassment_test_results_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
       house_account_customers: {
         Row: {
           created_at: string | null
@@ -3816,6 +4016,7 @@ export type Database = {
       incident_reports: {
         Row: {
           body_part_injured: string | null
+          body_part_side: string | null
           closed_at: string | null
           closed_by: string | null
           created_at: string | null
@@ -3875,6 +4076,7 @@ export type Database = {
         }
         Insert: {
           body_part_injured?: string | null
+          body_part_side?: string | null
           closed_at?: string | null
           closed_by?: string | null
           created_at?: string | null
@@ -3934,6 +4136,7 @@ export type Database = {
         }
         Update: {
           body_part_injured?: string | null
+          body_part_side?: string | null
           closed_at?: string | null
           closed_by?: string | null
           created_at?: string | null
@@ -4320,6 +4523,7 @@ export type Database = {
           status: string
           title: string
           updated_at: string
+          user_email: string | null
           user_id: string
         }
         Insert: {
@@ -4337,6 +4541,7 @@ export type Database = {
           status?: string
           title: string
           updated_at?: string
+          user_email?: string | null
           user_id: string
         }
         Update: {
@@ -4354,6 +4559,7 @@ export type Database = {
           status?: string
           title?: string
           updated_at?: string
+          user_email?: string | null
           user_id?: string
         }
         Relationships: []
@@ -5319,6 +5525,7 @@ export type Database = {
           has_food_handlers_card: boolean | null
           has_servsafe: boolean | null
           hiring_manager: string
+          hours: string | null
           id: string
           id_expiration_date: string | null
           id_number: string | null
@@ -5336,6 +5543,7 @@ export type Database = {
           market: string
           middle_name: string | null
           mvr_approval: boolean | null
+          notes: string | null
           policy_expiration_date: string | null
           policy_number: string | null
           position: string
@@ -5356,6 +5564,7 @@ export type Database = {
           wage: number
           wage_within_scale: string | null
           will_be_driving: boolean | null
+          work_schedule: string | null
           zip: string | null
         }
         Insert: {
@@ -5379,6 +5588,7 @@ export type Database = {
           has_food_handlers_card?: boolean | null
           has_servsafe?: boolean | null
           hiring_manager: string
+          hours?: string | null
           id?: string
           id_expiration_date?: string | null
           id_number?: string | null
@@ -5396,6 +5606,7 @@ export type Database = {
           market: string
           middle_name?: string | null
           mvr_approval?: boolean | null
+          notes?: string | null
           policy_expiration_date?: string | null
           policy_number?: string | null
           position: string
@@ -5416,6 +5627,7 @@ export type Database = {
           wage: number
           wage_within_scale?: string | null
           will_be_driving?: boolean | null
+          work_schedule?: string | null
           zip?: string | null
         }
         Update: {
@@ -5439,6 +5651,7 @@ export type Database = {
           has_food_handlers_card?: boolean | null
           has_servsafe?: boolean | null
           hiring_manager?: string
+          hours?: string | null
           id?: string
           id_expiration_date?: string | null
           id_number?: string | null
@@ -5456,6 +5669,7 @@ export type Database = {
           market?: string
           middle_name?: string | null
           mvr_approval?: boolean | null
+          notes?: string | null
           policy_expiration_date?: string | null
           policy_number?: string | null
           position?: string
@@ -5476,6 +5690,7 @@ export type Database = {
           wage?: number
           wage_within_scale?: string | null
           will_be_driving?: boolean | null
+          work_schedule?: string | null
           zip?: string | null
         }
         Relationships: []
@@ -5559,6 +5774,61 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      onboarding_reminder_log: {
+        Row: {
+          created_at: string
+          id: string
+          incomplete_tasks: Json
+          new_hire_id: string | null
+          recipient_emails: Json
+          reminder_type: string
+          sent_at: string
+          sent_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          incomplete_tasks?: Json
+          new_hire_id?: string | null
+          recipient_emails?: Json
+          reminder_type?: string
+          sent_at?: string
+          sent_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          incomplete_tasks?: Json
+          new_hire_id?: string | null
+          recipient_emails?: Json
+          reminder_type?: string
+          sent_at?: string
+          sent_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_reminder_log_new_hire_id_fkey"
+            columns: ["new_hire_id"]
+            isOneToOne: false
+            referencedRelation: "new_hire_submissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_reminder_log_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_reminder_log_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["profile_id"]
+          },
+        ]
       }
       onboarding_steps: {
         Row: {
@@ -6891,6 +7161,86 @@ export type Database = {
           },
         ]
       }
+      store_labor_goal_history: {
+        Row: {
+          changed_at: string | null
+          changed_by: string | null
+          id: string
+          new_goal: number
+          notes: string | null
+          period_number: number
+          previous_goal: number | null
+          store_labor_goal_id: string | null
+          store_number: string
+          year: number
+        }
+        Insert: {
+          changed_at?: string | null
+          changed_by?: string | null
+          id?: string
+          new_goal: number
+          notes?: string | null
+          period_number: number
+          previous_goal?: number | null
+          store_labor_goal_id?: string | null
+          store_number: string
+          year: number
+        }
+        Update: {
+          changed_at?: string | null
+          changed_by?: string | null
+          id?: string
+          new_goal?: number
+          notes?: string | null
+          period_number?: number
+          previous_goal?: number | null
+          store_labor_goal_id?: string | null
+          store_number?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_labor_goal_history_store_labor_goal_id_fkey"
+            columns: ["store_labor_goal_id"]
+            isOneToOne: false
+            referencedRelation: "store_labor_goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_labor_goals: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          labor_goal: number
+          period_number: number
+          store_number: string
+          updated_at: string | null
+          year: number
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          labor_goal?: number
+          period_number: number
+          store_number: string
+          updated_at?: string | null
+          year: number
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          labor_goal?: number
+          period_number?: number
+          store_number?: string
+          updated_at?: string | null
+          year?: number
+        }
+        Relationships: []
+      }
       store_region_groups: {
         Row: {
           created_at: string | null
@@ -7148,6 +7498,39 @@ export type Database = {
           store?: string | null
           training?: string | null
           uploaded_at?: string | null
+        }
+        Relationships: []
+      }
+      training_completion_snapshots: {
+        Row: {
+          avg_completion: number | null
+          completed_count: number | null
+          created_at: string
+          id: string
+          snapshot_date: string
+          store_number: string
+          total_employees: number | null
+          training: string
+        }
+        Insert: {
+          avg_completion?: number | null
+          completed_count?: number | null
+          created_at?: string
+          id?: string
+          snapshot_date: string
+          store_number: string
+          total_employees?: number | null
+          training: string
+        }
+        Update: {
+          avg_completion?: number | null
+          completed_count?: number | null
+          created_at?: string
+          id?: string
+          snapshot_date?: string
+          store_number?: string
+          total_employees?: number | null
+          training?: string
         }
         Relationships: []
       }
@@ -7616,6 +7999,140 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_store_monthly_spending"
             referencedColumns: ["store_id"]
+          },
+        ]
+      }
+      variance_flags: {
+        Row: {
+          actual_amount: number
+          business_date: string
+          cash_deposit_id: string | null
+          created_at: string | null
+          expected_amount: number | null
+          id: string
+          requires_director_approval: boolean | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by_name: string | null
+          reviewed_by_user_id: string | null
+          severity: string
+          shift_deposit_id: string | null
+          status: string
+          store_number: string
+          triggered_threshold: number
+          updated_at: string | null
+          variance_amount: number
+          variance_category: string | null
+          variance_explanation: string | null
+          variance_percentage: number | null
+          variance_type: string
+        }
+        Insert: {
+          actual_amount: number
+          business_date: string
+          cash_deposit_id?: string | null
+          created_at?: string | null
+          expected_amount?: number | null
+          id?: string
+          requires_director_approval?: boolean | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by_name?: string | null
+          reviewed_by_user_id?: string | null
+          severity: string
+          shift_deposit_id?: string | null
+          status?: string
+          store_number: string
+          triggered_threshold: number
+          updated_at?: string | null
+          variance_amount: number
+          variance_category?: string | null
+          variance_explanation?: string | null
+          variance_percentage?: number | null
+          variance_type?: string
+        }
+        Update: {
+          actual_amount?: number
+          business_date?: string
+          cash_deposit_id?: string | null
+          created_at?: string | null
+          expected_amount?: number | null
+          id?: string
+          requires_director_approval?: boolean | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by_name?: string | null
+          reviewed_by_user_id?: string | null
+          severity?: string
+          shift_deposit_id?: string | null
+          status?: string
+          store_number?: string
+          triggered_threshold?: number
+          updated_at?: string | null
+          variance_amount?: number
+          variance_category?: string | null
+          variance_explanation?: string | null
+          variance_percentage?: number | null
+          variance_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "variance_flags_cash_deposit_id_fkey"
+            columns: ["cash_deposit_id"]
+            isOneToOne: false
+            referencedRelation: "cash_deposits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "variance_flags_shift_deposit_id_fkey"
+            columns: ["shift_deposit_id"]
+            isOneToOne: false
+            referencedRelation: "shift_deposits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      variance_flags_history: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          new_status: string | null
+          notes: string | null
+          old_status: string | null
+          performed_by_name: string | null
+          performed_by_user_id: string | null
+          variance_flag_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          new_status?: string | null
+          notes?: string | null
+          old_status?: string | null
+          performed_by_name?: string | null
+          performed_by_user_id?: string | null
+          variance_flag_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          new_status?: string | null
+          notes?: string | null
+          old_status?: string | null
+          performed_by_name?: string | null
+          performed_by_user_id?: string | null
+          variance_flag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "variance_flags_history_variance_flag_id_fkey"
+            columns: ["variance_flag_id"]
+            isOneToOne: false
+            referencedRelation: "variance_flags"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -8599,11 +9116,19 @@ export type Database = {
           deposit_ids: string | null
           expected_total: number | null
           match_status: string | null
+          receipt_variance: number | null
+          resolution_notes: string | null
+          resolution_status: string | null
+          resolved_at: string | null
+          resolved_by_name: string | null
+          shift_actual_total: number | null
           store_name: string | null
           store_number: string | null
           submitted_at: string | null
           submitted_by: string | null
           submitted_date: string | null
+          validated_at: string | null
+          validated_total: number | null
           variance: number | null
           variance_abs: number | null
         }
@@ -8704,6 +9229,7 @@ export type Database = {
         Returns: boolean
       }
       cleanup_old_wsr_data: { Args: never; Returns: number }
+      cleanup_variances_below_threshold: { Args: never; Returns: number }
       create_training_snapshot: {
         Args: { p_batch_id: string; p_snapshot_date: string }
         Returns: undefined
@@ -9682,11 +10208,13 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { user_id: string }; Returns: boolean }
+      is_admin_user: { Args: { user_uuid: string }; Returns: boolean }
       is_dm: { Args: { user_uuid: string }; Returns: boolean }
       is_executive: { Args: { user_uuid: string }; Returns: boolean }
       is_jsonb_array_of_strings: { Args: { j: Json }; Returns: boolean }
       is_portal_master_admin: { Args: { _user_id: string }; Returns: boolean }
       is_role_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_system_admin: { Args: { user_id: string }; Returns: boolean }
       jsonb_try_parse: { Args: { txt: string }; Returns: Json }
       normalize_market: { Args: { market_name: string }; Returns: string }
       process_approval: {
