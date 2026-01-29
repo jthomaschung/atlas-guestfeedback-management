@@ -173,13 +173,13 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
                       <TableCell 
                         key={category} 
                         className={cn(
-                          "text-center",
+                          "text-center store-category-cell",
                           bgClass,
                           count > 0 && onCellClick && "cursor-pointer hover:underline hover:opacity-70 transition-colors"
                         )}
                         onClick={() => count > 0 && handleCellClick(store.storeNumber, category)}
                       >
-                        <span style={{ color: 'black' }}>{count > 0 ? count : '—'}</span>
+                        {count > 0 ? count : '—'}
                       </TableCell>
                     );
                   })}
