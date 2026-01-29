@@ -81,11 +81,11 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
   const getCellColor = (count: number, total: number) => {
     if (count === 0) return "";
     const percentage = (count / total) * 100;
-    // Use explicit black text for all colored backgrounds (dark:text-white for dark mode)
-    if (percentage >= 20) return "bg-destructive/20 text-black dark:text-white";
-    if (percentage >= 10) return "bg-warning/20 text-black dark:text-white";
-    if (percentage >= 5) return "bg-info/20 text-black dark:text-white";
-    return "bg-muted/50 text-black dark:text-white";
+    // Use slate-900 for guaranteed dark text on all colored backgrounds
+    if (percentage >= 20) return "bg-destructive/20 !text-slate-900";
+    if (percentage >= 10) return "bg-warning/20 !text-slate-900";
+    if (percentage >= 5) return "bg-info/20 !text-slate-900";
+    return "bg-muted/50 !text-slate-900";
   };
 
   const handleCellClick = (storeNumber: string | null, category: string | null) => {
