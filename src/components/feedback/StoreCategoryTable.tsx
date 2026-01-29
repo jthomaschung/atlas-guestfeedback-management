@@ -170,19 +170,28 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
                   <TableCell className="text-muted-foreground">{store.market}</TableCell>
                   {categories.map(category => {
                     const count = store.categories[category] || 0;
-                    const cellStyle = getCellStyle(count, store.total);
+                    const hasColor = count > 0;
+                    const percentage = store.total > 0 ? (count / store.total) * 100 : 0;
+                    let bgClass = "";
+                    if (hasColor) {
+                      if (percentage >= 20) bgClass = "bg-destructive/20";
+                      else if (percentage >= 10) bgClass = "bg-warning/20";
+                      else if (percentage >= 5) bgClass = "bg-info/20";
+                      else bgClass = "bg-muted/50";
+                    }
                     return (
                       <TableCell 
                         key={category} 
                         className={cn(
                           "text-center",
-                          cellStyle.className,
-                          count > 0 && onCellClick && "cursor-pointer hover:underline hover:opacity-70 transition-colors"
+                          bgClass,
+                          hasColor && onCellClick && "cursor-pointer hover:underline hover:opacity-70 transition-colors"
                         )}
-                        style={cellStyle.style}
-                        onClick={() => count > 0 && handleCellClick(store.storeNumber, category)}
+                        onClick={() => hasColor && handleCellClick(store.storeNumber, category)}
                       >
-                        {count > 0 ? count : '—'}
+                        {hasColor ? (
+                          <span style={{ color: '#000000', fontWeight: 500 }}>{count}</span>
+                        ) : '—'}
                       </TableCell>
                     );
                   })}
