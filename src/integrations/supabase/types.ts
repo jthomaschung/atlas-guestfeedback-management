@@ -1881,6 +1881,72 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_summary_edits: {
+        Row: {
+          approval_status: string | null
+          business_date: string
+          created_at: string
+          edit_reason: string
+          edit_type: string
+          edited_at: string
+          edited_by_name: string
+          edited_by_user_id: string | null
+          id: string
+          new_value: number | null
+          old_value: number | null
+          requires_approval: boolean | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by_name: string | null
+          reviewed_by_user_id: string | null
+          store_number: string
+          target_record_id: string | null
+          target_table: string
+        }
+        Insert: {
+          approval_status?: string | null
+          business_date: string
+          created_at?: string
+          edit_reason: string
+          edit_type: string
+          edited_at?: string
+          edited_by_name: string
+          edited_by_user_id?: string | null
+          id?: string
+          new_value?: number | null
+          old_value?: number | null
+          requires_approval?: boolean | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by_name?: string | null
+          reviewed_by_user_id?: string | null
+          store_number: string
+          target_record_id?: string | null
+          target_table: string
+        }
+        Update: {
+          approval_status?: string | null
+          business_date?: string
+          created_at?: string
+          edit_reason?: string
+          edit_type?: string
+          edited_at?: string
+          edited_by_name?: string
+          edited_by_user_id?: string | null
+          id?: string
+          new_value?: number | null
+          old_value?: number | null
+          requires_approval?: boolean | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by_name?: string | null
+          reviewed_by_user_id?: string | null
+          store_number?: string
+          target_record_id?: string | null
+          target_table?: string
+        }
+        Relationships: []
+      }
       daily_summary_log: {
         Row: {
           created_at: string
@@ -9131,6 +9197,37 @@ export type Database = {
           validated_total: number | null
           variance: number | null
           variance_abs: number | null
+        }
+        Relationships: []
+      }
+      v_daily_summary: {
+        Row: {
+          am_actual: number | null
+          am_expected: number | null
+          am_receipt_url: string | null
+          am_shift_id: string | null
+          am_signer_1: string | null
+          am_signer_2: string | null
+          bank_receipt_url: string | null
+          business_date: string | null
+          daily_actual: number | null
+          daily_expected: number | null
+          overall_status: string | null
+          pm_actual: number | null
+          pm_expected: number | null
+          pm_receipt_url: string | null
+          pm_shift_id: string | null
+          pm_signer_1: string | null
+          pm_signer_2: string | null
+          receipt_amount: number | null
+          receipt_validated_at: string | null
+          receipt_variance: number | null
+          shift_count: number | null
+          shift_status: string | null
+          store_name: string | null
+          store_number: string | null
+          wsr_expected: number | null
+          wsr_variance: number | null
         }
         Relationships: []
       }
