@@ -81,11 +81,11 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
   const getCellColor = (count: number, total: number) => {
     if (count === 0) return "";
     const percentage = (count / total) * 100;
-    // Use dark text (foreground) for all colored backgrounds
-    if (percentage >= 20) return "bg-destructive/20 text-foreground";
-    if (percentage >= 10) return "bg-warning/20 text-foreground";
-    if (percentage >= 5) return "bg-info/20 text-foreground";
-    return "bg-muted/50 text-foreground";
+    // Use explicit black text for all colored backgrounds (dark:text-white for dark mode)
+    if (percentage >= 20) return "bg-destructive/20 text-black dark:text-white";
+    if (percentage >= 10) return "bg-warning/20 text-black dark:text-white";
+    if (percentage >= 5) return "bg-info/20 text-black dark:text-white";
+    return "bg-muted/50 text-black dark:text-white";
   };
 
   const handleCellClick = (storeNumber: string | null, category: string | null) => {
@@ -172,7 +172,7 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
                       <TableCell 
                         key={category} 
                         className={cn(
-                          "text-center text-foreground",
+                          "text-center",
                           getCellColor(count, store.total),
                           count > 0 && onCellClick && "cursor-pointer hover:underline hover:opacity-70 transition-colors"
                         )}
@@ -184,7 +184,7 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
                   })}
                   <TableCell 
                     className={cn(
-                      "text-center font-medium bg-muted/30 text-foreground",
+                      "text-center font-medium bg-muted/30",
                       store.total > 0 && onCellClick && "cursor-pointer hover:underline hover:opacity-70 transition-colors"
                     )}
                     onClick={() => store.total > 0 && handleCellClick(store.storeNumber, null)}
@@ -204,7 +204,7 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
                     <TableCell 
                       key={category} 
                       className={cn(
-                        "text-center font-bold text-foreground",
+                        "text-center font-bold",
                         count > 0 && onCellClick && "cursor-pointer hover:underline hover:opacity-70 transition-colors"
                       )}
                       onClick={() => count > 0 && handleCellClick(null, category)}
@@ -215,7 +215,7 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
                 })}
                 <TableCell 
                   className={cn(
-                    "text-center font-bold bg-muted/50 text-foreground",
+                    "text-center font-bold bg-muted/50",
                     grandTotal > 0 && onCellClick && "cursor-pointer hover:underline hover:opacity-70 transition-colors"
                   )}
                   onClick={() => grandTotal > 0 && handleCellClick(null, null)}
