@@ -78,14 +78,15 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
     };
   }, [feedbacks]);
 
-  const getCellColor = (count: number, total: number) => {
-    if (count === 0) return "";
+  const getCellStyle = (count: number, total: number): { className: string; style: React.CSSProperties } => {
+    if (count === 0) return { className: "", style: {} };
     const percentage = (count / total) * 100;
-    // Use slate-900 for guaranteed dark text on all colored backgrounds
-    if (percentage >= 20) return "bg-destructive/20 !text-slate-900";
-    if (percentage >= 10) return "bg-warning/20 !text-slate-900";
-    if (percentage >= 5) return "bg-info/20 !text-slate-900";
-    return "bg-muted/50 !text-slate-900";
+    // Use inline style to force black text - Tailwind classes are being overridden somewhere
+    const textStyle: React.CSSProperties = { color: '#1e293b' }; // slate-800
+    if (percentage >= 20) return { className: "bg-destructive/20", style: textStyle };
+    if (percentage >= 10) return { className: "bg-warning/20", style: textStyle };
+    if (percentage >= 5) return { className: "bg-info/20", style: textStyle };
+    return { className: "bg-muted/50", style: textStyle };
   };
 
   const handleCellClick = (storeNumber: string | null, category: string | null) => {
@@ -168,14 +169,16 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
                   <TableCell className="text-muted-foreground">{store.market}</TableCell>
                   {categories.map(category => {
                     const count = store.categories[category] || 0;
+                    const cellStyle = getCellStyle(count, store.total);
                     return (
                       <TableCell 
                         key={category} 
                         className={cn(
                           "text-center",
-                          getCellColor(count, store.total),
+                          cellStyle.className,
                           count > 0 && onCellClick && "cursor-pointer hover:underline hover:opacity-70 transition-colors"
                         )}
+                        style={cellStyle.style}
                         onClick={() => count > 0 && handleCellClick(store.storeNumber, category)}
                       >
                         {count > 0 ? count : '—'}
