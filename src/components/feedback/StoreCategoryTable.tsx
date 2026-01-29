@@ -82,7 +82,8 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
     if (count === 0) return { className: "", style: {} };
     const percentage = (count / total) * 100;
     // Use inline style to force black text - Tailwind classes are being overridden somewhere
-    const textStyle: React.CSSProperties = { color: '#1e293b' }; // slate-800
+    const textStyle: React.CSSProperties = { color: '#0f172a' }; // slate-900 - very dark
+    console.log('getCellStyle called - count:', count, 'percentage:', percentage, 'style:', textStyle);
     if (percentage >= 20) return { className: "bg-destructive/20", style: textStyle };
     if (percentage >= 10) return { className: "bg-warning/20", style: textStyle };
     if (percentage >= 5) return { className: "bg-info/20", style: textStyle };
