@@ -5,6 +5,8 @@ import { CustomerFeedback } from "@/types/feedback";
 import { FeedbackReportingFilters, ORDER_ISSUES_CATEGORIES } from "@/components/feedback/FeedbackReportingFilters";
 import { ComplaintTrendsChart } from "@/components/feedback/ComplaintTrendsChart";
 import { StoreCategoryTable } from "@/components/feedback/StoreCategoryTable";
+import { FeedbackDrillDownDialog } from "@/components/feedback/FeedbackDrillDownDialog";
+import { FeedbackDetailsDialog } from "@/components/feedback/FeedbackDetailsDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -19,6 +21,15 @@ interface SummaryStats {
 const Summary = () => {
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
   const [periods, setPeriods] = useState<Array<{ id: string; name: string; start_date: string; end_date: string }>>([]);
+  
+  // Drill-down dialog state
+  const [drillDownOpen, setDrillDownOpen] = useState(false);
+  const [drillDownFeedbacks, setDrillDownFeedbacks] = useState<CustomerFeedback[]>([]);
+  const [drillDownTitle, setDrillDownTitle] = useState("");
+  
+  // Details dialog state
+  const [selectedFeedback, setSelectedFeedback] = useState<CustomerFeedback | null>(null);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [stores, setStores] = useState<Array<{ store_number: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -365,7 +376,37 @@ const Summary = () => {
       <ComplaintTrendsChart feedbacks={filteredFeedbacks} periods={periods} />
 
       {/* Store Category Performance Table */}
-      <StoreCategoryTable feedbacks={filteredFeedbacks} />
+      <StoreCategoryTable 
+        feedbacks={filteredFeedbacks} 
+        onCellClick={(title, cellFeedbacks) => {
+          setDrillDownTitle(title);
+          setDrillDownFeedbacks(cellFeedbacks);
+          setDrillDownOpen(true);
+        }}
+      />
+      
+      {/* Drill-Down Dialog */}
+      <FeedbackDrillDownDialog
+        isOpen={drillDownOpen}
+        onClose={() => setDrillDownOpen(false)}
+        title={drillDownTitle}
+        feedbacks={drillDownFeedbacks}
+        onViewDetails={(feedback) => {
+          setSelectedFeedback(feedback);
+          setDetailsDialogOpen(true);
+        }}
+      />
+      
+      {/* Feedback Details Dialog */}
+      <FeedbackDetailsDialog
+        feedback={selectedFeedback}
+        isOpen={detailsDialogOpen}
+        onClose={() => {
+          setDetailsDialogOpen(false);
+          setSelectedFeedback(null);
+        }}
+        onUpdate={fetchSummaryData}
+      />
     </div>
   );
 };

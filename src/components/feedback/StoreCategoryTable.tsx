@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 
 interface StoreCategoryTableProps {
   feedbacks: CustomerFeedback[];
+  onCellClick?: (title: string, feedbacks: CustomerFeedback[]) => void;
 }
 
 interface StoreData {
@@ -15,8 +16,8 @@ interface StoreData {
   total: number;
 }
 
-export function StoreCategoryTable({ feedbacks }: StoreCategoryTableProps) {
-  const { storeData, categories, categoryTotals, grandTotal } = useMemo(() => {
+export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTableProps) {
+  const { storeData, categories, categoryTotals, grandTotal, categoryMap } = useMemo(() => {
     // Normalize categories to handle case differences
     const categoryMap = new Map<string, string>();
     const allCategoriesRaw = feedbacks.map(fb => fb.complaint_category);
@@ -72,7 +73,8 @@ export function StoreCategoryTable({ feedbacks }: StoreCategoryTableProps) {
       storeData: storeDataArray,
       categories: allCategories,
       categoryTotals,
-      grandTotal
+      grandTotal,
+      categoryMap
     };
   }, [feedbacks]);
 
@@ -83,6 +85,38 @@ export function StoreCategoryTable({ feedbacks }: StoreCategoryTableProps) {
     if (percentage >= 10) return "bg-warning/20 text-warning-foreground";
     if (percentage >= 5) return "bg-info/20 text-info-foreground";
     return "bg-muted/50";
+  };
+
+  const handleCellClick = (storeNumber: string | null, category: string | null) => {
+    if (!onCellClick) return;
+    
+    let filtered: CustomerFeedback[];
+    let title: string;
+    
+    if (storeNumber && category) {
+      // Specific store + category
+      filtered = feedbacks.filter(fb => 
+        fb.store_number === storeNumber && 
+        categoryMap.get(fb.complaint_category.toLowerCase()) === category
+      );
+      title = `Store #${storeNumber} - ${category}`;
+    } else if (storeNumber) {
+      // All categories for a store
+      filtered = feedbacks.filter(fb => fb.store_number === storeNumber);
+      title = `Store #${storeNumber} - All Categories`;
+    } else if (category) {
+      // All stores for a category
+      filtered = feedbacks.filter(fb => 
+        categoryMap.get(fb.complaint_category.toLowerCase()) === category
+      );
+      title = `All Stores - ${category}`;
+    } else {
+      // Grand total - all feedbacks
+      filtered = [...feedbacks];
+      title = "All Feedback";
+    }
+    
+    onCellClick(title, filtered);
   };
 
   if (storeData.length === 0) {
@@ -108,7 +142,7 @@ export function StoreCategoryTable({ feedbacks }: StoreCategoryTableProps) {
       <CardHeader>
         <CardTitle>Store Performance by Category</CardTitle>
         <CardDescription>
-          Breakdown of feedback categories by store location. Colors indicate concentration levels.
+          Breakdown of feedback categories by store location. Click any number to see details.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -138,14 +172,22 @@ export function StoreCategoryTable({ feedbacks }: StoreCategoryTableProps) {
                         key={category} 
                         className={cn(
                           "text-center",
-                          getCellColor(count, store.total)
+                          getCellColor(count, store.total),
+                          count > 0 && onCellClick && "cursor-pointer hover:underline text-primary hover:text-primary/80 transition-colors"
                         )}
+                        onClick={() => count > 0 && handleCellClick(store.storeNumber, category)}
                       >
                         {count > 0 ? count : '—'}
                       </TableCell>
                     );
                   })}
-                  <TableCell className="text-center font-medium bg-muted/30">
+                  <TableCell 
+                    className={cn(
+                      "text-center font-medium bg-muted/30",
+                      store.total > 0 && onCellClick && "cursor-pointer hover:underline text-primary hover:text-primary/80 transition-colors"
+                    )}
+                    onClick={() => store.total > 0 && handleCellClick(store.storeNumber, null)}
+                  >
                     {store.total}
                   </TableCell>
                 </TableRow>
@@ -155,12 +197,28 @@ export function StoreCategoryTable({ feedbacks }: StoreCategoryTableProps) {
               <TableRow className="border-t-2 bg-muted/20 font-medium">
                 <TableCell className="font-bold">TOTAL</TableCell>
                 <TableCell className="text-muted-foreground">All Markets</TableCell>
-                {categories.map(category => (
-                  <TableCell key={category} className="text-center font-bold">
-                    {categoryTotals[category] || 0}
-                  </TableCell>
-                ))}
-                <TableCell className="text-center font-bold bg-muted/50">
+                {categories.map(category => {
+                  const count = categoryTotals[category] || 0;
+                  return (
+                    <TableCell 
+                      key={category} 
+                      className={cn(
+                        "text-center font-bold",
+                        count > 0 && onCellClick && "cursor-pointer hover:underline text-primary hover:text-primary/80 transition-colors"
+                      )}
+                      onClick={() => count > 0 && handleCellClick(null, category)}
+                    >
+                      {count}
+                    </TableCell>
+                  );
+                })}
+                <TableCell 
+                  className={cn(
+                    "text-center font-bold bg-muted/50",
+                    grandTotal > 0 && onCellClick && "cursor-pointer hover:underline text-primary hover:text-primary/80 transition-colors"
+                  )}
+                  onClick={() => grandTotal > 0 && handleCellClick(null, null)}
+                >
                   {grandTotal}
                 </TableCell>
               </TableRow>
