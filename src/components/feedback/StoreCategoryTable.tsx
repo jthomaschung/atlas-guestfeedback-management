@@ -172,9 +172,9 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
                       <TableCell 
                         key={category} 
                         className={cn(
-                          "text-center",
+                          "text-center text-foreground",
                           getCellColor(count, store.total),
-                          count > 0 && onCellClick && "cursor-pointer hover:underline text-primary hover:text-primary/80 transition-colors"
+                          count > 0 && onCellClick && "cursor-pointer hover:underline hover:opacity-70 transition-colors"
                         )}
                         onClick={() => count > 0 && handleCellClick(store.storeNumber, category)}
                       >
@@ -184,8 +184,8 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
                   })}
                   <TableCell 
                     className={cn(
-                      "text-center font-medium bg-muted/30",
-                      store.total > 0 && onCellClick && "cursor-pointer hover:underline text-primary hover:text-primary/80 transition-colors"
+                      "text-center font-medium bg-muted/30 text-foreground",
+                      store.total > 0 && onCellClick && "cursor-pointer hover:underline hover:opacity-70 transition-colors"
                     )}
                     onClick={() => store.total > 0 && handleCellClick(store.storeNumber, null)}
                   >
@@ -204,8 +204,8 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
                     <TableCell 
                       key={category} 
                       className={cn(
-                        "text-center font-bold",
-                        count > 0 && onCellClick && "cursor-pointer hover:underline text-primary hover:text-primary/80 transition-colors"
+                        "text-center font-bold text-foreground",
+                        count > 0 && onCellClick && "cursor-pointer hover:underline hover:opacity-70 transition-colors"
                       )}
                       onClick={() => count > 0 && handleCellClick(null, category)}
                     >
@@ -215,8 +215,8 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
                 })}
                 <TableCell 
                   className={cn(
-                    "text-center font-bold bg-muted/50",
-                    grandTotal > 0 && onCellClick && "cursor-pointer hover:underline text-primary hover:text-primary/80 transition-colors"
+                    "text-center font-bold bg-muted/50 text-foreground",
+                    grandTotal > 0 && onCellClick && "cursor-pointer hover:underline hover:opacity-70 transition-colors"
                   )}
                   onClick={() => grandTotal > 0 && handleCellClick(null, null)}
                 >
