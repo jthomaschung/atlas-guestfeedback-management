@@ -174,24 +174,22 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
                     const percentage = store.total > 0 ? (count / store.total) * 100 : 0;
                     let bgClass = "";
                     if (hasColor) {
-                      if (percentage >= 20) bgClass = "bg-destructive/20";
-                      else if (percentage >= 10) bgClass = "bg-warning/20";
-                      else if (percentage >= 5) bgClass = "bg-info/20";
-                      else bgClass = "bg-muted/50";
+                      if (percentage >= 20) bgClass = "bg-red-100";
+                      else if (percentage >= 10) bgClass = "bg-orange-100";
+                      else if (percentage >= 5) bgClass = "bg-blue-100";
+                      else bgClass = "bg-gray-100";
                     }
                     return (
                       <TableCell 
                         key={category} 
                         className={cn(
-                          "text-center",
+                          "text-center text-gray-900",
                           bgClass,
                           hasColor && onCellClick && "cursor-pointer hover:underline hover:opacity-70 transition-colors"
                         )}
                         onClick={() => hasColor && handleCellClick(store.storeNumber, category)}
                       >
-                        {hasColor ? (
-                          <span style={{ color: '#000000', fontWeight: 500 }}>{count}</span>
-                        ) : '—'}
+                        {count > 0 ? count : '—'}
                       </TableCell>
                     );
                   })}
@@ -243,19 +241,19 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
         {/* Legend */}
         <div className="mt-4 flex flex-wrap gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-destructive/20 border border-border rounded"></div>
+            <div className="w-4 h-4 bg-red-100 border border-border rounded"></div>
             <span className="text-muted-foreground">≥20% of store feedback</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-warning/20 border border-border rounded"></div>
+            <div className="w-4 h-4 bg-orange-100 border border-border rounded"></div>
             <span className="text-muted-foreground">10-19% of store feedback</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-info/20 border border-border rounded"></div>
+            <div className="w-4 h-4 bg-blue-100 border border-border rounded"></div>
             <span className="text-muted-foreground">5-9% of store feedback</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-muted/50 border border-border rounded"></div>
+            <div className="w-4 h-4 bg-gray-100 border border-border rounded"></div>
             <span className="text-muted-foreground">1-4% of store feedback</span>
           </div>
         </div>
