@@ -154,6 +154,11 @@ All colors MUST be HSL.
   }
 }
 
+/* Force dark text on colored table cells */
+.store-category-cell {
+  color: #000000 !important;
+}
+
 @layer base {
   * {
     @apply border-border;
