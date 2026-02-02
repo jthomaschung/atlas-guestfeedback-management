@@ -283,16 +283,15 @@ const Index = () => {
                              (assigneeFilter.includes('unassigned') && (!fb.assignee || fb.assignee === 'Unassigned')) ||
                              (fb.assignee && assigneeFilter.includes(fb.assignee));
       
-      // Period filter
+      // Period filter - use string comparison for dates to avoid timezone issues
       let matchesPeriod = true;
       if (periodFilter.length > 0) {
         const selectedPeriods = periods.filter(p => periodFilter.includes(p.id));
         if (selectedPeriods.length > 0) {
-          const feedbackDate = new Date(fb.feedback_date);
+          // Use string comparison (YYYY-MM-DD format) to avoid timezone issues
+          const feedbackDateStr = fb.feedback_date; // Already in YYYY-MM-DD format
           matchesPeriod = selectedPeriods.some(period => {
-            const periodStart = new Date(period.start_date);
-            const periodEnd = new Date(period.end_date);
-            return feedbackDate >= periodStart && feedbackDate <= periodEnd;
+            return feedbackDateStr >= period.start_date && feedbackDateStr <= period.end_date;
           });
         }
       }
@@ -357,16 +356,15 @@ const Index = () => {
                              (assigneeFilter.includes('unassigned') && (!fb.assignee || fb.assignee === 'Unassigned')) ||
                              (fb.assignee && assigneeFilter.includes(fb.assignee));
 
-      // Period filter
+      // Period filter - use string comparison for dates to avoid timezone issues
       let matchesPeriod = true;
       if (periodFilter.length > 0) {
         const selectedPeriods = periods.filter(p => periodFilter.includes(p.id));
         if (selectedPeriods.length > 0) {
-          const feedbackDate = new Date(fb.feedback_date);
+          // Use string comparison (YYYY-MM-DD format) to avoid timezone issues
+          const feedbackDateStr = fb.feedback_date;
           matchesPeriod = selectedPeriods.some(period => {
-            const periodStart = new Date(period.start_date);
-            const periodEnd = new Date(period.end_date);
-            return feedbackDate >= periodStart && feedbackDate <= periodEnd;
+            return feedbackDateStr >= period.start_date && feedbackDateStr <= period.end_date;
           });
         }
       }
@@ -466,17 +464,19 @@ const Index = () => {
           customer_called: data.customer_called || false
         };
 
-        // If feedback is resolved, remove it from dashboard
+        // Update the feedbacks array (keep resolved items visible with lighter styling)
+        setFeedbacks(prev => prev.map(fb => fb.id === updatedFeedback.id ? updatedFeedback : fb));
+        
+        // Also update allFeedbacks for chart consistency
+        setAllFeedbacks(prev => prev.map(fb => fb.id === updatedFeedback.id ? updatedFeedback : fb));
+        
+        // Update the selected feedback to prevent stale reference
+        setSelectedFeedback(updatedFeedback);
+        
+        // Close dialog if resolved
         if (updatedFeedback.resolution_status === 'resolved') {
-          setFeedbacks(prev => prev.filter(fb => fb.id !== updatedFeedback.id));
           setIsDialogOpen(false);
           setSelectedFeedback(null);
-        } else {
-          // Update the feedbacks array
-          setFeedbacks(prev => prev.map(fb => fb.id === updatedFeedback.id ? updatedFeedback : fb));
-          
-          // Update the selected feedback to prevent stale reference
-          setSelectedFeedback(updatedFeedback);
         }
       } catch (error) {
         console.error('Error updating feedback:', error);
