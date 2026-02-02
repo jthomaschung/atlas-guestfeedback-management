@@ -280,6 +280,11 @@ export function FeedbackReportingFilters({
           </Button>
         </div>
       )}
+      
+      {/* Debug info - shows filter state */}
+      <div className="mt-4 p-3 bg-orange-500 text-white rounded text-xs">
+        🔍 FILTER STATE: period=[{periodFilter.join(',')}] store=[{storeFilter.join(',')}]
+      </div>
     </div>
   );
 }
