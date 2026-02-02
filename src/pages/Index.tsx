@@ -197,9 +197,9 @@ const Index = () => {
       // Store ALL feedbacks for charts
       setAllFeedbacks(mappedFeedbacks);
       
-      // Filter out resolved for the table/dashboard
-      const activeFeedbacks = mappedFeedbacks.filter(fb => fb.resolution_status !== 'resolved');
-      setFeedbacks(activeFeedbacks);
+      // Include all feedbacks (including resolved) for the table/dashboard
+      // Resolved items will be styled differently in the UI
+      setFeedbacks(mappedFeedbacks);
     } catch (error) {
       console.error('Error fetching feedback:', error);
       toast({

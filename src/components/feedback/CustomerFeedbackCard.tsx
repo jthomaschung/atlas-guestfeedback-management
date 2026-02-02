@@ -164,12 +164,14 @@ export function CustomerFeedbackCard({
 
   const isEscalated = feedback.resolution_status === 'escalated';
 
+  const isResolved = feedback.resolution_status === 'resolved';
+
   return (
     <Card className={cn(
       "group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer",
       isEscalated && "bg-red-600 dark:bg-red-700 border-red-600 dark:border-red-700",
       !isEscalated && isUrgent && "ring-2 ring-red-200 dark:ring-red-800/50",
-      feedback.resolution_status === 'resolved' && "opacity-75"
+      isResolved && "opacity-40 bg-muted/30 border-dashed hover:opacity-60"
     )} onClick={() => onViewDetails(feedback)}>
       <CardHeader className={cn("pb-3", isEscalated && "text-white")}>
         <div className="flex items-start justify-between">
