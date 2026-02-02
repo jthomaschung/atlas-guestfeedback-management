@@ -47,6 +47,48 @@ interface FeedbackWebhookData {
   order_number?: string
 }
 
+// P1 2026 starts on 2025-12-31 - this is the cutoff for automatic period assignment
+const P1_2026_START = '2025-12-31'
+
+/**
+ * Look up the fiscal period for a given feedback date from the periods table.
+ * Only applies to dates >= P1 2026 start (2025-12-31).
+ */
+async function lookupPeriodByDate(feedbackDate: string): Promise<string | null> {
+  // Only auto-assign for dates >= P1 2026 start
+  if (feedbackDate < P1_2026_START) {
+    console.log(`Date ${feedbackDate} is before P1 2026 start, skipping auto-period assignment`)
+    return null
+  }
+
+  try {
+    console.log(`Looking up period for date: ${feedbackDate}`)
+    
+    const { data: periodData, error } = await supabase
+      .from('periods')
+      .select('name')
+      .lte('start_date', feedbackDate)
+      .gte('end_date', feedbackDate)
+      .maybeSingle()
+
+    if (error) {
+      console.error('Error querying periods table:', error)
+      return null
+    }
+
+    if (periodData?.name) {
+      console.log(`Found matching period: ${periodData.name}`)
+      return periodData.name
+    }
+
+    console.warn(`No matching period found for date: ${feedbackDate}`)
+    return null
+  } catch (error) {
+    console.error('Exception during period lookup:', error)
+    return null
+  }
+}
+
 async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | null> {
   console.log('=== VALIDATION START ===')
   console.log('Input data keys:', Object.keys(data))
@@ -303,6 +345,18 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     }
   }
   
+  // Determine period - auto-calculate for P1 2026 onward
+  let finalPeriod: string | null = null
+  if (feedback_date >= P1_2026_START) {
+    // Auto-assign period based on feedback_date
+    finalPeriod = await lookupPeriodByDate(feedback_date)
+    console.log(`Auto-assigned period: ${finalPeriod}`)
+  } else {
+    // For dates before P1 2026, use webhook value or null
+    finalPeriod = data.period || data.Period || null
+    console.log(`Using webhook period (pre-2026): ${finalPeriod}`)
+  }
+  
   const validatedData = {
     channel: channel, // Keep original channel value
     feedback_date,
@@ -318,7 +372,7 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     assignee: data.assignee || defaultAssignee,
     priority: data.priority || defaultPriority,
     ee_action: data.ee_action || data.Action || data['Action Item'] || null,
-    period: data.period || data.Period || null,
+    period: finalPeriod,
     time_of_day: data.time_of_day || data['Time of Day'] || data.time || null,
     order_number: data.order_number || data['Order Number'] || data.order || null
   }
