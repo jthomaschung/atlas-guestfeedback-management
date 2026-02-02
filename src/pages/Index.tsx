@@ -257,6 +257,13 @@ const Index = () => {
 
   // Filter and sort feedbacks
   const filteredFeedbacks = useMemo(() => {
+    console.log('🔍 FILTER DEBUG:', {
+      feedbacksCount: feedbacks.length,
+      storeFilter,
+      periodFilter,
+      periodsAvailable: periods.length
+    });
+    
     let filtered = feedbacks.filter(fb => {
       const matchesSearch = !searchTerm || 
                            fb.feedback_text?.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -315,11 +322,35 @@ const Index = () => {
           if (feedbackDate > toDate) matchesDateRange = false;
         }
       }
+
+      // Debug: Log for store 1111
+      if (fb.store_number === '1111') {
+        console.log('🏪 Store 1111 item:', {
+          id: fb.id,
+          date: fb.feedback_date,
+          status: fb.resolution_status,
+          matchesSearch,
+          matchesStatus,
+          matchesPriority,
+          matchesCategory,
+          matchesChannel,
+          matchesStore,
+          matchesMarket,
+          matchesAssignee,
+          matchesPeriod,
+          matchesDateRange,
+          PASSES: matchesSearch && matchesStatus && matchesPriority && matchesCategory && 
+                  matchesChannel && matchesStore && matchesMarket && matchesAssignee && 
+                  matchesPeriod && matchesDateRange
+        });
+      }
       
       return matchesSearch && matchesStatus && matchesPriority && matchesCategory && 
               matchesChannel && matchesStore && matchesMarket && matchesAssignee && 
               matchesPeriod && matchesDateRange;
     });
+
+    console.log('🔍 FILTER RESULT:', filtered.length, 'items pass all filters');
 
     // Apply sorting
     return [...filtered].sort((a, b) => {
