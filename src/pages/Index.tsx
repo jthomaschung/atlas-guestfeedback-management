@@ -705,10 +705,11 @@ const Index = () => {
           </div>
         )}
 
-        {/* Debug: Show filtered count */}
-        <div className="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg text-sm">
-          <strong>Debug:</strong> feedbacks state: {feedbacks.length} | filteredFeedbacks: {filteredFeedbacks.length} | 
-          chartFeedbacks: {chartFeedbacks.length} | allFeedbacks: {allFeedbacks.length}
+        {/* Debug: Show filtered count - Always visible */}
+        <div className="p-4 bg-red-500 text-white rounded-lg text-sm font-bold">
+          ⚠️ DEBUG: feedbacks={feedbacks.length} | filtered={filteredFeedbacks.length} | 
+          chart={chartFeedbacks.length} | all={allFeedbacks.length} | 
+          storeFilter=[{storeFilter.join(',')}] | periodFilter=[{periodFilter.join(',')}]
         </div>
 
         <CustomerFeedbackTable
