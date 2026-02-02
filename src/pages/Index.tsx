@@ -736,13 +736,6 @@ const Index = () => {
           </div>
         )}
 
-        {/* Debug: Show filtered count - Always visible */}
-        <div className="p-4 bg-red-500 text-white rounded-lg text-sm font-bold">
-          ⚠️ DEBUG: feedbacks={feedbacks.length} | filtered={filteredFeedbacks.length} | 
-          chart={chartFeedbacks.length} | all={allFeedbacks.length} | 
-          storeFilter=[{storeFilter.join(',')}] | periodFilter=[{periodFilter.join(',')}]
-        </div>
-
         <CustomerFeedbackTable
           feedbacks={filteredFeedbacks}
           onEdit={handleEdit}
