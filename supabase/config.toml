@@ -75,3 +75,6 @@ verify_jwt = false
 
 [functions.send-bulk-internal-feedback-notifications]
 verify_jwt = false
+
+[functions.backfill-periods]
+verify_jwt = false
