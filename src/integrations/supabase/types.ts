@@ -1895,6 +1895,7 @@ export type Database = {
           new_value: number | null
           old_value: number | null
           requires_approval: boolean | null
+          requires_director_approval: boolean | null
           review_notes: string | null
           reviewed_at: string | null
           reviewed_by_name: string | null
@@ -1916,6 +1917,7 @@ export type Database = {
           new_value?: number | null
           old_value?: number | null
           requires_approval?: boolean | null
+          requires_director_approval?: boolean | null
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by_name?: string | null
@@ -1937,6 +1939,7 @@ export type Database = {
           new_value?: number | null
           old_value?: number | null
           requires_approval?: boolean | null
+          requires_director_approval?: boolean | null
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by_name?: string | null
@@ -8202,6 +8205,42 @@ export type Database = {
           },
         ]
       }
+      weekly_sales_expected: {
+        Row: {
+          am_expected: number | null
+          created_at: string | null
+          date: string
+          expected_deposit: number | null
+          id: string
+          pm_expected: number | null
+          source_file: string | null
+          store_number: string
+          week_ending: string | null
+        }
+        Insert: {
+          am_expected?: number | null
+          created_at?: string | null
+          date: string
+          expected_deposit?: number | null
+          id?: string
+          pm_expected?: number | null
+          source_file?: string | null
+          store_number: string
+          week_ending?: string | null
+        }
+        Update: {
+          am_expected?: number | null
+          created_at?: string | null
+          date?: string
+          expected_deposit?: number | null
+          id?: string
+          pm_expected?: number | null
+          source_file?: string | null
+          store_number?: string
+          week_ending?: string | null
+        }
+        Relationships: []
+      }
       work_orders: {
         Row: {
           assignee: string | null
@@ -9212,6 +9251,7 @@ export type Database = {
           business_date: string | null
           daily_actual: number | null
           daily_expected: number | null
+          expectation_variance: number | null
           overall_status: string | null
           pm_actual: number | null
           pm_expected: number | null
@@ -9220,13 +9260,18 @@ export type Database = {
           pm_signer_1: string | null
           pm_signer_2: string | null
           receipt_amount: number | null
+          receipt_count: number | null
+          receipt_ids: string | null
+          receipt_urls: string | null
           receipt_validated_at: string | null
           receipt_variance: number | null
           shift_count: number | null
           shift_status: string | null
           store_name: string | null
           store_number: string | null
+          wsr_am_expected: number | null
           wsr_expected: number | null
+          wsr_pm_expected: number | null
           wsr_variance: number | null
         }
         Relationships: []
