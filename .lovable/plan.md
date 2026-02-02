@@ -1,103 +1,78 @@
 
 
-# Automatic Period Assignment for Guest Feedback
+# Backfill Period Values for All Stores
 
 ## Overview
-Update the feedback ingestion process to automatically determine the fiscal period based on `feedback_date`, using the `periods` table as reference. This will apply to all feedback from **P1 2026 onward** (feedback_date >= 2025-12-31).
+Update all existing feedback records dated **P1 2026 onward** (>= 2025-12-31) to populate the `period` column based on the `periods` table. This affects **301 records** across all stores.
 
 ---
 
 ## Current State
-- The `period` field is currently set from webhook data: `data.period || data.Period || null`
-- If no period is provided in the webhook, the field remains empty
-- The `periods` table contains fiscal period definitions with `start_date`, `end_date`, `name`, and `year`
 
----
-
-## Periods Table Structure
-| Period | Start Date | End Date | Year |
-|--------|------------|----------|------|
-| 2026 P1 | 2025-12-31 | 2026-01-27 | 2026 |
-| 2026 P2 | 2026-01-28 | 2026-02-24 | 2026 |
-| 2026 P3 | 2026-02-25 | 2026-03-24 | 2026 |
-| ... | ... | ... | ... |
+| Metric | Value |
+|--------|-------|
+| Records needing update | 301 |
+| Date range | >= 2025-12-31 |
+| Current period value | NULL or empty |
+| Stores affected | All stores with P1 2026+ feedback |
 
 ---
 
 ## Implementation Plan
 
-### Step 1: Add Period Lookup Function
-Add a new helper function in the edge function to query the `periods` table and find the matching period for a given date.
+### Step 1: Create Backfill Edge Function
+Create a new edge function `backfill-periods` that:
+1. Fetches all feedback where `feedback_date >= '2025-12-31'` AND `period IS NULL`
+2. Loads all periods from the `periods` table (year >= 2026)
+3. For each feedback record, finds the matching period by date range
+4. Updates the `period` column with the correct value (e.g., "2026 P1", "2026 P2")
 
-```text
-Function: lookupPeriodByDate(feedbackDate: string)
-  1. Query periods table where:
-     - start_date <= feedbackDate
-     - end_date >= feedbackDate
-     - year >= 2026 (only for P1 2026+)
-  2. Return period name (e.g., "2026 P1") or null
-```
+### Step 2: Deploy and Execute
+1. Deploy the edge function
+2. Call the function once to backfill all existing records
+3. Function returns summary of updated records by period
 
-### Step 2: Update Validation Logic
-Modify the `validateFeedbackData` function to:
-1. Parse the `feedback_date`
-2. Check if date is >= 2025-12-31 (P1 2026 start date)
-3. If yes, call the period lookup function
-4. Use the looked-up period instead of webhook-provided value
-
-### Step 3: Handle Edge Cases
-- If `feedback_date` is before P1 2026 start (2025-12-31): keep existing behavior (use webhook value or null)
-- If no matching period found in database: log warning and set to null
-- If database query fails: gracefully fallback to null with error logging
+### Step 3: Verify Results
+- Confirm store 1111 shows 7 records under "2026 P1"
+- Confirm all stores have correct period assignments
+- Check Summary page displays data correctly
 
 ---
 
-## Technical Details
+## Edge Function Logic
 
-### Database Query
-```sql
-SELECT name FROM periods 
-WHERE start_date <= '2026-02-01' 
-  AND end_date >= '2026-02-01'
-LIMIT 1
-```
-
-### Logic Flow
 ```text
-feedback_date received
-       │
-       ▼
-Is date >= 2025-12-31?
-       │
-    No │ Yes
-       │   │
-       ▼   ▼
-Use webhook  Query periods table
-value/null        │
-                  ▼
-           Period found?
-              │
-           No │ Yes
-              │   │
-              ▼   ▼
-          Set null  Use period.name
-                    (e.g., "2026 P2")
+1. Query customer_feedback where:
+   - feedback_date >= '2025-12-31'
+   - period IS NULL or period = ''
+
+2. Query periods table for all 2026+ periods
+
+3. For each feedback record:
+   - Find period where start_date <= feedback_date <= end_date
+   - Update customer_feedback.period = period.name
+
+4. Return summary: { updated: 301, periodSummary: { "2026 P1": 257, "2026 P2": 44 } }
 ```
 
 ---
 
-## Files to Modify
+## Files to Create
 
-| File | Changes |
+| File | Purpose |
 |------|---------|
-| `supabase/functions/ingest-feedback/index.ts` | Add `lookupPeriodByDate()` function, update validation to auto-assign period |
+| `supabase/functions/backfill-periods/index.ts` | One-time backfill function to update existing records |
 
 ---
 
-## Testing
-After implementation, test with:
-1. Feedback dated 2026-02-01 → should auto-assign "2026 P2"
-2. Feedback dated 2025-12-31 → should auto-assign "2026 P1"
-3. Feedback dated 2025-12-30 → should use webhook value or null (before P1 2026)
-4. Feedback with explicit period in webhook → should use auto-calculated period (overrides webhook)
+## Expected Results
+
+After running the backfill:
+
+| Period | Expected Records |
+|--------|-----------------|
+| 2026 P1 | ~257 (Dec 31 - Jan 27) |
+| 2026 P2 | ~44 (Jan 28 - Feb 24) |
+
+Store 1111 specifically will have its 7 feedback records (dated Jan 4-22, 2026) correctly assigned to **"2026 P1"**.
 
