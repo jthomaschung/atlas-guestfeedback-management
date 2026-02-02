@@ -705,6 +705,12 @@ const Index = () => {
           </div>
         )}
 
+        {/* Debug: Show filtered count */}
+        <div className="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg text-sm">
+          <strong>Debug:</strong> feedbacks state: {feedbacks.length} | filteredFeedbacks: {filteredFeedbacks.length} | 
+          chartFeedbacks: {chartFeedbacks.length} | allFeedbacks: {allFeedbacks.length}
+        </div>
+
         <CustomerFeedbackTable
           feedbacks={filteredFeedbacks}
           onEdit={handleEdit}
