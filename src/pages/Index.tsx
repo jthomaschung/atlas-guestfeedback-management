@@ -200,8 +200,6 @@ const Index = () => {
       // Include all feedbacks (including resolved) for the table/dashboard
       // Resolved items will be styled differently in the UI
       setFeedbacks(mappedFeedbacks);
-      
-      console.log('📊 Data loaded - Total:', mappedFeedbacks.length, 'Resolved:', mappedFeedbacks.filter(f => f.resolution_status === 'resolved').length);
     } catch (error) {
       console.error('Error fetching feedback:', error);
       toast({
@@ -259,9 +257,9 @@ const Index = () => {
 
   // Filter and sort feedbacks
   const filteredFeedbacks = useMemo(() => {
-    console.log('🔍 Filtering - Input feedbacks:', feedbacks.length, 'Resolved in input:', feedbacks.filter(f => f.resolution_status === 'resolved').length);
     let filtered = feedbacks.filter(fb => {
-      const matchesSearch = fb.feedback_text?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      const matchesSearch = !searchTerm || 
+                           fb.feedback_text?.toLowerCase().includes(searchTerm.toLowerCase()) || 
                            fb.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
                            fb.case_number?.includes(searchTerm) ||
                            fb.store_number?.includes(searchTerm);
@@ -323,8 +321,6 @@ const Index = () => {
               matchesPeriod && matchesDateRange;
     });
 
-    console.log('🔍 After filter - Filtered count:', filtered.length, 'Resolved in filtered:', filtered.filter(f => f.resolution_status === 'resolved').length);
-    
     // Apply sorting
     return [...filtered].sort((a, b) => {
       const dateA = new Date(a.feedback_date).getTime();
