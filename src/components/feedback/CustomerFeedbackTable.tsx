@@ -20,6 +20,17 @@ export function CustomerFeedbackTable({
   isAdmin, 
   canEditCategory 
 }: CustomerFeedbackTableProps) {
+  console.log('📋 CustomerFeedbackTable rendering with', feedbacks.length, 'items');
+  
+  if (feedbacks.length === 0) {
+    return (
+      <div className="p-8 text-center border-2 border-dashed border-muted-foreground/25 rounded-lg">
+        <p className="text-muted-foreground text-lg">No feedback items match your current filters.</p>
+        <p className="text-sm text-muted-foreground mt-2">Try adjusting or clearing your filters to see more results.</p>
+      </div>
+    );
+  }
+  
   return (
     <div className="space-y-4">
       <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
