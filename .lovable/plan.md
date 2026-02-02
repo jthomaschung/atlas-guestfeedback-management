@@ -1,114 +1,103 @@
 
 
-## Add Drill-Down Functionality to Summary Page Table
+# Automatic Period Assignment for Guest Feedback
 
-### Overview
-Enable users to click on the numbers in the Store Category Table on the Summary page to see the actual feedback items that make up those counts. Clicking a number will open a dialog showing the filtered feedback cards.
-
----
-
-### Current Architecture
-
-The Summary page uses:
-- `StoreCategoryTable` - displays a grid of stores vs categories with counts
-- `filteredFeedbacks` - the filtered feedback array based on current filter selections
-- The main Dashboard (`Index.tsx`) already has the `FeedbackDetailsDialog` for viewing individual feedback
+## Overview
+Update the feedback ingestion process to automatically determine the fiscal period based on `feedback_date`, using the `periods` table as reference. This will apply to all feedback from **P1 2026 onward** (feedback_date >= 2025-12-31).
 
 ---
 
-### Implementation Approach
-
-**Create a new Drill-Down Dialog Component**
-
-A new `FeedbackDrillDownDialog` component that:
-- Accepts a list of filtered feedback items and a title
-- Displays the feedback items as cards in a scrollable dialog
-- Allows clicking individual cards to open the full `FeedbackDetailsDialog`
+## Current State
+- The `period` field is currently set from webhook data: `data.period || data.Period || null`
+- If no period is provided in the webhook, the field remains empty
+- The `periods` table contains fiscal period definitions with `start_date`, `end_date`, `name`, and `year`
 
 ---
 
-### Files to Modify
-
-| File | Change |
-|------|--------|
-| `src/components/feedback/StoreCategoryTable.tsx` | Add click handlers to count cells, accept callback props, track drill-down state |
-| `src/components/feedback/FeedbackDrillDownDialog.tsx` | **New file** - Dialog to display list of feedback cards |
-| `src/pages/Summary.tsx` | Add state for drill-down dialog, pass callbacks to StoreCategoryTable |
+## Periods Table Structure
+| Period | Start Date | End Date | Year |
+|--------|------------|----------|------|
+| 2026 P1 | 2025-12-31 | 2026-01-27 | 2026 |
+| 2026 P2 | 2026-01-28 | 2026-02-24 | 2026 |
+| 2026 P3 | 2026-02-25 | 2026-03-24 | 2026 |
+| ... | ... | ... | ... |
 
 ---
 
-### Technical Details
+## Implementation Plan
 
-**1. New Component: `FeedbackDrillDownDialog.tsx`**
+### Step 1: Add Period Lookup Function
+Add a new helper function in the edge function to query the `periods` table and find the matching period for a given date.
 
 ```text
-Props:
-- isOpen: boolean
-- onClose: () => void
-- title: string (e.g., "Store #1234 - Slow Service (5 items)")
-- feedbacks: CustomerFeedback[]
-- onViewDetails: (feedback: CustomerFeedback) => void
-
-Features:
-- Scrollable list of CustomerFeedbackCard components
-- Each card is clickable to open full details
-- Shows count in header
+Function: lookupPeriodByDate(feedbackDate: string)
+  1. Query periods table where:
+     - start_date <= feedbackDate
+     - end_date >= feedbackDate
+     - year >= 2026 (only for P1 2026+)
+  2. Return period name (e.g., "2026 P1") or null
 ```
 
-**2. Update `StoreCategoryTable.tsx`**
+### Step 2: Update Validation Logic
+Modify the `validateFeedbackData` function to:
+1. Parse the `feedback_date`
+2. Check if date is >= 2025-12-31 (P1 2026 start date)
+3. If yes, call the period lookup function
+4. Use the looked-up period instead of webhook-provided value
 
-```text
-New Props:
-- onCellClick?: (storeNumber: string, category: string, feedbacks: CustomerFeedback[]) => void
-- allFeedbacks: CustomerFeedback[] (needed to filter)
+### Step 3: Handle Edge Cases
+- If `feedback_date` is before P1 2026 start (2025-12-31): keep existing behavior (use webhook value or null)
+- If no matching period found in database: log warning and set to null
+- If database query fails: gracefully fallback to null with error logging
 
-Changes:
-- Make count cells clickable (cursor-pointer, hover effect)
-- On click, filter feedbacks by store + category and call onCellClick
-- Also make totals row clickable (filter by category only)
-- Make store total column clickable (filter by store only)
+---
+
+## Technical Details
+
+### Database Query
+```sql
+SELECT name FROM periods 
+WHERE start_date <= '2026-02-01' 
+  AND end_date >= '2026-02-01'
+LIMIT 1
 ```
 
-**3. Update `Summary.tsx`**
-
+### Logic Flow
 ```text
-New State:
-- drillDownOpen: boolean
-- drillDownFeedbacks: CustomerFeedback[]
-- drillDownTitle: string
-- selectedFeedback: CustomerFeedback | null
-- isDetailsDialogOpen: boolean
-
-New Functions:
-- handleCellClick: filters feedback and opens drill-down dialog
-- handleViewDetails: opens full FeedbackDetailsDialog from drill-down
-
-Integrate:
-- Pass onCellClick to StoreCategoryTable
-- Render FeedbackDrillDownDialog
-- Render FeedbackDetailsDialog for individual item viewing
+feedback_date received
+       │
+       ▼
+Is date >= 2025-12-31?
+       │
+    No │ Yes
+       │   │
+       ▼   ▼
+Use webhook  Query periods table
+value/null        │
+                  ▼
+           Period found?
+              │
+           No │ Yes
+              │   │
+              ▼   ▼
+          Set null  Use period.name
+                    (e.g., "2026 P2")
 ```
 
 ---
 
-### User Experience Flow
+## Files to Modify
 
-```text
-1. User views Summary page with Store Category Table
-2. User sees a count (e.g., "5" under "Slow Service" for Store #1234)
-3. User clicks the "5" 
-4. Drill-down dialog opens with title "Store #1234 - Slow Service (5 items)"
-5. Dialog shows 5 feedback cards in a scrollable list
-6. User clicks a specific card
-7. Full FeedbackDetailsDialog opens for that item
-8. User can close details dialog and return to drill-down, or close both
-```
+| File | Changes |
+|------|---------|
+| `supabase/functions/ingest-feedback/index.ts` | Add `lookupPeriodByDate()` function, update validation to auto-assign period |
 
 ---
 
-### Visual Changes to Table Cells
-
-- Count cells with values > 0 become clickable
-- Hover state: underline + pointer cursor
-- Visual indicator that cells are interactive (subtle blue text color on hover)
+## Testing
+After implementation, test with:
+1. Feedback dated 2026-02-01 → should auto-assign "2026 P2"
+2. Feedback dated 2025-12-31 → should auto-assign "2026 P1"
+3. Feedback dated 2025-12-30 → should use webhook value or null (before P1 2026)
+4. Feedback with explicit period in webhook → should use auto-calculated period (overrides webhook)
 
