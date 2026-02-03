@@ -1,50 +1,64 @@
-# Design System Update Plan: ATLAS Guest Feedback Portal
 
-## Status: ✅ COMPLETED
+# Fix: Scrollable Drill-Down Dialog
 
-All design system updates have been implemented successfully.
+## Problem Identified
 
-## Changes Made
+The `FeedbackDrillDownDialog` cannot scroll because it's using a complex nested flexbox layout that conflicts with the base `DialogContent` component which has:
+- `display: grid` (default)
+- `overflow-hidden` (added recently)
 
-### 1. CSS Variables (`src/index.css`)
-- ✅ Updated sidebar tokens to dark theme (#18191F)
-- ✅ Added --sidebar-muted, --sidebar-hover, --sidebar-active tokens
-- ✅ Updated page background to soft cool gray (#F4F5F7)
-- ✅ Added sidebar-nav-active CSS class with 3px red accent rail
+Other working dialogs in this codebase (like `FeedbackDetailsDialog` and `StoreManagementDialog`) use a simpler approach that works.
 
-### 2. Sidebar Component (`src/components/AppSidebar.tsx`)
-- ✅ Dark background theme applied
-- ✅ Removed icon bubbles - flat icons now
-- ✅ Added 3px red accent rail on active items
-- ✅ Updated dimensions: 280px expanded, 76px collapsed
-- ✅ Added tooltips for collapsed mode
-- ✅ Updated typography with proper color tokens
+---
 
-### 3. Top Header (`src/App.tsx`)
-- ✅ Changed from dark to light/transparent background
-- ✅ Added bottom border instead of top red accent
-- ✅ Updated button styling to muted with hover states
-- ✅ Removed ATLAS branding from header (now in sidebar only)
+## Solution
 
-### 4. Hero Banner (`src/pages/Index.tsx`)
-- ✅ Changed from centered to left-aligned layout
-- ✅ Added 48px badge with logo
-- ✅ Added 2px vertical red accent line
-- ✅ Integrated welcome message with user info
-- ✅ Added CTA button on right
+Match the pattern from other working dialogs - apply `max-h-[90vh] overflow-y-auto` directly on `DialogContent` instead of trying to create a scrollable child container.
 
-### 5. Header Components
-- ✅ Updated NotificationBell.tsx for light header theme
-- ✅ Updated PortalSwitcher.tsx for light header theme
+---
 
-### 6. Sidebar Width (`src/components/ui/sidebar.tsx`)
-- ✅ Updated SIDEBAR_WIDTH to "17.5rem" (280px)
-- ✅ Updated SIDEBAR_WIDTH_ICON to "4.75rem" (76px)
+## Changes Required
 
-## Visual Reference
+### File: `src/components/feedback/FeedbackDrillDownDialog.tsx`
 
-**Implemented Design:**
-- Dark sidebar (#18191F) with red accent rail on active items
-- Light header with bottom border
-- Left-aligned hero banner with CTA button
-- Consistent use of design tokens throughout
+**Current (not working):**
+```tsx
+<DialogContent className="max-w-4xl h-[85vh] !flex !flex-col p-0">
+  <DialogHeader className="flex-shrink-0 p-6 pb-4">...</DialogHeader>
+  <div 
+    className="flex-1 overflow-y-auto px-6 pb-6"
+    style={{ minHeight: 0 }}
+  >
+    <div className="space-y-4">...</div>
+  </div>
+</DialogContent>
+```
+
+**New (matching working dialogs):**
+```tsx
+<DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+  <DialogHeader>...</DialogHeader>
+  <div className="space-y-4">...</div>
+</DialogContent>
+```
+
+This approach:
+1. Removes the flex layout override that conflicts with grid
+2. Removes the fixed height in favor of max-height
+3. Puts scrolling on the DialogContent itself (proven pattern)
+4. Removes unnecessary nested wrapper divs
+
+---
+
+## Why This Works
+
+Looking at other dialogs in this project:
+
+| Dialog | Approach | Works? |
+|--------|----------|--------|
+| `FeedbackDetailsDialog` | `max-h-[90vh] overflow-y-auto` on DialogContent | Yes |
+| `StoreManagementDialog` | `max-h-[90vh] overflow-y-auto` on DialogContent | Yes |
+| `FeedbackDialog` | `max-h-[90vh] overflow-y-auto` on DialogContent | Yes |
+| `FeedbackDrillDownDialog` | Nested flex with child scroll | No |
+
+The `overflow-hidden` on the base component prevents child elements from scrolling, but `overflow-y-auto` on the same element overrides it and enables scrolling.
