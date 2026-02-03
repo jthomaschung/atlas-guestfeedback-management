@@ -73,25 +73,18 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen flex w-full overflow-hidden">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0 pt-0">
-          <header className="relative h-16 flex items-center justify-between bg-atlas-dark pl-3 pr-6 sticky top-0 z-50 mt-0">
-            {/* Red accent line at top - spans full width */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-primary z-10" />
-            
+          <header className="relative h-16 flex items-center justify-between bg-background border-b border-border px-4 sm:px-6 sticky top-0 z-50 mt-0">
             <div className="flex items-center gap-3">
-              <SidebarTrigger className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg" />
-              <div>
-                <h1 className="text-xl font-bold tracking-wide text-white">ATLAS</h1>
-                <p className="hidden lg:block text-xs text-gray-400">Guest Feedback Dashboard</p>
-              </div>
+              <SidebarTrigger className="text-foreground/80 hover:text-foreground hover:bg-muted transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg" />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => window.location.href = 'https://atlas-masterportal.lovable.app/'}
-                className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-200 min-h-[44px] px-4 rounded-lg"
+                className="text-foreground/80 hover:text-foreground hover:bg-muted transition-all duration-200 min-h-[44px] px-3 rounded-lg"
               >
-                <Home className="h-4 w-4 mr-2" />
+                <Home className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Home</span>
               </Button>
               <PortalSwitcher />
@@ -100,9 +93,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
                 variant="ghost" 
                 size="sm" 
                 onClick={handleSignOut}
-                className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-200 min-h-[44px] px-4 rounded-lg"
+                className="text-foreground/80 hover:text-foreground hover:bg-muted transition-all duration-200 min-h-[44px] px-3 rounded-lg"
               >
-                <LogOut className="h-4 w-4 mr-2" />
+                <LogOut className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Sign Out</span>
               </Button>
             </div>

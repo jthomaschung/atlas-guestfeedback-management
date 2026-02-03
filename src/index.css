@@ -2,15 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Remove sidebar border and create seamless header */
+/* Sidebar styling - dark theme with red accent border */
 [data-sidebar="sidebar"] {
   border-right: none !important;
-  background: linear-gradient(to bottom, 
-    hsl(210 15% 12%) 0, 
-    hsl(210 15% 12%) 64px,
-    hsl(220 14% 96%) 64px,
-    hsl(220 14% 96%) 100%
-  ) !important;
+  background: hsl(var(--sidebar-background)) !important;
+  border-top: 2px solid hsl(var(--sidebar-primary));
+  border-right: 2px solid hsl(var(--sidebar-primary));
+  border-bottom: 2px solid hsl(var(--sidebar-primary));
+  border-radius: 0 12px 12px 0;
 }
 
 /* Ensure sidebar header aligns with global header */
@@ -19,14 +18,31 @@
   padding-top: 0 !important;
 }
 
+/* Active nav item with left accent rail */
+.sidebar-nav-active {
+  position: relative;
+  background: hsl(var(--sidebar-accent));
+}
+
+.sidebar-nav-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: hsl(var(--sidebar-primary));
+  border-radius: 0 9999px 9999px 0;
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    /* Atlas Branding Color Palette */
-    --background: 0 0% 98%;
+    /* Page Background - soft cool gray */
+    --background: 220 10% 96%;
     --foreground: 210 10% 15%;
 
     --card: 0 0% 100%;
@@ -97,17 +113,18 @@ All colors MUST be HSL.
     /* Custom shadows */
     --shadow-yellow: 0 10px 25px -5px hsl(48 100% 80% / 0.4), 0 4px 6px -2px hsl(48 100% 80% / 0.2);
 
-    /* Atlas Sidebar - Light Theme */
-    --sidebar-background: 220 14% 96%;
-    --sidebar-foreground: 220 9% 46%;
+    /* Atlas Sidebar - Dark Theme per specification */
+    --sidebar-background: 220 15% 10%;
+    --sidebar-foreground: 220 10% 65%;
     --sidebar-primary: 0 85% 45%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 0 0% 100%;
-    --sidebar-accent-foreground: 220 14% 20%;
-    --sidebar-border: 220 14% 90%;
+    --sidebar-accent: 220 15% 18%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 220 15% 18%;
     --sidebar-ring: 0 85% 45%;
-    --sidebar-active: 0 0% 100%;
-    --sidebar-hover: 220 14% 92%;
+    --sidebar-active: 220 15% 18%;
+    --sidebar-hover: 220 15% 13%;
+    --sidebar-muted: 220 10% 55%;
   }
 
   .dark {
@@ -140,15 +157,15 @@ All colors MUST be HSL.
     --input: 210 15% 18%;
     --ring: 0 85% 50%;
 
-    /* Atlas Dark Sidebar */
+    /* Atlas Dark Sidebar - same as light since sidebar is always dark */
     --sidebar-background: 210 15% 10%;
     --sidebar-foreground: 210 15% 85%;
-    --sidebar-primary: 210 100% 50%;
-    --sidebar-primary-foreground: 210 15% 100%;
+    --sidebar-primary: 0 85% 45%;
+    --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 210 15% 15%;
     --sidebar-accent-foreground: 210 15% 90%;
     --sidebar-border: 210 15% 18%;
-    --sidebar-ring: 210 100% 50%;
+    --sidebar-ring: 0 85% 45%;
     --sidebar-active: 210 15% 18%;
     --sidebar-hover: 210 15% 15%;
   }

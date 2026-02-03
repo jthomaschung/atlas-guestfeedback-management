@@ -567,7 +567,7 @@ const Index = () => {
   if (!authUser) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-slate-600">Authenticating...</div>
+        <div className="text-muted-foreground">Authenticating...</div>
       </div>
     );
   }
@@ -615,42 +615,53 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-3 sm:px-6 max-w-7xl">
-        {/* Hero Banner - ATLAS Portal Branding - aligned with content */}
-        <div className="bg-black py-8 px-6 mb-6 rounded-lg mt-4">
-          <div className="text-center">
-            <img 
-              src="/lovable-uploads/9faa62d6-a114-492a-88df-c8401b255bd5.png" 
-              alt="Atlas Logo" 
-              className="w-16 h-16 mx-auto mb-4"
-            />
-            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-wide mb-2">
-              GUEST FEEDBACK PORTAL
-            </h1>
-            <div className="w-16 h-1 bg-red-600 mx-auto mb-3"></div>
-            <p className="text-gray-400 text-sm">
-              Manage and resolve customer feedback efficiently
-            </p>
+        {/* Hero Banner - ATLAS Portal Branding - Left-aligned with CTA */}
+        <div className="bg-slate-900 p-4 rounded-xl mt-4 mb-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            {/* Badge */}
+            <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+              <img 
+                src="/lovable-uploads/9faa62d6-a114-492a-88df-c8401b255bd5.png" 
+                alt="Atlas Logo" 
+                className="w-8 h-8"
+              />
+            </div>
+            
+            {/* Vertical Red Accent */}
+            <div className="hidden sm:block w-0.5 h-12 bg-primary rounded-full" />
+            
+            {/* Welcome Text */}
+            <div className="flex-1">
+              <h1 className="text-lg font-semibold text-white">
+                Welcome, {profile?.display_name || profile?.first_name || authUser?.email?.split('@')[0] || 'User'}
+              </h1>
+              <p className="text-xs text-gray-400">
+                {permissions.isAdmin ? (
+                  "Administrator Access - All Markets & Stores"
+                ) : permissions.markets.length > 0 ? (
+                  `Market Access: ${permissions.markets.join(', ')}`
+                ) : permissions.stores.length > 0 ? (
+                  `Store Access: ${permissions.stores.join(', ')}`
+                ) : (
+                  "Monitor and respond to customer feedback"
+                )}
+              </p>
+            </div>
+            
+            {/* CTA Button */}
+            <Button 
+              className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground"
+              onClick={() => {
+                // Scroll to feedback table
+                document.querySelector('[data-sidebar="content"]')?.scrollTo({ top: 600, behavior: 'smooth' });
+              }}
+            >
+              View Feedback
+            </Button>
           </div>
         </div>
 
         <div className="space-y-4 sm:space-y-6">
-        {/* Welcome Message */}
-        <div className="mb-2">
-          <p className="text-sm text-foreground">
-            Welcome, {profile?.display_name || profile?.first_name || authUser?.email?.split('@')[0] || 'User'}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {permissions.isAdmin ? (
-              "Administrator Access - All Markets & Stores"
-            ) : permissions.markets.length > 0 ? (
-              `Market Access: ${permissions.markets.join(', ')}`
-            ) : permissions.stores.length > 0 ? (
-              `Store Access: ${permissions.stores.join(', ')}`
-            ) : (
-              "Loading access permissions..."
-            )}
-          </p>
-        </div>
 
         <CustomerFeedbackStats 
           feedbacks={filteredFeedbacks}
