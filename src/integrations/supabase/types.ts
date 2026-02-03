@@ -1983,6 +1983,58 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_summary_notes: {
+        Row: {
+          business_date: string
+          created_at: string
+          created_by_name: string
+          created_by_user_id: string | null
+          id: string
+          note_text: string
+          store_number: string
+        }
+        Insert: {
+          business_date: string
+          created_at?: string
+          created_by_name: string
+          created_by_user_id?: string | null
+          id?: string
+          note_text: string
+          store_number: string
+        }
+        Update: {
+          business_date?: string
+          created_at?: string
+          created_by_name?: string
+          created_by_user_id?: string | null
+          id?: string
+          note_text?: string
+          store_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_summary_notes_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["store_number"]
+          },
+          {
+            foreignKeyName: "daily_summary_notes_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["store_number"]
+          },
+          {
+            foreignKeyName: "daily_summary_notes_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "v_store_monthly_spending"
+            referencedColumns: ["store_number"]
+          },
+        ]
+      }
       debug_webhooks: {
         Row: {
           content_type: string | null
@@ -7328,6 +7380,33 @@ export type Database = {
         }
         Relationships: []
       }
+      store_staffing_targets: {
+        Row: {
+          created_at: string | null
+          id: string
+          position: string
+          store_number: string
+          target_count: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          position: string
+          store_number: string
+          target_count?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          position?: string
+          store_number?: string
+          target_count?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       stores: {
         Row: {
           address: string | null
@@ -7338,6 +7417,8 @@ export type Database = {
           entity: string | null
           is_active: boolean | null
           labor_goal: number | null
+          latitude: number | null
+          longitude: number | null
           manager: string | null
           phone: string | null
           pm_dmr_rate: number | null
@@ -7357,6 +7438,8 @@ export type Database = {
           entity?: string | null
           is_active?: boolean | null
           labor_goal?: number | null
+          latitude?: number | null
+          longitude?: number | null
           manager?: string | null
           phone?: string | null
           pm_dmr_rate?: number | null
@@ -7376,6 +7459,8 @@ export type Database = {
           entity?: string | null
           is_active?: boolean | null
           labor_goal?: number | null
+          latitude?: number | null
+          longitude?: number | null
           manager?: string | null
           phone?: string | null
           pm_dmr_rate?: number | null
