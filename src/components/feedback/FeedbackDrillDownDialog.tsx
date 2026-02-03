@@ -19,16 +19,19 @@ export function FeedbackDrillDownDialog({
 }: FeedbackDrillDownDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl !grid-rows-[auto_1fr] max-h-[85vh]">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl h-[85vh] !flex !flex-col p-0">
+        <DialogHeader className="flex-shrink-0 p-6 pb-4">
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
             {feedbacks.length} feedback item{feedbacks.length !== 1 ? 's' : ''} found
           </DialogDescription>
         </DialogHeader>
         
-        <div className="overflow-y-auto -mr-2 pr-2">
-          <div className="space-y-4 pb-4">
+        <div 
+          className="flex-1 overflow-y-auto px-6 pb-6"
+          style={{ minHeight: 0 }}
+        >
+          <div className="space-y-4">
             {feedbacks.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 No feedback items to display.
