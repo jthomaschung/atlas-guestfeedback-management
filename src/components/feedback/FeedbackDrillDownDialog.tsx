@@ -19,15 +19,15 @@ export function FeedbackDrillDownDialog({
 }: FeedbackDrillDownDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col">
-        <DialogHeader className="flex-shrink-0">
+      <DialogContent className="max-w-4xl !grid-rows-[auto_1fr] max-h-[85vh]">
+        <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
             {feedbacks.length} feedback item{feedbacks.length !== 1 ? 's' : ''} found
           </DialogDescription>
         </DialogHeader>
         
-        <div className="flex-1 overflow-y-auto min-h-0 pr-2">
+        <div className="overflow-y-auto -mr-2 pr-2">
           <div className="space-y-4 pb-4">
             {feedbacks.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
