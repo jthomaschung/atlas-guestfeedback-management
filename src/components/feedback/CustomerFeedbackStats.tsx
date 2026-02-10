@@ -21,9 +21,10 @@ export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFee
     fb.complaint_category?.toLowerCase() === 'rockstar service'
   ).length;
 
-  // Calculate average response time (created_at to updated_at for non-unopened feedback)
+  // Calculate average response time (created_at to updated_at for responded/resolved feedback)
+  // Matches the same logic used on the Reporting page
   const respondedFeedbacks = feedbacks.filter(fb => 
-    fb.resolution_status !== 'unopened' && fb.created_at && fb.updated_at && fb.updated_at !== fb.created_at
+    (fb.resolution_status === 'responded' || fb.resolution_status === 'resolved') && fb.created_at && fb.updated_at
   );
   
   let avgResponseTimeLabel = 'N/A';
