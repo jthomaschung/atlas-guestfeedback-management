@@ -5155,7 +5155,8 @@ export type Database = {
           action: string
           created_at: string
           id: string
-          manager_id: string
+          manager_email: string | null
+          manager_id: string | null
           notes: string | null
           reviewed_at: string
           ticket_id: string
@@ -5164,7 +5165,8 @@ export type Database = {
           action: string
           created_at?: string
           id?: string
-          manager_id: string
+          manager_email?: string | null
+          manager_id?: string | null
           notes?: string | null
           reviewed_at?: string
           ticket_id: string
@@ -5173,7 +5175,8 @@ export type Database = {
           action?: string
           created_at?: string
           id?: string
-          manager_id?: string
+          manager_email?: string | null
+          manager_id?: string | null
           notes?: string | null
           reviewed_at?: string
           ticket_id?: string
@@ -7196,10 +7199,11 @@ export type Database = {
           created_at: string | null
           created_by_user_id: string | null
           deposit_amount: number
-          dual_custody_sheet_url: string
+          dual_custody_sheet_url: string | null
           expected_deposit: number
           id: string
           notes: string | null
+          resolution_type: string | null
           shift_type: string
           signer_1_name: string
           signer_2_name: string
@@ -7216,10 +7220,11 @@ export type Database = {
           created_at?: string | null
           created_by_user_id?: string | null
           deposit_amount: number
-          dual_custody_sheet_url: string
+          dual_custody_sheet_url?: string | null
           expected_deposit?: number
           id?: string
           notes?: string | null
+          resolution_type?: string | null
           shift_type: string
           signer_1_name: string
           signer_2_name: string
@@ -7236,10 +7241,11 @@ export type Database = {
           created_at?: string | null
           created_by_user_id?: string | null
           deposit_amount?: number
-          dual_custody_sheet_url?: string
+          dual_custody_sheet_url?: string | null
           expected_deposit?: number
           id?: string
           notes?: string | null
+          resolution_type?: string | null
           shift_type?: string
           signer_1_name?: string
           signer_2_name?: string
