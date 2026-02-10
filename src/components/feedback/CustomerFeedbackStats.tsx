@@ -1,6 +1,6 @@
 import { CustomerFeedback } from "@/types/feedback";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare, Clock, CheckCircle, AlertTriangle, Star, Loader2 } from "lucide-react";
+import { MessageSquare, Clock, CheckCircle, AlertTriangle, Star, Loader2, Timer } from "lucide-react";
 
 interface CustomerFeedbackStatsProps {
   feedbacks: CustomerFeedback[];
