@@ -80,6 +80,12 @@ export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFee
       color: 'text-emerald-600',
       onClick: () => onFilterChange?.('category', 'Praise'),
     },
+    {
+      title: 'Avg Response Time',
+      value: avgResponseTimeLabel,
+      icon: Timer,
+      color: 'text-blue-600',
+    },
   ];
 
   return (
