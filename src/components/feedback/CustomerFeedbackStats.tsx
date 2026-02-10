@@ -21,6 +21,29 @@ export function CustomerFeedbackStats({ feedbacks, onFilterChange }: CustomerFee
     fb.complaint_category?.toLowerCase() === 'rockstar service'
   ).length;
 
+  // Calculate average response time (created_at to updated_at for non-unopened feedback)
+  const respondedFeedbacks = feedbacks.filter(fb => 
+    fb.resolution_status !== 'unopened' && fb.created_at && fb.updated_at && fb.updated_at !== fb.created_at
+  );
+  
+  let avgResponseTimeLabel = 'N/A';
+  if (respondedFeedbacks.length > 0) {
+    const totalMs = respondedFeedbacks.reduce((sum, fb) => {
+      const created = new Date(fb.created_at).getTime();
+      const updated = new Date(fb.updated_at).getTime();
+      return sum + Math.max(0, updated - created);
+    }, 0);
+    const avgMs = totalMs / respondedFeedbacks.length;
+    const avgHours = avgMs / (1000 * 60 * 60);
+    if (avgHours < 1) {
+      avgResponseTimeLabel = `${Math.round(avgMs / (1000 * 60))}m`;
+    } else if (avgHours < 24) {
+      avgResponseTimeLabel = `${avgHours.toFixed(1)}h`;
+    } else {
+      avgResponseTimeLabel = `${(avgHours / 24).toFixed(1)}d`;
+    }
+  }
+
   const stats = [
     {
       title: 'Total Open Feedback',
