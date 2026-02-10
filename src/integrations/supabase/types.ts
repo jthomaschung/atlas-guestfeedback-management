@@ -655,6 +655,7 @@ export type Database = {
           receipt_image_url: string
           resolution_notes: string | null
           resolution_status: string | null
+          resolution_type: string | null
           resolved_at: string | null
           resolved_by_name: string | null
           resolved_by_user_id: string | null
@@ -678,6 +679,7 @@ export type Database = {
           receipt_image_url: string
           resolution_notes?: string | null
           resolution_status?: string | null
+          resolution_type?: string | null
           resolved_at?: string | null
           resolved_by_name?: string | null
           resolved_by_user_id?: string | null
@@ -701,6 +703,7 @@ export type Database = {
           receipt_image_url?: string
           resolution_notes?: string | null
           resolution_status?: string | null
+          resolution_type?: string | null
           resolved_at?: string | null
           resolved_by_name?: string | null
           resolved_by_user_id?: string | null
