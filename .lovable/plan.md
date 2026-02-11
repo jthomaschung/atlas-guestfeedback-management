@@ -1,30 +1,52 @@
 
 
-## Sidebar Group Header Styling Fix
+## Fix: Sidebar Red Border and Rounded Corners Not Visible
 
-### Problem
-The group headers ("Guest Feedback", "Executive", etc.) appear as plain text, while the reference Accounting Portal shows them with a **highlighted background** (rounded, lighter background) that makes them visually distinct from sub-items.
+### Root Cause
+
+There are two bugs in the CSS preventing the red border and rounded corners from showing:
+
+1. **CSS property conflict in `src/index.css`**: Line 7 declares `border-right: none !important;` which completely overrides line 10's `border-right: 2px solid hsl(var(--sidebar-primary));`. The `!important` flag on `none` wins, so the right red border never appears.
+
+2. **Overflow clipping**: The sidebar's parent wrapper in `src/components/ui/sidebar.tsx` (line 233) is a `fixed` positioned div that tightly wraps the sidebar. The rounded corners on the inner `[data-sidebar="sidebar"]` div may get clipped because the outer container doesn't allow overflow to be visible.
 
 ### Changes
 
-**File: `src/components/AppSidebar.tsx`** (renderGroupHeader function, ~line 176-189)
+**File: `src/index.css`** (lines 6-13)
 
-Update the `CollapsibleTrigger` button styling to add a visible background highlight on group headers when expanded:
-- Add a conditional background: when the group `isOpen`, apply `bg-sidebar-accent` (the lighter dark shade) with rounded corners
-- Make the text brighter (use `text-sidebar-accent-foreground`) when the group is open
-- Add `rounded-md` for the rounded pill look matching the reference
+Remove the conflicting `border-right: none !important;` and instead use a single shorthand or ordered declarations that don't conflict:
 
-The updated styling for the `SidebarMenuButton` inside `CollapsibleTrigger`:
-- Default state: same as now (no background, muted text)
-- Open/expanded state: `bg-sidebar-accent text-sidebar-accent-foreground rounded-md`
+```css
+[data-sidebar="sidebar"] {
+  background: hsl(var(--sidebar-background)) !important;
+  border-left: none !important;
+  border-top: 2px solid hsl(var(--sidebar-primary)) !important;
+  border-right: 2px solid hsl(var(--sidebar-primary)) !important;
+  border-bottom: 2px solid hsl(var(--sidebar-primary)) !important;
+  border-radius: 0 12px 12px 0;
+  overflow: visible;
+}
+```
 
-**File: `src/components/AppSidebar.tsx`** (sub-items indentation, ~lines 222, 240, 258, 276, 294)
+Key fixes:
+- Replace `border-right: none !important` with `border-left: none !important` (we want to hide the LEFT border, not the right)
+- Add `!important` to the border declarations so they override any component-level styles
+- Add `overflow: visible` to prevent clipping of rounded corners
 
-Add left padding (`pl-4`) to the sub-item `SidebarMenu` containers so items are indented slightly more under their group header, matching the reference layout.
+**File: `src/components/ui/sidebar.tsx`** (line 233-244)
+
+Add `overflow-visible` to the fixed-position parent wrapper div so the rounded corners and border of the inner sidebar div are not clipped:
+
+```tsx
+className={cn(
+  "duration-200 fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex overflow-visible",
+  ...
+)}
+```
 
 ### Summary
-- 1 file changed: `src/components/AppSidebar.tsx`
-- Group headers get a highlighted background when expanded
-- Sub-items get slightly more indentation
-- No structural or behavioral changes
+- 2 files changed: `src/index.css`, `src/components/ui/sidebar.tsx`
+- Fixes the CSS property conflict where `border-right: none` was killing the red right border
+- Ensures parent container doesn't clip rounded corners
+- No visual or behavioral changes beyond making the border and corners visible as intended
 
