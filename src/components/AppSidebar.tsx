@@ -175,7 +175,10 @@ export function AppSidebar() {
 
     return (
       <CollapsibleTrigger asChild>
-        <SidebarMenuButton className="w-full justify-between h-11 px-3 text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-accent-foreground">
+        <SidebarMenuButton className={cn(
+          "w-full justify-between h-11 px-3 hover:bg-sidebar-hover hover:text-sidebar-accent-foreground",
+          isOpen ? "bg-sidebar-accent text-sidebar-accent-foreground rounded-md" : "text-sidebar-foreground"
+        )}>
           <div className="flex items-center gap-3">
             <Icon className="h-5 w-5" />
             <span className="font-semibold text-sm">{title}</span>
@@ -219,7 +222,7 @@ export function AppSidebar() {
                 {renderGroupHeader(MessageSquare, "Guest Feedback", guestFeedbackOpen, setGuestFeedbackOpen)}
                 {!isCollapsed && (
                   <CollapsibleContent>
-                    <SidebarMenu className="mt-1 space-y-0.5">
+                    <SidebarMenu className="mt-1 space-y-0.5 pl-4">
                       {guestFeedbackItems.map(renderNavItem)}
                     </SidebarMenu>
                   </CollapsibleContent>
@@ -237,7 +240,7 @@ export function AppSidebar() {
                 {renderGroupHeader(Shield, "Executive", executiveOpen, setExecutiveOpen)}
                 {!isCollapsed && (
                   <CollapsibleContent>
-                    <SidebarMenu className="mt-1 space-y-0.5">
+                    <SidebarMenu className="mt-1 space-y-0.5 pl-4">
                       {executiveItems.map(renderNavItem)}
                     </SidebarMenu>
                   </CollapsibleContent>
@@ -255,7 +258,7 @@ export function AppSidebar() {
                 {renderGroupHeader(BookOpen, "Support", supportOpen, setSupportOpen)}
                 {!isCollapsed && (
                   <CollapsibleContent>
-                    <SidebarMenu className="mt-1 space-y-0.5">
+                    <SidebarMenu className="mt-1 space-y-0.5 pl-4">
                       {supportItems.map(renderNavItem)}
                     </SidebarMenu>
                   </CollapsibleContent>
@@ -273,7 +276,7 @@ export function AppSidebar() {
                 {renderGroupHeader(Archive, "Archive", archiveOpen, setArchiveOpen)}
                 {!isCollapsed && (
                   <CollapsibleContent>
-                    <SidebarMenu className="mt-1 space-y-0.5">
+                    <SidebarMenu className="mt-1 space-y-0.5 pl-4">
                       {archiveItems.map(renderNavItem)}
                     </SidebarMenu>
                   </CollapsibleContent>
@@ -291,7 +294,7 @@ export function AppSidebar() {
                 {renderGroupHeader(Settings, "Administration", adminOpen, setAdminOpen)}
                 {!isCollapsed && (
                   <CollapsibleContent>
-                    <SidebarMenu className="mt-1 space-y-0.5">
+                    <SidebarMenu className="mt-1 space-y-0.5 pl-4">
                       {adminItems.map(renderNavItem)}
                     </SidebarMenu>
                   </CollapsibleContent>
