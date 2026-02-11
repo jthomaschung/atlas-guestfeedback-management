@@ -200,19 +200,14 @@ export function AppSidebar() {
         "bg-sidebar h-16 flex items-center border-b border-sidebar-border",
         isCollapsed ? "justify-center px-2" : "px-4"
       )}>
-        <div className="flex items-center gap-3">
-          <img 
-            src="/lovable-uploads/9faa62d6-a114-492a-88df-c8401b255bd5.png" 
-            alt="Atlas Logo" 
-            className="w-8 h-8"
-          />
-          {!isCollapsed && (
-            <div>
-              <h2 className="font-bold text-lg text-sidebar-accent-foreground tracking-wide">ATLAS</h2>
-              <p className="text-xs text-sidebar-muted">Guest Feedback Portal</p>
-            </div>
-          )}
-        </div>
+        {!isCollapsed ? (
+          <div>
+            <h2 className="font-bold text-lg text-sidebar-accent-foreground tracking-wide">ATLAS</h2>
+            <p className="text-xs text-sidebar-muted">Guest Feedback Portal</p>
+          </div>
+        ) : (
+          <span className="font-bold text-sm text-sidebar-accent-foreground">A</span>
+        )}
       </div>
 
       <SidebarContent className={`bg-sidebar pt-2 ${isMobile ? "mobile-scroll" : ""}`}>
