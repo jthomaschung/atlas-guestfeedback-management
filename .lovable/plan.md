@@ -1,31 +1,30 @@
 
 
-## Sidebar Visual Update
+## Sidebar Group Header Styling Fix
 
-Based on the reference screenshot, here are the changes to match the desired look:
+### Problem
+The group headers ("Guest Feedback", "Executive", etc.) appear as plain text, while the reference Accounting Portal shows them with a **highlighted background** (rounded, lighter background) that makes them visually distinct from sub-items.
 
-### What Changes
+### Changes
 
-**1. Remove the logo image, keep text only (AppSidebar.tsx)**
-- Remove the `<img>` tag for the Atlas logo
-- Keep "ATLAS" heading and "Guest Feedback Portal" subtitle
-- Ensure proper spacing and alignment without the logo
+**File: `src/components/AppSidebar.tsx`** (renderGroupHeader function, ~line 176-189)
 
-**2. Red border wraps top, right, and bottom with rounded corners (already mostly done in index.css)**
-- The current CSS already applies `border-top`, `border-right`, `border-bottom` with Atlas Red and `border-radius: 0 12px 12px 0`
-- Verify this matches the screenshot styling -- it should already be correct
+Update the `CollapsibleTrigger` button styling to add a visible background highlight on group headers when expanded:
+- Add a conditional background: when the group `isOpen`, apply `bg-sidebar-accent` (the lighter dark shade) with rounded corners
+- Make the text brighter (use `text-sidebar-accent-foreground`) when the group is open
+- Add `rounded-md` for the rounded pill look matching the reference
 
-### Files to Edit
+The updated styling for the `SidebarMenuButton` inside `CollapsibleTrigger`:
+- Default state: same as now (no background, muted text)
+- Open/expanded state: `bg-sidebar-accent text-sidebar-accent-foreground rounded-md`
 
-- **src/components/AppSidebar.tsx** -- Remove the logo `<img>` element from the header section (lines 204-208), keep the text "ATLAS" and "Guest Feedback Portal"
+**File: `src/components/AppSidebar.tsx`** (sub-items indentation, ~lines 222, 240, 258, 276, 294)
 
-### Technical Details
+Add left padding (`pl-4`) to the sub-item `SidebarMenu` containers so items are indented slightly more under their group header, matching the reference layout.
 
-In `AppSidebar.tsx`, the header block (lines 199-216) will be simplified:
-- Remove the `<img>` tag on lines 204-208
-- Remove the `gap-3` flex container that held the logo + text, since only text remains
-- Keep the `<h2>` ("ATLAS") and `<p>` ("Guest Feedback Portal") elements
-- Adjust padding/alignment so the text sits cleanly at the top left of the sidebar
-
-The red border wrapping (top, right, bottom with rounded right corners) is already implemented in `src/index.css` lines 9-12 and should match the reference screenshot.
+### Summary
+- 1 file changed: `src/components/AppSidebar.tsx`
+- Group headers get a highlighted background when expanded
+- Sub-items get slightly more indentation
+- No structural or behavioral changes
 
