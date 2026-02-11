@@ -200,7 +200,7 @@ export function AppSidebar() {
     >
       {/* ATLAS Branding Header */}
       <div className={cn(
-        "bg-sidebar h-16 flex items-center border-b border-sidebar-border",
+        "h-16 flex items-center border-b border-sidebar-border rounded-tr-[12px]",
         isCollapsed ? "justify-center px-2" : "px-4"
       )}>
         {!isCollapsed ? (
