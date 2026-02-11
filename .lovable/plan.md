@@ -1,29 +1,14 @@
 
 
-## Fix: Top-Right Rounded Corner Blocked by Header Background
+## Update Favicon to Atlas Team Patch Logo
 
-### Problem
-The sidebar header div (containing "ATLAS" / "Guest Feedback Portal") has its own `bg-sidebar` background and no border-radius. This square-cornered inner div paints over the top-right rounded corner of the parent sidebar, making it look clipped/blocked.
+### Steps
 
-### Fix
-
-**File: `src/components/AppSidebar.tsx`** (line 202-204)
-
-Add `rounded-tr-[12px]` to the header div so its top-right corner matches the parent sidebar's border-radius. Also remove the redundant `bg-sidebar` since it inherits from the parent.
-
-Change:
-```tsx
-"bg-sidebar h-16 flex items-center border-b border-sidebar-border",
-```
-To:
-```tsx
-"h-16 flex items-center border-b border-sidebar-border rounded-tr-[12px]",
-```
-
-This ensures the header's top-right corner curves with the sidebar border instead of covering it with a square corner.
+1. **Copy the uploaded image** to `public/favicon.png` using `lov-copy`
+2. **Update `index.html`** to reference the new favicon with the correct path and type:
+   - Add `<link rel="icon" href="/favicon.png" type="image/png">` in the `<head>`
 
 ### Summary
-- 1 file changed: `src/components/AppSidebar.tsx`
-- Adds matching border-radius to the header div's top-right corner
-- Removes redundant background class
+- 1 file copied, 1 file edited (`index.html`)
+- The browser tab will show the Atlas Team Patch logo
 
