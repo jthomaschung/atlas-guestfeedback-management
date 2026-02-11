@@ -8879,6 +8879,45 @@ export type Database = {
         }
         Relationships: []
       }
+      wsr_inventory_unit_costs: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          id: number
+          item_name: string
+          store_number: number
+          unit_cost: number | null
+          unit_of_measure: string | null
+          week_ending: string
+          week_number: number | null
+          year: number | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          id?: never
+          item_name: string
+          store_number: number
+          unit_cost?: number | null
+          unit_of_measure?: string | null
+          week_ending: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          id?: never
+          item_name?: string
+          store_number?: number
+          unit_cost?: number | null
+          unit_of_measure?: string | null
+          week_ending?: string
+          week_number?: number | null
+          year?: number | null
+        }
+        Relationships: []
+      }
       wsr_labor: {
         Row: {
           created_at: string | null
@@ -9338,6 +9377,7 @@ export type Database = {
           am_actual: number | null
           am_expected: number | null
           am_receipt_url: string | null
+          am_resolution_type: string | null
           am_shift_id: string | null
           am_signer_1: string | null
           am_signer_2: string | null
@@ -9350,6 +9390,7 @@ export type Database = {
           pm_actual: number | null
           pm_expected: number | null
           pm_receipt_url: string | null
+          pm_resolution_type: string | null
           pm_shift_id: string | null
           pm_signer_1: string | null
           pm_signer_2: string | null
@@ -9465,7 +9506,7 @@ export type Database = {
         Returns: boolean
       }
       cleanup_old_wsr_data: { Args: never; Returns: number }
-      cleanup_variances_below_threshold: { Args: never; Returns: number }
+      cleanup_variances_below_threshold: { Args: never; Returns: undefined }
       create_training_snapshot: {
         Args: { p_batch_id: string; p_snapshot_date: string }
         Returns: undefined
@@ -10563,6 +10604,10 @@ export type Database = {
               report_number: string
             }[]
           }
+      swap_shift_types: {
+        Args: { id_a: string; id_b: string }
+        Returns: undefined
+      }
       user_has_market_access: {
         Args: { target_market: string; user_id: string }
         Returns: boolean
