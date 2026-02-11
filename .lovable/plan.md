@@ -1,64 +1,31 @@
 
-# Fix: Scrollable Drill-Down Dialog
 
-## Problem Identified
+## Sidebar Visual Update
 
-The `FeedbackDrillDownDialog` cannot scroll because it's using a complex nested flexbox layout that conflicts with the base `DialogContent` component which has:
-- `display: grid` (default)
-- `overflow-hidden` (added recently)
+Based on the reference screenshot, here are the changes to match the desired look:
 
-Other working dialogs in this codebase (like `FeedbackDetailsDialog` and `StoreManagementDialog`) use a simpler approach that works.
+### What Changes
 
----
+**1. Remove the logo image, keep text only (AppSidebar.tsx)**
+- Remove the `<img>` tag for the Atlas logo
+- Keep "ATLAS" heading and "Guest Feedback Portal" subtitle
+- Ensure proper spacing and alignment without the logo
 
-## Solution
+**2. Red border wraps top, right, and bottom with rounded corners (already mostly done in index.css)**
+- The current CSS already applies `border-top`, `border-right`, `border-bottom` with Atlas Red and `border-radius: 0 12px 12px 0`
+- Verify this matches the screenshot styling -- it should already be correct
 
-Match the pattern from other working dialogs - apply `max-h-[90vh] overflow-y-auto` directly on `DialogContent` instead of trying to create a scrollable child container.
+### Files to Edit
 
----
+- **src/components/AppSidebar.tsx** -- Remove the logo `<img>` element from the header section (lines 204-208), keep the text "ATLAS" and "Guest Feedback Portal"
 
-## Changes Required
+### Technical Details
 
-### File: `src/components/feedback/FeedbackDrillDownDialog.tsx`
+In `AppSidebar.tsx`, the header block (lines 199-216) will be simplified:
+- Remove the `<img>` tag on lines 204-208
+- Remove the `gap-3` flex container that held the logo + text, since only text remains
+- Keep the `<h2>` ("ATLAS") and `<p>` ("Guest Feedback Portal") elements
+- Adjust padding/alignment so the text sits cleanly at the top left of the sidebar
 
-**Current (not working):**
-```tsx
-<DialogContent className="max-w-4xl h-[85vh] !flex !flex-col p-0">
-  <DialogHeader className="flex-shrink-0 p-6 pb-4">...</DialogHeader>
-  <div 
-    className="flex-1 overflow-y-auto px-6 pb-6"
-    style={{ minHeight: 0 }}
-  >
-    <div className="space-y-4">...</div>
-  </div>
-</DialogContent>
-```
+The red border wrapping (top, right, bottom with rounded right corners) is already implemented in `src/index.css` lines 9-12 and should match the reference screenshot.
 
-**New (matching working dialogs):**
-```tsx
-<DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-  <DialogHeader>...</DialogHeader>
-  <div className="space-y-4">...</div>
-</DialogContent>
-```
-
-This approach:
-1. Removes the flex layout override that conflicts with grid
-2. Removes the fixed height in favor of max-height
-3. Puts scrolling on the DialogContent itself (proven pattern)
-4. Removes unnecessary nested wrapper divs
-
----
-
-## Why This Works
-
-Looking at other dialogs in this project:
-
-| Dialog | Approach | Works? |
-|--------|----------|--------|
-| `FeedbackDetailsDialog` | `max-h-[90vh] overflow-y-auto` on DialogContent | Yes |
-| `StoreManagementDialog` | `max-h-[90vh] overflow-y-auto` on DialogContent | Yes |
-| `FeedbackDialog` | `max-h-[90vh] overflow-y-auto` on DialogContent | Yes |
-| `FeedbackDrillDownDialog` | Nested flex with child scroll | No |
-
-The `overflow-hidden` on the base component prevents child elements from scrolling, but `overflow-y-auto` on the same element overrides it and enables scrolling.
