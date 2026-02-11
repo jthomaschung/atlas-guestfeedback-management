@@ -1,52 +1,29 @@
 
 
-## Fix: Sidebar Red Border and Rounded Corners Not Visible
+## Fix: Top-Right Rounded Corner Blocked by Header Background
 
-### Root Cause
+### Problem
+The sidebar header div (containing "ATLAS" / "Guest Feedback Portal") has its own `bg-sidebar` background and no border-radius. This square-cornered inner div paints over the top-right rounded corner of the parent sidebar, making it look clipped/blocked.
 
-There are two bugs in the CSS preventing the red border and rounded corners from showing:
+### Fix
 
-1. **CSS property conflict in `src/index.css`**: Line 7 declares `border-right: none !important;` which completely overrides line 10's `border-right: 2px solid hsl(var(--sidebar-primary));`. The `!important` flag on `none` wins, so the right red border never appears.
+**File: `src/components/AppSidebar.tsx`** (line 202-204)
 
-2. **Overflow clipping**: The sidebar's parent wrapper in `src/components/ui/sidebar.tsx` (line 233) is a `fixed` positioned div that tightly wraps the sidebar. The rounded corners on the inner `[data-sidebar="sidebar"]` div may get clipped because the outer container doesn't allow overflow to be visible.
+Add `rounded-tr-[12px]` to the header div so its top-right corner matches the parent sidebar's border-radius. Also remove the redundant `bg-sidebar` since it inherits from the parent.
 
-### Changes
-
-**File: `src/index.css`** (lines 6-13)
-
-Remove the conflicting `border-right: none !important;` and instead use a single shorthand or ordered declarations that don't conflict:
-
-```css
-[data-sidebar="sidebar"] {
-  background: hsl(var(--sidebar-background)) !important;
-  border-left: none !important;
-  border-top: 2px solid hsl(var(--sidebar-primary)) !important;
-  border-right: 2px solid hsl(var(--sidebar-primary)) !important;
-  border-bottom: 2px solid hsl(var(--sidebar-primary)) !important;
-  border-radius: 0 12px 12px 0;
-  overflow: visible;
-}
-```
-
-Key fixes:
-- Replace `border-right: none !important` with `border-left: none !important` (we want to hide the LEFT border, not the right)
-- Add `!important` to the border declarations so they override any component-level styles
-- Add `overflow: visible` to prevent clipping of rounded corners
-
-**File: `src/components/ui/sidebar.tsx`** (line 233-244)
-
-Add `overflow-visible` to the fixed-position parent wrapper div so the rounded corners and border of the inner sidebar div are not clipped:
-
+Change:
 ```tsx
-className={cn(
-  "duration-200 fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex overflow-visible",
-  ...
-)}
+"bg-sidebar h-16 flex items-center border-b border-sidebar-border",
 ```
+To:
+```tsx
+"h-16 flex items-center border-b border-sidebar-border rounded-tr-[12px]",
+```
+
+This ensures the header's top-right corner curves with the sidebar border instead of covering it with a square corner.
 
 ### Summary
-- 2 files changed: `src/index.css`, `src/components/ui/sidebar.tsx`
-- Fixes the CSS property conflict where `border-right: none` was killing the red right border
-- Ensures parent container doesn't clip rounded corners
-- No visual or behavioral changes beyond making the border and corners visible as intended
+- 1 file changed: `src/components/AppSidebar.tsx`
+- Adds matching border-radius to the header div's top-right corner
+- Removes redundant background class
 
