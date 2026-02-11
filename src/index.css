@@ -4,12 +4,13 @@
 
 /* Sidebar styling - dark theme with red accent border */
 [data-sidebar="sidebar"] {
-  border-right: none !important;
   background: hsl(var(--sidebar-background)) !important;
-  border-top: 2px solid hsl(var(--sidebar-primary));
-  border-right: 2px solid hsl(var(--sidebar-primary));
-  border-bottom: 2px solid hsl(var(--sidebar-primary));
+  border-left: none !important;
+  border-top: 2px solid hsl(var(--sidebar-primary)) !important;
+  border-right: 2px solid hsl(var(--sidebar-primary)) !important;
+  border-bottom: 2px solid hsl(var(--sidebar-primary)) !important;
   border-radius: 0 12px 12px 0;
+  overflow: visible;
 }
 
 /* Ensure sidebar header aligns with global header */
