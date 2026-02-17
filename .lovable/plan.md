@@ -1,30 +1,32 @@
 
-## Update Hero Banner Image
 
-### Change
-Replace the current badge image in the dashboard hero banner with the uploaded Red Carpet Customer Service patch logo.
+## Improve Red Carpet Patch Clarity in Hero Banner
 
-### Steps
+### Problem
+The patch image is crammed into a small 48px circle (`rounded-full` + `object-cover`), which clips the design and makes it look blurry/terrible. A detailed patch logo needs more space and should not be circle-cropped.
 
-1. **Copy the uploaded image** to `public/lovable-uploads/red-carpet-badge.png`
-2. **Update `src/pages/Index.tsx`** (line 624): Change the image `src` from the current path to the new Red Carpet patch image. Also increase the image and container size slightly since the patch has more detail than a simple logo.
-
-### Technical Details
+### Fix
 
 **File: `src/pages/Index.tsx`** (lines 622-628)
 
-Change the badge container and image to use the new patch:
+Remove the circular crop and increase the size so the patch is displayed clearly:
 
 ```tsx
-<div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
+<div className="w-16 h-16 rounded-lg bg-white/10 flex items-center justify-center shrink-0 overflow-hidden p-1">
   <img 
     src="/lovable-uploads/red-carpet-badge.png" 
     alt="Red Carpet Customer Service" 
-    className="w-12 h-12 rounded-full object-cover"
+    className="w-full h-full object-contain"
   />
 </div>
 ```
 
-- Makes the container circular to match the patch shape
-- Slightly larger (14/12 instead of 12/8) to show detail
-- 1 image copied, 1 file edited
+Changes:
+- Container: `w-14 h-14 rounded-full` becomes `w-16 h-16 rounded-lg` -- larger, square with rounded corners instead of a circle
+- Added `p-1` padding so the image doesn't touch the edges
+- Image: `w-12 h-12 rounded-full object-cover` becomes `w-full h-full object-contain` -- fills the container without cropping, preserving the full patch design
+
+### Summary
+- 1 file changed: `src/pages/Index.tsx`
+- The patch will display at full detail without being cropped into a circle
+
