@@ -619,11 +619,11 @@ const Index = () => {
         <div className="bg-slate-900 p-4 rounded-xl mt-4 mb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             {/* Badge */}
-            <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+            <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
               <img 
-                src="/lovable-uploads/9faa62d6-a114-492a-88df-c8401b255bd5.png" 
-                alt="Atlas Logo" 
-                className="w-8 h-8"
+                src="/lovable-uploads/red-carpet-badge.png" 
+                alt="Red Carpet Customer Service" 
+                className="w-12 h-12 rounded-full object-cover"
               />
             </div>
             
