@@ -4633,6 +4633,7 @@ export type Database = {
       }
       internal_feedback: {
         Row: {
+          admin_notes: string | null
           archived: boolean
           archived_at: string | null
           browser_info: Json | null
@@ -4651,6 +4652,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          admin_notes?: string | null
           archived?: boolean
           archived_at?: string | null
           browser_info?: Json | null
@@ -4669,6 +4671,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          admin_notes?: string | null
           archived?: boolean
           archived_at?: string | null
           browser_info?: Json | null
@@ -5391,6 +5394,7 @@ export type Database = {
           airport_fingerprinting_complete: boolean | null
           airport_fingerprinting_complete_at: string | null
           associate_id: string | null
+          auto_archive_waived: boolean
           clearance_email_sent: boolean | null
           clearance_email_sent_at: string | null
           company_policies_complete: boolean | null
@@ -5472,6 +5476,7 @@ export type Database = {
           airport_fingerprinting_complete?: boolean | null
           airport_fingerprinting_complete_at?: string | null
           associate_id?: string | null
+          auto_archive_waived?: boolean
           clearance_email_sent?: boolean | null
           clearance_email_sent_at?: string | null
           company_policies_complete?: boolean | null
@@ -5553,6 +5558,7 @@ export type Database = {
           airport_fingerprinting_complete?: boolean | null
           airport_fingerprinting_complete_at?: string | null
           associate_id?: string | null
+          auto_archive_waived?: boolean
           clearance_email_sent?: boolean | null
           clearance_email_sent_at?: string | null
           company_policies_complete?: boolean | null
@@ -5675,6 +5681,7 @@ export type Database = {
           policy_number: string | null
           position: string
           referral_name: string | null
+          same_day_hire: boolean
           security_clearance_notes: string | null
           security_clearance_required: boolean | null
           security_clearance_status: string | null
@@ -5738,6 +5745,7 @@ export type Database = {
           policy_number?: string | null
           position: string
           referral_name?: string | null
+          same_day_hire?: boolean
           security_clearance_notes?: string | null
           security_clearance_required?: boolean | null
           security_clearance_status?: string | null
@@ -5801,6 +5809,7 @@ export type Database = {
           policy_number?: string | null
           position?: string
           referral_name?: string | null
+          same_day_hire?: boolean
           security_clearance_notes?: string | null
           security_clearance_required?: boolean | null
           security_clearance_status?: string | null
