@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -29,7 +30,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Bug, Lightbulb, MessageCircle, Upload, X, Image } from "lucide-react";
+import { Bug, Lightbulb, MessageCircle, Upload, X, Image, User } from "lucide-react";
 
 const feedbackSchema = z.object({
   category: z.enum(["Bug", "Feedback", "Wishlist"]),
@@ -44,13 +45,18 @@ type FeedbackForm = z.infer<typeof feedbackSchema>;
 const pageOptions = [
   { value: "general", label: "General / Not page-specific" },
   { value: "/", label: "Dashboard / Home" },
+  { value: "/dashboard", label: "Dashboard" },
   { value: "/summary", label: "Summary" },
-  { value: "/facilities", label: "Facilities Dashboard" },
-  { value: "/submit", label: "Submit Work Order" },
   { value: "/gfm", label: "Guest Feedback Management" },
   { value: "/feedback-reporting", label: "Feedback Reporting" },
   { value: "/red-carpet-leaders", label: "Red Carpet Leaders" },
   { value: "/feedback-archive", label: "Feedback Archive" },
+  { value: "/executive-oversight", label: "Executive Oversight" },
+  { value: "/accuracy", label: "Accuracy" },
+  { value: "/training", label: "Training" },
+  { value: "/email-templates", label: "Email Templates" },
+  { value: "/praise-board", label: "Praise Board" },
+  { value: "/internal-feedback", label: "Internal Feedback" },
   { value: "/user-hierarchy", label: "User Hierarchy" },
   { value: "/settings", label: "Settings" },
 ];
@@ -61,6 +67,7 @@ interface FeedbackDialogProps {
 }
 
 export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
+  const { user, profile } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [screenshot, setScreenshot] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
@@ -221,6 +228,14 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
           </DialogDescription>
         </DialogHeader>
         
+        <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 p-2.5 rounded-md mb-1">
+          <User className="h-3.5 w-3.5 shrink-0" />
+          <span>
+            Submitting as <span className="font-medium text-foreground">{profile?.first_name} {profile?.last_name}</span>
+            {user?.email && <span className="ml-1">({user.email})</span>}
+          </span>
+        </div>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField

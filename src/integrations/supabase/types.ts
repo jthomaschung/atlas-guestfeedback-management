@@ -4693,6 +4693,7 @@ export type Database = {
           priority: string
           screenshot_path: string | null
           status: string
+          submitter_name: string | null
           title: string
           updated_at: string
           user_email: string | null
@@ -4712,6 +4713,7 @@ export type Database = {
           priority?: string
           screenshot_path?: string | null
           status?: string
+          submitter_name?: string | null
           title: string
           updated_at?: string
           user_email?: string | null
@@ -4731,6 +4733,7 @@ export type Database = {
           priority?: string
           screenshot_path?: string | null
           status?: string
+          submitter_name?: string | null
           title?: string
           updated_at?: string
           user_email?: string | null
