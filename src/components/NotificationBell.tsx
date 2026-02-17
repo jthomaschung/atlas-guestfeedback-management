@@ -71,6 +71,10 @@ export function NotificationBell() {
         return 'Feedback assigned to you';
       case 'feedback_escalation':
         return 'Feedback escalated';
+      case 'feedback_status_change_confirmation':
+        return 'Feedback status updated';
+      case 'note_tagged':
+        return 'You were tagged in a note';
       default:
         return 'Notification';
     }
@@ -82,12 +86,13 @@ export function NotificationBell() {
     setIsOpen(false);
     refresh();
     
-    // Navigate to dashboard with feedbackId param to auto-open the details
-    if (notification.feedback_id && notification.notification_type === 'feedback_mention') {
-      const targetUrl = `/?feedbackId=${notification.feedback_id}`;
+    // Navigate to feedback details for any notification with a feedback_id
+    if (notification.feedback_id) {
+      const currentPath = window.location.pathname;
+      const basePath = currentPath.startsWith('/gfm') ? '/gfm' : '/';
+      const targetUrl = `${basePath}?feedbackId=${notification.feedback_id}`;
       console.log('🔔 Navigating to:', targetUrl);
-      // Use navigate for SPA navigation, but force reload if already on root
-      if (window.location.pathname === '/') {
+      if (currentPath === basePath) {
         window.location.href = targetUrl;
       } else {
         navigate(targetUrl);
