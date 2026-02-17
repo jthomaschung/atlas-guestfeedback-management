@@ -619,11 +619,11 @@ const Index = () => {
         <div className="bg-slate-900 p-4 rounded-xl mt-4 mb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             {/* Badge */}
-            <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
+            <div className="w-16 h-16 rounded-lg bg-white/10 flex items-center justify-center shrink-0 overflow-hidden p-1">
               <img 
                 src="/lovable-uploads/red-carpet-badge.png" 
                 alt="Red Carpet Customer Service" 
-                className="w-12 h-12 rounded-full object-cover"
+                className="w-full h-full object-contain"
               />
             </div>
             
