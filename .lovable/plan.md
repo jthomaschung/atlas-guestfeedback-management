@@ -1,32 +1,43 @@
 
 
-## Improve Red Carpet Patch Clarity in Hero Banner
+## Fix Notification Click Behavior
 
 ### Problem
-The patch image is crammed into a small 48px circle (`rounded-full` + `object-cover`), which clips the design and makes it look blurry/terrible. A detailed patch logo needs more space and should not be circle-cropped.
+Currently, clicking a notification in the bell only opens the related feedback if the notification type is `feedback_mention`. Most notifications in the system are `feedback_status_change_confirmation` or `note_tagged` types, and clicking them does nothing visible -- they just get marked as read silently.
 
-### Fix
+### What the notifications are
+- **feedback_status_change_confirmation**: Auto-generated when you change a feedback status (e.g., "You updated Case X status to processing"). These are confirmations of your own actions.
+- **feedback_mention**: Generated when someone tags you in a resolution note.
+- **note_tagged**: Older tag notifications -- many are missing data (no feedback_id, message, or tagger_name).
 
-**File: `src/pages/Index.tsx`** (lines 622-628)
+### Plan
 
-Remove the circular crop and increase the size so the patch is displayed clearly:
+**1. Make all notification types with a `feedback_id` clickable (src/components/NotificationBell.tsx)**
 
-```tsx
-<div className="w-16 h-16 rounded-lg bg-white/10 flex items-center justify-center shrink-0 overflow-hidden p-1">
-  <img 
-    src="/lovable-uploads/red-carpet-badge.png" 
-    alt="Red Carpet Customer Service" 
-    className="w-full h-full object-contain"
-  />
-</div>
-```
+Update `handleNotificationClick` to navigate to the feedback for ANY notification that has a `feedback_id`, not just `feedback_mention`. This means status change confirmations will also open the relevant feedback case when clicked.
 
-Changes:
-- Container: `w-14 h-14 rounded-full` becomes `w-16 h-16 rounded-lg` -- larger, square with rounded corners instead of a circle
-- Added `p-1` padding so the image doesn't touch the edges
-- Image: `w-12 h-12 rounded-full object-cover` becomes `w-full h-full object-contain` -- fills the container without cropping, preserving the full patch design
+**2. Add display titles for all notification types**
+
+Update `getNotificationTitle` to show meaningful titles for `feedback_status_change_confirmation` and `note_tagged` types (currently they just show "Notification").
+
+**3. Show the notification message for status change confirmations**
+
+These notifications already have a `message` field (e.g., "You updated Case CF-XXX status to resolved") -- they will display properly since the template already renders `notification.message`.
+
+**4. Handle navigation correctly for the GFM portal**
+
+The current code navigates to `/?feedbackId=...` which is the main dashboard. If you're on the GFM portal (`/gfm`), it should navigate to the correct page. Update to detect the current portal context and navigate accordingly.
+
+### Technical Details
+
+**File: `src/components/NotificationBell.tsx`**
+
+- Line 86: Change the condition from `notification.feedback_id && notification.notification_type === 'feedback_mention'` to just `notification.feedback_id` -- so any notification with a linked feedback opens it.
+- Lines 66-76: Add cases for `feedback_status_change_confirmation` ("Feedback status updated") and `note_tagged` ("You were tagged in a note").
+- Lines 87-94: Update navigation logic to work from any page, not just the root path.
 
 ### Summary
-- 1 file changed: `src/pages/Index.tsx`
-- The patch will display at full detail without being cropped into a circle
+- 1 file changed: `src/components/NotificationBell.tsx`
+- All notifications with a linked feedback case will open that case when clicked
+- Notification titles will be more descriptive
 
