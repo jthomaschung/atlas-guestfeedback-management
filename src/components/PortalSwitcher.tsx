@@ -1,7 +1,7 @@
 import { useUserPermissions } from '@/hooks/useUserPermissions';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { ChevronDown, Wrench, UtensilsCrossed, Users, MessageSquare, BarChart3 } from 'lucide-react';
+import { ChevronDown, Wrench, UtensilsCrossed, Users, MessageSquare, BarChart3, Calculator } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { createAuthenticatedUrl } from '@/utils/sessionToken';
 
@@ -46,6 +46,13 @@ const portals = [
     icon: BarChart3,
     href: '/kpi-dashboard',
     externalUrl: 'https://atlas-kpis.lovable.app'
+  },
+  {
+    key: 'accounting',
+    title: 'Accounting',
+    icon: Calculator,
+    href: '/accounting',
+    externalUrl: 'https://accounting.atlasteam.app'
   }
 ];
 
@@ -124,7 +131,9 @@ export function PortalSwitcher() {
       case 'guest-feedback':
         return permissions.canAccessGuestFeedback;
       case 'kpi-dashboard':
-        return true; // KPI Dashboard accessible to all authenticated users
+        return true;
+      case 'accounting':
+        return true;
       default:
         return false;
     }
