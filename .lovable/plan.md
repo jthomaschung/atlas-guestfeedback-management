@@ -1,66 +1,78 @@
 
 
-## Update Feedback Form for Guest Feedback Portal
+## Mobile Optimization Plan
 
-### Problem
-The feedback dialog has two issues:
-1. It doesn't show who is submitting -- the logged-in user's name and email are invisible
-2. The page/context dropdown includes pages from other portals (e.g., "Facilities Dashboard", "Submit Work Order") and is missing several pages that actually exist in this portal
+This plan adds mobile-responsive behavior across all pages while keeping the desktop layout completely untouched. All changes use Tailwind's responsive prefixes so they only apply at `max-width: 768px`.
 
-### Changes
+### What Already Works on Mobile
+- **Sidebar**: Already uses a Sheet (slide-out drawer) on mobile via the shadcn sidebar component -- no changes needed
+- **Header**: Already responsive with `px-4 sm:px-6`, icon-only buttons on mobile, `gap-1 sm:gap-2`
+- **Hero Banner**: Already stacks vertically on mobile (`flex-col sm:flex-row`), CTA goes full-width
+- **Feedback Cards Grid**: Already responsive (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`)
+- **Filter Grids**: Already responsive (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`)
+- **iOS zoom prevention**: Already handled in `index.css` (inputs forced to `text-base`)
 
-**File: `src/components/FeedbackDialog.tsx`**
+### Changes Needed
 
-**1. Show the logged-in user's info at the top of the form**
+**1. Summary Page (`src/pages/Summary.tsx`)**
+- Reduce padding on mobile: `p-6` to `p-3 sm:p-6`
+- Page title: `text-3xl` to `text-2xl sm:text-3xl`
+- Stats grid: `grid-cols-1 md:grid-cols-2` to `grid-cols-2 md:grid-cols-2` (2-col on mobile for compact stats)
 
-Add a "Submitting as" section below the dialog description that displays:
-- The user's name (from their profile: first_name + last_name)
-- Their email address
-- Pulled from the `useAuth()` hook (user object + profile)
+**2. Accuracy Page (`src/pages/Accuracy.tsx`)**
+- Reduce padding on mobile: `p-6` to `p-3 sm:p-6`
+- Page title: `text-3xl` to `text-2xl sm:text-3xl`
+- Period badges: wrap properly on small screens (already uses `flex-wrap`, OK)
+- Tabs: `grid-cols-4` to `grid-cols-2 sm:grid-cols-4` so tabs don't get too narrow on mobile
+- Overview charts grid: `grid-cols-1 lg:grid-cols-2` -- already fine
+- Key Insights grid: `md:grid-cols-2` -- already fine
 
-This way the submitter is always visible and tied to the logged-in session.
+**3. Feedback Reporting Page (`src/pages/FeedbackReporting.tsx`)**
+- Reduce padding on mobile: `p-6` to `p-3 sm:p-6`
+- Page title: `text-3xl` to `text-2xl sm:text-3xl`
+- Stats grid gap: `gap-6` to `gap-3 sm:gap-6`
+- Bar chart left margin: reduce from 120px to 80px on mobile for category labels
 
-**2. Replace page options with this portal's actual pages**
+**4. Praise Board Page (`src/pages/PraiseBoard.tsx`)**
+- Header: Stack vertically on mobile -- title and "Add Praise" button
+- Title: `text-3xl` to `text-2xl sm:text-3xl`
+- Icon size: `h-8 w-8` to `h-6 w-6 sm:h-8 sm:w-8`
+- "Add Praise" button: full-width on mobile
 
-Remove pages that don't exist in this portal and add the ones that do:
+**5. Executive Oversight Page (`src/pages/ExecutiveOversight.tsx`)**
+- Reduce container padding on mobile
 
-| Remove | Add |
-|--------|-----|
-| `/facilities` -- Facilities Dashboard | `/accuracy` -- Accuracy |
-| `/submit` -- Submit Work Order | `/training` -- Training |
-| | `/email-templates` -- Email Templates |
-| | `/praise-board` -- Praise Board |
-| | `/executive-oversight` -- Executive Oversight |
-| | `/dashboard` -- Dashboard |
-| | `/internal-feedback` -- Internal Feedback |
+**6. Settings Page (`src/pages/Settings.tsx`)**
+- Tabs: ensure horizontal scrolling or stacking on mobile
+- Form inputs and buttons: ensure full-width on mobile
 
-Final page list:
-- General / Not page-specific
-- Dashboard / Home (`/`)
-- Dashboard (alt) (`/dashboard`)
-- Summary (`/summary`)
-- Guest Feedback Management (`/gfm`)
-- Feedback Reporting (`/feedback-reporting`)
-- Red Carpet Leaders (`/red-carpet-leaders`)
-- Feedback Archive (`/feedback-archive`)
-- Executive Oversight (`/executive-oversight`)
-- Accuracy (`/accuracy`)
-- Training (`/training`)
-- Email Templates (`/email-templates`)
-- Praise Board (`/praise-board`)
-- Internal Feedback (`/internal-feedback`)
-- User Hierarchy (`/user-hierarchy`)
-- Settings (`/settings`)
+**7. Index/Dashboard Page (`src/pages/Index.tsx`)**
+- Stats grid: The 6-column grid (`lg:grid-cols-6`) already falls back to `grid-cols-1 md:grid-cols-2` -- change mobile to `grid-cols-2` for a more compact 2-column layout on phones
+- Reduce container padding on loading state
+
+**8. Global CSS (`src/index.css`)**
+- Add a utility class for responsive chart containers (reduce min-height on mobile)
+- Add `img { max-width: 100%; height: auto; }` rule to ensure images never overflow on mobile
 
 ### Technical Details
 
-- Import `useAuth` from `@/hooks/useAuth`
-- Use `user?.email` for email and `profile?.first_name` / `profile?.last_name` for name
-- Display as a small read-only info block (muted text, with a user icon) between the dialog description and the category field
-- Also stores `user_id` on submit (already done), so this is purely a visual addition
+All changes use existing Tailwind responsive prefixes (`sm:`, `md:`, `lg:`). No new dependencies. No desktop styles are modified -- every change is additive via mobile-first breakpoints.
 
-### Summary
-- 1 file changed: `src/components/FeedbackDialog.tsx`
-- Submitter identity is now visible in the form
-- Page options match this portal's actual routes
+Files to edit:
+1. `src/pages/Summary.tsx` -- mobile padding, title size
+2. `src/pages/Accuracy.tsx` -- mobile padding, title size, tab layout
+3. `src/pages/FeedbackReporting.tsx` -- mobile padding, title size, chart margins
+4. `src/pages/PraiseBoard.tsx` -- header stacking, button full-width
+5. `src/pages/Index.tsx` -- stats grid, loading state padding
+6. `src/pages/ExecutiveOversight.tsx` -- container padding
+7. `src/pages/Settings.tsx` -- tab and form layout
+8. `src/index.css` -- global image max-width rule
+
+### What Will NOT Change
+- Desktop layout, spacing, fonts, or styling (all changes scoped to mobile breakpoints)
+- Sidebar behavior (already mobile-optimized with Sheet drawer)
+- Header layout (already responsive)
+- Hero banner (already responsive)
+- Filter components (already responsive)
+- Feedback card grid (already responsive)
 
