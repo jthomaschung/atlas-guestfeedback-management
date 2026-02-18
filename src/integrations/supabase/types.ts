@@ -4681,6 +4681,7 @@ export type Database = {
       internal_feedback: {
         Row: {
           admin_notes: string | null
+          admin_notes_history: Json | null
           archived: boolean
           archived_at: string | null
           browser_info: Json | null
@@ -4701,6 +4702,7 @@ export type Database = {
         }
         Insert: {
           admin_notes?: string | null
+          admin_notes_history?: Json | null
           archived?: boolean
           archived_at?: string | null
           browser_info?: Json | null
@@ -4721,6 +4723,7 @@ export type Database = {
         }
         Update: {
           admin_notes?: string | null
+          admin_notes_history?: Json | null
           archived?: boolean
           archived_at?: string | null
           browser_info?: Json | null

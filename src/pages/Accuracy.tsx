@@ -198,7 +198,7 @@ export default function Accuracy() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6 space-y-6">
+      <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
         <Skeleton className="h-12 w-64" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
@@ -210,10 +210,10 @@ export default function Accuracy() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold">Accuracy Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">Accuracy Dashboard</h1>
           <p className="text-muted-foreground">
             Track and analyze Missing Items and Sandwich Made Wrong complaints
           </p>
@@ -277,7 +277,7 @@ export default function Accuracy() {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="stores">Store Rankings</TabsTrigger>
           <TabsTrigger value="markets">Market Rankings</TabsTrigger>

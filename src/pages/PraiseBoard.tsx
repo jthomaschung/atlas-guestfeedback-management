@@ -145,22 +145,22 @@ export default function PraiseBoard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl shadow-lg">
-            <Star className="h-8 w-8 text-white fill-white" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="p-2 sm:p-3 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl shadow-lg">
+            <Star className="h-6 w-6 sm:h-8 sm:w-8 text-white fill-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-2">
               Praise Board
-              <Sparkles className="h-6 w-6 text-amber-500" />
+              <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-amber-500" />
             </h1>
-            <p className="text-muted-foreground">Celebrating exceptional service and happy customers</p>
+            <p className="text-sm sm:text-base text-muted-foreground">Celebrating exceptional service and happy customers</p>
           </div>
         </div>
         <Button
           onClick={() => setShowAddPraise(true)}
-          className="bg-amber-500 hover:bg-amber-600 text-white"
+          className="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Praise

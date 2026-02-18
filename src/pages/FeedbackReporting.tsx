@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FeedbackReportingStats {
   averageResponseTime: number;
@@ -42,6 +43,7 @@ const FeedbackReporting = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { permissions } = useUserPermissions();
+  const isMobile = useIsMobile();
 
   const filteredFeedbacks = useMemo(() => {
     return feedbacks.filter(fb => {
@@ -297,7 +299,7 @@ const FeedbackReporting = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto p-3 sm:p-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
@@ -309,9 +311,9 @@ const FeedbackReporting = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-foreground">Guest Feedback Reporting & Analytics</h1>
+    <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Guest Feedback Reporting & Analytics</h1>
         <p className="text-muted-foreground mt-1">
           View insights and analytics for guest feedback performance across all channels
         </p>
@@ -348,7 +350,7 @@ const FeedbackReporting = () => {
       />
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Average Response Time</CardTitle>
@@ -434,7 +436,7 @@ const FeedbackReporting = () => {
                     count
                   }))}
                 layout="vertical"
-                margin={{ left: 120, right: 20, top: 10, bottom: 10 }}
+                margin={{ left: isMobile ? 80 : 120, right: 20, top: 10, bottom: 10 }}
               >
                 <XAxis 
                   type="number"
