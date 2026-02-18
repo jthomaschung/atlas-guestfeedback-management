@@ -110,14 +110,14 @@ export default function ExecutiveOversight() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 py-4 sm:py-6">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
                 <AlertTriangle className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Executive Oversight</h1>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Executive Oversight</h1>
                 <p className="text-sm text-gray-600">
                   Critical customer feedback requiring {userRole.toUpperCase()} attention
                 </p>
@@ -135,8 +135,8 @@ export default function ExecutiveOversight() {
 
       {/* Info Banner */}
       <div className="bg-red-50 border-b border-red-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="py-3 sm:py-4">
             <div className="flex items-start space-x-3">
               <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
               <div className="text-sm text-red-800">
@@ -163,8 +163,8 @@ export default function ExecutiveOversight() {
 
       {/* Footer Info */}
       <div className="bg-white border-t mt-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-gray-600">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 text-sm text-gray-600">
             <div className="flex items-start space-x-2">
               <Users className="h-4 w-4 text-gray-400 mt-0.5" />
               <div>

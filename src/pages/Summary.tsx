@@ -265,7 +265,7 @@ const Summary = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto p-3 sm:p-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
@@ -277,9 +277,9 @@ const Summary = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-foreground">Performance Summary</h1>
+    <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Performance Summary</h1>
         <p className="text-muted-foreground mt-1">
           Overview of guest feedback performance and trends across all locations
         </p>
@@ -316,7 +316,7 @@ const Summary = () => {
       />
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Average Response Time</CardTitle>

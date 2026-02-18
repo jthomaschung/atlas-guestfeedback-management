@@ -244,9 +244,9 @@ const Settings = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-foreground">Settings</h1>
+    <div className="container mx-auto p-3 sm:p-6 max-w-7xl">
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Settings</h1>
         <p className="text-muted-foreground mt-1">
           Manage your account settings and system configuration
         </p>
