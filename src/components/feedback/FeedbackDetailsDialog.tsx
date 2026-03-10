@@ -1821,6 +1821,29 @@ Customer Service Team`);
                 <div>
                   <span className="text-muted-foreground">Channel:</span> {feedback.channel}
                 </div>
+                {feedback.feedback_source && (
+                  <div>
+                    <span className="text-muted-foreground">Feedback Source:</span> {feedback.feedback_source}
+                  </div>
+                )}
+                {feedback.type_of_feedback && (
+                  <div>
+                    <span className="text-muted-foreground">Type:</span>{' '}
+                    <Badge variant="outline" className={cn(
+                      "text-xs",
+                      feedback.type_of_feedback.toLowerCase() === 'fyi' 
+                        ? "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400" 
+                        : "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400"
+                    )}>
+                      {feedback.type_of_feedback}
+                    </Badge>
+                  </div>
+                )}
+                {feedback.reward && (
+                  <div>
+                    <span className="text-muted-foreground">Reward:</span> {feedback.reward}
+                  </div>
+                )}
                 {feedback.rating && (
                   <div>
                     <span className="text-muted-foreground">Rating:</span> {feedback.rating}/5
