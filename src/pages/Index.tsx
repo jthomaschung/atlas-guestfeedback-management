@@ -41,7 +41,8 @@ const Index = () => {
   const authContext = useAuth();
   const { user: authUser, profile, isSessionReady } = authContext || { user: null, profile: null, isSessionReady: false };
   const { permissions } = useUserPermissions();
-  const { likes, userLikes, toggleLike } = useFeedbackLikes();
+  const feedbackIds = useMemo(() => feedbacks.map(f => f.id), [feedbacks]);
+  const { likes, userLikes, toggleLike } = useFeedbackLikes(feedbackIds);
 
   // Handle feedbackId query param to auto-open specific feedback
   useEffect(() => {
