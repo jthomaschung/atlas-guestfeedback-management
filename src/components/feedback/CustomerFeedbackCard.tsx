@@ -519,31 +519,30 @@ export function CustomerFeedbackCard({
             )}
           </div>
 
-          {/* Like Button */}
+          {/* Like Button - Instagram style bottom right */}
           {isPraise && onToggleLike && (
-            <div className="flex items-center gap-2 pt-2 border-t border-amber-200/50 dark:border-amber-800/30">
-              <Button
-                variant="ghost"
-                size="sm"
+            <div className="flex justify-end items-center gap-1.5 pt-1">
+              <span className={cn(
+                "text-xs font-medium transition-all",
+                isLiked ? "text-red-500" : "text-muted-foreground"
+              )}>
+                {likeCount > 0 ? likeCount : ''}
+              </span>
+              <button
                 className={cn(
-                  "h-8 px-2 gap-1.5 transition-all",
+                  "transition-all duration-200 active:scale-125",
                   isLiked 
-                    ? "text-red-500 hover:text-red-600" 
+                    ? "text-red-500" 
                     : "text-muted-foreground hover:text-red-400"
                 )}
                 onClick={(e) => {
                   e.stopPropagation();
                   onToggleLike(feedback.id);
                 }}
+                title={isLiked ? "Unlike" : "Like"}
               >
-                <Heart className={cn("h-4 w-4 transition-all", isLiked && "fill-current scale-110")} />
-                <span className="text-xs font-medium">{likeCount > 0 ? likeCount : ''}</span>
-              </Button>
-              {likeCount > 0 && (
-                <span className="text-xs text-muted-foreground">
-                  {likeCount === 1 ? '1 like' : `${likeCount} likes`}
-                </span>
-              )}
+                <Heart className={cn("h-5 w-5 transition-all", isLiked && "fill-current scale-110")} />
+              </button>
             </div>
           )}
         </div>
