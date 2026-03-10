@@ -170,7 +170,20 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
   // Handle missing required fields with reasonable defaults
   const channel = data.channel || data.Source || 'RAP'
   const feedback_date = data.feedback_date || data.Date || new Date().toISOString().split('T')[0]
-  const complaint_category = data.complaint_category || data['Type of Complaint'] || 'Other'
+  const rawCategory = data.complaint_category || data['Type of Complaint'] || 'Other'
+  
+  // Normalize category names to standard values
+  const categoryNormalization: Record<string, string> = {
+    'order accuracy': 'Sandwich Made Wrong',
+    'hours': 'Closed Early',
+    'team member friendliness': 'Rude Service',
+    'sandwich issue': 'Sandwich Made Wrong',
+    'missing items': 'Missing Item',
+    'order issue': 'Sandwich Made Wrong',
+    'oop': 'Out of Product',
+    'delivery timing': 'Slow Service',
+  }
+  const complaint_category = categoryNormalization[rawCategory.toLowerCase()] || rawCategory
   const store_number = data.store_number || data.Store || '000'
   const market = data.market || data.Market || 'Unknown'
 

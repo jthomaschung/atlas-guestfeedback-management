@@ -57,14 +57,18 @@ const categoryOptions = [
   { value: 'Bread Quality', label: 'Bread Quality' },
   { value: 'Cleanliness', label: 'Cleanliness' },
   { value: 'Closed Early', label: 'Closed Early' },
+  { value: 'Credit Card Issue', label: 'Credit Card Issue' },
+  { value: 'Loyalty Program Issues', label: 'Loyalty Program Issues' },
   { value: 'Order Issues', label: 'Order Issues' },
   { value: 'Other', label: 'Other' },
   { value: 'Out of Product', label: 'Out of Product' },
+  { value: 'Possible Food Poisoning', label: 'Possible Food Poisoning' },
   { value: 'Praise', label: 'Praise' },
   { value: 'Pricing Issue', label: 'Pricing Issue' },
   { value: 'Product Issue', label: 'Product Issue' },
   { value: 'Rude Service', label: 'Rude Service' },
   { value: 'Slow Service', label: 'Slow Service' },
+  { value: 'Unauthorized Tip', label: 'Unauthorized Tip' },
 ];
 
 // Order Issues combines: Sandwich Made Wrong, Missing Item/Items (case-insensitive)
