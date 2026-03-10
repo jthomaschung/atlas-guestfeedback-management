@@ -518,6 +518,34 @@ export function CustomerFeedbackCard({
               </div>
             )}
           </div>
+
+          {/* Like Button */}
+          {isPraise && onToggleLike && (
+            <div className="flex items-center gap-2 pt-2 border-t border-amber-200/50 dark:border-amber-800/30">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "h-8 px-2 gap-1.5 transition-all",
+                  isLiked 
+                    ? "text-red-500 hover:text-red-600" 
+                    : "text-muted-foreground hover:text-red-400"
+                )}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleLike(feedback.id);
+                }}
+              >
+                <Heart className={cn("h-4 w-4 transition-all", isLiked && "fill-current scale-110")} />
+                <span className="text-xs font-medium">{likeCount > 0 ? likeCount : ''}</span>
+              </Button>
+              {likeCount > 0 && (
+                <span className="text-xs text-muted-foreground">
+                  {likeCount === 1 ? '1 like' : `${likeCount} likes`}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
