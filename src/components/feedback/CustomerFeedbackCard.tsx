@@ -183,7 +183,8 @@ export function CustomerFeedbackCard({
       "group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer overflow-hidden",
       isEscalated && "bg-red-600 dark:bg-red-700 border-red-600 dark:border-red-700",
       !isEscalated && isUrgent && "ring-2 ring-red-200 dark:ring-red-800/50",
-      isResolved && "opacity-40 bg-muted/30 border-dashed hover:opacity-60"
+      isResolved && "opacity-40 bg-muted/30 border-dashed hover:opacity-60",
+      isPraise && !isEscalated && !isResolved && "border-l-4 border-l-amber-400 bg-gradient-to-br from-amber-50/60 via-yellow-50/30 to-transparent dark:from-amber-950/30 dark:via-yellow-950/10"
     )} onClick={() => onViewDetails(feedback)}>
       <CardHeader className={cn("pb-3", isEscalated && "text-white")}>
         <div className="flex items-start justify-between">
