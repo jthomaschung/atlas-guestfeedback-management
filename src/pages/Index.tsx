@@ -12,6 +12,7 @@ import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserPermissions } from "@/hooks/useUserPermissions";
+import { useFeedbackLikes } from "@/hooks/useFeedbackLikes";
 import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
