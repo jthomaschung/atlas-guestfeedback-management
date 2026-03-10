@@ -678,16 +678,18 @@ const Index = () => {
               </p>
             </div>
             
-            {/* CTA Button */}
-            <Button 
-              className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground"
-              onClick={() => {
-                // Scroll to feedback table
-                document.querySelector('[data-sidebar="content"]')?.scrollTo({ top: 600, behavior: 'smooth' });
-              }}
-            >
-              View Feedback
-            </Button>
+            {/* CTA Buttons */}
+            <div className="flex gap-2 w-full sm:w-auto">
+              <AddFeedbackDialog onFeedbackAdded={fetchFeedbacks} />
+              <Button 
+                className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-primary-foreground"
+                onClick={() => {
+                  document.querySelector('[data-sidebar="content"]')?.scrollTo({ top: 600, behavior: 'smooth' });
+                }}
+              >
+                View Feedback
+              </Button>
+            </div>
           </div>
         </div>
 
