@@ -224,8 +224,9 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
       console.log('📋 ROUTING: FYI type → guestfeedback@atlaswe.com')
     } else if (typeNormalized === 'guest support') {
       // Guest Support: route by category
-      const storeFollowUpCategories = ['order issue', 'cleanliness', 'closed early']
-      const autoEscalateCategories = ['out of product', 'rude service', 'possible food poisoning', 'rude']
+      // Order Issue = composite: sandwich made wrong, missing item, sandwich issue, order issue
+      const storeFollowUpCategories = ['order issue', 'sandwich made wrong', 'missing item', 'missing items', 'sandwich issue', 'cleanliness', 'closed early']
+      const autoEscalateCategories = ['out of product', 'rude service', 'possible food poisoning', 'rude', 'oop']
 
       if (storeFollowUpCategories.includes(categoryLower)) {
         defaultAssignee = await findStoreAssignee(store_number)
