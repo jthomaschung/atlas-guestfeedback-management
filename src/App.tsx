@@ -30,6 +30,7 @@ import Accuracy from '@/pages/Accuracy';
 import Training from '@/pages/Training';
 import EmailTemplates from '@/pages/EmailTemplates';
 import PraiseBoard from '@/pages/PraiseBoard';
+import OpenFeedback from '@/pages/OpenFeedback';
 import { AuthGate } from '@/components/AuthGate';
 import { PortalGate } from '@/auth/PortalGate';
 
@@ -226,6 +227,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <EmailTemplates />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/open-feedback" 
+                element={
+                  <ProtectedRoute>
+                    <OpenFeedback />
                   </ProtectedRoute>
                 } 
               />

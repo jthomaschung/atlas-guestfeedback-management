@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive, UserCheck, TrendingUp, Shield, Target, BookOpen, Mail, Star, ChevronDown } from "lucide-react";
+import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive, UserCheck, TrendingUp, Shield, Target, BookOpen, Mail, Star, ChevronDown, Inbox } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -30,6 +30,7 @@ const guestFeedbackItems = [
   { title: "Accuracy", url: "/accuracy", icon: Target },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Feedback Reporting", url: "/feedback-reporting", icon: TrendingUp },
+  { title: "Open Feedback", url: "/open-feedback", icon: Inbox },
   { title: "Praise Board", url: "/praise-board", icon: Star },
   { title: "Summary", url: "/summary", icon: BarChart3 },
 ];
