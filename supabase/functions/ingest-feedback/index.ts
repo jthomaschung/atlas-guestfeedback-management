@@ -188,7 +188,7 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
   const market = data.market || data.Market || 'Unknown'
 
   // New pipeline fields
-  const type_of_feedback = data.type_of_feedback || data['Type of Feedback'] || null
+  const type_of_feedback = data.type_of_feedback || data['Type of Feedback'] || data['Type of feedback'] || null
   const reward = data.reward || data.Reward || null
   const feedback_source = data.feedback_source || data['Feedback Source'] || data.Source || channel
 
