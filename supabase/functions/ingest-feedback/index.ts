@@ -211,7 +211,8 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     'other': 'Low',
     'cleanliness': 'Medium',
     'possible food poisoning': 'Critical',
-    'loyalty program issues': 'Low'
+    'loyalty program issues': 'Low',
+    'unauthorized tip': 'Low'
   }
   
   const categoryLower = complaint_category.toLowerCase()
