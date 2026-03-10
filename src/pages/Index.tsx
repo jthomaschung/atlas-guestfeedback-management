@@ -14,6 +14,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserPermissions } from "@/hooks/useUserPermissions";
 import { useFeedbackLikes } from "@/hooks/useFeedbackLikes";
 import { supabase } from "@/integrations/supabase/client";
+import { AddFeedbackDialog } from "@/components/feedback/AddFeedbackDialog";
 
 const Index = () => {
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
