@@ -1900,7 +1900,7 @@ Customer Service Team`);
                     <SelectItem value="responded">Responded</SelectItem>
                     <SelectItem value="resolved">Resolved</SelectItem>
                     <SelectItem value="escalated">Escalated</SelectItem>
-                    {feedback?.channel?.toLowerCase() === 'qualtrics' && (
+                    {(feedback?.channel?.toLowerCase() === 'qualtrics' || feedback?.type_of_feedback?.toLowerCase() === 'fyi') && (
                       <SelectItem value="acknowledged">Acknowledged</SelectItem>
                     )}
                   </SelectContent>

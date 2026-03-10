@@ -382,7 +382,28 @@ export function CustomerFeedbackCard({
                 {feedback.rating}/5
               </Badge>
             )}
+
+            {feedback.type_of_feedback && (
+              <Badge variant="outline" className={cn(
+                "text-xs",
+                feedback.type_of_feedback.toLowerCase() === 'fyi'
+                  ? "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400"
+                  : "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400",
+                isEscalated && "bg-white/20 border-white/30 text-white"
+              )}>
+                {feedback.type_of_feedback}
+              </Badge>
+            )}
           </div>
+
+          {feedback.reward && (
+            <div className={cn(
+              "text-xs",
+              isEscalated ? "text-white/80" : "text-muted-foreground"
+            )}>
+              <span className="font-medium">Reward:</span> {feedback.reward}
+            </div>
+          )}
           
           {/* CMX Link for Product Issues */}
           {shouldShowCMXLink(feedback) && (
