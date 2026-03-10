@@ -12,6 +12,7 @@ import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserPermissions } from "@/hooks/useUserPermissions";
+import { useFeedbackLikes } from "@/hooks/useFeedbackLikes";
 import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
@@ -40,6 +41,8 @@ const Index = () => {
   const authContext = useAuth();
   const { user: authUser, profile, isSessionReady } = authContext || { user: null, profile: null, isSessionReady: false };
   const { permissions } = useUserPermissions();
+  const feedbackIds = useMemo(() => feedbacks.map(f => f.id), [feedbacks]);
+  const { likes, userLikes, toggleLike } = useFeedbackLikes(feedbackIds);
 
   // Handle feedbackId query param to auto-open specific feedback
   useEffect(() => {
@@ -752,6 +755,9 @@ const Index = () => {
           onEdit={handleViewDetails}
           onViewDetails={handleViewDetails}
           isAdmin={false}
+          likes={likes}
+          userLikes={userLikes}
+          onToggleLike={toggleLike}
         />
 
         <FeedbackDetailsDialog
