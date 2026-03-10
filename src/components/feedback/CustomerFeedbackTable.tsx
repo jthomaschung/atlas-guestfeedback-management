@@ -9,6 +9,9 @@ interface CustomerFeedbackTableProps {
   onCategoryChange?: (feedback: CustomerFeedback, newCategory: string) => void;
   isAdmin?: boolean;
   canEditCategory?: boolean;
+  likes?: Record<string, number>;
+  userLikes?: Set<string>;
+  onToggleLike?: (feedbackId: string) => void;
 }
 
 export function CustomerFeedbackTable({ 
@@ -18,7 +21,10 @@ export function CustomerFeedbackTable({
   onDelete, 
   onCategoryChange,
   isAdmin, 
-  canEditCategory 
+  canEditCategory,
+  likes,
+  userLikes,
+  onToggleLike,
 }: CustomerFeedbackTableProps) {
   console.log('📋 CustomerFeedbackTable rendering with', feedbacks.length, 'items');
   
@@ -44,6 +50,9 @@ export function CustomerFeedbackTable({
             onCategoryChange={onCategoryChange}
             isAdmin={isAdmin}
             canEditCategory={canEditCategory}
+            likeCount={likes?.[feedback.id] || 0}
+            isLiked={userLikes?.has(feedback.id) || false}
+            onToggleLike={onToggleLike}
           />
         ))}
       </div>
