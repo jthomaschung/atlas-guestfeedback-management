@@ -172,7 +172,7 @@ export function CustomerFeedbackCard({
 
   return (
     <Card className={cn(
-      "group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer",
+      "group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer overflow-hidden",
       isEscalated && "bg-red-600 dark:bg-red-700 border-red-600 dark:border-red-700",
       !isEscalated && isUrgent && "ring-2 ring-red-200 dark:ring-red-800/50",
       isResolved && "opacity-40 bg-muted/30 border-dashed hover:opacity-60"
@@ -275,7 +275,7 @@ export function CustomerFeedbackCard({
             ) : (
             <div className="relative group/feedback">
                 <p className={cn(
-                  "text-sm leading-relaxed whitespace-pre-wrap break-words",
+                  "text-sm leading-relaxed whitespace-pre-wrap break-all [overflow-wrap:anywhere]",
                   isEscalated ? "text-white/90" : "text-muted-foreground"
                 )}>
                   {feedback.feedback_text}
