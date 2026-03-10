@@ -468,14 +468,20 @@ Deno.serve(async (req) => {
     // Try to insert into database
     console.log('Inserting into database...')
     
-    // Auto-escalate Critical priority feedback
-    const initialStatus = validatedData.priority === 'Critical' ? 'escalated' : 'unopened'
-    const escalatedAt = validatedData.priority === 'Critical' ? new Date().toISOString() : null
-    const slaDeadline = validatedData.priority === 'Critical' 
-      ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString() // 48 hours from now
+    // Auto-escalate: Critical priority OR Guest Support with escalate categories
+    const typeNorm = (validatedData.type_of_feedback || '').trim().toLowerCase()
+    const catNorm = validatedData.complaint_category.toLowerCase()
+    const autoEscalateCategories = ['out of product', 'rude service', 'possible food poisoning', 'rude']
+    const shouldEscalate = validatedData.priority === 'Critical' || 
+      (typeNorm === 'guest support' && autoEscalateCategories.includes(catNorm))
+    
+    const initialStatus = shouldEscalate ? 'escalated' : 'unopened'
+    const escalatedAt = shouldEscalate ? new Date().toISOString() : null
+    const slaDeadline = shouldEscalate 
+      ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
       : null
     
-    console.log(`Priority: ${validatedData.priority}, Status: ${initialStatus}, Auto-escalated: ${validatedData.priority === 'Critical'}`)
+    console.log(`Priority: ${validatedData.priority}, Status: ${initialStatus}, Auto-escalated: ${shouldEscalate}`)
     
     const { data: insertedData, error: insertError } = await supabase
       .from('customer_feedback')
@@ -494,14 +500,17 @@ Deno.serve(async (req) => {
         feedback_text: validatedData.feedback_text,
         priority: validatedData.priority,
         assignee: validatedData.assignee,
-        user_id: '00000000-0000-0000-0000-000000000000', // System user
+        user_id: '00000000-0000-0000-0000-000000000000',
         escalated_at: escalatedAt,
         sla_deadline: slaDeadline,
-        auto_escalated: validatedData.priority === 'Critical',
+        auto_escalated: shouldEscalate,
         ee_action: validatedData.ee_action,
         period: validatedData.period,
         time_of_day: validatedData.time_of_day,
-        order_number: validatedData.order_number
+        order_number: validatedData.order_number,
+        type_of_feedback: validatedData.type_of_feedback,
+        reward: validatedData.reward,
+        feedback_source: validatedData.feedback_source,
       })
       .select()
       .single()
