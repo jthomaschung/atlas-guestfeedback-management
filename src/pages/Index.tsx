@@ -151,10 +151,36 @@ const Index = () => {
       });
       
       // Fetch ALL feedback (including resolved) for charts
-      const { data, error } = await supabase
-        .from('customer_feedback')
-        .select('*')
-        .order('created_at', { ascending: false });
+      // Supabase default limit is 1000 rows, so we need to paginate
+      let allData: any[] = [];
+      let from = 0;
+      const pageSize = 1000;
+      let hasMore = true;
+      
+      while (hasMore) {
+        const { data: pageData, error: pageError } = await supabase
+          .from('customer_feedback')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .range(from, from + pageSize - 1);
+        
+        if (pageError) {
+          console.error('Error fetching feedback:', pageError);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to load customer feedback"
+          });
+          return;
+        }
+        
+        allData = allData.concat(pageData || []);
+        hasMore = (pageData?.length || 0) === pageSize;
+        from += pageSize;
+      }
+      
+      const data = allData;
+      const error = null;
 
       if (error) {
         console.error('Error fetching feedback:', error);
