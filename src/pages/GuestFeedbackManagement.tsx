@@ -29,6 +29,7 @@ export default function GuestFeedbackManagement() {
   useEffect(() => {
     if (user?.email) {
       loadGuestFeedbackManagerFeedback();
+      loadPraises();
     }
   }, [user?.email]);
 
