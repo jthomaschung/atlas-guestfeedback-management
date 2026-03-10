@@ -275,7 +275,7 @@ export function CustomerFeedbackCard({
             ) : (
             <div className="relative group/feedback">
                 <p className={cn(
-                  "text-sm leading-relaxed whitespace-pre-wrap break-words",
+                  "text-sm leading-relaxed whitespace-pre-wrap break-all [overflow-wrap:anywhere]",
                   isEscalated ? "text-white/90" : "text-muted-foreground"
                 )}>
                   {feedback.feedback_text}
