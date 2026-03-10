@@ -17,6 +17,7 @@ export default function GuestFeedbackManagement() {
   const { toast } = useToast();
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
   const [filteredFeedbacks, setFilteredFeedbacks] = useState<CustomerFeedback[]>([]);
+  const [praises, setPraises] = useState<CustomerFeedback[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFeedback, setSelectedFeedback] = useState<CustomerFeedback | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
