@@ -42,4 +42,7 @@ export interface CustomerFeedback {
   order_number?: string;
   period?: string;
   ee_action?: string;
+  type_of_feedback?: string;
+  reward?: string;
+  feedback_source?: string;
 }

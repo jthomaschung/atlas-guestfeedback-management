@@ -1713,6 +1713,7 @@ export type Database = {
           escalated_by: string | null
           executive_notes: string | null
           feedback_date: string
+          feedback_source: string | null
           feedback_text: string | null
           id: string
           market: string
@@ -1725,9 +1726,11 @@ export type Database = {
           ready_for_dm_resolution: boolean | null
           resolution_notes: string | null
           resolution_status: string | null
+          reward: string | null
           sla_deadline: string | null
           store_number: string
           time_of_day: string | null
+          type_of_feedback: string | null
           updated_at: string
           user_id: string
           viewed: boolean | null
@@ -1756,6 +1759,7 @@ export type Database = {
           escalated_by?: string | null
           executive_notes?: string | null
           feedback_date: string
+          feedback_source?: string | null
           feedback_text?: string | null
           id?: string
           market: string
@@ -1768,9 +1772,11 @@ export type Database = {
           ready_for_dm_resolution?: boolean | null
           resolution_notes?: string | null
           resolution_status?: string | null
+          reward?: string | null
           sla_deadline?: string | null
           store_number: string
           time_of_day?: string | null
+          type_of_feedback?: string | null
           updated_at?: string
           user_id: string
           viewed?: boolean | null
@@ -1799,6 +1805,7 @@ export type Database = {
           escalated_by?: string | null
           executive_notes?: string | null
           feedback_date?: string
+          feedback_source?: string | null
           feedback_text?: string | null
           id?: string
           market?: string
@@ -1811,9 +1818,11 @@ export type Database = {
           ready_for_dm_resolution?: boolean | null
           resolution_notes?: string | null
           resolution_status?: string | null
+          reward?: string | null
           sla_deadline?: string | null
           store_number?: string
           time_of_day?: string | null
+          type_of_feedback?: string | null
           updated_at?: string
           user_id?: string
           viewed?: boolean | null
