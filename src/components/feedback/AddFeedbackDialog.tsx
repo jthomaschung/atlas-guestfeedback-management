@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 const COMPLAINT_CATEGORIES = [
   "Sandwich Made Wrong",
@@ -30,6 +31,11 @@ const COMPLAINT_CATEGORIES = [
 const PRIORITIES = ["Praise", "Low", "Medium", "High", "Critical"] as const;
 const TYPES_OF_FEEDBACK = ["Guest Support", "FYI"] as const;
 
+interface StoreInfo {
+  store_number: string;
+  region: string | null;
+}
+
 interface AddFeedbackDialogProps {
   onFeedbackAdded: () => void;
 }
@@ -37,7 +43,10 @@ interface AddFeedbackDialogProps {
 export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [stores, setStores] = useState<StoreInfo[]>([]);
   const { toast } = useToast();
+  const authContext = useAuth();
+  const user = authContext?.user;
 
   const [form, setForm] = useState({
     feedback_date: new Date().toISOString().split("T")[0],
@@ -55,8 +64,31 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
     reward: "",
   });
 
+  useEffect(() => {
+    const fetchStores = async () => {
+      const { data } = await supabase
+        .from("stores")
+        .select("store_number, region")
+        .neq("store_number", "Corp")
+        .order("store_number");
+      if (data) {
+        setStores(data.map(s => ({ store_number: s.store_number, region: s.region })));
+      }
+    };
+    fetchStores();
+  }, []);
+
   const updateField = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleStoreChange = (storeNumber: string) => {
+    const store = stores.find((s) => s.store_number === storeNumber);
+    setForm((prev) => ({
+      ...prev,
+      store_number: storeNumber,
+      market: store?.region || "",
+    }));
   };
 
   const resetForm = () => {
@@ -84,14 +116,23 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
       toast({
         variant: "destructive",
         title: "Missing required fields",
-        description: "Store number, market, and category are required.",
+        description: "Store, market, and category are required.",
+      });
+      return;
+    }
+
+    if (!user?.id) {
+      toast({
+        variant: "destructive",
+        title: "Not authenticated",
+        description: "You must be logged in to add feedback.",
       });
       return;
     }
 
     setSubmitting(true);
     try {
-      // Look up period from the periods table
+      // Look up period
       let period: string | null = null;
       const { data: periodData } = await supabase
         .from("periods")
@@ -124,7 +165,7 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
         case_number: caseNumber,
         resolution_status: "unopened",
         assignee: "Unassigned",
-        user_id: "00000000-0000-0000-0000-000000000000",
+        user_id: user.id,
         period,
       });
 
@@ -176,23 +217,26 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="store_number">Store # *</Label>
-              <Input
-                id="store_number"
-                placeholder="e.g. 1019"
-                value={form.store_number}
-                onChange={(e) => updateField("store_number", e.target.value)}
-                required
-              />
+              <Label>Store # *</Label>
+              <Select value={form.store_number} onValueChange={handleStoreChange}>
+                <SelectTrigger><SelectValue placeholder="Select store..." /></SelectTrigger>
+                <SelectContent>
+                  {stores.map((s) => (
+                    <SelectItem key={s.store_number} value={s.store_number}>
+                      {s.store_number}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="market">Market *</Label>
               <Input
                 id="market"
-                placeholder="e.g. NE 3"
                 value={form.market}
-                onChange={(e) => updateField("market", e.target.value)}
-                required
+                readOnly
+                className="bg-muted"
+                placeholder="Auto-set from store"
               />
             </div>
           </div>
