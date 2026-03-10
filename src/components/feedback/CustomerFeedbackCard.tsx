@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { Edit, Calendar, Eye, User, Clock, AlertTriangle, Trash2, Star, Phone, Hash, Save, X, ExternalLink } from "lucide-react";
+import { Edit, Calendar, Eye, User, Clock, AlertTriangle, Trash2, Star, Phone, Hash, Save, X, ExternalLink, Heart } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -20,6 +20,9 @@ interface CustomerFeedbackCardProps {
   onCategoryChange?: (feedback: CustomerFeedback, newCategory: string) => void;
   isAdmin?: boolean;
   canEditCategory?: boolean;
+  likeCount?: number;
+  isLiked?: boolean;
+  onToggleLike?: (feedbackId: string) => void;
 }
 
 const statusColors = {
@@ -80,7 +83,10 @@ export function CustomerFeedbackCard({
   onDelete, 
   onCategoryChange,
   isAdmin, 
-  canEditCategory = false 
+  canEditCategory = false,
+  likeCount = 0,
+  isLiked = false,
+  onToggleLike,
 }: CustomerFeedbackCardProps) {
   const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
   const [isUpdatingCalled, setIsUpdatingCalled] = useState(false);
@@ -170,12 +176,15 @@ export function CustomerFeedbackCard({
 
   const isResolved = feedback.resolution_status === 'resolved';
 
+  const isPraise = feedback.complaint_category?.toLowerCase().includes('praise') || feedback.priority === 'Praise';
+
   return (
     <Card className={cn(
       "group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer overflow-hidden",
       isEscalated && "bg-red-600 dark:bg-red-700 border-red-600 dark:border-red-700",
       !isEscalated && isUrgent && "ring-2 ring-red-200 dark:ring-red-800/50",
-      isResolved && "opacity-40 bg-muted/30 border-dashed hover:opacity-60"
+      isResolved && "opacity-40 bg-muted/30 border-dashed hover:opacity-60",
+      isPraise && !isEscalated && !isResolved && "border-l-4 border-l-amber-400 bg-gradient-to-br from-amber-50/60 via-yellow-50/30 to-transparent dark:from-amber-950/30 dark:via-yellow-950/10"
     )} onClick={() => onViewDetails(feedback)}>
       <CardHeader className={cn("pb-3", isEscalated && "text-white")}>
         <div className="flex items-start justify-between">
@@ -509,6 +518,34 @@ export function CustomerFeedbackCard({
               </div>
             )}
           </div>
+
+          {/* Like Button */}
+          {isPraise && onToggleLike && (
+            <div className="flex items-center gap-2 pt-2 border-t border-amber-200/50 dark:border-amber-800/30">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "h-8 px-2 gap-1.5 transition-all",
+                  isLiked 
+                    ? "text-red-500 hover:text-red-600" 
+                    : "text-muted-foreground hover:text-red-400"
+                )}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleLike(feedback.id);
+                }}
+              >
+                <Heart className={cn("h-4 w-4 transition-all", isLiked && "fill-current scale-110")} />
+                <span className="text-xs font-medium">{likeCount > 0 ? likeCount : ''}</span>
+              </Button>
+              {likeCount > 0 && (
+                <span className="text-xs text-muted-foreground">
+                  {likeCount === 1 ? '1 like' : `${likeCount} likes`}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

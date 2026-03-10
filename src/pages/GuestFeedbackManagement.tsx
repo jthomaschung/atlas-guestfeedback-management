@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { CustomerFeedback } from '@/types/feedback';
 import { CustomerFeedbackTable } from '@/components/feedback/CustomerFeedbackTable';
@@ -9,13 +9,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { useFeedbackLikes } from '@/hooks/useFeedbackLikes';
+import { Loader2, Star } from 'lucide-react';
 
 export default function GuestFeedbackManagement() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
   const [filteredFeedbacks, setFilteredFeedbacks] = useState<CustomerFeedback[]>([]);
+  const [praises, setPraises] = useState<CustomerFeedback[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFeedback, setSelectedFeedback] = useState<CustomerFeedback | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
@@ -27,6 +29,7 @@ export default function GuestFeedbackManagement() {
   useEffect(() => {
     if (user?.email) {
       loadGuestFeedbackManagerFeedback();
+      loadPraises();
     }
   }, [user?.email]);
 
@@ -84,6 +87,29 @@ export default function GuestFeedbackManagement() {
     }
   };
 
+  const loadPraises = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('customer_feedback')
+        .select('*')
+        .ilike('complaint_category', '%praise%')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      const formattedData: CustomerFeedback[] = data?.map(item => ({
+        ...item,
+        resolution_status: item.resolution_status as CustomerFeedback['resolution_status'],
+        priority: item.priority as CustomerFeedback['priority']
+      })) || [];
+
+      setPraises(formattedData);
+    } catch (error) {
+      console.error('Error loading praises:', error);
+    }
+  };
+
   const handleEdit = (feedback: CustomerFeedback) => {
     setSelectedFeedback(feedback);
     setDetailsDialogOpen(true);
@@ -127,6 +153,9 @@ export default function GuestFeedbackManagement() {
     }
   };
 
+  const praiseIds = useMemo(() => praises.map(p => p.id), [praises]);
+  const { likes, userLikes, toggleLike } = useFeedbackLikes(praiseIds);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -150,6 +179,32 @@ export default function GuestFeedbackManagement() {
       </div>
 
       <CustomerFeedbackStats feedbacks={filteredFeedbacks} />
+
+      {/* Praise Section - visible to all */}
+      {praises.length > 0 && (
+        <Card className="border-amber-200/50 bg-gradient-to-r from-amber-50/50 to-transparent dark:from-amber-950/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
+              Recent Praise
+            </CardTitle>
+            <CardDescription>
+              Celebrating great service across all stores — double-tap to show some love!
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CustomerFeedbackTable
+              feedbacks={praises}
+              onEdit={handleEdit}
+              onViewDetails={handleViewDetails}
+              canEditCategory={false}
+              likes={likes}
+              userLikes={userLikes}
+              onToggleLike={toggleLike}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>
