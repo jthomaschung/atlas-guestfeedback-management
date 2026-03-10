@@ -231,6 +231,14 @@ function App() {
                 } 
               />
               <Route 
+                path="/open-feedback" 
+                element={
+                  <ProtectedRoute>
+                    <OpenFeedback />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
                 path="/praise-board" 
                 element={
                   <ProtectedRoute>

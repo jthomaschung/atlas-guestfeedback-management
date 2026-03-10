@@ -749,10 +749,9 @@ const Index = () => {
 
         <CustomerFeedbackTable
           feedbacks={filteredFeedbacks}
-          onEdit={handleEdit}
+          onEdit={handleViewDetails}
           onViewDetails={handleViewDetails}
-          onDelete={handleDelete}
-          isAdmin={true}
+          isAdmin={false}
         />
 
         <FeedbackDetailsDialog

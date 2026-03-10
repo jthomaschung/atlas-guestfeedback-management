@@ -30,6 +30,7 @@ const guestFeedbackItems = [
   { title: "Accuracy", url: "/accuracy", icon: Target },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Feedback Reporting", url: "/feedback-reporting", icon: TrendingUp },
+  { title: "Open Feedback", url: "/open-feedback", icon: Inbox },
   { title: "Praise Board", url: "/praise-board", icon: Star },
   { title: "Summary", url: "/summary", icon: BarChart3 },
 ];
