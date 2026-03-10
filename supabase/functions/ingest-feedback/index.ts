@@ -45,6 +45,11 @@ interface FeedbackWebhookData {
   period?: string
   time_of_day?: string
   order_number?: string
+
+  // New pipeline fields
+  type_of_feedback?: string
+  reward?: string
+  feedback_source?: string
 }
 
 // P1 2026 starts on 2025-12-31 - this is the cutoff for automatic period assignment
