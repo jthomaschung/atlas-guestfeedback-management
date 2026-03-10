@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { CustomerFeedback } from '@/types/feedback';
 import { CustomerFeedbackTable } from '@/components/feedback/CustomerFeedbackTable';
@@ -9,7 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { useFeedbackLikes } from '@/hooks/useFeedbackLikes';
+import { Loader2, Star } from 'lucide-react';
 
 export default function GuestFeedbackManagement() {
   const { user } = useAuth();
