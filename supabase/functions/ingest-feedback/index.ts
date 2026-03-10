@@ -45,6 +45,11 @@ interface FeedbackWebhookData {
   period?: string
   time_of_day?: string
   order_number?: string
+
+  // New pipeline fields
+  type_of_feedback?: string
+  reward?: string
+  feedback_source?: string
 }
 
 // P1 2026 starts on 2025-12-31 - this is the cutoff for automatic period assignment
@@ -89,13 +94,72 @@ async function lookupPeriodByDate(feedbackDate: string): Promise<string | null> 
   }
 }
 
+async function findDmForMarket(market: string): Promise<string> {
+  try {
+    const { data: marketDm } = await supabase
+      .from('user_hierarchy')
+      .select('user_id')
+      .eq('role', 'DM')
+      .limit(200)
+    
+    if (!marketDm || marketDm.length === 0) return 'Unassigned'
+
+    // Exact match first
+    for (const dm of marketDm) {
+      const [{ data: permissions }, { data: profile }] = await Promise.all([
+        supabase.from('user_permissions').select('markets').eq('user_id', dm.user_id).maybeSingle(),
+        supabase.from('profiles').select('email').eq('user_id', dm.user_id).maybeSingle(),
+      ])
+      const dmEmail = profile?.email || 'unknown'
+      if (permissions?.markets?.includes(market)) {
+        console.log(`Found DM for market ${market}: ${dmEmail}`)
+        return dmEmail
+      }
+    }
+
+    // Normalized match
+    const normalizedMarket = market.replace(/\s+/g, '').toUpperCase()
+    for (const dm of marketDm) {
+      const [{ data: permissions }, { data: profile }] = await Promise.all([
+        supabase.from('user_permissions').select('markets').eq('user_id', dm.user_id).maybeSingle(),
+        supabase.from('profiles').select('email').eq('user_id', dm.user_id).maybeSingle(),
+      ])
+      const dmEmail = profile?.email || 'unknown'
+      if (permissions?.markets) {
+        const hasMatch = permissions.markets.some((m: string) => 
+          m.replace(/\s+/g, '').toUpperCase() === normalizedMarket
+        )
+        if (hasMatch) {
+          console.log(`Found DM (normalized) for market ${market}: ${dmEmail}`)
+          return dmEmail
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error finding DM for market:', error)
+  }
+  return 'Unassigned'
+}
+
+async function findStoreAssignee(store_number: string): Promise<string> {
+  try {
+    console.log(`Looking for store email: store${store_number}@atlaswe.com`)
+    const { data: storeUser } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('email', `store${store_number}@atlaswe.com`)
+      .maybeSingle()
+    return storeUser?.email || 'Unassigned'
+  } catch (error) {
+    console.error('Error fetching store user:', error)
+    return 'Unassigned'
+  }
+}
+
 async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | null> {
   console.log('=== VALIDATION START ===')
   console.log('Input data keys:', Object.keys(data))
   console.log('Input data:', JSON.stringify(data, null, 2))
-  console.log('Raw complaint_category field:', data.complaint_category)
-  console.log('Raw feedback_text field:', data.feedback_text)
-  console.log('Raw complaint_text field:', data.complaint_text)
   
   // Basic data check
   if (!data || typeof data !== 'object') {
@@ -104,19 +168,21 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
   }
 
   // Handle missing required fields with reasonable defaults
-  const channel = data.channel || data.Source || 'qualtrics' // Map Source to channel
-  const feedback_date = data.feedback_date || data.Date || new Date().toISOString().split('T')[0] // Map Date to feedback_date
-  const complaint_category = data.complaint_category || data['Type of Complaint'] || 'Other' // Map field names
-  const store_number = data.store_number || data.Store || '000' // Map Store to store_number
-  const market = data.market || data.Market || 'Unknown' // Map Market to market
+  const channel = data.channel || data.Source || 'RAP'
+  const feedback_date = data.feedback_date || data.Date || new Date().toISOString().split('T')[0]
+  const complaint_category = data.complaint_category || data['Type of Complaint'] || 'Other'
+  const store_number = data.store_number || data.Store || '000'
+  const market = data.market || data.Market || 'Unknown'
+
+  // New pipeline fields
+  const type_of_feedback = data.type_of_feedback || data['Type of Feedback'] || null
+  const reward = data.reward || data.Reward || null
+  const feedback_source = data.feedback_source || data['Feedback Source'] || data.Source || channel
 
   // Generate case number if not provided
   const case_number = data.case_number || `CF-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`
   
   // Set priority based on exact complaint category mapping
-  let defaultPriority: 'Praise' | 'Low' | 'Medium' | 'High' | 'Critical' = 'Low'
-  
-  // Hardcoded priority mapping per user requirements - using case-insensitive matching
   const priorityMapping: Record<string, 'Praise' | 'Low' | 'Medium' | 'High' | 'Critical'> = {
     'sandwich made wrong': 'High',
     'slow service': 'Medium',
@@ -124,7 +190,7 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     'product issue': 'Low',
     'closed early': 'High',
     'praise': 'High',
-    'rockstar service': 'High', // Same as praise
+    'rockstar service': 'High',
     'missing item': 'High',
     'credit card issue': 'Low',
     'bread quality': 'Medium',
@@ -135,250 +201,105 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     'loyalty program issues': 'Low'
   }
   
-  // Use case-insensitive category match for priority assignment
   const categoryLower = complaint_category.toLowerCase()
-  defaultPriority = priorityMapping[categoryLower] || 'Low'
+  let defaultPriority: 'Praise' | 'Low' | 'Medium' | 'High' | 'Critical' = priorityMapping[categoryLower] || 'Low'
   
-  // Check feedback text for critical keywords (case-insensitive)
+  // Check feedback text for critical keywords
   const feedbackTextLower = (data.feedback_text || data.Feedback || data.complaint_text || '').toLowerCase()
   if (feedbackTextLower.includes('food poisoning')) {
-    console.log('🚨 CRITICAL: Food poisoning detected in feedback text - escalating to Critical priority')
+    console.log('🚨 CRITICAL: Food poisoning detected in feedback text')
     defaultPriority = 'Critical'
   }
   
-  // Determine assignee based on complaint category
+  // === NEW: type_of_feedback-driven routing ===
   let defaultAssignee = 'Unassigned'
-  
-  // Store level assignment - using case-insensitive matching
-  const storeLevelCategories = [
-    'sandwich made wrong', 
-    'praise', 
-    'missing item', 
-    'cleanliness'
-  ]
-  
-  // DM level assignment - using case-insensitive matching
-  const dmLevelCategories = [
-    'rude service', 
-    'out of product', 
-    'possible food poisoning',
-    'closed early'
-  ]
-  
-  // Guest feedback manager level assignment - using case-insensitive matching
-  const guestFeedbackCategories = [
-    'slow service',
-    'product issue',
-    'credit card issue', 
-    'bread quality',
-    'other',
-    'loyalty program issues'
-  ]
-  
-  if (storeLevelCategories.includes(categoryLower)) {
-    // Query for actual store user email from profiles
-    try {
-      console.log(`Looking for store email: store${store_number}@atlaswe.com`)
-      const { data: storeUser } = await supabase
-        .from('profiles')
-        .select('email')
-        .eq('email', `store${store_number}@atlaswe.com`)
-        .maybeSingle()
-      
-      console.log('Store user found:', storeUser)
-      
-      defaultAssignee = storeUser?.email || 'Unassigned'
-    } catch (error) {
-      console.error('Error fetching store user:', error)
-      defaultAssignee = 'Unassigned'
-    }
-  } else if (dmLevelCategories.includes(categoryLower)) {
-    // Find district manager who has access to this market
-    try {
-      const { data: marketDm } = await supabase
-        .from('user_hierarchy')
-        .select('user_id')
-        .eq('role', 'DM')
-        .limit(200) // Get all DMs, then filter by permissions
-      
-      if (marketDm && marketDm.length > 0) {
-        // Check each DM's permissions to find who has access to this market
-        console.log(`Looking for DM with access to market: ${market}`)
-        for (const dm of marketDm) {
-          const [{ data: permissions }, { data: profile }] = await Promise.all([
-            supabase
-              .from('user_permissions')
-              .select('markets')
-              .eq('user_id', dm.user_id)
-              .maybeSingle(),
-            supabase
-              .from('profiles')
-              .select('email')
-              .eq('user_id', dm.user_id)
-              .maybeSingle(),
-          ])
 
-          const dmEmail = profile?.email || 'unknown'
-          console.log(`DM ${dmEmail} has markets:`, permissions?.markets)
-          if (permissions?.markets?.includes(market)) {
-            console.log(`Found exact market match for DM: ${dmEmail}`)
-            defaultAssignee = dmEmail
-            break
-          }
-        }
-        
-        // If no exact match found, try normalized market names
-        if (defaultAssignee === 'Unassigned') {
-          console.log(`No exact market match found, trying normalized matching for market: ${market}`)
-          const normalizedMarket = market.replace(/\s+/g, '').toUpperCase()
-          for (const dm of marketDm) {
-            const [{ data: permissions }, { data: profile }] = await Promise.all([
-              supabase
-                .from('user_permissions')
-                .select('markets')
-                .eq('user_id', dm.user_id)
-                .maybeSingle(),
-              supabase
-                .from('profiles')
-                .select('email')
-                .eq('user_id', dm.user_id)
-                .maybeSingle(),
-            ])
+  if (type_of_feedback) {
+    const typeNormalized = type_of_feedback.trim().toLowerCase()
+    console.log(`🔀 ROUTING: type_of_feedback = "${type_of_feedback}" (normalized: "${typeNormalized}")`)
 
-            const dmEmail = profile?.email || 'unknown'
-            if (permissions?.markets) {
-              const hasMatchingMarket = permissions.markets.some((m: string) => {
-                const normalizedPermission = m.replace(/\s+/g, '').toUpperCase()
-                console.log(`Comparing ${normalizedMarket} with ${normalizedPermission} for DM: ${dmEmail}`)
-                return normalizedPermission === normalizedMarket
-              })
-              
-              if (hasMatchingMarket) {
-                console.log(`Found normalized market match for DM: ${dmEmail}`)
-                defaultAssignee = dmEmail
-                break
-              }
-            }
-          }
-        }
+    if (typeNormalized === 'fyi') {
+      // FYI: acknowledge-only, assign to guest feedback manager
+      defaultAssignee = 'guestfeedback@atlaswe.com'
+      console.log('📋 ROUTING: FYI type → guestfeedback@atlaswe.com')
+    } else if (typeNormalized === 'guest support') {
+      // Guest Support: route by category
+      const storeFollowUpCategories = ['order issue', 'cleanliness', 'closed early']
+      const autoEscalateCategories = ['out of product', 'rude service', 'possible food poisoning', 'rude']
+
+      if (storeFollowUpCategories.includes(categoryLower)) {
+        defaultAssignee = await findStoreAssignee(store_number)
+        console.log(`🏪 ROUTING: Guest Support + Store category → ${defaultAssignee}`)
+      } else if (autoEscalateCategories.includes(categoryLower)) {
+        defaultAssignee = await findDmForMarket(market)
+        console.log(`🚨 ROUTING: Guest Support + Escalate category → ${defaultAssignee}`)
+      } else {
+        defaultAssignee = 'guestfeedback@atlaswe.com'
+        console.log(`📬 ROUTING: Guest Support + GFM category → guestfeedback@atlaswe.com`)
       }
-    } catch (error) {
-      console.error('Error fetching district manager:', error)
-      defaultAssignee = 'Unassigned'
+    } else {
+      // Unknown type_of_feedback value, fallback to GFM
+      defaultAssignee = 'guestfeedback@atlaswe.com'
+      console.log(`⚠️ ROUTING: Unknown type "${type_of_feedback}" → guestfeedback@atlaswe.com`)
     }
-  } else if (guestFeedbackCategories.includes(categoryLower)) {
-    // Assign to guest feedback manager
-    defaultAssignee = 'guestfeedback@atlaswe.com'
   } else {
-    // Default fallback for any other categories
-    defaultAssignee = 'guestfeedback@atlaswe.com'
-  }
-  
-  // Override assignee if food poisoning detected in text - assign to DM
-  if (feedbackTextLower.includes('food poisoning')) {
-    try {
-      console.log('🚨 Food poisoning detected - attempting to assign to District Manager')
-      const { data: marketDm } = await supabase
-        .from('user_hierarchy')
-        .select('user_id')
-        .eq('role', 'DM')
-        .limit(200)
-      
-      if (marketDm && marketDm.length > 0) {
-        for (const dm of marketDm) {
-          const [{ data: permissions }, { data: profile }] = await Promise.all([
-            supabase
-              .from('user_permissions')
-              .select('markets')
-              .eq('user_id', dm.user_id)
-              .maybeSingle(),
-            supabase
-              .from('profiles')
-              .select('email')
-              .eq('user_id', dm.user_id)
-              .maybeSingle(),
-          ])
-
-          const dmEmail = profile?.email || 'unknown'
-          if (permissions?.markets?.includes(market)) {
-            console.log(`Assigned food poisoning case to DM: ${dmEmail}`)
-            defaultAssignee = dmEmail
-            break
-          }
-        }
-        
-        // Try normalized market match if no exact match
-        if (defaultAssignee === 'guestfeedback@atlaswe.com') {
-          const normalizedMarket = market.replace(/\s+/g, '').toUpperCase()
-          for (const dm of marketDm) {
-            const [{ data: permissions }, { data: profile }] = await Promise.all([
-              supabase
-                .from('user_permissions')
-                .select('markets')
-                .eq('user_id', dm.user_id)
-                .maybeSingle(),
-              supabase
-                .from('profiles')
-                .select('email')
-                .eq('user_id', dm.user_id)
-                .maybeSingle(),
-            ])
-
-            const dmEmail = profile?.email || 'unknown'
-            if (permissions?.markets) {
-              const hasMatchingMarket = permissions.markets.some((m: string) => {
-                const normalizedPermission = m.replace(/\s+/g, '').toUpperCase()
-                return normalizedPermission === normalizedMarket
-              })
-              
-              if (hasMatchingMarket) {
-                console.log(`Assigned food poisoning case to DM (normalized match): ${dmEmail}`)
-                defaultAssignee = dmEmail
-                break
-              }
-            }
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error assigning food poisoning case to DM:', error)
+    // === LEGACY: No type_of_feedback, use old category-based routing ===
+    console.log('🔀 ROUTING: No type_of_feedback, using legacy category routing')
+    
+    const storeLevelCategories = ['sandwich made wrong', 'praise', 'missing item', 'cleanliness']
+    const dmLevelCategories = ['rude service', 'out of product', 'possible food poisoning', 'closed early']
+    const guestFeedbackCategories = ['slow service', 'product issue', 'credit card issue', 'bread quality', 'other', 'loyalty program issues']
+    
+    if (storeLevelCategories.includes(categoryLower)) {
+      defaultAssignee = await findStoreAssignee(store_number)
+    } else if (dmLevelCategories.includes(categoryLower)) {
+      defaultAssignee = await findDmForMarket(market)
+    } else if (guestFeedbackCategories.includes(categoryLower)) {
+      defaultAssignee = 'guestfeedback@atlaswe.com'
+    } else {
+      defaultAssignee = 'guestfeedback@atlaswe.com'
+    }
+    
+    // Override for food poisoning in text
+    if (feedbackTextLower.includes('food poisoning')) {
+      console.log('🚨 Food poisoning detected - assigning to DM')
+      defaultAssignee = await findDmForMarket(market)
     }
   }
   
-  // Determine period - auto-calculate for P1 2026 onward
+  // Determine period
   let finalPeriod: string | null = null
   if (feedback_date >= P1_2026_START) {
-    // Auto-assign period based on feedback_date
     finalPeriod = await lookupPeriodByDate(feedback_date)
     console.log(`Auto-assigned period: ${finalPeriod}`)
   } else {
-    // For dates before P1 2026, use webhook value or null
     finalPeriod = data.period || data.Period || null
-    console.log(`Using webhook period (pre-2026): ${finalPeriod}`)
   }
   
   const validatedData = {
-    channel: channel, // Keep original channel value
+    channel: 'RAP', // Always normalize channel to RAP
     feedback_date,
-    complaint_category: complaint_category, // Keep original category exactly as received
+    complaint_category: complaint_category,
     feedback_text: data.feedback_text || data.Feedback || data.complaint_text || '',
     rating: data.rating ? parseInt(data.rating) : null,
     store_number,
     market,
     customer_name: data.customer_name || data.Name || null,
     customer_email: data.customer_email || data.Email || null,
-    customer_phone: data.customer_phone || data.Phone || data.ustomer_phone || null, // Handle field mapping
+    customer_phone: data.customer_phone || data.Phone || data.ustomer_phone || null,
     case_number,
     assignee: data.assignee || defaultAssignee,
     priority: data.priority || defaultPriority,
     ee_action: data.ee_action || data.Action || data['Action Item'] || null,
     period: finalPeriod,
     time_of_day: data.time_of_day || data['Time of Day'] || data.time || null,
-    order_number: data.order_number || data['Order Number'] || data.order || null
+    order_number: data.order_number || data['Order Number'] || data.order || null,
+    type_of_feedback: type_of_feedback,
+    reward: reward,
+    feedback_source: feedback_source,
   }
   
   console.log('=== VALIDATION SUCCESS ===')
-  console.log('Final complaint category:', complaint_category)
   console.log('Validated data:', JSON.stringify(validatedData, null, 2))
   
   return { ...validatedData, rating: validatedData.rating ?? undefined }
@@ -547,14 +468,20 @@ Deno.serve(async (req) => {
     // Try to insert into database
     console.log('Inserting into database...')
     
-    // Auto-escalate Critical priority feedback
-    const initialStatus = validatedData.priority === 'Critical' ? 'escalated' : 'unopened'
-    const escalatedAt = validatedData.priority === 'Critical' ? new Date().toISOString() : null
-    const slaDeadline = validatedData.priority === 'Critical' 
-      ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString() // 48 hours from now
+    // Auto-escalate: Critical priority OR Guest Support with escalate categories
+    const typeNorm = (validatedData.type_of_feedback || '').trim().toLowerCase()
+    const catNorm = validatedData.complaint_category.toLowerCase()
+    const autoEscalateCategories = ['out of product', 'rude service', 'possible food poisoning', 'rude']
+    const shouldEscalate = validatedData.priority === 'Critical' || 
+      (typeNorm === 'guest support' && autoEscalateCategories.includes(catNorm))
+    
+    const initialStatus = shouldEscalate ? 'escalated' : 'unopened'
+    const escalatedAt = shouldEscalate ? new Date().toISOString() : null
+    const slaDeadline = shouldEscalate 
+      ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
       : null
     
-    console.log(`Priority: ${validatedData.priority}, Status: ${initialStatus}, Auto-escalated: ${validatedData.priority === 'Critical'}`)
+    console.log(`Priority: ${validatedData.priority}, Status: ${initialStatus}, Auto-escalated: ${shouldEscalate}`)
     
     const { data: insertedData, error: insertError } = await supabase
       .from('customer_feedback')
@@ -573,14 +500,17 @@ Deno.serve(async (req) => {
         feedback_text: validatedData.feedback_text,
         priority: validatedData.priority,
         assignee: validatedData.assignee,
-        user_id: '00000000-0000-0000-0000-000000000000', // System user
+        user_id: '00000000-0000-0000-0000-000000000000',
         escalated_at: escalatedAt,
         sla_deadline: slaDeadline,
-        auto_escalated: validatedData.priority === 'Critical',
+        auto_escalated: shouldEscalate,
         ee_action: validatedData.ee_action,
         period: validatedData.period,
         time_of_day: validatedData.time_of_day,
-        order_number: validatedData.order_number
+        order_number: validatedData.order_number,
+        type_of_feedback: validatedData.type_of_feedback,
+        reward: validatedData.reward,
+        feedback_source: validatedData.feedback_source,
       })
       .select()
       .single()

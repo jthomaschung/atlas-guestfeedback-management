@@ -1023,78 +1023,141 @@ export type Database = {
       }
       catering_leads: {
         Row: {
+          address: string | null
           assigned_to: string | null
+          budget: number | null
           campaign_id: string | null
           campaign_slug: string | null
           company_name: string | null
           contacted_at: string | null
           converted_at: string | null
           created_at: string | null
+          delivery_address: string | null
+          delivery_time_type: string | null
+          dietary_restrictions: string | null
           email: string
           estimated_order_value: number | null
+          event_date: string | null
           event_type: string | null
           expected_close_date: string | null
+          frequency: string | null
+          headcount: number | null
           id: string
           last_interaction_at: string | null
           lead_score: number | null
+          lead_source: string | null
+          market: string | null
           marketing_consent: boolean | null
           message: string | null
           name: string
           next_callback_at: string | null
+          next_follow_up_date: string | null
           notes: string | null
+          onsite_contact_name: string | null
+          onsite_contact_phone: string | null
+          other_decision_makers: string | null
+          payment_method: string | null
           phone: string
+          primary_contact_name: string | null
+          service_type: string | null
+          setup_type: string | null
           source: string | null
           status: string | null
+          store_number: string | null
+          swag_notes: string | null
+          swag_sent: boolean | null
           updated_at: string | null
         }
         Insert: {
+          address?: string | null
           assigned_to?: string | null
+          budget?: number | null
           campaign_id?: string | null
           campaign_slug?: string | null
           company_name?: string | null
           contacted_at?: string | null
           converted_at?: string | null
           created_at?: string | null
+          delivery_address?: string | null
+          delivery_time_type?: string | null
+          dietary_restrictions?: string | null
           email: string
           estimated_order_value?: number | null
+          event_date?: string | null
           event_type?: string | null
           expected_close_date?: string | null
+          frequency?: string | null
+          headcount?: number | null
           id?: string
           last_interaction_at?: string | null
           lead_score?: number | null
+          lead_source?: string | null
+          market?: string | null
           marketing_consent?: boolean | null
           message?: string | null
           name: string
           next_callback_at?: string | null
+          next_follow_up_date?: string | null
           notes?: string | null
+          onsite_contact_name?: string | null
+          onsite_contact_phone?: string | null
+          other_decision_makers?: string | null
+          payment_method?: string | null
           phone: string
+          primary_contact_name?: string | null
+          service_type?: string | null
+          setup_type?: string | null
           source?: string | null
           status?: string | null
+          store_number?: string | null
+          swag_notes?: string | null
+          swag_sent?: boolean | null
           updated_at?: string | null
         }
         Update: {
+          address?: string | null
           assigned_to?: string | null
+          budget?: number | null
           campaign_id?: string | null
           campaign_slug?: string | null
           company_name?: string | null
           contacted_at?: string | null
           converted_at?: string | null
           created_at?: string | null
+          delivery_address?: string | null
+          delivery_time_type?: string | null
+          dietary_restrictions?: string | null
           email?: string
           estimated_order_value?: number | null
+          event_date?: string | null
           event_type?: string | null
           expected_close_date?: string | null
+          frequency?: string | null
+          headcount?: number | null
           id?: string
           last_interaction_at?: string | null
           lead_score?: number | null
+          lead_source?: string | null
+          market?: string | null
           marketing_consent?: boolean | null
           message?: string | null
           name?: string
           next_callback_at?: string | null
+          next_follow_up_date?: string | null
           notes?: string | null
+          onsite_contact_name?: string | null
+          onsite_contact_phone?: string | null
+          other_decision_makers?: string | null
+          payment_method?: string | null
           phone?: string
+          primary_contact_name?: string | null
+          service_type?: string | null
+          setup_type?: string | null
           source?: string | null
           status?: string | null
+          store_number?: string | null
+          swag_notes?: string | null
+          swag_sent?: boolean | null
           updated_at?: string | null
         }
         Relationships: [
@@ -1650,6 +1713,7 @@ export type Database = {
           escalated_by: string | null
           executive_notes: string | null
           feedback_date: string
+          feedback_source: string | null
           feedback_text: string | null
           id: string
           market: string
@@ -1662,9 +1726,11 @@ export type Database = {
           ready_for_dm_resolution: boolean | null
           resolution_notes: string | null
           resolution_status: string | null
+          reward: string | null
           sla_deadline: string | null
           store_number: string
           time_of_day: string | null
+          type_of_feedback: string | null
           updated_at: string
           user_id: string
           viewed: boolean | null
@@ -1693,6 +1759,7 @@ export type Database = {
           escalated_by?: string | null
           executive_notes?: string | null
           feedback_date: string
+          feedback_source?: string | null
           feedback_text?: string | null
           id?: string
           market: string
@@ -1705,9 +1772,11 @@ export type Database = {
           ready_for_dm_resolution?: boolean | null
           resolution_notes?: string | null
           resolution_status?: string | null
+          reward?: string | null
           sla_deadline?: string | null
           store_number: string
           time_of_day?: string | null
+          type_of_feedback?: string | null
           updated_at?: string
           user_id: string
           viewed?: boolean | null
@@ -1736,6 +1805,7 @@ export type Database = {
           escalated_by?: string | null
           executive_notes?: string | null
           feedback_date?: string
+          feedback_source?: string | null
           feedback_text?: string | null
           id?: string
           market?: string
@@ -1748,9 +1818,11 @@ export type Database = {
           ready_for_dm_resolution?: boolean | null
           resolution_notes?: string | null
           resolution_status?: string | null
+          reward?: string | null
           sla_deadline?: string | null
           store_number?: string
           time_of_day?: string | null
+          type_of_feedback?: string | null
           updated_at?: string
           user_id?: string
           viewed?: boolean | null
@@ -2458,6 +2530,45 @@ export type Database = {
           submitted_by_name?: string | null
           success?: boolean
           user_agent?: string | null
+        }
+        Relationships: []
+      }
+      dm_observation_notifications: {
+        Row: {
+          completion_pct: number
+          created_at: string
+          dm_email: string | null
+          email_status: string
+          employee_name: string
+          error_message: string | null
+          id: string
+          sent_at: string | null
+          store_number: string
+          training: string
+        }
+        Insert: {
+          completion_pct: number
+          created_at?: string
+          dm_email?: string | null
+          email_status?: string
+          employee_name: string
+          error_message?: string | null
+          id?: string
+          sent_at?: string | null
+          store_number: string
+          training: string
+        }
+        Update: {
+          completion_pct?: number
+          created_at?: string
+          dm_email?: string | null
+          email_status?: string
+          employee_name?: string
+          error_message?: string | null
+          id?: string
+          sent_at?: string | null
+          store_number?: string
+          training?: string
         }
         Relationships: []
       }
@@ -3185,6 +3296,9 @@ export type Database = {
           ada_process_at: string | null
           ada_process_by: string | null
           ada_process_started: boolean | null
+          calculate_overpayment_at: string | null
+          calculate_overpayment_by: string | null
+          calculate_overpayment_completed: boolean | null
           claimant_interview_at: string | null
           claimant_interview_by: string | null
           claimant_interview_completed: boolean | null
@@ -3192,6 +3306,12 @@ export type Database = {
           claimant_interview_na_at: string | null
           claimant_interview_na_by: string | null
           claimant_interview_na_reason: string | null
+          confirm_adp_status_at: string | null
+          confirm_adp_status_by: string | null
+          confirm_adp_status_completed: boolean | null
+          contact_employee_repayment_at: string | null
+          contact_employee_repayment_by: string | null
+          contact_employee_repayment_completed: boolean | null
           corrective_action_at: string | null
           corrective_action_by: string | null
           corrective_action_completed: boolean | null
@@ -3243,6 +3363,8 @@ export type Database = {
           outcome_determined_at: string | null
           outcome_determined_by: string | null
           outcome_determined_completed: boolean | null
+          overpayment_amount: number | null
+          overpayment_payment_made: boolean | null
           policy_compliance_at: string | null
           policy_compliance_by: string | null
           policy_compliance_verified: boolean | null
@@ -3272,6 +3394,9 @@ export type Database = {
           safety_resolved_confirmed: boolean | null
           safety_resolved_notes: string | null
           updated_at: string | null
+          verify_with_payroll_at: string | null
+          verify_with_payroll_by: string | null
+          verify_with_payroll_completed: boolean | null
           witness_interview_na: boolean | null
           witness_interview_na_at: string | null
           witness_interview_na_by: string | null
@@ -3284,6 +3409,9 @@ export type Database = {
           ada_process_at?: string | null
           ada_process_by?: string | null
           ada_process_started?: boolean | null
+          calculate_overpayment_at?: string | null
+          calculate_overpayment_by?: string | null
+          calculate_overpayment_completed?: boolean | null
           claimant_interview_at?: string | null
           claimant_interview_by?: string | null
           claimant_interview_completed?: boolean | null
@@ -3291,6 +3419,12 @@ export type Database = {
           claimant_interview_na_at?: string | null
           claimant_interview_na_by?: string | null
           claimant_interview_na_reason?: string | null
+          confirm_adp_status_at?: string | null
+          confirm_adp_status_by?: string | null
+          confirm_adp_status_completed?: boolean | null
+          contact_employee_repayment_at?: string | null
+          contact_employee_repayment_by?: string | null
+          contact_employee_repayment_completed?: boolean | null
           corrective_action_at?: string | null
           corrective_action_by?: string | null
           corrective_action_completed?: boolean | null
@@ -3342,6 +3476,8 @@ export type Database = {
           outcome_determined_at?: string | null
           outcome_determined_by?: string | null
           outcome_determined_completed?: boolean | null
+          overpayment_amount?: number | null
+          overpayment_payment_made?: boolean | null
           policy_compliance_at?: string | null
           policy_compliance_by?: string | null
           policy_compliance_verified?: boolean | null
@@ -3371,6 +3507,9 @@ export type Database = {
           safety_resolved_confirmed?: boolean | null
           safety_resolved_notes?: string | null
           updated_at?: string | null
+          verify_with_payroll_at?: string | null
+          verify_with_payroll_by?: string | null
+          verify_with_payroll_completed?: boolean | null
           witness_interview_na?: boolean | null
           witness_interview_na_at?: string | null
           witness_interview_na_by?: string | null
@@ -3383,6 +3522,9 @@ export type Database = {
           ada_process_at?: string | null
           ada_process_by?: string | null
           ada_process_started?: boolean | null
+          calculate_overpayment_at?: string | null
+          calculate_overpayment_by?: string | null
+          calculate_overpayment_completed?: boolean | null
           claimant_interview_at?: string | null
           claimant_interview_by?: string | null
           claimant_interview_completed?: boolean | null
@@ -3390,6 +3532,12 @@ export type Database = {
           claimant_interview_na_at?: string | null
           claimant_interview_na_by?: string | null
           claimant_interview_na_reason?: string | null
+          confirm_adp_status_at?: string | null
+          confirm_adp_status_by?: string | null
+          confirm_adp_status_completed?: boolean | null
+          contact_employee_repayment_at?: string | null
+          contact_employee_repayment_by?: string | null
+          contact_employee_repayment_completed?: boolean | null
           corrective_action_at?: string | null
           corrective_action_by?: string | null
           corrective_action_completed?: boolean | null
@@ -3441,6 +3589,8 @@ export type Database = {
           outcome_determined_at?: string | null
           outcome_determined_by?: string | null
           outcome_determined_completed?: boolean | null
+          overpayment_amount?: number | null
+          overpayment_payment_made?: boolean | null
           policy_compliance_at?: string | null
           policy_compliance_by?: string | null
           policy_compliance_verified?: boolean | null
@@ -3470,6 +3620,9 @@ export type Database = {
           safety_resolved_confirmed?: boolean | null
           safety_resolved_notes?: string | null
           updated_at?: string | null
+          verify_with_payroll_at?: string | null
+          verify_with_payroll_by?: string | null
+          verify_with_payroll_completed?: boolean | null
           witness_interview_na?: boolean | null
           witness_interview_na_at?: string | null
           witness_interview_na_by?: string | null
@@ -3781,6 +3934,51 @@ export type Database = {
           },
         ]
       }
+      house_account_credits: {
+        Row: {
+          business_date: string
+          created_at: string
+          customer_name: string | null
+          id: string
+          order_id: string | null
+          payment_amount: number
+          payment_id: number | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          store_number: string
+        }
+        Insert: {
+          business_date: string
+          created_at?: string
+          customer_name?: string | null
+          id?: string
+          order_id?: string | null
+          payment_amount: number
+          payment_id?: number | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          store_number: string
+        }
+        Update: {
+          business_date?: string
+          created_at?: string
+          customer_name?: string | null
+          id?: string
+          order_id?: string | null
+          payment_amount?: number
+          payment_id?: number | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          store_number?: string
+        }
+        Relationships: []
+      }
       house_account_customers: {
         Row: {
           created_at: string | null
@@ -3826,6 +4024,176 @@ export type Database = {
           status?: string | null
           store_number?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      house_account_invoice_items: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          description: string | null
+          id: number
+          invoice_date: string | null
+          invoice_number: string
+          is_sub_item: boolean | null
+          price_each: number | null
+          quantity: number | null
+          store_number: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          invoice_date?: string | null
+          invoice_number: string
+          is_sub_item?: boolean | null
+          price_each?: number | null
+          quantity?: number | null
+          store_number?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          invoice_date?: string | null
+          invoice_number?: string
+          is_sub_item?: boolean | null
+          price_each?: number | null
+          quantity?: number | null
+          store_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "house_account_invoice_items_invoice_number_fkey"
+            columns: ["invoice_number"]
+            isOneToOne: false
+            referencedRelation: "house_account_invoices"
+            referencedColumns: ["invoice_number"]
+          },
+        ]
+      }
+      house_account_invoices: {
+        Row: {
+          customer_address: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          del_charge: number | null
+          delay_date: string | null
+          discounts: number | null
+          id: number
+          invoice_date: string | null
+          invoice_number: string
+          parsed_at: string | null
+          sales_tax: number | null
+          source_file: string | null
+          store_address: string | null
+          store_number: string
+          store_phone: string | null
+          subtotal: number | null
+          total: number | null
+        }
+        Insert: {
+          customer_address?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          del_charge?: number | null
+          delay_date?: string | null
+          discounts?: number | null
+          id?: number
+          invoice_date?: string | null
+          invoice_number: string
+          parsed_at?: string | null
+          sales_tax?: number | null
+          source_file?: string | null
+          store_address?: string | null
+          store_number: string
+          store_phone?: string | null
+          subtotal?: number | null
+          total?: number | null
+        }
+        Update: {
+          customer_address?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          del_charge?: number | null
+          delay_date?: string | null
+          discounts?: number | null
+          id?: number
+          invoice_date?: string | null
+          invoice_number?: string
+          parsed_at?: string | null
+          sales_tax?: number | null
+          source_file?: string | null
+          store_address?: string | null
+          store_number?: string
+          store_phone?: string | null
+          subtotal?: number | null
+          total?: number | null
+        }
+        Relationships: []
+      }
+      house_account_payments: {
+        Row: {
+          address: string | null
+          balance: number | null
+          bus_date: string | null
+          cust_id: string | null
+          customer_name: string | null
+          grand_total: number | null
+          id: number
+          order_id: string | null
+          order_total: number | null
+          parsed_at: string | null
+          payments: number | null
+          phone: string | null
+          report_date_from: string | null
+          report_date_to: string | null
+          report_generated_at: string | null
+          source_file: string | null
+          store_number: string
+          trans_desc: string | null
+        }
+        Insert: {
+          address?: string | null
+          balance?: number | null
+          bus_date?: string | null
+          cust_id?: string | null
+          customer_name?: string | null
+          grand_total?: number | null
+          id?: number
+          order_id?: string | null
+          order_total?: number | null
+          parsed_at?: string | null
+          payments?: number | null
+          phone?: string | null
+          report_date_from?: string | null
+          report_date_to?: string | null
+          report_generated_at?: string | null
+          source_file?: string | null
+          store_number: string
+          trans_desc?: string | null
+        }
+        Update: {
+          address?: string | null
+          balance?: number | null
+          bus_date?: string | null
+          cust_id?: string | null
+          customer_name?: string | null
+          grand_total?: number | null
+          id?: number
+          order_id?: string | null
+          order_total?: number | null
+          parsed_at?: string | null
+          payments?: number | null
+          phone?: string | null
+          report_date_from?: string | null
+          report_date_to?: string | null
+          report_generated_at?: string | null
+          source_file?: string | null
+          store_number?: string
+          trans_desc?: string | null
         }
         Relationships: []
       }
@@ -5461,6 +5829,8 @@ export type Database = {
           emergency_contacts_completed_at: string | null
           fast_track_complete: boolean | null
           fast_track_completed_at: string | null
+          fast_track_login: string | null
+          fast_track_password: string | null
           fhc_complete: boolean | null
           fhc_completed_at: string | null
           handbook_signed: boolean | null
@@ -5488,6 +5858,8 @@ export type Database = {
           insurance_card_verified_at: string | null
           insurance_info_verified: boolean | null
           insurance_info_verified_at: string | null
+          makeshift_login: string | null
+          makeshift_password: string | null
           makeshift_sent: boolean | null
           makeshift_sent_at: string | null
           mvr_approved: boolean | null
@@ -5543,6 +5915,8 @@ export type Database = {
           emergency_contacts_completed_at?: string | null
           fast_track_complete?: boolean | null
           fast_track_completed_at?: string | null
+          fast_track_login?: string | null
+          fast_track_password?: string | null
           fhc_complete?: boolean | null
           fhc_completed_at?: string | null
           handbook_signed?: boolean | null
@@ -5570,6 +5944,8 @@ export type Database = {
           insurance_card_verified_at?: string | null
           insurance_info_verified?: boolean | null
           insurance_info_verified_at?: string | null
+          makeshift_login?: string | null
+          makeshift_password?: string | null
           makeshift_sent?: boolean | null
           makeshift_sent_at?: string | null
           mvr_approved?: boolean | null
@@ -5625,6 +6001,8 @@ export type Database = {
           emergency_contacts_completed_at?: string | null
           fast_track_complete?: boolean | null
           fast_track_completed_at?: string | null
+          fast_track_login?: string | null
+          fast_track_password?: string | null
           fhc_complete?: boolean | null
           fhc_completed_at?: string | null
           handbook_signed?: boolean | null
@@ -5652,6 +6030,8 @@ export type Database = {
           insurance_card_verified_at?: string | null
           insurance_info_verified?: boolean | null
           insurance_info_verified_at?: string | null
+          makeshift_login?: string | null
+          makeshift_password?: string | null
           makeshift_sent?: boolean | null
           makeshift_sent_at?: string | null
           mvr_approved?: boolean | null
@@ -5733,6 +6113,7 @@ export type Database = {
           policy_expiration_date: string | null
           policy_number: string | null
           position: string
+          preferred_name: string | null
           referral_name: string | null
           same_day_hire: boolean
           security_clearance_notes: string | null
@@ -5797,6 +6178,7 @@ export type Database = {
           policy_expiration_date?: string | null
           policy_number?: string | null
           position: string
+          preferred_name?: string | null
           referral_name?: string | null
           same_day_hire?: boolean
           security_clearance_notes?: string | null
@@ -5861,6 +6243,7 @@ export type Database = {
           policy_expiration_date?: string | null
           policy_number?: string | null
           position?: string
+          preferred_name?: string | null
           referral_name?: string | null
           same_day_hire?: boolean
           security_clearance_notes?: string | null
@@ -6284,11 +6667,54 @@ export type Database = {
         }
         Relationships: []
       }
+      payroll_report_uploads: {
+        Row: {
+          acknowledged_count: number
+          completion_rate: number
+          created_at: string
+          file_name: string
+          id: string
+          markets: string[] | null
+          pending_count: number
+          policies: string[] | null
+          total_records: number
+          uploaded_by: string | null
+          uploaded_by_name: string | null
+        }
+        Insert: {
+          acknowledged_count?: number
+          completion_rate?: number
+          created_at?: string
+          file_name: string
+          id?: string
+          markets?: string[] | null
+          pending_count?: number
+          policies?: string[] | null
+          total_records?: number
+          uploaded_by?: string | null
+          uploaded_by_name?: string | null
+        }
+        Update: {
+          acknowledged_count?: number
+          completion_rate?: number
+          created_at?: string
+          file_name?: string
+          id?: string
+          markets?: string[] | null
+          pending_count?: number
+          policies?: string[] | null
+          total_records?: number
+          uploaded_by?: string | null
+          uploaded_by_name?: string | null
+        }
+        Relationships: []
+      }
       payroll_ticket_comments: {
         Row: {
           attachments: Json | null
           content: string
           created_at: string
+          created_by_email: string | null
           id: string
           is_internal: boolean
           parent_id: string | null
@@ -6300,6 +6726,7 @@ export type Database = {
           attachments?: Json | null
           content: string
           created_at?: string
+          created_by_email?: string | null
           id?: string
           is_internal?: boolean
           parent_id?: string | null
@@ -6311,6 +6738,7 @@ export type Database = {
           attachments?: Json | null
           content?: string
           created_at?: string
+          created_by_email?: string | null
           id?: string
           is_internal?: boolean
           parent_id?: string | null
@@ -6782,6 +7210,47 @@ export type Database = {
           },
         ]
       }
+      position_pay_grades: {
+        Row: {
+          created_at: string
+          id: string
+          max_pay: number
+          min_pay: number
+          pay_type: string
+          position_id: string
+          state: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          max_pay: number
+          min_pay: number
+          pay_type?: string
+          position_id: string
+          state: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          max_pay?: number
+          min_pay?: number
+          pay_type?: string
+          position_id?: string
+          state?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "position_pay_grades_position_id_fkey"
+            columns: ["position_id"]
+            isOneToOne: false
+            referencedRelation: "positions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       position_systems_requirements: {
         Row: {
           created_at: string | null
@@ -6929,7 +7398,9 @@ export type Database = {
           first_name: string | null
           id: string
           is_active: boolean
+          last_active_at: string | null
           last_name: string | null
+          last_sign_in_at: string | null
           slack_user_id: string | null
           store_id: number | null
           updated_at: string
@@ -6942,7 +7413,9 @@ export type Database = {
           first_name?: string | null
           id?: string
           is_active?: boolean
+          last_active_at?: string | null
           last_name?: string | null
+          last_sign_in_at?: string | null
           slack_user_id?: string | null
           store_id?: number | null
           updated_at?: string
@@ -6955,7 +7428,9 @@ export type Database = {
           first_name?: string | null
           id?: string
           is_active?: boolean
+          last_active_at?: string | null
           last_name?: string | null
+          last_sign_in_at?: string | null
           slack_user_id?: string | null
           store_id?: number | null
           updated_at?: string
@@ -8229,7 +8704,7 @@ export type Database = {
       }
       variance_flags: {
         Row: {
-          actual_amount: number
+          actual_amount: number | null
           business_date: string
           cash_deposit_id: string | null
           created_at: string | null
@@ -8240,20 +8715,20 @@ export type Database = {
           reviewed_at: string | null
           reviewed_by_name: string | null
           reviewed_by_user_id: string | null
-          severity: string
+          severity: string | null
           shift_deposit_id: string | null
-          status: string
+          status: string | null
           store_number: string
-          triggered_threshold: number
+          triggered_threshold: number | null
           updated_at: string | null
-          variance_amount: number
+          variance_amount: number | null
           variance_category: string | null
           variance_explanation: string | null
           variance_percentage: number | null
-          variance_type: string
+          variance_type: string | null
         }
         Insert: {
-          actual_amount: number
+          actual_amount?: number | null
           business_date: string
           cash_deposit_id?: string | null
           created_at?: string | null
@@ -8264,20 +8739,20 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by_name?: string | null
           reviewed_by_user_id?: string | null
-          severity: string
+          severity?: string | null
           shift_deposit_id?: string | null
-          status?: string
+          status?: string | null
           store_number: string
-          triggered_threshold: number
+          triggered_threshold?: number | null
           updated_at?: string | null
-          variance_amount: number
+          variance_amount?: number | null
           variance_category?: string | null
           variance_explanation?: string | null
           variance_percentage?: number | null
-          variance_type?: string
+          variance_type?: string | null
         }
         Update: {
-          actual_amount?: number
+          actual_amount?: number | null
           business_date?: string
           cash_deposit_id?: string | null
           created_at?: string | null
@@ -8288,17 +8763,17 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by_name?: string | null
           reviewed_by_user_id?: string | null
-          severity?: string
+          severity?: string | null
           shift_deposit_id?: string | null
-          status?: string
+          status?: string | null
           store_number?: string
-          triggered_threshold?: number
+          triggered_threshold?: number | null
           updated_at?: string | null
-          variance_amount?: number
+          variance_amount?: number | null
           variance_category?: string | null
           variance_explanation?: string | null
           variance_percentage?: number | null
-          variance_type?: string
+          variance_type?: string | null
         }
         Relationships: [
           {
@@ -9409,6 +9884,42 @@ export type Database = {
           },
         ]
       }
+      house_account_open_balances: {
+        Row: {
+          balance: number | null
+          bus_date: string | null
+          customer_name: string | null
+          order_id: string | null
+          order_total: number | null
+          payments: number | null
+          phone: string | null
+          store_number: string | null
+          trans_desc: string | null
+        }
+        Insert: {
+          balance?: number | null
+          bus_date?: string | null
+          customer_name?: string | null
+          order_id?: string | null
+          order_total?: number | null
+          payments?: number | null
+          phone?: string | null
+          store_number?: string | null
+          trans_desc?: string | null
+        }
+        Update: {
+          balance?: number | null
+          bus_date?: string | null
+          customer_name?: string | null
+          order_id?: string | null
+          order_total?: number | null
+          payments?: number | null
+          phone?: string | null
+          store_number?: string | null
+          trans_desc?: string | null
+        }
+        Relationships: []
+      }
       v_daily_deposit_tracking: {
         Row: {
           actual_total: number | null
@@ -9448,6 +9959,8 @@ export type Database = {
           daily_actual: number | null
           daily_expected: number | null
           expectation_variance: number | null
+          ha_credit: number | null
+          ha_pending_count: number | null
           overall_status: string | null
           pm_actual: number | null
           pm_expected: number | null
@@ -10533,11 +11046,11 @@ export type Database = {
           display_name: string
           email: string
           first_name: string
+          hierarchy_role: string
+          last_active_at: string
           last_name: string
-          portal_count: number
           role_display_name: string
           role_id: string
-          role_name: string
           total_count: number
           user_id: string
         }[]
@@ -10670,6 +11183,7 @@ export type Database = {
         Args: { id_a: string; id_b: string }
         Returns: undefined
       }
+      touch_last_active: { Args: never; Returns: undefined }
       user_has_market_access: {
         Args: { target_market: string; user_id: string }
         Returns: boolean
