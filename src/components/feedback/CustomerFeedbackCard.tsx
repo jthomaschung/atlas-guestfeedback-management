@@ -83,7 +83,10 @@ export function CustomerFeedbackCard({
   onDelete, 
   onCategoryChange,
   isAdmin, 
-  canEditCategory = false 
+  canEditCategory = false,
+  likeCount = 0,
+  isLiked = false,
+  onToggleLike,
 }: CustomerFeedbackCardProps) {
   const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
   const [isUpdatingCalled, setIsUpdatingCalled] = useState(false);
