@@ -87,6 +87,29 @@ export default function GuestFeedbackManagement() {
     }
   };
 
+  const loadPraises = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('customer_feedback')
+        .select('*')
+        .ilike('complaint_category', '%praise%')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      const formattedData: CustomerFeedback[] = data?.map(item => ({
+        ...item,
+        resolution_status: item.resolution_status as CustomerFeedback['resolution_status'],
+        priority: item.priority as CustomerFeedback['priority']
+      })) || [];
+
+      setPraises(formattedData);
+    } catch (error) {
+      console.error('Error loading praises:', error);
+    }
+  };
+
   const handleEdit = (feedback: CustomerFeedback) => {
     setSelectedFeedback(feedback);
     setDetailsDialogOpen(true);
