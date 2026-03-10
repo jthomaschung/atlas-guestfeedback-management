@@ -153,6 +153,9 @@ export default function GuestFeedbackManagement() {
     }
   };
 
+  const praiseIds = useMemo(() => praises.map(p => p.id), [praises]);
+  const { likes, userLikes, toggleLike } = useFeedbackLikes(praiseIds);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -176,6 +179,32 @@ export default function GuestFeedbackManagement() {
       </div>
 
       <CustomerFeedbackStats feedbacks={filteredFeedbacks} />
+
+      {/* Praise Section - visible to all */}
+      {praises.length > 0 && (
+        <Card className="border-amber-200/50 bg-gradient-to-r from-amber-50/50 to-transparent dark:from-amber-950/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
+              Recent Praise
+            </CardTitle>
+            <CardDescription>
+              Celebrating great service across all stores — double-tap to show some love!
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CustomerFeedbackTable
+              feedbacks={praises}
+              onEdit={handleEdit}
+              onViewDetails={handleViewDetails}
+              canEditCategory={false}
+              likes={likes}
+              userLikes={userLikes}
+              onToggleLike={toggleLike}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>
