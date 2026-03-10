@@ -755,6 +755,9 @@ const Index = () => {
           onEdit={handleViewDetails}
           onViewDetails={handleViewDetails}
           isAdmin={false}
+          likes={likes}
+          userLikes={userLikes}
+          onToggleLike={toggleLike}
         />
 
         <FeedbackDetailsDialog
