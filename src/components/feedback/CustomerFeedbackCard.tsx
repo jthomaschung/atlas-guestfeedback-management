@@ -20,6 +20,9 @@ interface CustomerFeedbackCardProps {
   onCategoryChange?: (feedback: CustomerFeedback, newCategory: string) => void;
   isAdmin?: boolean;
   canEditCategory?: boolean;
+  likeCount?: number;
+  isLiked?: boolean;
+  onToggleLike?: (feedbackId: string) => void;
 }
 
 const statusColors = {
