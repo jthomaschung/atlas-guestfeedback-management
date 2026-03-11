@@ -86,59 +86,38 @@ const channelLabels = {
 
 // Helper function to determine assignee based on category, store, and market
 const getAssigneeForFeedback = async (storeNumber: string, market: string, category: string): Promise<string> => {
-  console.log('🔍 ASSIGNMENT: Looking up assignee for', { storeNumber, market, category });
+  const normalizedCategory = category.toLowerCase().trim().replace(/\s+/g, ' ');
+  console.log('🔍 ASSIGNMENT: Looking up assignee for', { storeNumber, market, category, normalizedCategory });
 
-  try {
-    // Get the store manager first
-    const { data: storeData } = await supabase
-      .from('stores')
-      .select('manager')
-      .eq('store_number', storeNumber)
-      .maybeSingle();
+  const storeFollowUpCategories = [
+    'sandwich made wrong',
+    'missing item',
+    'missing items',
+    'sandwich issue',
+    'order issue',
+    'order accuracy',
+    'cleanliness',
+    'closed early'
+  ];
 
-    const storeManager = storeData?.manager;
-    console.log('🏪 ASSIGNMENT: Store manager found:', storeManager);
+  const autoEscalateCategories = ['out of product', 'rude service', 'possible food poisoning', 'oop'];
 
-    // Special handling for Praise and Rockstar Service categories - assign to store manager if available
-    if (category === 'Praise' || category?.toLowerCase() === 'rockstar service') {
-      if (storeManager && storeManager.trim() !== '') {
-        console.log('👏 ASSIGNMENT: Assigning praise/rockstar service to store manager:', storeManager);
-        return storeManager;
-      }
-    }
+  if (storeFollowUpCategories.includes(normalizedCategory)) {
+    const storeEmail = `store${storeNumber}@atlaswe.com`;
+    console.log('🏪 ASSIGNMENT: Store follow-up category, assigning to', storeEmail);
+    return storeEmail;
+  }
 
-    // Categories that should go to store managers
-    const storeManagerCategories = [
-      'Sandwich Made wrong', 'Slow Service', 'Rude Service', 'Missing Item',
-      'Cleanliness', 'Food Quality', 'Staff Service', 'Store Appearance',
-      'Wait Time', 'Order Accuracy', 'Temperature', 'Quantity', 'Experience',
-      'Training', 'Manager/Supervisor Contact Request'
-    ];
+  if (autoEscalateCategories.includes(normalizedCategory)) {
+    try {
+      console.log('📊 ASSIGNMENT: Auto-escalate category, looking for DM in market:', market);
 
-    if (storeManagerCategories.includes(category)) {
-      if (storeManager && storeManager.trim() !== '') {
-        console.log('🏪 ASSIGNMENT: Assigning to store manager for category:', category);
-        return storeManager;
-      }
-    }
-
-    // Categories that should go to DMs
-    const dmCategories = [
-      'Product Issue', 'Closed Early', 'Credit Card Issue', 'Bread Quality',
-      'Out of Product', 'Other', 'Multiple Issues', 'Delivery Service'
-    ];
-
-    if (dmCategories.includes(category)) {
-      console.log('📊 ASSIGNMENT: Looking for DM for category:', category);
-      
-      // Look up DM for the market - simplified approach
       const { data: dmUsers } = await supabase
         .from('user_permissions')
         .select('user_id')
         .contains('markets', [market]);
 
       if (dmUsers && dmUsers.length > 0) {
-        // Get the profile for the first DM user
         const { data: profileData } = await supabase
           .from('profiles')
           .select('display_name')
@@ -150,20 +129,13 @@ const getAssigneeForFeedback = async (storeNumber: string, market: string, categ
           return profileData.display_name;
         }
       }
+    } catch (error) {
+      console.error('❌ ASSIGNMENT: Error looking up DM assignee:', error);
     }
-
-    // Fallback to store manager if no specific assignment found
-    if (storeManager && storeManager.trim() !== '') {
-      console.log('🔄 ASSIGNMENT: Fallback to store manager:', storeManager);
-      return storeManager;
-    }
-
-  } catch (error) {
-    console.error('❌ ASSIGNMENT: Error looking up assignee:', error);
   }
 
-  console.log('⚠️ ASSIGNMENT: No assignment found, defaulting to Unassigned');
-  return 'Unassigned';
+  console.log('📬 ASSIGNMENT: Defaulting to guest feedback queue');
+  return 'guestfeedback@atlaswe.com';
 };
 
 export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: FeedbackDetailsDialogProps) {
