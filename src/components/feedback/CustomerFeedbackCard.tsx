@@ -17,7 +17,7 @@ interface CustomerFeedbackCardProps {
   onEdit: (feedback: CustomerFeedback) => void;
   onViewDetails: (feedback: CustomerFeedback) => void;
   onDelete?: (feedback: CustomerFeedback) => void;
-  onCategoryChange?: (feedback: CustomerFeedback, newCategory: string) => void;
+  onCategoryChange?: (feedback: CustomerFeedback, newCategory: string, newAssignee?: string) => void;
   isAdmin?: boolean;
   canEditCategory?: boolean;
   likeCount?: number;
