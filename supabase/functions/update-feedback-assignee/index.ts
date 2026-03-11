@@ -18,16 +18,17 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { feedbackId, assignee } = await req.json()
+    const { feedbackId, assignee, complaint_category } = await req.json()
     
-    console.log(`Updating feedback ${feedbackId} to assign to ${assignee}`)
+    const updateFields: Record<string, unknown> = { updated_at: new Date().toISOString() }
+    if (assignee !== undefined) updateFields.assignee = assignee
+    if (complaint_category !== undefined) updateFields.complaint_category = complaint_category
+    
+    console.log(`Updating feedback ${feedbackId}:`, updateFields)
     
     const { data, error } = await supabase
       .from('customer_feedback')
-      .update({ 
-        assignee: assignee,
-        updated_at: new Date().toISOString()
-      })
+      .update(updateFields)
       .eq('id', feedbackId)
       .select('id, assignee, store_number, market, complaint_category')
       .single()
