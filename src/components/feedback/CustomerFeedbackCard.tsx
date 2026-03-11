@@ -239,8 +239,11 @@ export function CustomerFeedbackCard({
             {canEditCategory ? (
               <div className="mb-1" onClick={(e) => e.stopPropagation()}>
                 <Select
-                  value={categoryOptions.find(o => o.value.toLowerCase() === feedback.complaint_category?.toLowerCase())?.value || feedback.complaint_category}
-                  onValueChange={handleCategoryChange}
+                  value={categoryOptions.find(o => o.value.toLowerCase() === feedback.complaint_category?.toLowerCase())?.value || feedback.complaint_category || ''}
+                  onValueChange={(val) => {
+                    const canonical = categoryOptions.find(o => o.value === val)?.value || val;
+                    handleCategoryChange(canonical);
+                  }}
                   disabled={isUpdatingCategory}
                 >
                   <SelectTrigger className={cn(
