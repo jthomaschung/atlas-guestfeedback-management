@@ -246,7 +246,7 @@ export function CustomerFeedbackCard({
                 "font-semibold text-sm leading-tight mb-1",
                 isEscalated ? "text-white" : "text-foreground"
               )}>
-                {categoryLabels[feedback.complaint_category as keyof typeof categoryLabels] || feedback.complaint_category}
+                {categoryOptions.find(o => o.value.toLowerCase() === feedback.complaint_category?.toLowerCase())?.label || feedback.complaint_category}
               </h3>
             )}
             
