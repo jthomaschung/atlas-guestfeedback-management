@@ -151,15 +151,27 @@ export function CustomerFeedbackCard({
   };
 
   const getAssigneeForCategory = (category: string, storeNumber: string): string => {
-    const cat = category.toLowerCase();
-    const storeFollowUp = ['sandwich made wrong', 'missing item', 'missing items', 'sandwich issue', 'order issue', 'cleanliness', 'closed early'];
+    const cat = category.toLowerCase().trim().replace(/\s+/g, ' ');
+    const storeFollowUp = [
+      'sandwich made wrong',
+      'missing item',
+      'missing items',
+      'sandwich issue',
+      'order issue',
+      'order accuracy',
+      'cleanliness',
+      'closed early'
+    ];
     const autoEscalate = ['out of product', 'rude service', 'possible food poisoning', 'oop'];
-    
+
     if (storeFollowUp.includes(cat)) {
       return `store${storeNumber}@atlaswe.com`;
-    } else if (autoEscalate.includes(cat)) {
+    }
+
+    if (autoEscalate.includes(cat)) {
       return ''; // Will need DM lookup — keep current assignee for now
     }
+
     return 'guestfeedback@atlaswe.com';
   };
 
