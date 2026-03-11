@@ -17,7 +17,7 @@ interface CustomerFeedbackCardProps {
   onEdit: (feedback: CustomerFeedback) => void;
   onViewDetails: (feedback: CustomerFeedback) => void;
   onDelete?: (feedback: CustomerFeedback) => void;
-  onCategoryChange?: (feedback: CustomerFeedback, newCategory: string) => void;
+  onCategoryChange?: (feedback: CustomerFeedback, newCategory: string, newAssignee?: string) => void;
   isAdmin?: boolean;
   canEditCategory?: boolean;
   likeCount?: number;
@@ -150,19 +150,36 @@ export function CustomerFeedbackCard({
     setIsEditingFeedback(false);
   };
 
+  const getAssigneeForCategory = (category: string, storeNumber: string): string => {
+    const cat = category.toLowerCase();
+    const storeFollowUp = ['sandwich made wrong', 'missing item', 'missing items', 'sandwich issue', 'order issue', 'cleanliness', 'closed early'];
+    const autoEscalate = ['out of product', 'rude service', 'possible food poisoning', 'oop'];
+    
+    if (storeFollowUp.includes(cat)) {
+      return `store${storeNumber}@atlaswe.com`;
+    } else if (autoEscalate.includes(cat)) {
+      return ''; // Will need DM lookup — keep current assignee for now
+    }
+    return 'guestfeedback@atlaswe.com';
+  };
+
   const handleCategoryChange = async (newCategory: string) => {
     if (!canEditCategory || isUpdatingCategory) return;
     
     setIsUpdatingCategory(true);
     try {
+      const newAssignee = getAssigneeForCategory(newCategory, feedback.store_number);
+      const updateFields: Record<string, string> = { complaint_category: newCategory };
+      if (newAssignee) updateFields.assignee = newAssignee;
+
       const { error } = await supabase
         .from('customer_feedback')
-        .update({ complaint_category: newCategory })
+        .update(updateFields)
         .eq('id', feedback.id);
 
       if (error) throw error;
 
-      onCategoryChange?.(feedback, newCategory);
+      onCategoryChange?.(feedback, newCategory, newAssignee || undefined);
       toast.success('Category updated successfully');
     } catch (error) {
       console.error('Error updating category:', error);
