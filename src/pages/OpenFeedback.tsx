@@ -412,6 +412,9 @@ const OpenFeedback = () => {
             onEdit={handleEdit}
             onViewDetails={handleViewDetails}
             onDelete={handleDelete}
+            onCategoryChange={(feedback, newCategory) => {
+              setFeedbacks(prev => prev.map(fb => fb.id === feedback.id ? { ...fb, complaint_category: newCategory } : fb));
+            }}
             isAdmin={permissions.isAdmin}
             canEditCategory={permissions.isAdmin}
           />
