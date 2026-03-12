@@ -141,7 +141,7 @@ const Summary = () => {
     
     // Calculate average response time for responded/resolved feedback
     const respondedFeedbacks = feedbacksToCalculate.filter(fb => 
-      fb.resolution_status === 'responded' || fb.resolution_status === 'resolved'
+      fb.resolution_status !== 'unopened'
     );
     
     const responseTimes = respondedFeedbacks.map(fb => {
