@@ -228,7 +228,9 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
 
   // Handle missing required fields with reasonable defaults
   const channel = data.channel || data.Source || 'RAP'
-  const feedback_date = data.feedback_date || data.Date || new Date().toISOString().split('T')[0]
+  const rawDateStr = data.feedback_date || data.Date || new Date().toISOString().split('T')[0]
+  const feedback_date = normalizeDateFormat(rawDateStr)
+  console.log(`Date normalization: "${rawDateStr}" → "${feedback_date}"`)
   const rawCategory = data.complaint_category || data['Type of Complaint'] || 'Other'
   
   // Normalize category names to standard values
@@ -244,7 +246,9 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
   }
   const complaint_category = categoryNormalization[rawCategory.toLowerCase()] || rawCategory
   const store_number = data.store_number || data.Store || '000'
-  const market = data.market || data.Market || 'Unknown'
+  
+  // Look up market from stores table instead of trusting webhook data
+  const market = await lookupMarketByStore(store_number)
 
   // New pipeline fields
   const type_of_feedback = data.type_of_feedback || data['Type of Feedback'] || data['Type of feedback'] || null
