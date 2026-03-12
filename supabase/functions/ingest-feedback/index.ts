@@ -156,6 +156,65 @@ async function findStoreAssignee(store_number: string): Promise<string> {
   }
 }
 
+/**
+ * Look up the market (region) for a given store_number from the stores table.
+ */
+async function lookupMarketByStore(store_number: string): Promise<string> {
+  try {
+    console.log(`Looking up market for store: ${store_number}`)
+    const { data, error } = await supabase
+      .from('stores')
+      .select('region')
+      .eq('store_number', store_number)
+      .maybeSingle()
+
+    if (error) {
+      console.error('Error querying stores table for market:', error)
+      return 'Unknown'
+    }
+
+    if (data?.region) {
+      console.log(`Found market for store ${store_number}: ${data.region}`)
+      return data.region
+    }
+
+    console.warn(`No market found for store ${store_number}`)
+    return 'Unknown'
+  } catch (error) {
+    console.error('Exception during market lookup:', error)
+    return 'Unknown'
+  }
+}
+
+/**
+ * Normalize a date string to YYYY-MM-DD format.
+ * Handles: YYYY-MM-DD, MM-DD-YYYY, MM/DD/YYYY, M/D/YYYY, etc.
+ */
+function normalizeDateFormat(dateStr: string): string {
+  if (!dateStr) return new Date().toISOString().split('T')[0]
+  
+  const trimmed = dateStr.trim()
+  
+  // Already YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed
+  
+  // MM-DD-YYYY or MM/DD/YYYY
+  const mdyMatch = trimmed.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/)
+  if (mdyMatch) {
+    const [, month, day, year] = mdyMatch
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+  }
+  
+  // Fallback: try Date parsing
+  const parsed = new Date(trimmed)
+  if (!isNaN(parsed.getTime())) {
+    return parsed.toISOString().split('T')[0]
+  }
+  
+  console.warn(`Could not parse date: "${dateStr}", using today`)
+  return new Date().toISOString().split('T')[0]
+}
+
 async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | null> {
   console.log('=== VALIDATION START ===')
   console.log('Input data keys:', Object.keys(data))
@@ -169,7 +228,9 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
 
   // Handle missing required fields with reasonable defaults
   const channel = data.channel || data.Source || 'RAP'
-  const feedback_date = data.feedback_date || data.Date || new Date().toISOString().split('T')[0]
+  const rawDateStr = data.feedback_date || data.Date || new Date().toISOString().split('T')[0]
+  const feedback_date = normalizeDateFormat(rawDateStr)
+  console.log(`Date normalization: "${rawDateStr}" → "${feedback_date}"`)
   const rawCategory = data.complaint_category || data['Type of Complaint'] || 'Other'
   
   // Normalize category names to standard values
@@ -185,7 +246,9 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
   }
   const complaint_category = categoryNormalization[rawCategory.toLowerCase()] || rawCategory
   const store_number = data.store_number || data.Store || '000'
-  const market = data.market || data.Market || 'Unknown'
+  
+  // Look up market from stores table instead of trusting webhook data
+  const market = await lookupMarketByStore(store_number)
 
   // New pipeline fields
   const type_of_feedback = data.type_of_feedback || data['Type of Feedback'] || data['Type of feedback'] || null
