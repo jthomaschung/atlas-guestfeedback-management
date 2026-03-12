@@ -31,6 +31,7 @@ import Training from '@/pages/Training';
 import EmailTemplates from '@/pages/EmailTemplates';
 import PraiseBoard from '@/pages/PraiseBoard';
 import OpenFeedback from '@/pages/OpenFeedback';
+import RefundProcessing from '@/pages/RefundProcessing';
 import { AuthGate } from '@/components/AuthGate';
 import { PortalGate } from '@/auth/PortalGate';
 
