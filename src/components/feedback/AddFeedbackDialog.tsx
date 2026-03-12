@@ -125,6 +125,11 @@ async function resolveInitialAssignee({
   return "guestfeedback@atlaswe.com";
 }
 
+interface StoreInfo {
+  store_number: string;
+  region: string | null;
+}
+
 interface AddFeedbackDialogProps {
   onFeedbackAdded: () => void;
 }
