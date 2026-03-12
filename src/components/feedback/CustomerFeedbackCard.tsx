@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { Edit, Calendar, Eye, User, Clock, AlertTriangle, Trash2, Star, Phone, Hash, Save, X, ExternalLink, Heart } from "lucide-react";
+import { Edit, Calendar, Eye, User, Clock, AlertTriangle, Trash2, Star, Phone, Hash, Save, X, ExternalLink, Heart, DollarSign } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { RequestRefundDialog } from './RequestRefundDialog';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -90,6 +91,7 @@ export function CustomerFeedbackCard({
 }: CustomerFeedbackCardProps) {
   const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
   const [isUpdatingCalled, setIsUpdatingCalled] = useState(false);
+  const [refundDialogOpen, setRefundDialogOpen] = useState(false);
   const [isEditingFeedback, setIsEditingFeedback] = useState(false);
   const [editedFeedbackText, setEditedFeedbackText] = useState(feedback.feedback_text || '');
   const [isUpdatingFeedback, setIsUpdatingFeedback] = useState(false);
@@ -208,6 +210,7 @@ export function CustomerFeedbackCard({
   const isPraise = feedback.complaint_category?.toLowerCase().includes('praise') || feedback.priority === 'Praise';
 
   return (
+    <>
     <Card className={cn(
       "group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer overflow-hidden",
       isEscalated && "bg-red-600 dark:bg-red-700 border-red-600 dark:border-red-700",
@@ -551,6 +554,21 @@ export function CustomerFeedbackCard({
             )}
           </div>
 
+          {/* Request Refund Button */}
+          {!isPraise && !isResolved && (
+            <div className="pt-1" onClick={(e) => e.stopPropagation()}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs gap-1"
+                onClick={() => setRefundDialogOpen(true)}
+              >
+                <DollarSign className="h-3 w-3" />
+                Request Refund
+              </Button>
+            </div>
+          )}
+
           {/* Like Button - Instagram style bottom right */}
           {isPraise && onToggleLike && (
             <div className="flex justify-end items-center gap-1.5 pt-1">
@@ -580,5 +598,12 @@ export function CustomerFeedbackCard({
         </div>
       </CardContent>
     </Card>
+
+    <RequestRefundDialog
+      feedback={feedback}
+      isOpen={refundDialogOpen}
+      onClose={() => setRefundDialogOpen(false)}
+    />
+    </>
   );
 }

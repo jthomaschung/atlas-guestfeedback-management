@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive, UserCheck, TrendingUp, Shield, Target, BookOpen, Mail, Star, ChevronDown, Inbox } from "lucide-react";
+import { LayoutDashboard, BarChart3, Users, Settings, MessageSquare, Archive, UserCheck, TrendingUp, Shield, Target, BookOpen, Mail, Star, ChevronDown, Inbox, DollarSign } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -54,6 +54,7 @@ const archiveItems = [
 const adminItems = [
   { title: "User Management", url: "/user-hierarchy", icon: Users },
   { title: "GFM", url: "/gfm", icon: UserCheck },
+  { title: "Refund Processing", url: "/refund-processing", icon: DollarSign },
   { title: "Email Templates", url: "/email-templates", icon: Mail },
   { title: "Internal Feedback", url: "/internal-feedback", icon: MessageSquare },
   { title: "Settings", url: "/settings", icon: Settings },
