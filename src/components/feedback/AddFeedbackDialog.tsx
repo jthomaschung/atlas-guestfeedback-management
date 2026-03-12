@@ -31,9 +31,98 @@ const COMPLAINT_CATEGORIES = [
 const PRIORITIES = ["Praise", "Low", "Medium", "High", "Critical"] as const;
 const TYPES_OF_FEEDBACK = ["Guest Support", "FYI"] as const;
 
-interface StoreInfo {
-  store_number: string;
-  region: string | null;
+const normalizeText = (value: string) => value.toLowerCase().trim().replace(/\s+/g, " ");
+
+const STORE_FOLLOW_UP_CATEGORIES = new Set([
+  "sandwich made wrong",
+  "missing item",
+  "missing items",
+  "sandwich issue",
+  "order issue",
+  "order accuracy",
+  "cleanliness",
+  "closed early",
+]);
+
+const AUTO_ESCALATE_CATEGORIES = new Set([
+  "out of product",
+  "rude service",
+  "possible food poisoning",
+  "oop",
+]);
+
+async function findDmEmailForMarket(market: string): Promise<string | null> {
+  try {
+    const normalizedMarket = market.replace(/\s+/g, "").toUpperCase();
+
+    const { data: permissionRows, error: permissionError } = await supabase
+      .from("user_permissions")
+      .select("user_id, markets")
+      .not("markets", "is", null);
+
+    if (permissionError || !permissionRows?.length) return null;
+
+    const matchingUserIds = permissionRows
+      .filter((row) =>
+        Array.isArray(row.markets) &&
+        row.markets.some(
+          (value) =>
+            typeof value === "string" &&
+            value.replace(/\s+/g, "").toUpperCase() === normalizedMarket
+        )
+      )
+      .map((row) => row.user_id)
+      .filter((userId): userId is string => typeof userId === "string");
+
+    if (!matchingUserIds.length) return null;
+
+    const { data: profiles, error: profileError } = await supabase
+      .from("profiles")
+      .select("user_id, email")
+      .in("user_id", matchingUserIds)
+      .not("email", "is", null)
+      .limit(1);
+
+    if (profileError || !profiles?.length) return null;
+
+    return profiles[0].email;
+  } catch (error) {
+    console.error("Error finding DM assignee:", error);
+    return null;
+  }
+}
+
+async function resolveInitialAssignee({
+  complaintCategory,
+  storeNumber,
+  market,
+  typeOfFeedback,
+}: {
+  complaintCategory: string;
+  storeNumber: string;
+  market: string;
+  typeOfFeedback: string;
+}): Promise<string> {
+  const normalizedType = normalizeText(typeOfFeedback || "Guest Support");
+  const normalizedCategory = normalizeText(complaintCategory);
+
+  if (normalizedType === "fyi") {
+    return "guestfeedback@atlaswe.com";
+  }
+
+  if (normalizedType !== "guest support") {
+    return "guestfeedback@atlaswe.com";
+  }
+
+  if (STORE_FOLLOW_UP_CATEGORIES.has(normalizedCategory)) {
+    return `store${storeNumber}@atlaswe.com`;
+  }
+
+  if (AUTO_ESCALATE_CATEGORIES.has(normalizedCategory)) {
+    return (await findDmEmailForMarket(market)) || "guestfeedback@atlaswe.com";
+  }
+
+  return "guestfeedback@atlaswe.com";
 }
 
 interface AddFeedbackDialogProps {
