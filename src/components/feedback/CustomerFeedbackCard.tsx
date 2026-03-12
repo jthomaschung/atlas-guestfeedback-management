@@ -210,6 +210,7 @@ export function CustomerFeedbackCard({
   const isPraise = feedback.complaint_category?.toLowerCase().includes('praise') || feedback.priority === 'Praise';
 
   return (
+    <>
     <Card className={cn(
       "group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer overflow-hidden",
       isEscalated && "bg-red-600 dark:bg-red-700 border-red-600 dark:border-red-700",

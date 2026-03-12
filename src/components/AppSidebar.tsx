@@ -54,6 +54,7 @@ const archiveItems = [
 const adminItems = [
   { title: "User Management", url: "/user-hierarchy", icon: Users },
   { title: "GFM", url: "/gfm", icon: UserCheck },
+  { title: "Refund Processing", url: "/refund-processing", icon: DollarSign },
   { title: "Email Templates", url: "/email-templates", icon: Mail },
   { title: "Internal Feedback", url: "/internal-feedback", icon: MessageSquare },
   { title: "Settings", url: "/settings", icon: Settings },

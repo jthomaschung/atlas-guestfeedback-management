@@ -247,6 +247,14 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
+              <Route 
+                path="/refund-processing" 
+                element={
+                  <ProtectedRoute>
+                    <RefundProcessing />
+                  </ProtectedRoute>
+                } 
+              />
                <Route
                 path="/" 
                 element={
