@@ -235,6 +235,13 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
 
       const caseNumber = `CF-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
 
+      const assignee = await resolveInitialAssignee({
+        complaintCategory: form.complaint_category,
+        storeNumber: form.store_number,
+        market: form.market,
+        typeOfFeedback: form.type_of_feedback,
+      });
+
       const { error } = await supabase.from("customer_feedback").insert({
         feedback_date: form.feedback_date,
         store_number: form.store_number,
@@ -253,7 +260,7 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
         feedback_source: "Manual Entry",
         case_number: caseNumber,
         resolution_status: "unopened",
-        assignee: "Unassigned",
+        assignee,
         user_id: user.id,
         period,
       });
