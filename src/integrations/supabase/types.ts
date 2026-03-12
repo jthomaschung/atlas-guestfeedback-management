@@ -7482,6 +7482,110 @@ export type Database = {
           },
         ]
       }
+      refund_requests: {
+        Row: {
+          case_number: string | null
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          customer_name: string | null
+          denial_reason: string | null
+          denied_at: string | null
+          denied_by: string | null
+          director_approved_at: string | null
+          director_approved_by: string | null
+          director_notes: string | null
+          feedback_id: string
+          final_approved_at: string | null
+          final_approved_by: string | null
+          final_notes: string | null
+          id: string
+          manager_approved_at: string | null
+          manager_approved_by: string | null
+          manager_notes: string | null
+          market: string | null
+          notes: string | null
+          refund_amount: number
+          refund_method: string
+          refund_reason: string
+          requested_at: string
+          requested_by: string
+          status: string
+          store_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          case_number?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          customer_name?: string | null
+          denial_reason?: string | null
+          denied_at?: string | null
+          denied_by?: string | null
+          director_approved_at?: string | null
+          director_approved_by?: string | null
+          director_notes?: string | null
+          feedback_id: string
+          final_approved_at?: string | null
+          final_approved_by?: string | null
+          final_notes?: string | null
+          id?: string
+          manager_approved_at?: string | null
+          manager_approved_by?: string | null
+          manager_notes?: string | null
+          market?: string | null
+          notes?: string | null
+          refund_amount: number
+          refund_method: string
+          refund_reason: string
+          requested_at?: string
+          requested_by: string
+          status?: string
+          store_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          case_number?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          customer_name?: string | null
+          denial_reason?: string | null
+          denied_at?: string | null
+          denied_by?: string | null
+          director_approved_at?: string | null
+          director_approved_by?: string | null
+          director_notes?: string | null
+          feedback_id?: string
+          final_approved_at?: string | null
+          final_approved_by?: string | null
+          final_notes?: string | null
+          id?: string
+          manager_approved_at?: string | null
+          manager_approved_by?: string | null
+          manager_notes?: string | null
+          market?: string | null
+          notes?: string | null
+          refund_amount?: number
+          refund_method?: string
+          refund_reason?: string
+          requested_at?: string
+          requested_by?: string
+          status?: string
+          store_number?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "refund_requests_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "customer_feedback"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rewards_transactions: {
         Row: {
           created_at: string | null
