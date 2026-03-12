@@ -552,6 +552,21 @@ export function CustomerFeedbackCard({
             )}
           </div>
 
+          {/* Request Refund Button */}
+          {!isPraise && !isResolved && (
+            <div className="pt-1" onClick={(e) => e.stopPropagation()}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs gap-1"
+                onClick={() => setRefundDialogOpen(true)}
+              >
+                <DollarSign className="h-3 w-3" />
+                Request Refund
+              </Button>
+            </div>
+          )}
+
           {/* Like Button - Instagram style bottom right */}
           {isPraise && onToggleLike && (
             <div className="flex justify-end items-center gap-1.5 pt-1">
