@@ -597,5 +597,12 @@ export function CustomerFeedbackCard({
         </div>
       </CardContent>
     </Card>
+
+    <RequestRefundDialog
+      feedback={feedback}
+      isOpen={refundDialogOpen}
+      onClose={() => setRefundDialogOpen(false)}
+    />
+    </>
   );
 }
