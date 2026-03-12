@@ -91,6 +91,7 @@ export function CustomerFeedbackCard({
 }: CustomerFeedbackCardProps) {
   const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
   const [isUpdatingCalled, setIsUpdatingCalled] = useState(false);
+  const [refundDialogOpen, setRefundDialogOpen] = useState(false);
   const [isEditingFeedback, setIsEditingFeedback] = useState(false);
   const [editedFeedbackText, setEditedFeedbackText] = useState(feedback.feedback_text || '');
   const [isUpdatingFeedback, setIsUpdatingFeedback] = useState(false);
