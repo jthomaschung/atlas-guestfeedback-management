@@ -652,6 +652,10 @@ export type Database = {
           deposited_by_name: string
           id: string
           notes: string | null
+          ocr_amount_confidence: string | null
+          ocr_date_confidence: string | null
+          ocr_scanned_amount: number | null
+          ocr_scanned_date: string | null
           receipt_image_url: string
           resolution_notes: string | null
           resolution_status: string | null
@@ -676,6 +680,10 @@ export type Database = {
           deposited_by_name: string
           id?: string
           notes?: string | null
+          ocr_amount_confidence?: string | null
+          ocr_date_confidence?: string | null
+          ocr_scanned_amount?: number | null
+          ocr_scanned_date?: string | null
           receipt_image_url: string
           resolution_notes?: string | null
           resolution_status?: string | null
@@ -700,6 +708,10 @@ export type Database = {
           deposited_by_name?: string
           id?: string
           notes?: string | null
+          ocr_amount_confidence?: string | null
+          ocr_date_confidence?: string | null
+          ocr_scanned_amount?: number | null
+          ocr_scanned_date?: string | null
           receipt_image_url?: string
           resolution_notes?: string | null
           resolution_status?: string | null
@@ -4172,11 +4184,15 @@ export type Database = {
           customer_name: string | null
           grand_total: number | null
           id: number
+          is_promo_discount: boolean | null
           order_id: string | null
           order_total: number | null
           parsed_at: string | null
           payments: number | null
           phone: string | null
+          promo_emp: string | null
+          promo_reason: string | null
+          promo_type: string | null
           report_date_from: string | null
           report_date_to: string | null
           report_generated_at: string | null
@@ -4192,11 +4208,15 @@ export type Database = {
           customer_name?: string | null
           grand_total?: number | null
           id?: number
+          is_promo_discount?: boolean | null
           order_id?: string | null
           order_total?: number | null
           parsed_at?: string | null
           payments?: number | null
           phone?: string | null
+          promo_emp?: string | null
+          promo_reason?: string | null
+          promo_type?: string | null
           report_date_from?: string | null
           report_date_to?: string | null
           report_generated_at?: string | null
@@ -4212,11 +4232,15 @@ export type Database = {
           customer_name?: string | null
           grand_total?: number | null
           id?: number
+          is_promo_discount?: boolean | null
           order_id?: string | null
           order_total?: number | null
           parsed_at?: string | null
           payments?: number | null
           phone?: string | null
+          promo_emp?: string | null
+          promo_reason?: string | null
+          promo_type?: string | null
           report_date_from?: string | null
           report_date_to?: string | null
           report_generated_at?: string | null
@@ -7876,6 +7900,10 @@ export type Database = {
           expected_deposit: number
           id: string
           notes: string | null
+          ocr_actual_deposit: number | null
+          ocr_confidence: string | null
+          ocr_detection_method: string | null
+          ocr_expected_deposit: number | null
           resolution_type: string | null
           shift_type: string
           signer_1_name: string
@@ -7897,6 +7925,10 @@ export type Database = {
           expected_deposit?: number
           id?: string
           notes?: string | null
+          ocr_actual_deposit?: number | null
+          ocr_confidence?: string | null
+          ocr_detection_method?: string | null
+          ocr_expected_deposit?: number | null
           resolution_type?: string | null
           shift_type: string
           signer_1_name: string
@@ -7918,6 +7950,10 @@ export type Database = {
           expected_deposit?: number
           id?: string
           notes?: string | null
+          ocr_actual_deposit?: number | null
+          ocr_confidence?: string | null
+          ocr_detection_method?: string | null
+          ocr_expected_deposit?: number | null
           resolution_type?: string | null
           shift_type?: string
           signer_1_name?: string
