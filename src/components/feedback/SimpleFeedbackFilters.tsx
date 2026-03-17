@@ -16,6 +16,7 @@ export function SimpleFeedbackFilters({ feedbacks, onFilter }: SimpleFeedbackFil
   const [storeFilter, setStoreFilter] = useState<string[]>([]);
   const [marketFilter, setMarketFilter] = useState<string[]>([]);
   const [assigneeFilter, setAssigneeFilter] = useState<string[]>([]);
+  const [feedbackTypeFilter, setFeedbackTypeFilter] = useState<string[]>([]);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
 
   // Extract unique values for filter options
