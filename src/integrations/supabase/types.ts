@@ -7535,6 +7535,7 @@ export type Database = {
           refund_amount: number
           refund_method: string
           refund_reason: string
+          refund_receipt_url: string | null
           requested_at: string
           requested_by: string
           status: string
@@ -7569,6 +7570,7 @@ export type Database = {
           refund_amount: number
           refund_method: string
           refund_reason: string
+          refund_receipt_url?: string | null
           requested_at?: string
           requested_by: string
           status?: string
@@ -7603,6 +7605,7 @@ export type Database = {
           refund_amount?: number
           refund_method?: string
           refund_reason?: string
+          refund_receipt_url?: string | null
           requested_at?: string
           requested_by?: string
           status?: string

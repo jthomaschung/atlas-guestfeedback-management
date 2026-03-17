@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2, DollarSign, CheckCircle2, XCircle, Clock, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { RefundDetailDialog } from '@/components/refund/RefundDetailDialog';
 import {
   Dialog,
   DialogContent,
@@ -81,6 +82,7 @@ export default function RefundProcessing() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedRequest, setSelectedRequest] = useState<RefundRequest | null>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [actionDialogOpen, setActionDialogOpen] = useState(false);
   const [actionType, setActionType] = useState<'approve' | 'deny' | 'complete'>('approve');
   const [actionNotes, setActionNotes] = useState('');
@@ -311,7 +313,7 @@ export default function RefundProcessing() {
                     const config = statusConfig[request.status] || statusConfig.pending;
                     const StatusIcon = config.icon;
                     return (
-                      <TableRow key={request.id}>
+                      <TableRow key={request.id} className="cursor-pointer hover:bg-muted/50" onClick={() => { setSelectedRequest(request); setDetailDialogOpen(true); }}>
                         <TableCell className="font-mono text-xs">{request.case_number || '—'}</TableCell>
                         <TableCell>
                           <div>
@@ -335,7 +337,7 @@ export default function RefundProcessing() {
                           {format(new Date(request.requested_at), 'MMM d, yyyy')}
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-1">
+                          <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                             {['pending', 'manager_approved', 'director_approved'].includes(request.status) && (
                               <>
                                 <Button
@@ -414,6 +416,16 @@ export default function RefundProcessing() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Detail Dialog */}
+      <RefundDetailDialog
+        request={selectedRequest}
+        isOpen={detailDialogOpen}
+        onClose={() => setDetailDialogOpen(false)}
+        onUpdate={() => {
+          loadRefundRequests();
+        }}
+      />
     </div>
   );
 }
