@@ -1866,14 +1866,20 @@ Customer Service Team`);
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="unopened">Unopened</SelectItem>
-                    <SelectItem value="opened">Opened</SelectItem>
-                    <SelectItem value="processing">Processing</SelectItem>
-                    <SelectItem value="responded">Responded</SelectItem>
-                    <SelectItem value="resolved">Resolved</SelectItem>
-                    <SelectItem value="escalated">Escalated</SelectItem>
-                    {(feedback?.channel?.toLowerCase() === 'qualtrics' || feedback?.type_of_feedback?.toLowerCase() === 'fyi') && (
+                    {feedback?.type_of_feedback?.toLowerCase() === 'fyi' ? (
                       <SelectItem value="acknowledged">Acknowledged</SelectItem>
+                    ) : (
+                      <>
+                        <SelectItem value="unopened">Unopened</SelectItem>
+                        <SelectItem value="opened">Opened</SelectItem>
+                        <SelectItem value="processing">Processing</SelectItem>
+                        <SelectItem value="responded">Responded</SelectItem>
+                        <SelectItem value="resolved">Resolved</SelectItem>
+                        <SelectItem value="escalated">Escalated</SelectItem>
+                        {feedback?.channel?.toLowerCase() === 'qualtrics' && (
+                          <SelectItem value="acknowledged">Acknowledged</SelectItem>
+                        )}
+                      </>
                     )}
                   </SelectContent>
                 </Select>
