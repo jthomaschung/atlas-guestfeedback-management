@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { feedbackId, assignee, complaint_category } = await req.json()
+    const { feedbackId, assignee, complaint_category, feedback_text } = await req.json()
     
     const updateFields: Record<string, unknown> = { updated_at: new Date().toISOString() }
     if (assignee !== undefined) updateFields.assignee = assignee
