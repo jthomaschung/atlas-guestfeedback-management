@@ -115,6 +115,7 @@ export function FeedbackFilters({
 
   const activeFiltersCount = statusFilter.length + priorityFilter.length + categoryFilter.length + 
     channelFilter.length + storeFilter.length + marketFilter.length + assigneeFilter.length +
+    feedbackTypeFilter.length +
     (periodFilter && periodFilter !== 'all' ? 1 : 0);
 
   const handleStatusChange = (status: string) => {
