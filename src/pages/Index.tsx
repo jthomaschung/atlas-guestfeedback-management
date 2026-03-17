@@ -392,7 +392,7 @@ const Index = () => {
       const dateB = new Date(b.feedback_date).getTime();
       return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
     });
-  }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, sortOrder, dateFrom, dateTo]);
+  }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, sortOrder, dateFrom, dateTo, feedbackTypeFilter]);
 
   // Chart feedbacks - includes ALL feedback (including resolved) filtered by ALL active filters
   const chartFeedbacks = useMemo(() => {
