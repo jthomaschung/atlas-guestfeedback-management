@@ -93,6 +93,14 @@ export function SimpleFeedbackFilters({ feedbacks, onFilter }: SimpleFeedbackFil
       });
     }
 
+    // Feedback type filter
+    if (feedbackTypeFilter.length > 0) {
+      filtered = filtered.filter(feedback => {
+        const type = feedback.type_of_feedback?.trim() || '';
+        return feedbackTypeFilter.some(f => f.toLowerCase() === type.toLowerCase());
+      });
+    }
+
     // Sort
     filtered.sort((a, b) => {
       const dateA = new Date(a.feedback_date).getTime();
