@@ -36,6 +36,8 @@ interface FeedbackReportingFiltersProps {
   availableMarkets: string[];
   availableAssignees: string[];
   availablePeriods: Array<{ id: string; name: string; start_date: string; end_date: string }>;
+  feedbackTypeFilter?: string[];
+  onFeedbackTypeFilterChange?: (value: string[]) => void;
 }
 
 const statusOptions = [
@@ -80,6 +82,11 @@ const channelOptions = [
   { value: 'jimmy_johns', label: 'Jimmy Johns' },
 ];
 
+const feedbackTypeOptions = [
+  { value: 'FYI', label: 'FYI' },
+  { value: 'Guest Support', label: 'Guest Support' },
+];
+
 export function FeedbackReportingFilters({
   searchTerm,
   onSearchChange,
@@ -108,6 +115,8 @@ export function FeedbackReportingFilters({
   availableMarkets,
   availableAssignees,
   availablePeriods,
+  feedbackTypeFilter = [],
+  onFeedbackTypeFilterChange,
 }: FeedbackReportingFiltersProps) {
   const storeOptions: Option[] = (availableStores || []).map(store => ({ 
     value: store, 
@@ -146,6 +155,7 @@ export function FeedbackReportingFilters({
     marketFilter.length > 0 ||
     assigneeFilter.length > 0 ||
     periodFilter.length > 0 ||
+    feedbackTypeFilter.length > 0 ||
     dateFrom ||
     dateTo;
 
@@ -191,7 +201,7 @@ export function FeedbackReportingFilters({
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <MultiSelect
           options={channelOptions}
           selected={channelFilter}
@@ -212,6 +222,15 @@ export function FeedbackReportingFilters({
           onChange={onMarketFilterChange}
           placeholder="Select Markets"
         />
+
+        {onFeedbackTypeFilterChange && (
+          <MultiSelect
+            options={feedbackTypeOptions}
+            selected={feedbackTypeFilter}
+            onChange={onFeedbackTypeFilterChange}
+            placeholder="Select Type"
+          />
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

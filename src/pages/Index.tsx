@@ -33,6 +33,7 @@ const Index = () => {
   const [marketFilter, setMarketFilter] = useState<string[]>([]);
   const [assigneeFilter, setAssigneeFilter] = useState<string[]>([]);
   const [periodFilter, setPeriodFilter] = useState<string[]>([]);
+  const [feedbackTypeFilter, setFeedbackTypeFilter] = useState<string[]>([]);
   const [dateFrom, setDateFrom] = useState<Date | undefined>();
   const [dateTo, setDateTo] = useState<Date | undefined>();
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
@@ -375,9 +376,12 @@ const Index = () => {
         });
       }
       
+      const matchesFeedbackType = feedbackTypeFilter.length === 0 || 
+        feedbackTypeFilter.some(type => type.toLowerCase() === (fb.type_of_feedback?.trim() || '').toLowerCase());
+
       return matchesSearch && matchesStatus && matchesPriority && matchesCategory && 
               matchesChannel && matchesStore && matchesMarket && matchesAssignee && 
-              matchesPeriod && matchesDateRange;
+              matchesPeriod && matchesDateRange && matchesFeedbackType;
     });
 
     console.log('🔍 FILTER RESULT:', filtered.length, 'items pass all filters');
@@ -388,7 +392,7 @@ const Index = () => {
       const dateB = new Date(b.feedback_date).getTime();
       return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
     });
-  }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, sortOrder, dateFrom, dateTo]);
+  }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, sortOrder, dateFrom, dateTo, feedbackTypeFilter]);
 
   // Chart feedbacks - includes ALL feedback (including resolved) filtered by ALL active filters
   const chartFeedbacks = useMemo(() => {
@@ -449,11 +453,14 @@ const Index = () => {
         }
       }
       
+      const matchesFeedbackType = feedbackTypeFilter.length === 0 || 
+        feedbackTypeFilter.some(type => type.toLowerCase() === (fb.type_of_feedback?.trim() || '').toLowerCase());
+
       return matchesSearch && matchesStatus && matchesPriority && matchesCategory && 
              matchesChannel && matchesStore && matchesMarket && matchesAssignee && 
-             matchesPeriod && matchesDateRange;
+             matchesPeriod && matchesDateRange && matchesFeedbackType;
     });
-  }, [allFeedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, dateFrom, dateTo]);
+  }, [allFeedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, dateFrom, dateTo, feedbackTypeFilter]);
 
   // Get available filter options
   const availableStores = useMemo(() => {
@@ -590,6 +597,7 @@ const Index = () => {
     setMarketFilter([]);
     setAssigneeFilter([]);
     setPeriodFilter([]);
+    setFeedbackTypeFilter([]);
     setDateFrom(undefined);
     setDateTo(undefined);
   };
@@ -761,12 +769,14 @@ const Index = () => {
           availableMarkets={availableMarkets} 
           availableAssignees={availableAssignees}
           availablePeriods={periods}
+          feedbackTypeFilter={feedbackTypeFilter}
+          onFeedbackTypeFilterChange={setFeedbackTypeFilter}
         />
 
         {/* Prominent Clear Filters Button */}
         {(searchTerm || statusFilter.length > 0 || priorityFilter.length > 0 || 
           categoryFilter.length > 0 || channelFilter.length > 0 || storeFilter.length > 0 || 
-          marketFilter.length > 0 || assigneeFilter.length > 0 || periodFilter.length > 0 || dateFrom || dateTo) && (
+          marketFilter.length > 0 || assigneeFilter.length > 0 || periodFilter.length > 0 || feedbackTypeFilter.length > 0 || dateFrom || dateTo) && (
           <div className="flex justify-center">
             <Button 
               variant="outline" 

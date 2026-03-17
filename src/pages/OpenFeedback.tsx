@@ -27,6 +27,7 @@ const OpenFeedback = () => {
   const [marketFilter, setMarketFilter] = useState<string[]>([]);
   const [assigneeFilter, setAssigneeFilter] = useState<string[]>([]);
   const [periodFilter, setPeriodFilter] = useState<string[]>([]);
+  const [feedbackTypeFilter, setFeedbackTypeFilter] = useState<string[]>([]);
   const [dateFrom, setDateFrom] = useState<Date | undefined>();
   const [dateTo, setDateTo] = useState<Date | undefined>();
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
@@ -229,8 +230,11 @@ const OpenFeedback = () => {
         if (dateTo) { const d = new Date(dateTo); d.setHours(23,59,59,999); if (feedbackDate > d) matchesDateRange = false; }
       }
 
+      const matchesFeedbackType = feedbackTypeFilter.length === 0 || 
+        feedbackTypeFilter.some(type => type.toLowerCase() === (fb.type_of_feedback?.trim() || '').toLowerCase());
+
       return matchesSearch && matchesStatus && matchesPriority && matchesCategory && 
-        matchesChannel && matchesStore && matchesMarket && matchesAssignee && matchesPeriod && matchesDateRange;
+        matchesChannel && matchesStore && matchesMarket && matchesAssignee && matchesPeriod && matchesDateRange && matchesFeedbackType;
     });
 
     return [...filtered].sort((a, b) => {
@@ -238,7 +242,7 @@ const OpenFeedback = () => {
       const dateB = new Date(b.feedback_date).getTime();
       return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
     });
-  }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, sortOrder, dateFrom, dateTo]);
+  }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, sortOrder, dateFrom, dateTo, feedbackTypeFilter]);
 
   const availableStores = useMemo(() => stores.map(s => s.store_number).sort(), [stores]);
   const availableMarkets = useMemo(() => {
@@ -314,13 +318,14 @@ const OpenFeedback = () => {
     setMarketFilter([]);
     setAssigneeFilter([]);
     setPeriodFilter([]);
+    setFeedbackTypeFilter([]);
     setDateFrom(undefined);
     setDateTo(undefined);
   };
 
   const hasActiveFilters = searchTerm || statusFilter.length > 0 || priorityFilter.length > 0 || 
     categoryFilter.length > 0 || channelFilter.length > 0 || storeFilter.length > 0 || 
-    marketFilter.length > 0 || assigneeFilter.length > 0 || periodFilter.length > 0 || dateFrom || dateTo;
+    marketFilter.length > 0 || assigneeFilter.length > 0 || periodFilter.length > 0 || feedbackTypeFilter.length > 0 || dateFrom || dateTo;
 
   if (!authUser || !isSessionReady) {
     return (
@@ -396,6 +401,8 @@ const OpenFeedback = () => {
             availableMarkets={availableMarkets}
             availableAssignees={availableAssignees}
             availablePeriods={periods}
+            feedbackTypeFilter={feedbackTypeFilter}
+            onFeedbackTypeFilterChange={setFeedbackTypeFilter}
           />
 
           {hasActiveFilters && (
