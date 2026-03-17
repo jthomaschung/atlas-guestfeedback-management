@@ -776,7 +776,7 @@ const Index = () => {
         {/* Prominent Clear Filters Button */}
         {(searchTerm || statusFilter.length > 0 || priorityFilter.length > 0 || 
           categoryFilter.length > 0 || channelFilter.length > 0 || storeFilter.length > 0 || 
-          marketFilter.length > 0 || assigneeFilter.length > 0 || periodFilter.length > 0 || dateFrom || dateTo) && (
+          marketFilter.length > 0 || assigneeFilter.length > 0 || periodFilter.length > 0 || feedbackTypeFilter.length > 0 || dateFrom || dateTo) && (
           <div className="flex justify-center">
             <Button 
               variant="outline" 

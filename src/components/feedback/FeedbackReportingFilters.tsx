@@ -201,7 +201,7 @@ export function FeedbackReportingFilters({
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <MultiSelect
           options={channelOptions}
           selected={channelFilter}
@@ -222,6 +222,15 @@ export function FeedbackReportingFilters({
           onChange={onMarketFilterChange}
           placeholder="Select Markets"
         />
+
+        {onFeedbackTypeFilterChange && (
+          <MultiSelect
+            options={feedbackTypeOptions}
+            selected={feedbackTypeFilter}
+            onChange={onFeedbackTypeFilterChange}
+            placeholder="Select Type"
+          />
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

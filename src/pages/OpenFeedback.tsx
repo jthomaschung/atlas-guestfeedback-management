@@ -401,6 +401,8 @@ const OpenFeedback = () => {
             availableMarkets={availableMarkets}
             availableAssignees={availableAssignees}
             availablePeriods={periods}
+            feedbackTypeFilter={feedbackTypeFilter}
+            onFeedbackTypeFilterChange={setFeedbackTypeFilter}
           />
 
           {hasActiveFilters && (
