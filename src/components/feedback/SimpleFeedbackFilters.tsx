@@ -111,7 +111,7 @@ export function SimpleFeedbackFilters({ feedbacks, onFilter }: SimpleFeedbackFil
     onFilter(filtered);
   }, [
     feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter,
-    channelFilter, storeFilter, marketFilter, assigneeFilter, sortOrder, onFilter
+    channelFilter, storeFilter, marketFilter, assigneeFilter, feedbackTypeFilter, sortOrder, onFilter
   ]);
 
   const handleClearAllFilters = () => {
