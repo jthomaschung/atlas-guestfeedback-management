@@ -36,6 +36,8 @@ interface FeedbackReportingFiltersProps {
   availableMarkets: string[];
   availableAssignees: string[];
   availablePeriods: Array<{ id: string; name: string; start_date: string; end_date: string }>;
+  feedbackTypeFilter?: string[];
+  onFeedbackTypeFilterChange?: (value: string[]) => void;
 }
 
 const statusOptions = [
