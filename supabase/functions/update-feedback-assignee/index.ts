@@ -18,11 +18,12 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { feedbackId, assignee, complaint_category } = await req.json()
+    const { feedbackId, assignee, complaint_category, feedback_text } = await req.json()
     
     const updateFields: Record<string, unknown> = { updated_at: new Date().toISOString() }
     if (assignee !== undefined) updateFields.assignee = assignee
     if (complaint_category !== undefined) updateFields.complaint_category = complaint_category
+    if (feedback_text !== undefined) updateFields.feedback_text = feedback_text
     
     console.log(`Updating feedback ${feedbackId}:`, updateFields)
     
