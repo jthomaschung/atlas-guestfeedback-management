@@ -416,6 +416,16 @@ export default function RefundProcessing() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Detail Dialog */}
+      <RefundDetailDialog
+        request={selectedRequest}
+        isOpen={detailDialogOpen}
+        onClose={() => setDetailDialogOpen(false)}
+        onUpdate={() => {
+          loadRefundRequests();
+        }}
+      />
     </div>
   );
 }
