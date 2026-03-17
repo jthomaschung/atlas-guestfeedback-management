@@ -99,6 +99,8 @@ export function FeedbackFilters({
   onMarketFilterChange,
   assigneeFilter,
   onAssigneeFilterChange,
+  feedbackTypeFilter = [],
+  onFeedbackTypeFilterChange,
   sortOrder,
   onSortOrderChange,
   availableStores,
