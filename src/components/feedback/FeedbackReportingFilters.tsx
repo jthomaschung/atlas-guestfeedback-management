@@ -155,6 +155,7 @@ export function FeedbackReportingFilters({
     marketFilter.length > 0 ||
     assigneeFilter.length > 0 ||
     periodFilter.length > 0 ||
+    feedbackTypeFilter.length > 0 ||
     dateFrom ||
     dateTo;
 
