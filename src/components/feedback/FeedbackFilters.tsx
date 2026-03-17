@@ -174,6 +174,15 @@ export function FeedbackFilters({
     }
   };
 
+  const handleFeedbackTypeChange = (type: string) => {
+    if (!onFeedbackTypeFilterChange) return;
+    if (feedbackTypeFilter.includes(type)) {
+      onFeedbackTypeFilterChange(feedbackTypeFilter.filter(t => t !== type));
+    } else {
+      onFeedbackTypeFilterChange([...feedbackTypeFilter, type]);
+    }
+  };
+
   return (
     <Card className="p-3 md:p-4 space-y-3 md:space-y-4">
       {/* Search and Toggle */}
