@@ -82,6 +82,11 @@ const channelOptions = [
   { value: 'jimmy_johns', label: 'Jimmy Johns' },
 ];
 
+const feedbackTypeOptions = [
+  { value: 'FYI', label: 'FYI' },
+  { value: 'Guest Support', label: 'Guest Support' },
+];
+
 export function FeedbackReportingFilters({
   searchTerm,
   onSearchChange,
