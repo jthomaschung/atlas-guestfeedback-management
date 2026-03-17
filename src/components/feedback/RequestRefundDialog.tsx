@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { CustomerFeedback } from '@/types/feedback';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -22,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DollarSign, Loader2 } from 'lucide-react';
+import { DollarSign, Loader2, Camera, X, ImageIcon } from 'lucide-react';
 
 interface RequestRefundDialogProps {
   feedback: CustomerFeedback;
@@ -55,10 +56,59 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
   const [method, setMethod] = useState('');
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
+  const [bypassReceipt, setBypassReceipt] = useState(false);
+  const [bypassReason, setBypassReason] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File must be under 10MB');
+      return;
+    }
+    setReceiptFile(file);
+    setReceiptPreview(URL.createObjectURL(file));
+    setBypassReceipt(false);
+    setBypassReason('');
+  };
+
+  const clearReceipt = () => {
+    setReceiptFile(null);
+    if (receiptPreview) URL.revokeObjectURL(receiptPreview);
+    setReceiptPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const resetForm = () => {
+    setAmount('');
+    setReason('');
+    setMethod('');
+    setNotes('');
+    clearReceipt();
+    setBypassReceipt(false);
+    setBypassReason('');
+  };
 
   const handleSubmit = async () => {
     if (!amount || !reason || !method) {
       toast.error('Please fill in all required fields');
+      return;
+    }
+
+    if (!receiptFile && !bypassReceipt) {
+      toast.error('Please upload a receipt photo or provide a bypass reason');
+      return;
+    }
+
+    if (bypassReceipt && !bypassReason.trim()) {
+      toast.error('Please provide a reason for bypassing the receipt');
       return;
     }
 
@@ -70,6 +120,21 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
 
     setSubmitting(true);
     try {
+      let receiptUrl: string | null = null;
+
+      if (receiptFile) {
+        const fileExt = receiptFile.name.split('.').pop();
+        const filePath = `${feedback.id}/${Date.now()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('refund-receipts')
+          .upload(filePath, receiptFile);
+        if (uploadError) throw uploadError;
+        const { data: urlData } = supabase.storage
+          .from('refund-receipts')
+          .getPublicUrl(filePath);
+        receiptUrl = urlData.publicUrl;
+      }
+
       const { error } = await supabase
         .from('refund_requests')
         .insert({
@@ -83,16 +148,16 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
           market: feedback.market,
           customer_name: feedback.customer_name || null,
           case_number: feedback.case_number || null,
+          receipt_image_url: receiptUrl,
+          receipt_bypassed: bypassReceipt,
+          receipt_bypass_reason: bypassReceipt ? bypassReason : null,
         });
 
       if (error) throw error;
 
       toast.success('Refund request submitted successfully');
       onClose();
-      setAmount('');
-      setReason('');
-      setMethod('');
-      setNotes('');
+      resetForm();
     } catch (error) {
       console.error('Error submitting refund request:', error);
       toast.error('Failed to submit refund request');
@@ -158,6 +223,81 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Receipt Upload Section */}
+          <div className="space-y-2">
+            <Label>Receipt Photo *</Label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+
+            {receiptPreview ? (
+              <div className="relative rounded-md border border-border overflow-hidden">
+                <img
+                  src={receiptPreview}
+                  alt="Receipt preview"
+                  className="w-full max-h-48 object-contain bg-muted"
+                />
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="destructive"
+                  className="absolute top-2 right-2 h-7 w-7"
+                  onClick={clearReceipt}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : !bypassReceipt ? (
+              <div
+                className="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-muted-foreground/30 p-6 cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Camera className="h-8 w-8 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground text-center">
+                  Tap to take a photo or upload receipt
+                </p>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 rounded-md border border-dashed border-muted-foreground/30 p-4 text-muted-foreground">
+                <ImageIcon className="h-5 w-5 shrink-0" />
+                <p className="text-sm">Receipt bypassed</p>
+              </div>
+            )}
+
+            {/* Bypass Option */}
+            {!receiptFile && (
+              <div className="space-y-2 pt-1">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="bypass-receipt"
+                    checked={bypassReceipt}
+                    onCheckedChange={(checked) => {
+                      setBypassReceipt(!!checked);
+                      if (!checked) setBypassReason('');
+                    }}
+                  />
+                  <Label htmlFor="bypass-receipt" className="text-sm font-normal cursor-pointer">
+                    No receipt available
+                  </Label>
+                </div>
+                {bypassReceipt && (
+                  <Textarea
+                    placeholder="Why is the receipt not available? (required)"
+                    value={bypassReason}
+                    onChange={(e) => setBypassReason(e.target.value)}
+                    className="min-h-[60px] resize-none text-sm"
+                    maxLength={500}
+                  />
+                )}
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
