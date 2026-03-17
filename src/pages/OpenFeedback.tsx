@@ -230,8 +230,11 @@ const OpenFeedback = () => {
         if (dateTo) { const d = new Date(dateTo); d.setHours(23,59,59,999); if (feedbackDate > d) matchesDateRange = false; }
       }
 
+      const matchesFeedbackType = feedbackTypeFilter.length === 0 || 
+        feedbackTypeFilter.some(type => type.toLowerCase() === (fb.type_of_feedback?.trim() || '').toLowerCase());
+
       return matchesSearch && matchesStatus && matchesPriority && matchesCategory && 
-        matchesChannel && matchesStore && matchesMarket && matchesAssignee && matchesPeriod && matchesDateRange;
+        matchesChannel && matchesStore && matchesMarket && matchesAssignee && matchesPeriod && matchesDateRange && matchesFeedbackType;
     });
 
     return [...filtered].sort((a, b) => {
