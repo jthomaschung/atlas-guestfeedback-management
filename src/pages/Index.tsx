@@ -453,9 +453,12 @@ const Index = () => {
         }
       }
       
+      const matchesFeedbackType = feedbackTypeFilter.length === 0 || 
+        feedbackTypeFilter.some(type => type.toLowerCase() === (fb.type_of_feedback?.trim() || '').toLowerCase());
+
       return matchesSearch && matchesStatus && matchesPriority && matchesCategory && 
              matchesChannel && matchesStore && matchesMarket && matchesAssignee && 
-             matchesPeriod && matchesDateRange;
+             matchesPeriod && matchesDateRange && matchesFeedbackType;
     });
   }, [allFeedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, dateFrom, dateTo]);
 
