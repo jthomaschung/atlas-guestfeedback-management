@@ -769,6 +769,8 @@ const Index = () => {
           availableMarkets={availableMarkets} 
           availableAssignees={availableAssignees}
           availablePeriods={periods}
+          feedbackTypeFilter={feedbackTypeFilter}
+          onFeedbackTypeFilterChange={setFeedbackTypeFilter}
         />
 
         {/* Prominent Clear Filters Button */}
