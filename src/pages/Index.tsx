@@ -376,9 +376,12 @@ const Index = () => {
         });
       }
       
+      const matchesFeedbackType = feedbackTypeFilter.length === 0 || 
+        feedbackTypeFilter.some(type => type.toLowerCase() === (fb.type_of_feedback?.trim() || '').toLowerCase());
+
       return matchesSearch && matchesStatus && matchesPriority && matchesCategory && 
               matchesChannel && matchesStore && matchesMarket && matchesAssignee && 
-              matchesPeriod && matchesDateRange;
+              matchesPeriod && matchesDateRange && matchesFeedbackType;
     });
 
     console.log('🔍 FILTER RESULT:', filtered.length, 'items pass all filters');
