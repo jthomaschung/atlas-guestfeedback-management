@@ -7529,6 +7529,9 @@ export type Database = {
           manager_notes: string | null
           market: string | null
           notes: string | null
+          receipt_bypass_reason: string | null
+          receipt_bypassed: boolean
+          receipt_image_url: string | null
           refund_amount: number
           refund_method: string
           refund_reason: string
@@ -7560,6 +7563,9 @@ export type Database = {
           manager_notes?: string | null
           market?: string | null
           notes?: string | null
+          receipt_bypass_reason?: string | null
+          receipt_bypassed?: boolean
+          receipt_image_url?: string | null
           refund_amount: number
           refund_method: string
           refund_reason: string
@@ -7591,6 +7597,9 @@ export type Database = {
           manager_notes?: string | null
           market?: string | null
           notes?: string | null
+          receipt_bypass_reason?: string | null
+          receipt_bypassed?: boolean
+          receipt_image_url?: string | null
           refund_amount?: number
           refund_method?: string
           refund_reason?: string
