@@ -597,6 +597,7 @@ const Index = () => {
     setMarketFilter([]);
     setAssigneeFilter([]);
     setPeriodFilter([]);
+    setFeedbackTypeFilter([]);
     setDateFrom(undefined);
     setDateTo(undefined);
   };
