@@ -24,6 +24,8 @@ interface FeedbackFiltersProps {
   onMarketFilterChange: (markets: string[]) => void;
   assigneeFilter: string[];
   onAssigneeFilterChange: (assignees: string[]) => void;
+  feedbackTypeFilter?: string[];
+  onFeedbackTypeFilterChange?: (types: string[]) => void;
   sortOrder: 'newest' | 'oldest';
   onSortOrderChange: (order: 'newest' | 'oldest') => void;
   availableStores: string[];
