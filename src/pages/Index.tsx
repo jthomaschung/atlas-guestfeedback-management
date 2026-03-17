@@ -33,6 +33,7 @@ const Index = () => {
   const [marketFilter, setMarketFilter] = useState<string[]>([]);
   const [assigneeFilter, setAssigneeFilter] = useState<string[]>([]);
   const [periodFilter, setPeriodFilter] = useState<string[]>([]);
+  const [feedbackTypeFilter, setFeedbackTypeFilter] = useState<string[]>([]);
   const [dateFrom, setDateFrom] = useState<Date | undefined>();
   const [dateTo, setDateTo] = useState<Date | undefined>();
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
