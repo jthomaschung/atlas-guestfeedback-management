@@ -24,6 +24,8 @@ interface FeedbackFiltersProps {
   onMarketFilterChange: (markets: string[]) => void;
   assigneeFilter: string[];
   onAssigneeFilterChange: (assignees: string[]) => void;
+  feedbackTypeFilter?: string[];
+  onFeedbackTypeFilterChange?: (types: string[]) => void;
   sortOrder: 'newest' | 'oldest';
   onSortOrderChange: (order: 'newest' | 'oldest') => void;
   availableStores: string[];
@@ -75,6 +77,11 @@ const channelOptions = [
   { value: 'jimmy_johns', label: "Jimmy John's" },
 ];
 
+const feedbackTypeOptions = [
+  { value: 'FYI', label: 'FYI' },
+  { value: 'Guest Support', label: 'Guest Support' },
+];
+
 export function FeedbackFilters({
   searchTerm,
   onSearchChange,
@@ -92,6 +99,8 @@ export function FeedbackFilters({
   onMarketFilterChange,
   assigneeFilter,
   onAssigneeFilterChange,
+  feedbackTypeFilter = [],
+  onFeedbackTypeFilterChange,
   sortOrder,
   onSortOrderChange,
   availableStores,
@@ -106,6 +115,7 @@ export function FeedbackFilters({
 
   const activeFiltersCount = statusFilter.length + priorityFilter.length + categoryFilter.length + 
     channelFilter.length + storeFilter.length + marketFilter.length + assigneeFilter.length +
+    feedbackTypeFilter.length +
     (periodFilter && periodFilter !== 'all' ? 1 : 0);
 
   const handleStatusChange = (status: string) => {
@@ -161,6 +171,15 @@ export function FeedbackFilters({
       onAssigneeFilterChange(assigneeFilter.filter(a => a !== assignee));
     } else {
       onAssigneeFilterChange([...assigneeFilter, assignee]);
+    }
+  };
+
+  const handleFeedbackTypeChange = (type: string) => {
+    if (!onFeedbackTypeFilterChange) return;
+    if (feedbackTypeFilter.includes(type)) {
+      onFeedbackTypeFilterChange(feedbackTypeFilter.filter(t => t !== type));
+    } else {
+      onFeedbackTypeFilterChange([...feedbackTypeFilter, type]);
     }
   };
 
@@ -414,6 +433,34 @@ export function FeedbackFilters({
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {/* Feedback Type Filter */}
+          {onFeedbackTypeFilterChange && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-between bg-background">
+                  Type
+                  {feedbackTypeFilter.length > 0 && (
+                    <Badge variant="secondary">{feedbackTypeFilter.length}</Badge>
+                  )}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 bg-background z-50 max-h-60 overflow-y-auto">
+                <DropdownMenuLabel>Type of Feedback</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {feedbackTypeOptions.map((option) => (
+                  <DropdownMenuCheckboxItem
+                    key={option.value}
+                    checked={feedbackTypeFilter.includes(option.value)}
+                    onCheckedChange={() => handleFeedbackTypeChange(option.value)}
+                  >
+                    {option.label}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
 
           {/* Period Filter */}
           {availablePeriods && (

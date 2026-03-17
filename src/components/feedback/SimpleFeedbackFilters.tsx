@@ -16,6 +16,7 @@ export function SimpleFeedbackFilters({ feedbacks, onFilter }: SimpleFeedbackFil
   const [storeFilter, setStoreFilter] = useState<string[]>([]);
   const [marketFilter, setMarketFilter] = useState<string[]>([]);
   const [assigneeFilter, setAssigneeFilter] = useState<string[]>([]);
+  const [feedbackTypeFilter, setFeedbackTypeFilter] = useState<string[]>([]);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
 
   // Extract unique values for filter options
@@ -92,6 +93,14 @@ export function SimpleFeedbackFilters({ feedbacks, onFilter }: SimpleFeedbackFil
       });
     }
 
+    // Feedback type filter
+    if (feedbackTypeFilter.length > 0) {
+      filtered = filtered.filter(feedback => {
+        const type = feedback.type_of_feedback?.trim() || '';
+        return feedbackTypeFilter.some(f => f.toLowerCase() === type.toLowerCase());
+      });
+    }
+
     // Sort
     filtered.sort((a, b) => {
       const dateA = new Date(a.feedback_date).getTime();
@@ -102,7 +111,7 @@ export function SimpleFeedbackFilters({ feedbacks, onFilter }: SimpleFeedbackFil
     onFilter(filtered);
   }, [
     feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter,
-    channelFilter, storeFilter, marketFilter, assigneeFilter, sortOrder, onFilter
+    channelFilter, storeFilter, marketFilter, assigneeFilter, feedbackTypeFilter, sortOrder, onFilter
   ]);
 
   const handleClearAllFilters = () => {
@@ -114,6 +123,7 @@ export function SimpleFeedbackFilters({ feedbacks, onFilter }: SimpleFeedbackFil
     setStoreFilter([]);
     setMarketFilter([]);
     setAssigneeFilter([]);
+    setFeedbackTypeFilter([]);
     setSortOrder('newest');
   };
 
@@ -135,6 +145,8 @@ export function SimpleFeedbackFilters({ feedbacks, onFilter }: SimpleFeedbackFil
       onMarketFilterChange={setMarketFilter}
       assigneeFilter={assigneeFilter}
       onAssigneeFilterChange={setAssigneeFilter}
+      feedbackTypeFilter={feedbackTypeFilter}
+      onFeedbackTypeFilterChange={setFeedbackTypeFilter}
       sortOrder={sortOrder}
       onSortOrderChange={setSortOrder}
       availableStores={availableStores}
