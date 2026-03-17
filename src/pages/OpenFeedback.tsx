@@ -242,7 +242,7 @@ const OpenFeedback = () => {
       const dateB = new Date(b.feedback_date).getTime();
       return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
     });
-  }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, sortOrder, dateFrom, dateTo]);
+  }, [feedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, sortOrder, dateFrom, dateTo, feedbackTypeFilter]);
 
   const availableStores = useMemo(() => stores.map(s => s.store_number).sort(), [stores]);
   const availableMarkets = useMemo(() => {
