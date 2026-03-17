@@ -115,6 +115,8 @@ export function FeedbackReportingFilters({
   availableMarkets,
   availableAssignees,
   availablePeriods,
+  feedbackTypeFilter = [],
+  onFeedbackTypeFilterChange,
 }: FeedbackReportingFiltersProps) {
   const storeOptions: Option[] = (availableStores || []).map(store => ({ 
     value: store, 
