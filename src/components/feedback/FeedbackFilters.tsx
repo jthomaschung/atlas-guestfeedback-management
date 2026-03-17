@@ -434,6 +434,34 @@ export function FeedbackFilters({
             </DropdownMenuContent>
           </DropdownMenu>
 
+          {/* Feedback Type Filter */}
+          {onFeedbackTypeFilterChange && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-between bg-background">
+                  Type
+                  {feedbackTypeFilter.length > 0 && (
+                    <Badge variant="secondary">{feedbackTypeFilter.length}</Badge>
+                  )}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 bg-background z-50 max-h-60 overflow-y-auto">
+                <DropdownMenuLabel>Type of Feedback</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {feedbackTypeOptions.map((option) => (
+                  <DropdownMenuCheckboxItem
+                    key={option.value}
+                    checked={feedbackTypeFilter.includes(option.value)}
+                    onCheckedChange={() => handleFeedbackTypeChange(option.value)}
+                  >
+                    {option.label}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+
           {/* Period Filter */}
           {availablePeriods && (
             <DropdownMenu>
