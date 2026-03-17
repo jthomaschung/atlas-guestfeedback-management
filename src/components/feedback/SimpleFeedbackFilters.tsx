@@ -123,6 +123,7 @@ export function SimpleFeedbackFilters({ feedbacks, onFilter }: SimpleFeedbackFil
     setStoreFilter([]);
     setMarketFilter([]);
     setAssigneeFilter([]);
+    setFeedbackTypeFilter([]);
     setSortOrder('newest');
   };
 
