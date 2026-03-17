@@ -337,7 +337,7 @@ export default function RefundProcessing() {
                           {format(new Date(request.requested_at), 'MMM d, yyyy')}
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-1">
+                          <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                             {['pending', 'manager_approved', 'director_approved'].includes(request.status) && (
                               <>
                                 <Button
