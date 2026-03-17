@@ -460,7 +460,7 @@ const Index = () => {
              matchesChannel && matchesStore && matchesMarket && matchesAssignee && 
              matchesPeriod && matchesDateRange && matchesFeedbackType;
     });
-  }, [allFeedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, dateFrom, dateTo]);
+  }, [allFeedbacks, searchTerm, statusFilter, priorityFilter, categoryFilter, channelFilter, storeFilter, marketFilter, assigneeFilter, periodFilter, periods, dateFrom, dateTo, feedbackTypeFilter]);
 
   // Get available filter options
   const availableStores = useMemo(() => {
