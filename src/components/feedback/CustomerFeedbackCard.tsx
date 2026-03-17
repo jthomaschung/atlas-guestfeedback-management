@@ -319,7 +319,7 @@ export function CustomerFeedbackCard({
             ) : (
             <div className="relative group/feedback">
                 <p className={cn(
-                  "text-sm leading-relaxed whitespace-pre-wrap break-all [overflow-wrap:anywhere] max-h-32 overflow-y-auto",
+                  "text-sm leading-relaxed whitespace-pre-wrap break-words max-h-32 overflow-y-auto",
                   isEscalated ? "text-white/90" : "text-muted-foreground"
                 )}>
                   {feedback.feedback_text}
