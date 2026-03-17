@@ -145,6 +145,8 @@ export function SimpleFeedbackFilters({ feedbacks, onFilter }: SimpleFeedbackFil
       onMarketFilterChange={setMarketFilter}
       assigneeFilter={assigneeFilter}
       onAssigneeFilterChange={setAssigneeFilter}
+      feedbackTypeFilter={feedbackTypeFilter}
+      onFeedbackTypeFilterChange={setFeedbackTypeFilter}
       sortOrder={sortOrder}
       onSortOrderChange={setSortOrder}
       availableStores={availableStores}
