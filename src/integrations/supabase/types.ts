@@ -7622,6 +7622,78 @@ export type Database = {
           },
         ]
       }
+      refund_void_ledger: {
+        Row: {
+          amount: number
+          case_number: string | null
+          created_at: string
+          customer_name: string | null
+          feedback_id: string | null
+          id: string
+          market: string | null
+          method: string | null
+          notes: string | null
+          period: string | null
+          processed_at: string
+          processed_by: string | null
+          reason: string | null
+          refund_request_id: string | null
+          store_number: string | null
+          transaction_type: string
+        }
+        Insert: {
+          amount: number
+          case_number?: string | null
+          created_at?: string
+          customer_name?: string | null
+          feedback_id?: string | null
+          id?: string
+          market?: string | null
+          method?: string | null
+          notes?: string | null
+          period?: string | null
+          processed_at?: string
+          processed_by?: string | null
+          reason?: string | null
+          refund_request_id?: string | null
+          store_number?: string | null
+          transaction_type?: string
+        }
+        Update: {
+          amount?: number
+          case_number?: string | null
+          created_at?: string
+          customer_name?: string | null
+          feedback_id?: string | null
+          id?: string
+          market?: string | null
+          method?: string | null
+          notes?: string | null
+          period?: string | null
+          processed_at?: string
+          processed_by?: string | null
+          reason?: string | null
+          refund_request_id?: string | null
+          store_number?: string | null
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "refund_void_ledger_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "customer_feedback"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "refund_void_ledger_refund_request_id_fkey"
+            columns: ["refund_request_id"]
+            isOneToOne: false
+            referencedRelation: "refund_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rewards_transactions: {
         Row: {
           created_at: string | null
