@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2, DollarSign, CheckCircle2, XCircle, Clock, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { RefundDetailDialog } from '@/components/refund/RefundDetailDialog';
 import {
   Dialog,
   DialogContent,
