@@ -313,7 +313,7 @@ export default function RefundProcessing() {
                     const config = statusConfig[request.status] || statusConfig.pending;
                     const StatusIcon = config.icon;
                     return (
-                      <TableRow key={request.id}>
+                      <TableRow key={request.id} className="cursor-pointer hover:bg-muted/50" onClick={() => { setSelectedRequest(request); setDetailDialogOpen(true); }}>
                         <TableCell className="font-mono text-xs">{request.case_number || '—'}</TableCell>
                         <TableCell>
                           <div>
