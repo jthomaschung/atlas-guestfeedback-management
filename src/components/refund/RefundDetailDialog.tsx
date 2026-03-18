@@ -63,9 +63,10 @@ interface RefundRequest {
 }
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
-  pending: { label: 'Pending', color: 'bg-amber-100 text-amber-800 border-amber-200', icon: Clock },
-  manager_approved: { label: 'Manager Approved', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: ChevronRight },
-  director_approved: { label: 'Director Approved', color: 'bg-indigo-100 text-indigo-800 border-indigo-200', icon: ChevronRight },
+  pending: { label: 'Pending DM', color: 'bg-amber-100 text-amber-800 border-amber-200', icon: Clock },
+  dm_approved: { label: 'DM Approved', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: ChevronRight },
+  awaiting_director: { label: 'Awaiting Director', color: 'bg-violet-100 text-violet-800 border-violet-200', icon: Clock },
+  awaiting_catering: { label: 'Awaiting Catering', color: 'bg-orange-100 text-orange-800 border-orange-200', icon: Clock },
   approved: { label: 'Fully Approved', color: 'bg-green-100 text-green-800 border-green-200', icon: CheckCircle2 },
   denied: { label: 'Denied', color: 'bg-red-100 text-red-800 border-red-200', icon: XCircle },
   completed: { label: 'Completed', color: 'bg-emerald-100 text-emerald-800 border-emerald-200', icon: CheckCircle2 },
