@@ -243,6 +243,7 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     'order issue': 'Sandwich Made Wrong',
     'oop': 'Out of Product',
     'delivery timing': 'Slow Service',
+    'foreign object': 'Possible Food Poisoning',
   }
   const complaint_category = categoryNormalization[rawCategory.toLowerCase()] || rawCategory
   const store_number = data.store_number || data.Store || '000'

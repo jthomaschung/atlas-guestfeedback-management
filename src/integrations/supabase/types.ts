@@ -8417,9 +8417,12 @@ export type Database = {
       }
       training_completion_detailed: {
         Row: {
+          certified_manager_completed_date: string | null
+          certified_manager_status: string | null
           completion_pct: number | null
           employee_name: string | null
           fasttrack_username: string | null
+          hire_date: string | null
           id: number
           position: string | null
           source_type: string | null
@@ -8429,9 +8432,12 @@ export type Database = {
           uploaded_at: string | null
         }
         Insert: {
+          certified_manager_completed_date?: string | null
+          certified_manager_status?: string | null
           completion_pct?: number | null
           employee_name?: string | null
           fasttrack_username?: string | null
+          hire_date?: string | null
           id?: number
           position?: string | null
           source_type?: string | null
@@ -8441,9 +8447,12 @@ export type Database = {
           uploaded_at?: string | null
         }
         Update: {
+          certified_manager_completed_date?: string | null
+          certified_manager_status?: string | null
           completion_pct?: number | null
           employee_name?: string | null
           fasttrack_username?: string | null
+          hire_date?: string | null
           id?: number
           position?: string | null
           source_type?: string | null
@@ -8490,7 +8499,10 @@ export type Database = {
       training_employee_avg: {
         Row: {
           avg_completion: number | null
+          certified_manager_completed_date: string | null
+          certified_manager_status: string | null
           employee_name: string | null
+          hire_date: string | null
           id: number
           inserted_at: string | null
           store: string | null
@@ -8498,7 +8510,10 @@ export type Database = {
         }
         Insert: {
           avg_completion?: number | null
+          certified_manager_completed_date?: string | null
+          certified_manager_status?: string | null
           employee_name?: string | null
+          hire_date?: string | null
           id?: number
           inserted_at?: string | null
           store?: string | null
@@ -8506,7 +8521,10 @@ export type Database = {
         }
         Update: {
           avg_completion?: number | null
+          certified_manager_completed_date?: string | null
+          certified_manager_status?: string | null
           employee_name?: string | null
+          hire_date?: string | null
           id?: number
           inserted_at?: string | null
           store?: string | null
