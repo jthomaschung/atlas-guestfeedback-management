@@ -325,7 +325,17 @@ export default function RefundProcessing() {
                             )}
                           </div>
                         </TableCell>
-                        <TableCell>{request.customer_name || '—'}</TableCell>
+                        <TableCell>
+                          <div>
+                            <span>{request.customer_name || '—'}</span>
+                            {request.customer_email && (
+                              <p className="text-xs text-muted-foreground">{request.customer_email}</p>
+                            )}
+                            {request.customer_phone && (
+                              <p className="text-xs text-muted-foreground">{request.customer_phone}</p>
+                            )}
+                          </div>
+                        </TableCell>
                         <TableCell className="font-semibold">${Number(request.refund_amount).toFixed(2)}</TableCell>
                         <TableCell className="text-sm">{request.refund_reason}</TableCell>
                         <TableCell className="text-sm">{request.refund_method}</TableCell>

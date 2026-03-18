@@ -270,6 +270,18 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
               <p className="text-muted-foreground text-xs">Store</p>
               <p className="font-medium">#{request.store_number} {request.market && `(${request.market})`}</p>
             </div>
+            {request.customer_email && (
+              <div>
+                <p className="text-muted-foreground text-xs">Email</p>
+                <p className="font-medium text-xs break-all">{request.customer_email}</p>
+              </div>
+            )}
+            {request.customer_phone && (
+              <div>
+                <p className="text-muted-foreground text-xs">Phone</p>
+                <p className="font-medium">{request.customer_phone}</p>
+              </div>
+            )}
             <div>
               <p className="text-muted-foreground text-xs">Amount</p>
               <p className="font-bold text-lg">${Number(request.refund_amount).toFixed(2)}</p>
