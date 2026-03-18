@@ -421,15 +421,17 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
           )}
 
           {/* Approval Timeline */}
-          {(request.manager_approved_at || request.director_approved_at || request.final_approved_at || request.denied_at || request.completed_at) && (
+          {(request.manager_approved_at || request.director_approved_at || request.catering_approved_at || request.denied_at || request.completed_at) && (
             <>
               <Separator />
               <div>
                 <Label className="text-xs text-muted-foreground">Approval Timeline</Label>
                 <div className="space-y-1 mt-1 text-xs">
-                  {request.manager_approved_at && <p>✅ Manager approved — {format(new Date(request.manager_approved_at), 'MMM d h:mm a')}</p>}
+                  {request.manager_approved_at && <p>✅ DM approved — {format(new Date(request.manager_approved_at), 'MMM d h:mm a')}</p>}
+                  {request.requires_director_approval && !request.director_approved_at && request.manager_approved_at && <p>⏳ Awaiting Director approval</p>}
                   {request.director_approved_at && <p>✅ Director approved — {format(new Date(request.director_approved_at), 'MMM d h:mm a')}</p>}
-                  {request.final_approved_at && <p>✅ Final approved — {format(new Date(request.final_approved_at), 'MMM d h:mm a')}</p>}
+                  {request.requires_catering_approval && !request.catering_approved_at && request.manager_approved_at && <p>⏳ Awaiting Catering approval</p>}
+                  {request.catering_approved_at && <p>✅ Catering approved — {format(new Date(request.catering_approved_at), 'MMM d h:mm a')}</p>}
                   {request.completed_at && <p>✅ Completed — {format(new Date(request.completed_at), 'MMM d h:mm a')}</p>}
                   {request.denied_at && <p>❌ Denied — {format(new Date(request.denied_at), 'MMM d h:mm a')}{request.denial_reason && `: ${request.denial_reason}`}</p>}
                 </div>
