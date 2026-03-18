@@ -9,8 +9,13 @@ const corsHeaders = {
 
 interface NotificationRequest {
   refundRequestId: string;
-  notificationType: "new_refund" | "dm_approved" | "director_needed" | "catering_needed";
+  notificationType: "new_refund" | "dm_approved" | "director_needed" | "catering_needed" | "custom_email";
   approverName?: string;
+  customEmail?: {
+    to: string;
+    subject: string;
+    body: string;
+  };
 }
 
 const CATERING_EMAILS = [
