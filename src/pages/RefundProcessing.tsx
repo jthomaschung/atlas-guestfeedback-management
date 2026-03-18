@@ -146,6 +146,49 @@ export default function RefundProcessing() {
     setActionDialogOpen(true);
   };
 
+  const openEmailDialog = async (request: RefundRequest) => {
+    setSelectedRequest(request);
+    setEmailSubject(`Re: Refund Request — Case #${request.case_number || 'N/A'} — $${Number(request.refund_amount).toFixed(2)}`);
+    setEmailBody('');
+    setRequesterEmail(null);
+    setEmailDialogOpen(true);
+
+    // Look up requester email
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('id', request.requested_by)
+      .single();
+    setRequesterEmail(profile?.email || null);
+  };
+
+  const handleSendEmail = async () => {
+    if (!selectedRequest || !requesterEmail || !emailBody.trim()) return;
+    setEmailSending(true);
+    try {
+      const SENDGRID_KEY_NEEDED = true; // Uses edge function
+      const { error } = await supabase.functions.invoke('send-refund-approval-notification', {
+        body: {
+          refundRequestId: selectedRequest.id,
+          notificationType: 'custom_email',
+          customEmail: {
+            to: requesterEmail,
+            subject: emailSubject,
+            body: emailBody,
+          },
+        },
+      });
+      if (error) throw error;
+      toast({ title: 'Sent', description: `Email sent to ${requesterEmail}` });
+      setEmailDialogOpen(false);
+    } catch (err) {
+      console.error('Email send error:', err);
+      toast({ title: 'Error', description: 'Failed to send email', variant: 'destructive' });
+    } finally {
+      setEmailSending(false);
+    }
+  };
+
   // Determine what the next pending approval action is for a request
   const getNextApproval = (request: RefundRequest): { label: string; role: 'dm' | 'director' | 'catering' } | null => {
     if (request.status === 'pending' && !request.manager_approved_at) return { label: 'DM Approve', role: 'dm' };
