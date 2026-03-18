@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, DollarSign, CheckCircle2, XCircle, Clock, ChevronRight, Mail } from 'lucide-react';
+import { Loader2, DollarSign, CheckCircle2, XCircle, Clock, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { RefundDetailDialog } from '@/components/refund/RefundDetailDialog';
@@ -33,7 +33,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 interface RefundRequest {
@@ -97,11 +96,6 @@ export default function RefundProcessing() {
   const [actionType, setActionType] = useState<'approve' | 'deny' | 'complete'>('approve');
   const [actionNotes, setActionNotes] = useState('');
   const [processing, setProcessing] = useState(false);
-  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
-  const [emailSubject, setEmailSubject] = useState('');
-  const [emailBody, setEmailBody] = useState('');
-  const [emailSending, setEmailSending] = useState(false);
-  const [requesterEmail, setRequesterEmail] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = 'Refund Processing - Atlas';
@@ -146,48 +140,6 @@ export default function RefundProcessing() {
     setActionDialogOpen(true);
   };
 
-  const openEmailDialog = async (request: RefundRequest) => {
-    setSelectedRequest(request);
-    setEmailSubject(`Re: Refund Request — Case #${request.case_number || 'N/A'} — $${Number(request.refund_amount).toFixed(2)}`);
-    setEmailBody('');
-    setRequesterEmail(null);
-    setEmailDialogOpen(true);
-
-    // Look up requester email
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('email')
-      .eq('id', request.requested_by)
-      .single();
-    setRequesterEmail(profile?.email || null);
-  };
-
-  const handleSendEmail = async () => {
-    if (!selectedRequest || !requesterEmail || !emailBody.trim()) return;
-    setEmailSending(true);
-    try {
-      const SENDGRID_KEY_NEEDED = true; // Uses edge function
-      const { error } = await supabase.functions.invoke('send-refund-approval-notification', {
-        body: {
-          refundRequestId: selectedRequest.id,
-          notificationType: 'custom_email',
-          customEmail: {
-            to: requesterEmail,
-            subject: emailSubject,
-            body: emailBody,
-          },
-        },
-      });
-      if (error) throw error;
-      toast({ title: 'Sent', description: `Email sent to ${requesterEmail}` });
-      setEmailDialogOpen(false);
-    } catch (err) {
-      console.error('Email send error:', err);
-      toast({ title: 'Error', description: 'Failed to send email', variant: 'destructive' });
-    } finally {
-      setEmailSending(false);
-    }
-  };
 
   // Determine what the next pending approval action is for a request
   const getNextApproval = (request: RefundRequest): { label: string; role: 'dm' | 'director' | 'catering' } | null => {
@@ -479,15 +431,6 @@ export default function RefundProcessing() {
                                 Mark Complete
                               </Button>
                             )}
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-7 w-7 p-0"
-                              title="Email Requestor"
-                              onClick={() => openEmailDialog(request)}
-                            >
-                              <Mail className="h-3.5 w-3.5" />
-                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -548,50 +491,6 @@ export default function RefundProcessing() {
         }}
       />
 
-      {/* Email Requestor Dialog */}
-      <Dialog open={emailDialogOpen} onOpenChange={(open) => !open && setEmailDialogOpen(false)}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Mail className="h-5 w-5" />
-              Email Requestor
-            </DialogTitle>
-            <DialogDescription>
-              {requesterEmail ? `Sending to: ${requesterEmail}` : 'Loading recipient...'}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3 py-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="email-subject">Subject</Label>
-              <Input
-                id="email-subject"
-                value={emailSubject}
-                onChange={(e) => setEmailSubject(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="email-body">Message</Label>
-              <Textarea
-                id="email-body"
-                placeholder="Type your message to the requestor..."
-                value={emailBody}
-                onChange={(e) => setEmailBody(e.target.value)}
-                className="min-h-[120px] resize-none"
-                maxLength={5000}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEmailDialogOpen(false)} disabled={emailSending}>
-              Cancel
-            </Button>
-            <Button onClick={handleSendEmail} disabled={emailSending || !requesterEmail || !emailBody.trim()}>
-              {emailSending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-              Send Email
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
