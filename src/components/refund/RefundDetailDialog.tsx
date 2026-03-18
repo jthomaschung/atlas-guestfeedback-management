@@ -454,7 +454,7 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
                     <>
                       <Button size="sm" className="flex-1" onClick={() => handleAction('approve')} disabled={processing}>
                         {processing && <Loader2 className="h-4 w-4 animate-spin mr-1" />}
-                        {getNextApprovalLabel(request.status)}
+                        {nextApproval?.label || 'Approve'}
                       </Button>
                       <Button size="sm" variant="destructive" onClick={() => handleAction('deny')} disabled={processing}>
                         Deny
