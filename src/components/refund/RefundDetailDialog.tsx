@@ -96,13 +96,17 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
   }, [request?.id]);
 
   const loadEmails = async (req: RefundRequest) => {
-    // Get customer email from feedback
-    const { data: fb } = await supabase
-      .from('customer_feedback')
-      .select('customer_email')
-      .eq('id', req.feedback_id)
-      .single();
-    setCustomerEmail(fb?.customer_email || null);
+    // Use customer email from refund request directly, fallback to feedback record
+    if (req.customer_email) {
+      setCustomerEmail(req.customer_email);
+    } else {
+      const { data: fb } = await supabase
+        .from('customer_feedback')
+        .select('customer_email')
+        .eq('id', req.feedback_id)
+        .single();
+      setCustomerEmail(fb?.customer_email || null);
+    }
 
     // Get requester email from profiles
     const { data: profile } = await supabase
