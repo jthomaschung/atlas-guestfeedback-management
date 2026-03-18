@@ -7512,7 +7512,9 @@ export type Database = {
           completed_at: string | null
           completed_by: string | null
           created_at: string
+          customer_email: string | null
           customer_name: string | null
+          customer_phone: string | null
           denial_reason: string | null
           denied_at: string | null
           denied_by: string | null
@@ -7547,7 +7549,9 @@ export type Database = {
           completed_at?: string | null
           completed_by?: string | null
           created_at?: string
+          customer_email?: string | null
           customer_name?: string | null
+          customer_phone?: string | null
           denial_reason?: string | null
           denied_at?: string | null
           denied_by?: string | null
@@ -7582,7 +7586,9 @@ export type Database = {
           completed_at?: string | null
           completed_by?: string | null
           created_at?: string
+          customer_email?: string | null
           customer_name?: string | null
+          customer_phone?: string | null
           denial_reason?: string | null
           denied_at?: string | null
           denied_by?: string | null
