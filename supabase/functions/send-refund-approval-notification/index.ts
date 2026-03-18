@@ -102,7 +102,11 @@ serve(async (req: Request) => {
       });
 
       const success = res.ok;
-      console.log(`Custom email to ${customEmail.to}: ${success ? "sent" : "failed"}`);
+      if (!success) {
+        const errorBody = await res.text();
+        console.error(`SendGrid error (${res.status}): ${errorBody}`);
+      }
+      console.log(`Custom email to ${customEmail.to}: ${success ? "sent" : "failed"} (status: ${res.status})`);
 
       return new Response(
         JSON.stringify({ success, sent: success ? 1 : 0, failed: success ? 0 : 1 }),
