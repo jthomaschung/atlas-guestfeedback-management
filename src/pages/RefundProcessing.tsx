@@ -125,7 +125,7 @@ export default function RefundProcessing() {
 
   const stats = {
     pending: requests.filter(r => r.status === 'pending').length,
-    inProgress: requests.filter(r => ['manager_approved', 'director_approved'].includes(r.status)).length,
+    inProgress: requests.filter(r => ['dm_approved', 'awaiting_director', 'awaiting_catering'].includes(r.status)).length,
     approved: requests.filter(r => r.status === 'approved').length,
     completed: requests.filter(r => r.status === 'completed').length,
     denied: requests.filter(r => r.status === 'denied').length,
