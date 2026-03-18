@@ -97,6 +97,11 @@ export default function RefundProcessing() {
   const [actionType, setActionType] = useState<'approve' | 'deny' | 'complete'>('approve');
   const [actionNotes, setActionNotes] = useState('');
   const [processing, setProcessing] = useState(false);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailBody, setEmailBody] = useState('');
+  const [emailSending, setEmailSending] = useState(false);
+  const [requesterEmail, setRequesterEmail] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = 'Refund Processing - Atlas';
