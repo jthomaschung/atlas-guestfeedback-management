@@ -39,6 +39,7 @@ const refundReasons = [
   'Service Issue',
   'Overcharged',
   'Duplicate Charge',
+  'Catering Refund',
   'Other',
 ];
 
@@ -135,7 +136,7 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
         receiptUrl = urlData.publicUrl;
       }
 
-      const isCatering = (feedback.channel || '').toLowerCase() === 'catering';
+      const isCatering = (feedback.channel || '').toLowerCase() === 'catering' || reason === 'Catering Refund';
 
       const { error } = await supabase
         .from('refund_requests')
