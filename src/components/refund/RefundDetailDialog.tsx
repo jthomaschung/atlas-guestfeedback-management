@@ -250,6 +250,36 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
   const canApprove = nextApproval !== null && !['approved', 'denied', 'completed'].includes(request.status);
   const canComplete = request.status === 'approved';
 
+  const handleSendReceipt = async () => {
+    const receiptUrl = request.refund_receipt_url || request.receipt_image_url;
+    const recipients: string[] = [];
+    if (customerEmail) recipients.push(customerEmail);
+    if (requesterEmail) recipients.push(requesterEmail);
+
+    if (recipients.length === 0) {
+      toast({ title: 'Error', description: 'No email addresses found for customer or requester', variant: 'destructive' });
+      return;
+    }
+
+    setSending(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-refund-receipt', {
+        body: {
+          refundRequestId: request.id,
+          recipientEmails: recipients,
+          receiptUrl: receiptUrl || null,
+        },
+      });
+      if (error) throw error;
+      toast({ title: 'Sent!', description: `Receipt emailed to ${recipients.join(', ')}` });
+    } catch (error) {
+      console.error('Send error:', error);
+      toast({ title: 'Error', description: 'Failed to send receipt email', variant: 'destructive' });
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
