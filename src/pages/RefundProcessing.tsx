@@ -307,9 +307,9 @@ export default function RefundProcessing() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Requests</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="manager_approved">Manager Approved</SelectItem>
-            <SelectItem value="director_approved">Director Approved</SelectItem>
+            <SelectItem value="pending">Pending DM</SelectItem>
+            <SelectItem value="awaiting_director">Awaiting Director</SelectItem>
+            <SelectItem value="awaiting_catering">Awaiting Catering</SelectItem>
             <SelectItem value="approved">Fully Approved</SelectItem>
             <SelectItem value="completed">Completed</SelectItem>
             <SelectItem value="denied">Denied</SelectItem>
