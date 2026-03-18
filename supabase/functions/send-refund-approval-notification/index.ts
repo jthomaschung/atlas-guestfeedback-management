@@ -29,7 +29,7 @@ serve(async (req: Request) => {
   }
 
   try {
-    const { refundRequestId, notificationType, approverName }: NotificationRequest =
+    const { refundRequestId, notificationType, approverName, customEmail }: NotificationRequest =
       await req.json();
 
     if (!refundRequestId || !notificationType) {
