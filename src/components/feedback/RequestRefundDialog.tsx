@@ -161,6 +161,24 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
 
       if (error) throw error;
 
+      // Send DM approval notification
+      try {
+        await supabase.functions.invoke('send-refund-approval-notification', {
+          body: {
+            refundRequestId: (await supabase
+              .from('refund_requests')
+              .select('id')
+              .eq('feedback_id', feedback.id)
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .single()).data?.id,
+            notificationType: 'new_refund',
+          },
+        });
+      } catch (notifErr) {
+        console.error('Failed to send refund notification:', notifErr);
+      }
+
       toast.success('Refund request submitted successfully');
       onClose();
       resetForm();
