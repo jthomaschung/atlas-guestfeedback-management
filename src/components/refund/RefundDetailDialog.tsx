@@ -35,6 +35,9 @@ interface RefundRequest {
   director_approved_by: string | null;
   director_approved_at: string | null;
   director_notes: string | null;
+  catering_approved_by: string | null;
+  catering_approved_at: string | null;
+  catering_notes: string | null;
   final_approved_by: string | null;
   final_approved_at: string | null;
   final_notes: string | null;
@@ -49,6 +52,8 @@ interface RefundRequest {
   customer_email: string | null;
   customer_phone: string | null;
   case_number: string | null;
+  requires_director_approval: boolean;
+  requires_catering_approval: boolean;
   created_at: string;
   updated_at: string;
   receipt_image_url?: string | null;
