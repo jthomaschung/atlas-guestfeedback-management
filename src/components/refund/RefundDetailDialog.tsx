@@ -15,9 +15,8 @@ import { Separator } from '@/components/ui/separator';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 import {
-  DollarSign, Loader2, Camera, X, Send, CheckCircle2, Clock, XCircle, ChevronRight, ImageIcon, Upload, Mail,
+  DollarSign, Loader2, Camera, X, Send, CheckCircle2, Clock, XCircle, ChevronRight, ImageIcon, Upload,
 } from 'lucide-react';
 
 interface RefundRequest {
@@ -92,10 +91,6 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
   const [customerEmail, setCustomerEmail] = useState<string | null>(null);
   const [requesterEmail, setRequesterEmail] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [emailOpen, setEmailOpen] = useState(false);
-  const [emailSubject, setEmailSubject] = useState('');
-  const [emailBody, setEmailBody] = useState('');
-  const [emailSending, setEmailSending] = useState(false);
 
   useEffect(() => {
     if (request) {
@@ -462,69 +457,6 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
             </>
           )}
 
-          {/* Email Requestor */}
-          <Separator />
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs text-muted-foreground">Email Requestor</Label>
-              {requesterEmail && <span className="text-xs text-muted-foreground">{requesterEmail}</span>}
-            </div>
-            {!emailOpen ? (
-              <Button size="sm" variant="outline" className="w-full" onClick={() => {
-                setEmailSubject(`Re: Refund Request — Case #${request.case_number || 'N/A'} — $${Number(request.refund_amount).toFixed(2)}`);
-                setEmailBody('');
-                setEmailOpen(true);
-              }} disabled={!requesterEmail}>
-                <Mail className="h-4 w-4 mr-2" />
-                Compose Email
-              </Button>
-            ) : (
-              <div className="space-y-2">
-                <Input
-                  placeholder="Subject"
-                  value={emailSubject}
-                  onChange={(e) => setEmailSubject(e.target.value)}
-                  className="text-sm"
-                />
-                <Textarea
-                  placeholder="Type your message to the requestor..."
-                  value={emailBody}
-                  onChange={(e) => setEmailBody(e.target.value)}
-                  className="min-h-[80px] resize-none text-sm"
-                  maxLength={5000}
-                />
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" className="flex-1" onClick={() => setEmailOpen(false)} disabled={emailSending}>
-                    Cancel
-                  </Button>
-                  <Button size="sm" className="flex-1" onClick={async () => {
-                    if (!requesterEmail || !emailBody.trim()) return;
-                    setEmailSending(true);
-                    try {
-                      const { error } = await supabase.functions.invoke('send-refund-approval-notification', {
-                        body: {
-                          refundRequestId: request.id,
-                          notificationType: 'custom_email',
-                          customEmail: { to: requesterEmail, subject: emailSubject, body: emailBody },
-                        },
-                      });
-                      if (error) throw error;
-                      toast({ title: 'Sent', description: `Email sent to ${requesterEmail}` });
-                      setEmailOpen(false);
-                    } catch (err) {
-                      console.error('Email send error:', err);
-                      toast({ title: 'Error', description: 'Failed to send email', variant: 'destructive' });
-                    } finally {
-                      setEmailSending(false);
-                    }
-                  }} disabled={emailSending || !emailBody.trim()}>
-                    {emailSending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
-                    Send
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
 
           {/* Action section */}
           {(canApprove || canComplete) && (
