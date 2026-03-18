@@ -119,11 +119,11 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
       setCustomerEmail(fb?.customer_email || null);
     }
 
-    // Get requester email from profiles
+    // Get requester email from profiles (user_id references auth.users)
     const { data: profile } = await supabase
       .from('profiles')
       .select('email')
-      .eq('id', req.requested_by)
+      .eq('user_id', req.requested_by)
       .single();
     setRequesterEmail(profile?.email || null);
   };
