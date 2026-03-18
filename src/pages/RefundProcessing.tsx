@@ -139,6 +139,22 @@ export default function RefundProcessing() {
     setActionDialogOpen(true);
   };
 
+  // Determine what the next pending approval action is for a request
+  const getNextApproval = (request: RefundRequest): { label: string; role: 'dm' | 'director' | 'catering' } | null => {
+    if (request.status === 'pending' && !request.manager_approved_at) return { label: 'DM Approve', role: 'dm' };
+    if (request.requires_director_approval && !request.director_approved_at) return { label: 'Director Approve', role: 'director' };
+    if (request.requires_catering_approval && !request.catering_approved_at) return { label: 'Catering Approve', role: 'catering' };
+    return null;
+  };
+
+  // Check if all required approvals are met
+  const allApprovalsMet = (request: RefundRequest, overrideRole?: 'dm' | 'director' | 'catering'): boolean => {
+    const dmDone = !!request.manager_approved_at || overrideRole === 'dm';
+    const directorDone = !request.requires_director_approval || !!request.director_approved_at || overrideRole === 'director';
+    const cateringDone = !request.requires_catering_approval || !!request.catering_approved_at || overrideRole === 'catering';
+    return dmDone && directorDone && cateringDone;
+  };
+
   const handleAction = async () => {
     if (!selectedRequest || !user) return;
     setProcessing(true);
@@ -162,32 +178,46 @@ export default function RefundProcessing() {
           completed_at: new Date().toISOString(),
         };
       } else {
-        // Approval chain
-        const currentStatus = selectedRequest.status;
-        if (currentStatus === 'pending') {
-          updateFields = {
-            ...updateFields,
-            status: 'manager_approved',
-            manager_approved_by: user.id,
-            manager_approved_at: new Date().toISOString(),
-            manager_notes: actionNotes || null,
-          };
-        } else if (currentStatus === 'manager_approved') {
-          updateFields = {
-            ...updateFields,
-            status: 'director_approved',
-            director_approved_by: user.id,
-            director_approved_at: new Date().toISOString(),
-            director_notes: actionNotes || null,
-          };
-        } else if (currentStatus === 'director_approved') {
-          updateFields = {
-            ...updateFields,
-            status: 'approved',
-            final_approved_by: user.id,
-            final_approved_at: new Date().toISOString(),
-            final_notes: actionNotes || null,
-          };
+        // Determine which approval this is
+        const next = getNextApproval(selectedRequest);
+        if (!next) return;
+
+        if (next.role === 'dm') {
+          updateFields.manager_approved_by = user.id;
+          updateFields.manager_approved_at = new Date().toISOString();
+          updateFields.manager_notes = actionNotes || null;
+        } else if (next.role === 'director') {
+          updateFields.director_approved_by = user.id;
+          updateFields.director_approved_at = new Date().toISOString();
+          updateFields.director_notes = actionNotes || null;
+        } else if (next.role === 'catering') {
+          updateFields.catering_approved_by = user.id;
+          updateFields.catering_approved_at = new Date().toISOString();
+          updateFields.catering_notes = actionNotes || null;
+        }
+
+        // Check if all approvals are now met
+        if (allApprovalsMet(selectedRequest, next.role)) {
+          updateFields.status = 'approved';
+        } else {
+          // Set to next waiting status
+          if (next.role === 'dm') {
+            if (selectedRequest.requires_director_approval && !selectedRequest.director_approved_at) {
+              updateFields.status = 'awaiting_director';
+            } else if (selectedRequest.requires_catering_approval && !selectedRequest.catering_approved_at) {
+              updateFields.status = 'awaiting_catering';
+            } else {
+              updateFields.status = 'approved';
+            }
+          } else if (next.role === 'director') {
+            if (selectedRequest.requires_catering_approval && !selectedRequest.catering_approved_at) {
+              updateFields.status = 'awaiting_catering';
+            } else {
+              updateFields.status = 'approved';
+            }
+          } else {
+            updateFields.status = 'approved';
+          }
         }
       }
 
@@ -209,13 +239,9 @@ export default function RefundProcessing() {
     }
   };
 
-  const getNextApprovalLabel = (status: string) => {
-    switch (status) {
-      case 'pending': return 'Manager Approve';
-      case 'manager_approved': return 'Director Approve';
-      case 'director_approved': return 'Final Approve';
-      default: return 'Approve';
-    }
+  const getNextApprovalLabel = (request: RefundRequest) => {
+    const next = getNextApproval(request);
+    return next?.label || 'Approve';
   };
 
   if (loading) {
