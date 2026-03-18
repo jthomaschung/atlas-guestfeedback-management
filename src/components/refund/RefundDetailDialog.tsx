@@ -91,10 +91,6 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
   const [customerEmail, setCustomerEmail] = useState<string | null>(null);
   const [requesterEmail, setRequesterEmail] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [emailOpen, setEmailOpen] = useState(false);
-  const [emailSubject, setEmailSubject] = useState('');
-  const [emailBody, setEmailBody] = useState('');
-  const [emailSending, setEmailSending] = useState(false);
 
   useEffect(() => {
     if (request) {
