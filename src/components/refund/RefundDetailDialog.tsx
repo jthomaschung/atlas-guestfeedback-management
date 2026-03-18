@@ -174,6 +174,20 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
     }
   };
 
+  const getNextApproval = (req: RefundRequest): { label: string; role: 'dm' | 'director' | 'catering' } | null => {
+    if (!req.manager_approved_at) return { label: 'DM Approve', role: 'dm' };
+    if (req.requires_director_approval && !req.director_approved_at) return { label: 'Director Approve', role: 'director' };
+    if (req.requires_catering_approval && !req.catering_approved_at) return { label: 'Catering Approve', role: 'catering' };
+    return null;
+  };
+
+  const allApprovalsMet = (req: RefundRequest, overrideRole?: string): boolean => {
+    const dmDone = !!req.manager_approved_at || overrideRole === 'dm';
+    const directorDone = !req.requires_director_approval || !!req.director_approved_at || overrideRole === 'director';
+    const cateringDone = !req.requires_catering_approval || !!req.catering_approved_at || overrideRole === 'catering';
+    return dmDone && directorDone && cateringDone;
+  };
+
   const handleAction = async (type: 'approve' | 'deny' | 'complete') => {
     if (!user) return;
     setProcessing(true);
@@ -185,10 +199,37 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
       } else if (type === 'complete') {
         updateFields = { ...updateFields, status: 'completed', completed_by: user.id, completed_at: new Date().toISOString() };
       } else {
-        const s = request.status;
-        if (s === 'pending') updateFields = { ...updateFields, status: 'manager_approved', manager_approved_by: user.id, manager_approved_at: new Date().toISOString(), manager_notes: actionNotes || null };
-        else if (s === 'manager_approved') updateFields = { ...updateFields, status: 'director_approved', director_approved_by: user.id, director_approved_at: new Date().toISOString(), director_notes: actionNotes || null };
-        else if (s === 'director_approved') updateFields = { ...updateFields, status: 'approved', final_approved_by: user.id, final_approved_at: new Date().toISOString(), final_notes: actionNotes || null };
+        const next = getNextApproval(request);
+        if (!next) return;
+
+        if (next.role === 'dm') {
+          updateFields.manager_approved_by = user.id;
+          updateFields.manager_approved_at = new Date().toISOString();
+          updateFields.manager_notes = actionNotes || null;
+        } else if (next.role === 'director') {
+          updateFields.director_approved_by = user.id;
+          updateFields.director_approved_at = new Date().toISOString();
+          updateFields.director_notes = actionNotes || null;
+        } else if (next.role === 'catering') {
+          updateFields.catering_approved_by = user.id;
+          updateFields.catering_approved_at = new Date().toISOString();
+          updateFields.catering_notes = actionNotes || null;
+        }
+
+        if (allApprovalsMet(request, next.role)) {
+          updateFields.status = 'approved';
+        } else {
+          if (next.role === 'dm') {
+            if (request.requires_director_approval && !request.director_approved_at) updateFields.status = 'awaiting_director';
+            else if (request.requires_catering_approval && !request.catering_approved_at) updateFields.status = 'awaiting_catering';
+            else updateFields.status = 'approved';
+          } else if (next.role === 'director') {
+            if (request.requires_catering_approval && !request.catering_approved_at) updateFields.status = 'awaiting_catering';
+            else updateFields.status = 'approved';
+          } else {
+            updateFields.status = 'approved';
+          }
+        }
       }
 
       const { error } = await supabase.from('refund_requests').update(updateFields).eq('id', request.id);
@@ -205,46 +246,8 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
     }
   };
 
-  const handleSendReceipt = async () => {
-    const receiptUrl = request.refund_receipt_url || request.receipt_image_url;
-    const recipients: string[] = [];
-    if (customerEmail) recipients.push(customerEmail);
-    if (requesterEmail) recipients.push(requesterEmail);
-
-    if (recipients.length === 0) {
-      toast({ title: 'Error', description: 'No email addresses found for customer or requester', variant: 'destructive' });
-      return;
-    }
-
-    setSending(true);
-    try {
-      const { error } = await supabase.functions.invoke('send-refund-receipt', {
-        body: {
-          refundRequestId: request.id,
-          recipientEmails: recipients,
-          receiptUrl: receiptUrl || null,
-        },
-      });
-      if (error) throw error;
-      toast({ title: 'Sent!', description: `Receipt emailed to ${recipients.join(', ')}` });
-    } catch (error) {
-      console.error('Send error:', error);
-      toast({ title: 'Error', description: 'Failed to send receipt email', variant: 'destructive' });
-    } finally {
-      setSending(false);
-    }
-  };
-
-  const getNextApprovalLabel = (status: string) => {
-    switch (status) {
-      case 'pending': return 'Manager Approve';
-      case 'manager_approved': return 'Director Approve';
-      case 'director_approved': return 'Final Approve';
-      default: return 'Approve';
-    }
-  };
-
-  const canApprove = ['pending', 'manager_approved', 'director_approved'].includes(request.status);
+  const nextApproval = getNextApproval(request);
+  const canApprove = nextApproval !== null && !['approved', 'denied', 'completed'].includes(request.status);
   const canComplete = request.status === 'approved';
 
   return (
