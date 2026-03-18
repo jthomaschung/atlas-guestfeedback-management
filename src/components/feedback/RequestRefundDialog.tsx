@@ -147,6 +147,8 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
           store_number: feedback.store_number,
           market: feedback.market,
           customer_name: feedback.customer_name || null,
+          customer_email: feedback.customer_email || null,
+          customer_phone: feedback.customer_phone || null,
           case_number: feedback.case_number || null,
           receipt_image_url: receiptUrl,
           receipt_bypassed: bypassReceipt,

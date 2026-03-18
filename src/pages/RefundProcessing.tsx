@@ -61,6 +61,8 @@ interface RefundRequest {
   store_number: string | null;
   market: string | null;
   customer_name: string | null;
+  customer_email: string | null;
+  customer_phone: string | null;
   case_number: string | null;
   created_at: string;
   updated_at: string;
@@ -323,7 +325,17 @@ export default function RefundProcessing() {
                             )}
                           </div>
                         </TableCell>
-                        <TableCell>{request.customer_name || '—'}</TableCell>
+                        <TableCell>
+                          <div>
+                            <span>{request.customer_name || '—'}</span>
+                            {request.customer_email && (
+                              <p className="text-xs text-muted-foreground">{request.customer_email}</p>
+                            )}
+                            {request.customer_phone && (
+                              <p className="text-xs text-muted-foreground">{request.customer_phone}</p>
+                            )}
+                          </div>
+                        </TableCell>
                         <TableCell className="font-semibold">${Number(request.refund_amount).toFixed(2)}</TableCell>
                         <TableCell className="text-sm">{request.refund_reason}</TableCell>
                         <TableCell className="text-sm">{request.refund_method}</TableCell>

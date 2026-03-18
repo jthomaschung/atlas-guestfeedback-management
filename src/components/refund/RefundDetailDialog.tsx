@@ -46,6 +46,8 @@ interface RefundRequest {
   store_number: string | null;
   market: string | null;
   customer_name: string | null;
+  customer_email: string | null;
+  customer_phone: string | null;
   case_number: string | null;
   created_at: string;
   updated_at: string;
@@ -94,13 +96,17 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
   }, [request?.id]);
 
   const loadEmails = async (req: RefundRequest) => {
-    // Get customer email from feedback
-    const { data: fb } = await supabase
-      .from('customer_feedback')
-      .select('customer_email')
-      .eq('id', req.feedback_id)
-      .single();
-    setCustomerEmail(fb?.customer_email || null);
+    // Use customer email from refund request directly, fallback to feedback record
+    if (req.customer_email) {
+      setCustomerEmail(req.customer_email);
+    } else {
+      const { data: fb } = await supabase
+        .from('customer_feedback')
+        .select('customer_email')
+        .eq('id', req.feedback_id)
+        .single();
+      setCustomerEmail(fb?.customer_email || null);
+    }
 
     // Get requester email from profiles
     const { data: profile } = await supabase
@@ -268,6 +274,18 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
               <p className="text-muted-foreground text-xs">Store</p>
               <p className="font-medium">#{request.store_number} {request.market && `(${request.market})`}</p>
             </div>
+            {request.customer_email && (
+              <div>
+                <p className="text-muted-foreground text-xs">Email</p>
+                <p className="font-medium text-xs break-all">{request.customer_email}</p>
+              </div>
+            )}
+            {request.customer_phone && (
+              <div>
+                <p className="text-muted-foreground text-xs">Phone</p>
+                <p className="font-medium">{request.customer_phone}</p>
+              </div>
+            )}
             <div>
               <p className="text-muted-foreground text-xs">Amount</p>
               <p className="font-bold text-lg">${Number(request.refund_amount).toFixed(2)}</p>
