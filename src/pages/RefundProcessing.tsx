@@ -61,6 +61,8 @@ interface RefundRequest {
   store_number: string | null;
   market: string | null;
   customer_name: string | null;
+  customer_email: string | null;
+  customer_phone: string | null;
   case_number: string | null;
   created_at: string;
   updated_at: string;
