@@ -39,6 +39,7 @@ const refundReasons = [
   'Service Issue',
   'Overcharged',
   'Duplicate Charge',
+  'Catering Refund',
   'Other',
 ];
 
