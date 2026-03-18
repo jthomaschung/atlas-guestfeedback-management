@@ -479,6 +479,15 @@ export default function RefundProcessing() {
                                 Mark Complete
                               </Button>
                             )}
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 w-7 p-0"
+                              title="Email Requestor"
+                              onClick={() => openEmailDialog(request)}
+                            >
+                              <Mail className="h-3.5 w-3.5" />
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
