@@ -382,7 +382,7 @@ export default function RefundProcessing() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                            {['pending', 'manager_approved', 'director_approved'].includes(request.status) && (
+                            {getNextApproval(request) && request.status !== 'approved' && request.status !== 'completed' && request.status !== 'denied' && (
                               <>
                                 <Button
                                   size="sm"
@@ -390,7 +390,7 @@ export default function RefundProcessing() {
                                   className="h-7 text-xs"
                                   onClick={() => openAction(request, 'approve')}
                                 >
-                                  {getNextApprovalLabel(request.status)}
+                                  {getNextApprovalLabel(request)}
                                 </Button>
                                 <Button
                                   size="sm"
