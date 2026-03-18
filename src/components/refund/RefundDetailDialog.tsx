@@ -15,8 +15,9 @@ import { Separator } from '@/components/ui/separator';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import {
-  DollarSign, Loader2, Camera, X, Send, CheckCircle2, Clock, XCircle, ChevronRight, ImageIcon, Upload,
+  DollarSign, Loader2, Camera, X, Send, CheckCircle2, Clock, XCircle, ChevronRight, ImageIcon, Upload, Mail,
 } from 'lucide-react';
 
 interface RefundRequest {
