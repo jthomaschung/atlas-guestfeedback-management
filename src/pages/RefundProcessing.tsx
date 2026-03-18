@@ -228,6 +228,24 @@ export default function RefundProcessing() {
 
       if (error) throw error;
 
+      // Send notifications for next required approval
+      if (actionType === 'approve') {
+        try {
+          const nextStatus = updateFields.status as string;
+          if (nextStatus === 'awaiting_director') {
+            await supabase.functions.invoke('send-refund-approval-notification', {
+              body: { refundRequestId: selectedRequest.id, notificationType: 'director_needed' },
+            });
+          } else if (nextStatus === 'awaiting_catering') {
+            await supabase.functions.invoke('send-refund-approval-notification', {
+              body: { refundRequestId: selectedRequest.id, notificationType: 'catering_needed' },
+            });
+          }
+        } catch (notifErr) {
+          console.error('Notification send failed:', notifErr);
+        }
+      }
+
       toast({ title: 'Success', description: `Refund request ${actionType === 'deny' ? 'denied' : actionType === 'complete' ? 'completed' : 'approved'} successfully.` });
       setActionDialogOpen(false);
       await loadRefundRequests();

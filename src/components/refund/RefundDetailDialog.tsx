@@ -235,6 +235,24 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
       const { error } = await supabase.from('refund_requests').update(updateFields).eq('id', request.id);
       if (error) throw error;
 
+      // Send notifications for next required approval
+      if (type === 'approve') {
+        try {
+          const nextStatus = updateFields.status as string;
+          if (nextStatus === 'awaiting_director') {
+            await supabase.functions.invoke('send-refund-approval-notification', {
+              body: { refundRequestId: request.id, notificationType: 'director_needed' },
+            });
+          } else if (nextStatus === 'awaiting_catering') {
+            await supabase.functions.invoke('send-refund-approval-notification', {
+              body: { refundRequestId: request.id, notificationType: 'catering_needed' },
+            });
+          }
+        } catch (notifErr) {
+          console.error('Notification send failed:', notifErr);
+        }
+      }
+
       toast({ title: 'Success', description: `Refund request ${type === 'deny' ? 'denied' : type === 'complete' ? 'completed' : 'approved'}` });
       setActionNotes('');
       onUpdate();

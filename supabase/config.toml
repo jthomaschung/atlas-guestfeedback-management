@@ -81,3 +81,6 @@ verify_jwt = false
 
 [functions.send-refund-receipt]
 verify_jwt = true
+
+[functions.send-refund-approval-notification]
+verify_jwt = true
