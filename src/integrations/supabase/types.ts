@@ -7509,6 +7509,9 @@ export type Database = {
       refund_requests: {
         Row: {
           case_number: string | null
+          catering_approved_at: string | null
+          catering_approved_by: string | null
+          catering_notes: string | null
           completed_at: string | null
           completed_by: string | null
           created_at: string
@@ -7540,12 +7543,17 @@ export type Database = {
           refund_receipt_url: string | null
           requested_at: string
           requested_by: string
+          requires_catering_approval: boolean
+          requires_director_approval: boolean
           status: string
           store_number: string | null
           updated_at: string
         }
         Insert: {
           case_number?: string | null
+          catering_approved_at?: string | null
+          catering_approved_by?: string | null
+          catering_notes?: string | null
           completed_at?: string | null
           completed_by?: string | null
           created_at?: string
@@ -7577,12 +7585,17 @@ export type Database = {
           refund_receipt_url?: string | null
           requested_at?: string
           requested_by: string
+          requires_catering_approval?: boolean
+          requires_director_approval?: boolean
           status?: string
           store_number?: string | null
           updated_at?: string
         }
         Update: {
           case_number?: string | null
+          catering_approved_at?: string | null
+          catering_approved_by?: string | null
+          catering_notes?: string | null
           completed_at?: string | null
           completed_by?: string | null
           created_at?: string
@@ -7614,6 +7627,8 @@ export type Database = {
           refund_receipt_url?: string | null
           requested_at?: string
           requested_by?: string
+          requires_catering_approval?: boolean
+          requires_director_approval?: boolean
           status?: string
           store_number?: string | null
           updated_at?: string

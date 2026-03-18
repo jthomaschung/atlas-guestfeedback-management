@@ -35,6 +35,9 @@ interface RefundRequest {
   director_approved_by: string | null;
   director_approved_at: string | null;
   director_notes: string | null;
+  catering_approved_by: string | null;
+  catering_approved_at: string | null;
+  catering_notes: string | null;
   final_approved_by: string | null;
   final_approved_at: string | null;
   final_notes: string | null;
@@ -49,6 +52,8 @@ interface RefundRequest {
   customer_email: string | null;
   customer_phone: string | null;
   case_number: string | null;
+  requires_director_approval: boolean;
+  requires_catering_approval: boolean;
   created_at: string;
   updated_at: string;
   receipt_image_url?: string | null;
@@ -58,9 +63,10 @@ interface RefundRequest {
 }
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
-  pending: { label: 'Pending', color: 'bg-amber-100 text-amber-800 border-amber-200', icon: Clock },
-  manager_approved: { label: 'Manager Approved', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: ChevronRight },
-  director_approved: { label: 'Director Approved', color: 'bg-indigo-100 text-indigo-800 border-indigo-200', icon: ChevronRight },
+  pending: { label: 'Pending DM', color: 'bg-amber-100 text-amber-800 border-amber-200', icon: Clock },
+  dm_approved: { label: 'DM Approved', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: ChevronRight },
+  awaiting_director: { label: 'Awaiting Director', color: 'bg-violet-100 text-violet-800 border-violet-200', icon: Clock },
+  awaiting_catering: { label: 'Awaiting Catering', color: 'bg-orange-100 text-orange-800 border-orange-200', icon: Clock },
   approved: { label: 'Fully Approved', color: 'bg-green-100 text-green-800 border-green-200', icon: CheckCircle2 },
   denied: { label: 'Denied', color: 'bg-red-100 text-red-800 border-red-200', icon: XCircle },
   completed: { label: 'Completed', color: 'bg-emerald-100 text-emerald-800 border-emerald-200', icon: CheckCircle2 },
@@ -168,6 +174,20 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
     }
   };
 
+  const getNextApproval = (req: RefundRequest): { label: string; role: 'dm' | 'director' | 'catering' } | null => {
+    if (!req.manager_approved_at) return { label: 'DM Approve', role: 'dm' };
+    if (req.requires_director_approval && !req.director_approved_at) return { label: 'Director Approve', role: 'director' };
+    if (req.requires_catering_approval && !req.catering_approved_at) return { label: 'Catering Approve', role: 'catering' };
+    return null;
+  };
+
+  const allApprovalsMet = (req: RefundRequest, overrideRole?: string): boolean => {
+    const dmDone = !!req.manager_approved_at || overrideRole === 'dm';
+    const directorDone = !req.requires_director_approval || !!req.director_approved_at || overrideRole === 'director';
+    const cateringDone = !req.requires_catering_approval || !!req.catering_approved_at || overrideRole === 'catering';
+    return dmDone && directorDone && cateringDone;
+  };
+
   const handleAction = async (type: 'approve' | 'deny' | 'complete') => {
     if (!user) return;
     setProcessing(true);
@@ -179,10 +199,37 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
       } else if (type === 'complete') {
         updateFields = { ...updateFields, status: 'completed', completed_by: user.id, completed_at: new Date().toISOString() };
       } else {
-        const s = request.status;
-        if (s === 'pending') updateFields = { ...updateFields, status: 'manager_approved', manager_approved_by: user.id, manager_approved_at: new Date().toISOString(), manager_notes: actionNotes || null };
-        else if (s === 'manager_approved') updateFields = { ...updateFields, status: 'director_approved', director_approved_by: user.id, director_approved_at: new Date().toISOString(), director_notes: actionNotes || null };
-        else if (s === 'director_approved') updateFields = { ...updateFields, status: 'approved', final_approved_by: user.id, final_approved_at: new Date().toISOString(), final_notes: actionNotes || null };
+        const next = getNextApproval(request);
+        if (!next) return;
+
+        if (next.role === 'dm') {
+          updateFields.manager_approved_by = user.id;
+          updateFields.manager_approved_at = new Date().toISOString();
+          updateFields.manager_notes = actionNotes || null;
+        } else if (next.role === 'director') {
+          updateFields.director_approved_by = user.id;
+          updateFields.director_approved_at = new Date().toISOString();
+          updateFields.director_notes = actionNotes || null;
+        } else if (next.role === 'catering') {
+          updateFields.catering_approved_by = user.id;
+          updateFields.catering_approved_at = new Date().toISOString();
+          updateFields.catering_notes = actionNotes || null;
+        }
+
+        if (allApprovalsMet(request, next.role)) {
+          updateFields.status = 'approved';
+        } else {
+          if (next.role === 'dm') {
+            if (request.requires_director_approval && !request.director_approved_at) updateFields.status = 'awaiting_director';
+            else if (request.requires_catering_approval && !request.catering_approved_at) updateFields.status = 'awaiting_catering';
+            else updateFields.status = 'approved';
+          } else if (next.role === 'director') {
+            if (request.requires_catering_approval && !request.catering_approved_at) updateFields.status = 'awaiting_catering';
+            else updateFields.status = 'approved';
+          } else {
+            updateFields.status = 'approved';
+          }
+        }
       }
 
       const { error } = await supabase.from('refund_requests').update(updateFields).eq('id', request.id);
@@ -198,6 +245,10 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
       setProcessing(false);
     }
   };
+
+  const nextApproval = getNextApproval(request);
+  const canApprove = nextApproval !== null && !['approved', 'denied', 'completed'].includes(request.status);
+  const canComplete = request.status === 'approved';
 
   const handleSendReceipt = async () => {
     const receiptUrl = request.refund_receipt_url || request.receipt_image_url;
@@ -228,18 +279,6 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
       setSending(false);
     }
   };
-
-  const getNextApprovalLabel = (status: string) => {
-    switch (status) {
-      case 'pending': return 'Manager Approve';
-      case 'manager_approved': return 'Director Approve';
-      case 'director_approved': return 'Final Approve';
-      default: return 'Approve';
-    }
-  };
-
-  const canApprove = ['pending', 'manager_approved', 'director_approved'].includes(request.status);
-  const canComplete = request.status === 'approved';
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -382,15 +421,17 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
           )}
 
           {/* Approval Timeline */}
-          {(request.manager_approved_at || request.director_approved_at || request.final_approved_at || request.denied_at || request.completed_at) && (
+          {(request.manager_approved_at || request.director_approved_at || request.catering_approved_at || request.denied_at || request.completed_at) && (
             <>
               <Separator />
               <div>
                 <Label className="text-xs text-muted-foreground">Approval Timeline</Label>
                 <div className="space-y-1 mt-1 text-xs">
-                  {request.manager_approved_at && <p>✅ Manager approved — {format(new Date(request.manager_approved_at), 'MMM d h:mm a')}</p>}
+                  {request.manager_approved_at && <p>✅ DM approved — {format(new Date(request.manager_approved_at), 'MMM d h:mm a')}</p>}
+                  {request.requires_director_approval && !request.director_approved_at && request.manager_approved_at && <p>⏳ Awaiting Director approval</p>}
                   {request.director_approved_at && <p>✅ Director approved — {format(new Date(request.director_approved_at), 'MMM d h:mm a')}</p>}
-                  {request.final_approved_at && <p>✅ Final approved — {format(new Date(request.final_approved_at), 'MMM d h:mm a')}</p>}
+                  {request.requires_catering_approval && !request.catering_approved_at && request.manager_approved_at && <p>⏳ Awaiting Catering approval</p>}
+                  {request.catering_approved_at && <p>✅ Catering approved — {format(new Date(request.catering_approved_at), 'MMM d h:mm a')}</p>}
                   {request.completed_at && <p>✅ Completed — {format(new Date(request.completed_at), 'MMM d h:mm a')}</p>}
                   {request.denied_at && <p>❌ Denied — {format(new Date(request.denied_at), 'MMM d h:mm a')}{request.denial_reason && `: ${request.denial_reason}`}</p>}
                 </div>
@@ -415,7 +456,7 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
                     <>
                       <Button size="sm" className="flex-1" onClick={() => handleAction('approve')} disabled={processing}>
                         {processing && <Loader2 className="h-4 w-4 animate-spin mr-1" />}
-                        {getNextApprovalLabel(request.status)}
+                        {nextApproval?.label || 'Approve'}
                       </Button>
                       <Button size="sm" variant="destructive" onClick={() => handleAction('deny')} disabled={processing}>
                         Deny

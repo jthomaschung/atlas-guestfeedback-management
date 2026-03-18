@@ -50,6 +50,9 @@ interface RefundRequest {
   director_approved_by: string | null;
   director_approved_at: string | null;
   director_notes: string | null;
+  catering_approved_by: string | null;
+  catering_approved_at: string | null;
+  catering_notes: string | null;
   final_approved_by: string | null;
   final_approved_at: string | null;
   final_notes: string | null;
@@ -64,14 +67,17 @@ interface RefundRequest {
   customer_email: string | null;
   customer_phone: string | null;
   case_number: string | null;
+  requires_director_approval: boolean;
+  requires_catering_approval: boolean;
   created_at: string;
   updated_at: string;
 }
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
-  pending: { label: 'Pending', color: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400', icon: Clock },
-  manager_approved: { label: 'Manager Approved', color: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400', icon: ChevronRight },
-  director_approved: { label: 'Director Approved', color: 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400', icon: ChevronRight },
+  pending: { label: 'Pending DM', color: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400', icon: Clock },
+  dm_approved: { label: 'DM Approved', color: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400', icon: ChevronRight },
+  awaiting_director: { label: 'Awaiting Director', color: 'bg-violet-100 text-violet-800 border-violet-200 dark:bg-violet-900/20 dark:text-violet-400', icon: Clock },
+  awaiting_catering: { label: 'Awaiting Catering', color: 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400', icon: Clock },
   approved: { label: 'Fully Approved', color: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400', icon: CheckCircle2 },
   denied: { label: 'Denied', color: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400', icon: XCircle },
   completed: { label: 'Completed', color: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400', icon: CheckCircle2 },
@@ -119,7 +125,7 @@ export default function RefundProcessing() {
 
   const stats = {
     pending: requests.filter(r => r.status === 'pending').length,
-    inProgress: requests.filter(r => ['manager_approved', 'director_approved'].includes(r.status)).length,
+    inProgress: requests.filter(r => ['dm_approved', 'awaiting_director', 'awaiting_catering'].includes(r.status)).length,
     approved: requests.filter(r => r.status === 'approved').length,
     completed: requests.filter(r => r.status === 'completed').length,
     denied: requests.filter(r => r.status === 'denied').length,
@@ -131,6 +137,22 @@ export default function RefundProcessing() {
     setActionType(type);
     setActionNotes('');
     setActionDialogOpen(true);
+  };
+
+  // Determine what the next pending approval action is for a request
+  const getNextApproval = (request: RefundRequest): { label: string; role: 'dm' | 'director' | 'catering' } | null => {
+    if (request.status === 'pending' && !request.manager_approved_at) return { label: 'DM Approve', role: 'dm' };
+    if (request.requires_director_approval && !request.director_approved_at) return { label: 'Director Approve', role: 'director' };
+    if (request.requires_catering_approval && !request.catering_approved_at) return { label: 'Catering Approve', role: 'catering' };
+    return null;
+  };
+
+  // Check if all required approvals are met
+  const allApprovalsMet = (request: RefundRequest, overrideRole?: 'dm' | 'director' | 'catering'): boolean => {
+    const dmDone = !!request.manager_approved_at || overrideRole === 'dm';
+    const directorDone = !request.requires_director_approval || !!request.director_approved_at || overrideRole === 'director';
+    const cateringDone = !request.requires_catering_approval || !!request.catering_approved_at || overrideRole === 'catering';
+    return dmDone && directorDone && cateringDone;
   };
 
   const handleAction = async () => {
@@ -156,32 +178,46 @@ export default function RefundProcessing() {
           completed_at: new Date().toISOString(),
         };
       } else {
-        // Approval chain
-        const currentStatus = selectedRequest.status;
-        if (currentStatus === 'pending') {
-          updateFields = {
-            ...updateFields,
-            status: 'manager_approved',
-            manager_approved_by: user.id,
-            manager_approved_at: new Date().toISOString(),
-            manager_notes: actionNotes || null,
-          };
-        } else if (currentStatus === 'manager_approved') {
-          updateFields = {
-            ...updateFields,
-            status: 'director_approved',
-            director_approved_by: user.id,
-            director_approved_at: new Date().toISOString(),
-            director_notes: actionNotes || null,
-          };
-        } else if (currentStatus === 'director_approved') {
-          updateFields = {
-            ...updateFields,
-            status: 'approved',
-            final_approved_by: user.id,
-            final_approved_at: new Date().toISOString(),
-            final_notes: actionNotes || null,
-          };
+        // Determine which approval this is
+        const next = getNextApproval(selectedRequest);
+        if (!next) return;
+
+        if (next.role === 'dm') {
+          updateFields.manager_approved_by = user.id;
+          updateFields.manager_approved_at = new Date().toISOString();
+          updateFields.manager_notes = actionNotes || null;
+        } else if (next.role === 'director') {
+          updateFields.director_approved_by = user.id;
+          updateFields.director_approved_at = new Date().toISOString();
+          updateFields.director_notes = actionNotes || null;
+        } else if (next.role === 'catering') {
+          updateFields.catering_approved_by = user.id;
+          updateFields.catering_approved_at = new Date().toISOString();
+          updateFields.catering_notes = actionNotes || null;
+        }
+
+        // Check if all approvals are now met
+        if (allApprovalsMet(selectedRequest, next.role)) {
+          updateFields.status = 'approved';
+        } else {
+          // Set to next waiting status
+          if (next.role === 'dm') {
+            if (selectedRequest.requires_director_approval && !selectedRequest.director_approved_at) {
+              updateFields.status = 'awaiting_director';
+            } else if (selectedRequest.requires_catering_approval && !selectedRequest.catering_approved_at) {
+              updateFields.status = 'awaiting_catering';
+            } else {
+              updateFields.status = 'approved';
+            }
+          } else if (next.role === 'director') {
+            if (selectedRequest.requires_catering_approval && !selectedRequest.catering_approved_at) {
+              updateFields.status = 'awaiting_catering';
+            } else {
+              updateFields.status = 'approved';
+            }
+          } else {
+            updateFields.status = 'approved';
+          }
         }
       }
 
@@ -203,13 +239,9 @@ export default function RefundProcessing() {
     }
   };
 
-  const getNextApprovalLabel = (status: string) => {
-    switch (status) {
-      case 'pending': return 'Manager Approve';
-      case 'manager_approved': return 'Director Approve';
-      case 'director_approved': return 'Final Approve';
-      default: return 'Approve';
-    }
+  const getNextApprovalLabel = (request: RefundRequest) => {
+    const next = getNextApproval(request);
+    return next?.label || 'Approve';
   };
 
   if (loading) {
@@ -275,9 +307,9 @@ export default function RefundProcessing() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Requests</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="manager_approved">Manager Approved</SelectItem>
-            <SelectItem value="director_approved">Director Approved</SelectItem>
+            <SelectItem value="pending">Pending DM</SelectItem>
+            <SelectItem value="awaiting_director">Awaiting Director</SelectItem>
+            <SelectItem value="awaiting_catering">Awaiting Catering</SelectItem>
             <SelectItem value="approved">Fully Approved</SelectItem>
             <SelectItem value="completed">Completed</SelectItem>
             <SelectItem value="denied">Denied</SelectItem>
@@ -350,7 +382,7 @@ export default function RefundProcessing() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                            {['pending', 'manager_approved', 'director_approved'].includes(request.status) && (
+                            {getNextApproval(request) && request.status !== 'approved' && request.status !== 'completed' && request.status !== 'denied' && (
                               <>
                                 <Button
                                   size="sm"
@@ -358,7 +390,7 @@ export default function RefundProcessing() {
                                   className="h-7 text-xs"
                                   onClick={() => openAction(request, 'approve')}
                                 >
-                                  {getNextApprovalLabel(request.status)}
+                                  {getNextApprovalLabel(request)}
                                 </Button>
                                 <Button
                                   size="sm"

@@ -135,6 +135,8 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
         receiptUrl = urlData.publicUrl;
       }
 
+      const isCatering = (feedback.channel || '').toLowerCase() === 'catering';
+
       const { error } = await supabase
         .from('refund_requests')
         .insert({
@@ -153,6 +155,8 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
           receipt_image_url: receiptUrl,
           receipt_bypassed: bypassReceipt,
           receipt_bypass_reason: bypassReceipt ? bypassReason : null,
+          requires_director_approval: parsedAmount > 25,
+          requires_catering_approval: isCatering,
         });
 
       if (error) throw error;
