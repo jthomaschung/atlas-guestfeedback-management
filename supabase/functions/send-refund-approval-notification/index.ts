@@ -68,23 +68,62 @@ serve(async (req: Request) => {
       );
     }
 
+    // Handle custom email (free-form message to requestor)
+    if (notificationType === "custom_email" && customEmail) {
+      const customHtml = `
+        <!DOCTYPE html>
+        <html>
+          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+              <h1 style="color: #2563eb; margin: 0 0 8px 0; font-size: 18px;">Refund Request Update</h1>
+              <p style="margin: 0; font-size: 14px; color: #6b7280;">Case #${refund.case_number || "N/A"} — $${Number(refund.refund_amount).toFixed(2)}</p>
+            </div>
+            <div style="background-color: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; white-space: pre-wrap;">
+              ${customEmail.body.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
+            </div>
+            <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #e5e7eb; text-align: center; color: #9ca3af; font-size: 12px;">
+              <p>This message was sent via the Guest Feedback Management System.</p>
+            </div>
+          </body>
+        </html>
+      `;
+
+      const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${sendGridApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          personalizations: [{ to: [{ email: customEmail.to }], subject: customEmail.subject }],
+          from: { email: "guest.feedback@atlaswe.com", name: "Guest Feedback System" },
+          content: [{ type: "text/html", value: customHtml }],
+        }),
+      });
+
+      const success = res.ok;
+      console.log(`Custom email to ${customEmail.to}: ${success ? "sent" : "failed"}`);
+
+      return new Response(
+        JSON.stringify({ success, sent: success ? 1 : 0, failed: success ? 0 : 1 }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // Determine recipients based on notification type
     const recipients: { email: string; role: string }[] = [];
 
     if (notificationType === "new_refund") {
-      // Find DM for this market
       const dmEmail = await findDmEmailForMarket(supabase, refund.market);
       if (dmEmail) {
         recipients.push({ email: dmEmail, role: "DM" });
       }
     } else if (notificationType === "director_needed") {
-      // Find Director for this market via user_hierarchy
       const directorEmail = await findDirectorEmailForMarket(supabase, refund.market);
       if (directorEmail) {
         recipients.push({ email: directorEmail, role: "Director" });
       }
     } else if (notificationType === "catering_needed") {
-      // Notify fixed catering approvers + market director
       for (const email of CATERING_EMAILS) {
         recipients.push({ email, role: "Catering" });
       }
