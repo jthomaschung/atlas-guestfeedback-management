@@ -242,6 +242,8 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     'missing items': 'Missing Item',
     'order issue': 'Sandwich Made Wrong',
     'oop': 'Out of Product',
+    'out of stock': 'Out of Product',
+    'out of stock item': 'Out of Product',
     'delivery timing': 'Slow Service',
     'foreign object': 'Possible Food Poisoning',
   }
