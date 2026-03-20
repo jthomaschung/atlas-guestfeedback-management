@@ -5787,6 +5787,44 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_test_compliance_notifications: {
+        Row: {
+          days_overdue: number | null
+          employee_name: string
+          hiring_manager_email: string
+          id: string
+          new_hire_id: string
+          notified_at: string
+          store_number: string | null
+        }
+        Insert: {
+          days_overdue?: number | null
+          employee_name: string
+          hiring_manager_email: string
+          id?: string
+          new_hire_id: string
+          notified_at?: string
+          store_number?: string | null
+        }
+        Update: {
+          days_overdue?: number | null
+          employee_name?: string
+          hiring_manager_email?: string
+          id?: string
+          new_hire_id?: string
+          notified_at?: string
+          store_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_test_compliance_notifications_new_hire_id_fkey"
+            columns: ["new_hire_id"]
+            isOneToOne: false
+            referencedRelation: "new_hire_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       menu_test_results: {
         Row: {
           completed_at: string
@@ -6482,6 +6520,96 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      ootd_hourly: {
+        Row: {
+          avg_time_seconds: number | null
+          created_at: string | null
+          date: string
+          four_to_seven_min: number | null
+          gt_10_min: number | null
+          hour_end: string | null
+          hour_start: string
+          id: number
+          lt_4_min: number | null
+          seven_to_ten_min: number | null
+          store_location: string | null
+          store_number: string
+          total_orders: number | null
+        }
+        Insert: {
+          avg_time_seconds?: number | null
+          created_at?: string | null
+          date: string
+          four_to_seven_min?: number | null
+          gt_10_min?: number | null
+          hour_end?: string | null
+          hour_start: string
+          id?: never
+          lt_4_min?: number | null
+          seven_to_ten_min?: number | null
+          store_location?: string | null
+          store_number: string
+          total_orders?: number | null
+        }
+        Update: {
+          avg_time_seconds?: number | null
+          created_at?: string | null
+          date?: string
+          four_to_seven_min?: number | null
+          gt_10_min?: number | null
+          hour_end?: string | null
+          hour_start?: string
+          id?: never
+          lt_4_min?: number | null
+          seven_to_ten_min?: number | null
+          store_location?: string | null
+          store_number?: string
+          total_orders?: number | null
+        }
+        Relationships: []
+      }
+      ootd_store_daily: {
+        Row: {
+          created_at: string | null
+          date: string
+          id: number
+          store_location: string | null
+          store_number: string
+          total_avg_time_seconds: number | null
+          total_four_to_seven_min: number | null
+          total_gt_10_min: number | null
+          total_lt_4_min: number | null
+          total_orders: number | null
+          total_seven_to_ten_min: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          id?: never
+          store_location?: string | null
+          store_number: string
+          total_avg_time_seconds?: number | null
+          total_four_to_seven_min?: number | null
+          total_gt_10_min?: number | null
+          total_lt_4_min?: number | null
+          total_orders?: number | null
+          total_seven_to_ten_min?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          id?: never
+          store_location?: string | null
+          store_number?: string
+          total_avg_time_seconds?: number | null
+          total_four_to_seven_min?: number | null
+          total_gt_10_min?: number | null
+          total_lt_4_min?: number | null
+          total_orders?: number | null
+          total_seven_to_ten_min?: number | null
         }
         Relationships: []
       }
@@ -10915,6 +11043,16 @@ export type Database = {
           qualification_type: string
           store_number: string
           total_royalty: number
+        }[]
+      }
+      get_overdue_menu_test_employees: {
+        Args: never
+        Returns: {
+          days_since_hire: number
+          employee_name: string
+          hire_date: string
+          market: string
+          store_number: string
         }[]
       }
       get_pending_approvals_for_user: {
