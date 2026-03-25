@@ -1,29 +1,38 @@
 
 
-# Fix "Out of Stock" → "Out of Product" Category Normalization
+# Update Portal URLs to Custom Domains
 
-## Problem
-Store 2812 received feedback categorized as "Out of Stock Item" which was not recognized by the normalization logic. It should have been mapped to "Out of Product" and auto-escalated to the DM.
+## Situation
+The three files specified (`src/config/portalRegistry.ts`, `src/pages/hr/HRPublicLanding.tsx`, `src/pages/accounting/AccountingPublicLanding.tsx`) do not exist in this project. They likely belong to the master portal project.
 
-## Changes
+However, this project **does** contain lovable.app URLs that should be updated. Here is the proposed scope:
 
-### 1. Fix the existing record (SQL migration)
-Update feedback `2d2a6b91-6cb9-4e09-a28e-be2b3a7252bc`:
-- Change `complaint_category` from "Out of Stock Item" to "Out of Product"
-- Set `resolution_status` to "escalated"
-- Set `escalated_at`, `auto_escalated`, and `sla_deadline`
-- Look up and assign the OC market DM via `findDmForMarket` logic (query `user_hierarchy` + `user_permissions` + `profiles`)
+## Changes in This Project
 
-### 2. Update ingestion normalization (edge function)
-In `supabase/functions/ingest-feedback/index.ts`, add two new entries to the `categoryNormalization` map:
-```
-'out of stock': 'Out of Product',
-'out of stock item': 'Out of Product',
-```
+### 1. `src/components/PortalSwitcher.tsx`
+- `preview--trainingportal.lovable.app/welcome` → `training.atlasteam.app/welcome`
+- `atlas-kpis.lovable.app` → `kpi.atlasteam.app`
+- `atlas-guestfeedback-management.lovable.app/dashboard` → `guestfeedback.atlasteam.app/dashboard` (if present)
+- `accounting.atlasteam.app` is already correct
 
-This ensures any future "Out of Stock" or "Out of Stock Item" categories from webhooks are automatically normalized to "Out of Product" and routed through the existing escalation logic.
+### 2. `supabase/functions/monitor-sla/index.ts`
+- `guestfeedback.lovable.app` → `guestfeedback.atlasteam.app`
 
-### Files modified
-- `supabase/functions/ingest-feedback/index.ts` — add normalization entries
-- New SQL migration — fix the existing record
+### 3. `supabase/functions/send-feedback-slack-notification/index.ts`
+- `guestfeedback.lovable.app` → `guestfeedback.atlasteam.app`
+
+### 4. `supabase/functions/send-weekly-performance-summary/index.ts`
+- `guestfeedback.lovable.app` → `guestfeedback.atlasteam.app`
+
+### 5. `supabase/functions/send-refund-approval-notification/index.ts`
+- `guestfeedback.lovable.app` → `guestfeedback.atlasteam.app`
+
+### 6. `supabase/functions/send-executive-approval-notification/index.ts`
+- `guestfeedback.lovable.app` → `guestfeedback.atlasteam.app`
+
+### 7. `src/App.tsx` — masterLoginUrl
+- `atlas-masterportal.lovable.app` → update if you have a custom domain for the master portal (needs confirmation)
+
+## Note
+The `portalRegistry.ts` and landing page files you referenced are not in this codebase. If you'd like those updated, that change needs to happen in the master portal project.
 
