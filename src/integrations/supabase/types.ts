@@ -3978,6 +3978,9 @@ export type Database = {
       house_account_credits: {
         Row: {
           business_date: string
+          cleared_at: string | null
+          closed_at: string | null
+          closed_by: string | null
           created_at: string
           customer_name: string | null
           id: string
@@ -3992,6 +3995,9 @@ export type Database = {
         }
         Insert: {
           business_date: string
+          cleared_at?: string | null
+          closed_at?: string | null
+          closed_by?: string | null
           created_at?: string
           customer_name?: string | null
           id?: string
@@ -4006,6 +4012,9 @@ export type Database = {
         }
         Update: {
           business_date?: string
+          cleared_at?: string | null
+          closed_at?: string | null
+          closed_by?: string | null
           created_at?: string
           customer_name?: string | null
           id?: string
