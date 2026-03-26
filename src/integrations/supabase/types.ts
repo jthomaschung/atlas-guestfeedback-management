@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      _deprecated_user_permissions: {
+        Row: {
+          can_access_accounting_dev: boolean | null
+          can_access_catering_dev: boolean | null
+          can_access_facilities_dev: boolean | null
+          can_access_guest_feedback_dev: boolean | null
+          can_access_hr_dev: boolean | null
+          can_access_incident_reporting: boolean | null
+          can_access_kpi_dev: boolean | null
+          can_access_manager_payroll_dashboard: boolean | null
+          can_access_training_dev: boolean | null
+          created_at: string
+          id: string
+          is_development_user: boolean | null
+          markets: string[] | null
+          stores: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          can_access_accounting_dev?: boolean | null
+          can_access_catering_dev?: boolean | null
+          can_access_facilities_dev?: boolean | null
+          can_access_guest_feedback_dev?: boolean | null
+          can_access_hr_dev?: boolean | null
+          can_access_incident_reporting?: boolean | null
+          can_access_kpi_dev?: boolean | null
+          can_access_manager_payroll_dashboard?: boolean | null
+          can_access_training_dev?: boolean | null
+          created_at?: string
+          id?: string
+          is_development_user?: boolean | null
+          markets?: string[] | null
+          stores?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          can_access_accounting_dev?: boolean | null
+          can_access_catering_dev?: boolean | null
+          can_access_facilities_dev?: boolean | null
+          can_access_guest_feedback_dev?: boolean | null
+          can_access_hr_dev?: boolean | null
+          can_access_incident_reporting?: boolean | null
+          can_access_kpi_dev?: boolean | null
+          can_access_manager_payroll_dashboard?: boolean | null
+          can_access_training_dev?: boolean | null
+          created_at?: string
+          id?: string
+          is_development_user?: boolean | null
+          markets?: string[] | null
+          stores?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       accounting_settings: {
         Row: {
           description: string | null
@@ -3979,6 +4036,7 @@ export type Database = {
         Row: {
           business_date: string
           cleared_at: string | null
+          close_method: string | null
           closed_at: string | null
           closed_by: string | null
           created_at: string
@@ -3996,6 +4054,7 @@ export type Database = {
         Insert: {
           business_date: string
           cleared_at?: string | null
+          close_method?: string | null
           closed_at?: string | null
           closed_by?: string | null
           created_at?: string
@@ -4013,6 +4072,7 @@ export type Database = {
         Update: {
           business_date?: string
           cleared_at?: string | null
+          close_method?: string | null
           closed_at?: string | null
           closed_by?: string | null
           created_at?: string
@@ -6446,6 +6506,91 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      ocr_date_audit: {
+        Row: {
+          amount_delta: number | null
+          bank_deposit_date: string | null
+          cash_deposit_id: string | null
+          confidence_score: number | null
+          created_at: string | null
+          date_delta_days: number | null
+          id: string
+          manager_selected_date: string | null
+          match_method: string | null
+          ocr_amount: number | null
+          ocr_amount_confidence: string | null
+          ocr_date_confidence: string | null
+          ocr_extracted_date: string | null
+          pro_scan_triggered: boolean | null
+          store_number: string | null
+          submission_timestamp: string | null
+          submitted_amount: number | null
+          submitted_by_user_id: string | null
+        }
+        Insert: {
+          amount_delta?: number | null
+          bank_deposit_date?: string | null
+          cash_deposit_id?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          date_delta_days?: number | null
+          id?: string
+          manager_selected_date?: string | null
+          match_method?: string | null
+          ocr_amount?: number | null
+          ocr_amount_confidence?: string | null
+          ocr_date_confidence?: string | null
+          ocr_extracted_date?: string | null
+          pro_scan_triggered?: boolean | null
+          store_number?: string | null
+          submission_timestamp?: string | null
+          submitted_amount?: number | null
+          submitted_by_user_id?: string | null
+        }
+        Update: {
+          amount_delta?: number | null
+          bank_deposit_date?: string | null
+          cash_deposit_id?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          date_delta_days?: number | null
+          id?: string
+          manager_selected_date?: string | null
+          match_method?: string | null
+          ocr_amount?: number | null
+          ocr_amount_confidence?: string | null
+          ocr_date_confidence?: string | null
+          ocr_extracted_date?: string | null
+          pro_scan_triggered?: boolean | null
+          store_number?: string | null
+          submission_timestamp?: string | null
+          submitted_amount?: number | null
+          submitted_by_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ocr_date_audit_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["store_number"]
+          },
+          {
+            foreignKeyName: "ocr_date_audit_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["store_number"]
+          },
+          {
+            foreignKeyName: "ocr_date_audit_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "v_store_monthly_spending"
+            referencedColumns: ["store_number"]
+          },
+        ]
       }
       onboarding_reminder_log: {
         Row: {
@@ -8982,63 +9127,6 @@ export type Database = {
           in_app_notifications?: boolean | null
           updated_at?: string | null
           user_id?: string | null
-        }
-        Relationships: []
-      }
-      user_permissions: {
-        Row: {
-          can_access_accounting_dev: boolean | null
-          can_access_catering_dev: boolean | null
-          can_access_facilities_dev: boolean | null
-          can_access_guest_feedback_dev: boolean | null
-          can_access_hr_dev: boolean | null
-          can_access_incident_reporting: boolean | null
-          can_access_kpi_dev: boolean | null
-          can_access_manager_payroll_dashboard: boolean | null
-          can_access_training_dev: boolean | null
-          created_at: string
-          id: string
-          is_development_user: boolean | null
-          markets: string[] | null
-          stores: string[] | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          can_access_accounting_dev?: boolean | null
-          can_access_catering_dev?: boolean | null
-          can_access_facilities_dev?: boolean | null
-          can_access_guest_feedback_dev?: boolean | null
-          can_access_hr_dev?: boolean | null
-          can_access_incident_reporting?: boolean | null
-          can_access_kpi_dev?: boolean | null
-          can_access_manager_payroll_dashboard?: boolean | null
-          can_access_training_dev?: boolean | null
-          created_at?: string
-          id?: string
-          is_development_user?: boolean | null
-          markets?: string[] | null
-          stores?: string[] | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          can_access_accounting_dev?: boolean | null
-          can_access_catering_dev?: boolean | null
-          can_access_facilities_dev?: boolean | null
-          can_access_guest_feedback_dev?: boolean | null
-          can_access_hr_dev?: boolean | null
-          can_access_incident_reporting?: boolean | null
-          can_access_kpi_dev?: boolean | null
-          can_access_manager_payroll_dashboard?: boolean | null
-          can_access_training_dev?: boolean | null
-          created_at?: string
-          id?: string
-          is_development_user?: boolean | null
-          markets?: string[] | null
-          stores?: string[] | null
-          updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }

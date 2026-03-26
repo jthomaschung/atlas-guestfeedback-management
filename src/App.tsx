@@ -38,7 +38,13 @@ import { PortalGate } from '@/auth/PortalGate';
 import { SmartRedirect } from '@/components/SmartRedirect';
 import { FeedbackUpdater } from '@/components/FeedbackUpdater';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading, isProcessingTokens, signOut } = useAuth();
