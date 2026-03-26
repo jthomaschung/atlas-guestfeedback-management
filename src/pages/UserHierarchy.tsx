@@ -135,7 +135,7 @@ export default function UserHierarchy() {
     console.log('Checking development status for user:', user.email, user.id);
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_permissions')
         .select('is_development_user')
         .eq('user_id', user.id)
@@ -196,7 +196,7 @@ export default function UserHierarchy() {
         .from('notification_preferences')
         .select('*');
 
-      const { data: permissionData } = await supabase
+      const { data: permissionData } = await (supabase as any)
         .from('user_permissions')
         .select('*');
 
@@ -425,7 +425,7 @@ export default function UserHierarchy() {
       // Update or insert permissions
       if (!isCreateMode && selectedUser?.permissions) {
         console.log('Updating permissions for user:', userId, 'Markets:', formData.markets, 'Stores:', formData.stores);
-        const { data: permissionData, error: permissionError } = await supabase
+        const { data: permissionData, error: permissionError } = await (supabase as any)
           .from('user_permissions')
           .update({
             markets: formData.markets,
@@ -446,7 +446,7 @@ export default function UserHierarchy() {
         }
       } else {
         console.log('Inserting permissions for user:', userId, 'Markets:', formData.markets, 'Stores:', formData.stores);
-        const { data: permissionData, error: permissionError } = await supabase
+        const { data: permissionData, error: permissionError } = await (supabase as any)
           .from('user_permissions')
           .insert({
             user_id: userId,
