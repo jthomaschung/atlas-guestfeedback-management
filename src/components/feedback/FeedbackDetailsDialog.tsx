@@ -112,7 +112,7 @@ const getAssigneeForFeedback = async (storeNumber: string, market: string, categ
     try {
       console.log('📊 ASSIGNMENT: Auto-escalate category, looking for DM in market:', market);
 
-      const { data: dmUsers } = await supabase
+      const { data: dmUsers } = await (supabase as any)
         .from('user_permissions')
         .select('user_id')
         .contains('markets', [market]);

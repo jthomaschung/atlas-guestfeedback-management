@@ -88,7 +88,7 @@ export function useUserPermissions() {
       }
 
       // Fetch user permissions (both admin and non-admin users can have specific permissions)
-      const { data: permissions } = await supabase
+      const { data: permissions } = await (supabase as any)
         .from('user_permissions')
         .select('markets, stores, can_access_facilities_dev, can_access_catering_dev, can_access_hr_dev, can_access_guest_feedback_dev, is_development_user')
         .eq('user_id', user.id)
