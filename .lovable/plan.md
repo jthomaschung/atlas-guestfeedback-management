@@ -1,38 +1,26 @@
 
 
-# Update Portal URLs to Custom Domains
+# Stop Page Refresh on Tab Switch
 
-## Situation
-The three files specified (`src/config/portalRegistry.ts`, `src/pages/hr/HRPublicLanding.tsx`, `src/pages/accounting/AccountingPublicLanding.tsx`) do not exist in this project. They likely belong to the master portal project.
+## Problem
+Every time you switch to another browser tab and come back, the portal visually refreshes. This is caused by React Query's default `refetchOnWindowFocus: true` setting, which re-fetches all active queries whenever the browser tab regains focus. This triggers loading spinners and UI flicker unnecessarily.
 
-However, this project **does** contain lovable.app URLs that should be updated. Here is the proposed scope:
+## Solution
+Disable `refetchOnWindowFocus` globally on the `QueryClient` in `src/App.tsx`. The data doesn't change frequently enough to warrant automatic refetching on every tab switch — users can refresh manually or data updates via real-time subscriptions where needed.
 
-## Changes in This Project
+## Change
 
-### 1. `src/components/PortalSwitcher.tsx`
-- `preview--trainingportal.lovable.app/welcome` → `training.atlasteam.app/welcome`
-- `atlas-kpis.lovable.app` → `kpi.atlasteam.app`
-- `atlas-guestfeedback-management.lovable.app/dashboard` → `guestfeedback.atlasteam.app/dashboard` (if present)
-- `accounting.atlasteam.app` is already correct
+**`src/App.tsx`** — Update the QueryClient initialization:
 
-### 2. `supabase/functions/monitor-sla/index.ts`
-- `guestfeedback.lovable.app` → `guestfeedback.atlasteam.app`
+```typescript
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+```
 
-### 3. `supabase/functions/send-feedback-slack-notification/index.ts`
-- `guestfeedback.lovable.app` → `guestfeedback.atlasteam.app`
-
-### 4. `supabase/functions/send-weekly-performance-summary/index.ts`
-- `guestfeedback.lovable.app` → `guestfeedback.atlasteam.app`
-
-### 5. `supabase/functions/send-refund-approval-notification/index.ts`
-- `guestfeedback.lovable.app` → `guestfeedback.atlasteam.app`
-
-### 6. `supabase/functions/send-executive-approval-notification/index.ts`
-- `guestfeedback.lovable.app` → `guestfeedback.atlasteam.app`
-
-### 7. `src/App.tsx` — masterLoginUrl
-- `atlas-masterportal.lovable.app` → update if you have a custom domain for the master portal (needs confirmation)
-
-## Note
-The `portalRegistry.ts` and landing page files you referenced are not in this codebase. If you'd like those updated, that change needs to happen in the master portal project.
+This is a one-line config change. No other files need modification.
 
