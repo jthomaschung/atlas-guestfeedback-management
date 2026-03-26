@@ -94,7 +94,14 @@ export default function CustomerFeedbackPage() {
             updated_at: data.updated_at,
             priority: (data.priority || 'Low') as CustomerFeedback['priority'],
             assignee: data.assignee || 'Unassigned',
-            viewed: data.viewed || false
+            viewed: data.viewed || false,
+            type_of_feedback: data.type_of_feedback,
+            reward: data.reward,
+            feedback_source: data.feedback_source,
+            ee_action: data.ee_action,
+            order_number: data.order_number,
+            period: data.period,
+            time_of_day: data.time_of_day,
           };
           setSelectedFeedback(mappedFeedback);
           setIsDetailsOpen(true);
