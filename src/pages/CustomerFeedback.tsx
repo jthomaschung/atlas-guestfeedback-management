@@ -159,7 +159,14 @@ export default function CustomerFeedbackPage() {
           // Set default values for fields that might be missing
           priority: (item.priority || 'Low') as CustomerFeedback['priority'],
           assignee: item.assignee || 'Unassigned',
-          viewed: item.viewed || false
+          viewed: item.viewed || false,
+          type_of_feedback: item.type_of_feedback,
+          reward: item.reward,
+          feedback_source: item.feedback_source,
+          ee_action: item.ee_action,
+          order_number: item.order_number,
+          period: item.period,
+          time_of_day: item.time_of_day,
         };
       });
 
