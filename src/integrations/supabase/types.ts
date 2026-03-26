@@ -10437,6 +10437,25 @@ export type Database = {
         }
         Relationships: []
       }
+      store_health_scores: {
+        Row: {
+          avg_age_days: number | null
+          awaiting_response_count: number | null
+          critical_open: number | null
+          health_band: string | null
+          health_score: number | null
+          important_open: number | null
+          market: string | null
+          open_tickets: number | null
+          past_vendor_date: number | null
+          store_number: string | null
+          tickets_over_30_days: number | null
+          total_all_time: number | null
+          total_cost_completed: number | null
+          unassigned_open: number | null
+        }
+        Relationships: []
+      }
       v_daily_deposit_tracking: {
         Row: {
           actual_total: number | null
