@@ -800,7 +800,10 @@ const Index = () => {
           feedbacks={filteredFeedbacks}
           onEdit={handleViewDetails}
           onViewDetails={handleViewDetails}
-          isAdmin={false}
+          onDelete={permissions.isDirectorOrAbove ? handleDelete : undefined}
+          isAdmin={permissions.isAdmin}
+          canDelete={permissions.isDirectorOrAbove}
+          canEditCategory={permissions.isAdmin}
           likes={likes}
           userLikes={userLikes}
           onToggleLike={toggleLike}
