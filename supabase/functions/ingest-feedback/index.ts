@@ -235,17 +235,53 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
   
   // Normalize category names to standard values
   const categoryNormalization: Record<string, string> = {
+    // Sandwich / Order Issues
     'order accuracy': 'Sandwich Made Wrong',
-    'hours': 'Closed Early',
-    'team member friendliness': 'Rude Service',
     'sandwich issue': 'Sandwich Made Wrong',
-    'missing items': 'Missing Item',
     'order issue': 'Sandwich Made Wrong',
+    'sandwich made wrong': 'Sandwich Made Wrong',
+    // Missing Item
+    'missing items': 'Missing Item',
+    'missing item': 'Missing Item',
+    // Slow Service
+    'delivery timing': 'Slow Service',
+    'slow service': 'Slow Service',
+    // Rude Service
+    'team member friendliness': 'Rude Service',
+    'team member complaint': 'Rude Service',
+    'rude service': 'Rude Service',
+    // Closed Early
+    'hours': 'Closed Early',
+    'closed early': 'Closed Early',
+    // Out of Product
     'oop': 'Out of Product',
     'out of stock': 'Out of Product',
     'out of stock item': 'Out of Product',
-    'delivery timing': 'Slow Service',
+    'out of product': 'Out of Product',
+    // Food Safety
     'foreign object': 'Possible Food Poisoning',
+    'health safety': 'Possible Food Poisoning',
+    'illness': 'Possible Food Poisoning',
+    'allergic reaction guest': 'Possible Food Poisoning',
+    // Credit Card / Payment
+    'gift card issue': 'Credit Card Issue',
+    'incorrect change': 'Credit Card Issue',
+    'pricing issue': 'Credit Card Issue',
+    // Product Quality → Product Issue
+    'product quality': 'Product Issue',
+    // Misc → Other
+    'appearance': 'Other',
+    'area of restaurant': 'Other',
+    'online ordering': 'Other',
+    'online ordering issues': 'Other',
+    'duplicate order': 'Other',
+    'employment and hiring': 'Other',
+    'menu question': 'Other',
+    'no feedback provided': 'Other',
+    'not honored': 'Other',
+    'order not received': 'Other',
+    'wrong store': 'Other',
+    'gloves/equipment': 'Other',
   }
   const complaint_category = categoryNormalization[rawCategory.toLowerCase()] || rawCategory
   const store_number = data.store_number || data.Store || '000'
