@@ -85,6 +85,7 @@ export function CustomerFeedbackCard({
   onDelete, 
   onCategoryChange,
   isAdmin, 
+  canDelete,
   canEditCategory = false,
   likeCount = 0,
   isLiked = false,
