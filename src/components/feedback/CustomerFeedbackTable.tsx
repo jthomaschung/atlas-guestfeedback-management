@@ -8,6 +8,7 @@ interface CustomerFeedbackTableProps {
   onDelete?: (feedback: CustomerFeedback) => void;
   onCategoryChange?: (feedback: CustomerFeedback, newCategory: string, newAssignee?: string) => void;
   isAdmin?: boolean;
+  canDelete?: boolean;
   canEditCategory?: boolean;
   likes?: Record<string, number>;
   userLikes?: Set<string>;
@@ -21,6 +22,7 @@ export function CustomerFeedbackTable({
   onDelete, 
   onCategoryChange,
   isAdmin, 
+  canDelete,
   canEditCategory,
   likes,
   userLikes,
@@ -49,6 +51,7 @@ export function CustomerFeedbackTable({
             onDelete={onDelete}
             onCategoryChange={onCategoryChange}
             isAdmin={isAdmin}
+            canDelete={canDelete}
             canEditCategory={canEditCategory}
             likeCount={likes?.[feedback.id] || 0}
             isLiked={userLikes?.has(feedback.id) || false}

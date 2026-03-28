@@ -425,6 +425,7 @@ const OpenFeedback = () => {
                 : fb));
             }}
             isAdmin={permissions.isAdmin}
+            canDelete={permissions.isDirectorOrAbove}
             canEditCategory={permissions.isAdmin}
           />
 

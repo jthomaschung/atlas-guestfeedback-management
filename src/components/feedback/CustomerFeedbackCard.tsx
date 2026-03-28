@@ -20,6 +20,7 @@ interface CustomerFeedbackCardProps {
   onDelete?: (feedback: CustomerFeedback) => void;
   onCategoryChange?: (feedback: CustomerFeedback, newCategory: string, newAssignee?: string) => void;
   isAdmin?: boolean;
+  canDelete?: boolean;
   canEditCategory?: boolean;
   likeCount?: number;
   isLiked?: boolean;
@@ -84,6 +85,7 @@ export function CustomerFeedbackCard({
   onDelete, 
   onCategoryChange,
   isAdmin, 
+  canDelete,
   canEditCategory = false,
   likeCount = 0,
   isLiked = false,
@@ -373,7 +375,7 @@ export function CustomerFeedbackCard({
             >
               <Eye className="h-3 w-3" />
             </Button>
-            {isAdmin && onDelete && (
+            {canDelete && onDelete && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -385,7 +387,7 @@ export function CustomerFeedbackCard({
                   e.stopPropagation();
                   onDelete(feedback);
                 }}
-                title="Delete Feedback (Admin Only)"
+                title="Delete Feedback"
               >
                 <Trash2 className="h-3 w-3" />
               </Button>
