@@ -187,7 +187,7 @@ export default function FeedbackArchive() {
   };
 
   const handleDelete = async (feedback: CustomerFeedback) => {
-    if (!permissions.isAdmin) {
+    if (!permissions.isDirectorOrAbove) {
       toast({
         title: "Access Denied",
         description: "Only administrators can delete feedback records.",
@@ -396,8 +396,9 @@ export default function FeedbackArchive() {
                 feedbacks={filteredFeedbacks}
                 onEdit={(feedback) => handleReopen(feedback)}
                 onViewDetails={handleViewDetails}
-                onDelete={permissions.isAdmin ? handleDelete : undefined}
+                onDelete={permissions.isDirectorOrAbove ? handleDelete : undefined}
                 isAdmin={permissions.isAdmin}
+                canDelete={permissions.isDirectorOrAbove}
                 canEditCategory={false}
               />
             )}

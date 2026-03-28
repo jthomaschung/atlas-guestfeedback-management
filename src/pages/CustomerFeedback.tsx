@@ -279,6 +279,7 @@ export default function CustomerFeedbackPage() {
         onDelete={handleDelete}
         onCategoryChange={handleCategoryChange}
         isAdmin={permissions.isAdmin}
+        canDelete={permissions.isDirectorOrAbove}
         canEditCategory={permissions.isAdmin}
       />
 
