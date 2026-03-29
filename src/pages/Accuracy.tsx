@@ -33,13 +33,13 @@ export default function Accuracy() {
     if (user) {
       fetchPeriods();
     }
-  }, [user]);
+  }, [user?.id]);
 
   useEffect(() => {
     if (user && selectedPeriod) {
       loadAccuracyFeedback();
     }
-  }, [user, selectedPeriod]);
+  }, [user?.id, selectedPeriod]);
 
   const fetchPeriods = async () => {
     const { data, error } = await supabase

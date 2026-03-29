@@ -117,7 +117,7 @@ export default function UserHierarchy() {
   useEffect(() => {
     checkAdminStatus();
     checkCurrentUserDevelopmentStatus();
-  }, [user]);
+  }, [user?.id]);
 
   useEffect(() => {
     if (isAdmin) {

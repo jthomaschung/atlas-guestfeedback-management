@@ -295,7 +295,7 @@ const FeedbackReporting = () => {
     if (user) {
       fetchReportingData();
     }
-  }, [user]);
+  }, [user?.id]);
 
   if (loading) {
     return (

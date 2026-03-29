@@ -54,7 +54,7 @@ export default function ExecutiveOversight() {
     if (user && !loading) {
       checkExecutiveStatus();
     }
-  }, [user, loading]);
+  }, [user?.id, loading]);
 
   if (loading) {
     return (
