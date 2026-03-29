@@ -268,7 +268,7 @@ const Summary = () => {
     if (user) {
       fetchSummaryData();
     }
-  }, [user]);
+  }, [user?.id]);
 
   if (loading) {
     return (

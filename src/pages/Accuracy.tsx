@@ -33,7 +33,7 @@ export default function Accuracy() {
     if (user) {
       fetchPeriods();
     }
-  }, [user]);
+  }, [user?.id]);
 
   useEffect(() => {
     if (user && selectedPeriod) {
