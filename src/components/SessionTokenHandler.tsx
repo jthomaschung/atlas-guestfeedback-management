@@ -70,7 +70,7 @@ export function SessionTokenHandler() {
 
     // Process tokens on component mount
     handleIncomingTokens();
-  }, [user, setIsProcessingTokens]);
+  }, [user?.id, setIsProcessingTokens]);
 
   // This component doesn't render anything
   return null;
