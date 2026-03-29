@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
@@ -29,6 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isProcessingTokens, setIsProcessingTokens] = useState(false);
   const [isSessionReady, setIsSessionReady] = useState(true); // Default to true for direct logins
+  const initialLoadDone = useRef(false);
 
   useEffect(() => {
     // Set up auth state listener
@@ -38,19 +39,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch user profile
-          setTimeout(async () => {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('user_id', session.user.id)
-              .single();
-            setProfile(profile);
-          }, 0);
+          // Fetch user profile directly (no setTimeout to avoid race conditions)
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .single();
+          setProfile(profile);
         } else {
           setProfile(null);
         }
-        setLoading(false);
+        
+        // Only set loading to false on initial load, not on subsequent token refreshes
+        if (!initialLoadDone.current) {
+          setLoading(false);
+          initialLoadDone.current = true;
+        }
       }
     );
 
@@ -58,7 +62,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
+      if (!initialLoadDone.current) {
+        setLoading(false);
+        initialLoadDone.current = true;
+      }
     });
 
     return () => subscription.unsubscribe();

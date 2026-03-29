@@ -128,21 +128,15 @@ const Index = () => {
   }, [searchParams, setSearchParams, feedbacks, toast]);
 
   useEffect(() => {
-    if (authUser && isSessionReady) {
-      console.log('Auth user available and session ready, fetching data...', {
+    if (authUser) {
+      console.log('Auth user available, fetching data...', {
         authUserId: authUser.id,
-        isSessionReady
       });
       fetchFeedbacks();
       fetchPeriods();
       fetchStores();
-    } else if (authUser && !isSessionReady) {
-      console.log('Auth user available but session not ready yet, waiting...', {
-        authUserId: authUser.id,
-        isSessionReady
-      });
     }
-  }, [authUser?.id, isSessionReady]);
+  }, [authUser?.id]);
 
   const fetchFeedbacks = async () => {
     try {
@@ -617,25 +611,6 @@ const Index = () => {
     );
   }
 
-  if (!isSessionReady) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Customer Feedback Dashboard</h1>
-              <p className="text-sm sm:text-base text-muted-foreground mt-1">
-                Monitor and respond to customer feedback from Yelp, Qualtrics, and Jimmy John's channels
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center justify-center h-64">
-            <div className="text-lg">Establishing connection...</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (loading) {
     return (
