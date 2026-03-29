@@ -86,7 +86,7 @@ const OpenFeedback = () => {
       fetchPeriods();
       fetchStores();
     }
-  }, [authUser, isSessionReady]);
+  }, [authUser?.id, isSessionReady]);
 
   const mapFeedback = (item: any): CustomerFeedback => ({
     id: item.id,

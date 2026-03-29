@@ -142,7 +142,7 @@ const Index = () => {
         isSessionReady
       });
     }
-  }, [authUser, isSessionReady]);
+  }, [authUser?.id, isSessionReady]);
 
   const fetchFeedbacks = async () => {
     try {
