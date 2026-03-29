@@ -11,7 +11,7 @@ export function FeedbackUpdater() {
         console.log('Update result:', result);
       });
     }
-  }, [user]);
+  }, [user?.id]);
 
   return null;
 }
