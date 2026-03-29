@@ -1,35 +1,36 @@
 
 
-# Enable Delete for Directors, VP, and CEO
+# Fix: Page Still Refreshing on Tab Switch
 
-## Problem
-Only admins can currently delete feedback. Directors (Don Jones, Michelle Price, Tanner Luce), the VP (Arvey Tambunan), and the CEO (James Chung) also need this ability.
+## Root Cause
 
-## Solution
-The `useUserPermissions` hook already computes `isDirectorOrAbove` (matches admin, director, vp, ceo roles). The codebase currently gates delete on `isAdmin`. We need to pass `isDirectorOrAbove` as the delete permission flag instead.
+The `PortalGate` component wraps the entire app and runs `checkAccess()` on mount. When you switch browser tabs, Supabase's auth token refresh can cause the `AuthProvider`'s `onAuthStateChange` to fire, which updates `loading` to `true` momentarily. The `ProtectedRoute` component reacts to `authLoading` and shows a loading spinner, causing the visible "refresh."
+
+**Why the archive page doesn't do it:** FeedbackArchive depends on `user?.email` (a stable string). But more importantly, the real culprit is likely the `ProtectedRoute` component — it checks `authLoading` on every render. When the auth state listener fires on tab return, `loading` briefly flips, causing the entire layout to unmount and remount.
+
+The fix has two parts:
 
 ## Changes
 
-### 1. `src/components/feedback/CustomerFeedbackCard.tsx`
-- Change the delete button visibility from `{isAdmin && onDelete && ...}` to use a new `canDelete` prop
-- Add `canDelete?: boolean` to the props interface
-- Update the title from "Admin Only" to reflect the broader access
+### 1. `src/hooks/useAuth.tsx` — Don't re-set loading on auth state changes after initial load
 
-### 2. `src/components/feedback/CustomerFeedbackTable.tsx`
-- Add `canDelete?: boolean` prop and pass it through to `CustomerFeedbackCard`
+Currently, the `onAuthStateChange` callback doesn't set `loading` back to `true`, but the initial `getSession()` call and the auth listener race — both set `loading = false`, but the listener fires first with session, then `getSession` also fires. The real issue is that on tab return, Supabase fires `TOKEN_REFRESHED` which triggers `onAuthStateChange`, and the `setTimeout` for profile fetch creates a brief window where user exists but profile is null, potentially triggering re-renders.
 
-### 3. `src/pages/CustomerFeedback.tsx`
-- Pass `canDelete={permissions.isDirectorOrAbove}` to `CustomerFeedbackTable`
+**Fix:** Track whether initial load is complete. After that, don't touch `loading` on subsequent auth events. Also remove the `setTimeout` wrapper on profile fetch (it's unnecessary and causes race conditions).
 
-### 4. `src/pages/OpenFeedback.tsx`
-- Pass `canDelete={permissions.isDirectorOrAbove}` to `CustomerFeedbackTable`
+### 2. `src/components/SessionTokenHandler.tsx` — Guard against re-running on auth state changes
 
-### 5. `src/pages/FeedbackArchive.tsx`
-- Change `onDelete={permissions.isAdmin ? handleDelete : undefined}` to use `permissions.isDirectorOrAbove`
-- Pass `canDelete={permissions.isDirectorOrAbove}`
+The `useEffect` with `[user, setIsProcessingTokens]` dependency re-runs whenever `user` object reference changes (which happens on token refresh). This can briefly set state. Use `user?.id` instead.
 
-### 6. `src/pages/FeedbackArchive.tsx` — `handleDelete` guard
-- Change `if (!permissions.isAdmin)` to `if (!permissions.isDirectorOrAbove)`
+### 3. `src/pages/Index.tsx` — Remove `isSessionReady` from the data fetch dependency
 
-No database or migration changes needed — the `user_hierarchy` table already has the correct roles assigned.
+The `isSessionReady` state can toggle during token refreshes. Since PortalGate already ensures session validity before rendering children, this guard is redundant. Simplify to just depend on `authUser?.id`.
+
+## Summary of File Changes
+
+| File | Change |
+|------|--------|
+| `src/hooks/useAuth.tsx` | Add `initialLoadDone` ref; skip setting `loading` after first load; remove `setTimeout` on profile fetch |
+| `src/components/SessionTokenHandler.tsx` | Change `user` to `user?.id` in effect dependencies |
+| `src/pages/Index.tsx` | Remove `isSessionReady` check from data-fetch useEffect since PortalGate already guarantees session |
 
