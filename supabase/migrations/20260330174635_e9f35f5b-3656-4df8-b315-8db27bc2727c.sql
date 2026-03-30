@@ -1,0 +1,1 @@
+DELETE FROM customer_feedback WHERE channel = 'yelp';
