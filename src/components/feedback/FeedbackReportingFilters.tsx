@@ -77,7 +77,6 @@ const categoryOptions = [
 export const ORDER_ISSUES_CATEGORIES = ['sandwich made wrong', 'missing item', 'missing items'];
 
 const channelOptions = [
-  { value: 'yelp', label: 'Yelp' },
   { value: 'qualtrics', label: 'Qualtrics' },
   { value: 'jimmy_johns', label: 'Jimmy Johns' },
 ];
