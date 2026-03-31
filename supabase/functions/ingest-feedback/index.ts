@@ -236,15 +236,18 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
   // Normalize category names to standard values
   const categoryNormalization: Record<string, string> = {
     // Sandwich / Order Issues
-    'order accuracy': 'Sandwich Made Wrong',
     'sandwich issue': 'Sandwich Made Wrong',
     'order issue': 'Sandwich Made Wrong',
     'sandwich made wrong': 'Sandwich Made Wrong',
+    'submitted incorrect order': 'Sandwich Made Wrong',
+    // Order Accuracy (kept as its own category)
+    'order accuracy': 'Order Accuracy',
     // Missing Item
     'missing items': 'Missing Item',
     'missing item': 'Missing Item',
     // Slow Service
     'delivery timing': 'Slow Service',
+    'delivery complaint': 'Slow Service',
     'slow service': 'Slow Service',
     // Rude Service
     'team member friendliness': 'Rude Service',
@@ -269,6 +272,8 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     'pricing issue': 'Credit Card Issue',
     // Product Quality → Product Issue
     'product quality': 'Product Issue',
+    // Portion → Other
+    'portion': 'Other',
     // Misc → Other
     'appearance': 'Other',
     'area of restaurant': 'Other',
