@@ -57,7 +57,7 @@ async function findDmEmailForMarket(market: string): Promise<string | null> {
     const normalizedMarket = market.replace(/\s+/g, "").toUpperCase();
 
     const { data: permissionRows, error: permissionError } = await (supabase as any)
-      .from("user_permissions")
+      .from("user_market_permissions")
       .select("user_id, markets")
       .not("markets", "is", null);
 
