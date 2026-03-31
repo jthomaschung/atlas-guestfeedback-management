@@ -373,7 +373,7 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     // === LEGACY: No type_of_feedback, use old category-based routing ===
     console.log('🔀 ROUTING: No type_of_feedback, using legacy category routing')
     
-    const storeLevelCategories = ['sandwich made wrong', 'praise', 'missing item', 'cleanliness']
+    const storeLevelCategories = ['sandwich made wrong', 'praise', 'missing item', 'cleanliness', 'order accuracy']
     const dmLevelCategories = ['rude service', 'out of product', 'possible food poisoning', 'closed early']
     const guestFeedbackCategories = ['slow service', 'product issue', 'credit card issue', 'bread quality', 'other', 'loyalty program issues']
     
