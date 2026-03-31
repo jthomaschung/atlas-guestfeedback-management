@@ -108,6 +108,10 @@ async function resolveInitialAssignee({
   const normalizedCategory = normalizeText(complaintCategory);
 
   if (normalizedType === "fyi") {
+    // FYI still routes store-level categories to the store
+    if (STORE_FOLLOW_UP_CATEGORIES.has(normalizedCategory)) {
+      return `store${storeNumber}@atlaswe.com`;
+    }
     return "guestfeedback@atlaswe.com";
   }
 
@@ -265,7 +269,7 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
         channel: "RAP",
         feedback_source: "Manual Entry",
         case_number: caseNumber,
-        resolution_status: "unopened",
+        resolution_status: normalizeText(form.type_of_feedback) === "fyi" ? "acknowledged" : "unopened",
         assignee,
         user_id: user.id,
         period,

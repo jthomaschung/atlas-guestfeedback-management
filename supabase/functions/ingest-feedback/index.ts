@@ -335,20 +335,25 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
   // === NEW: type_of_feedback-driven routing ===
   let defaultAssignee = 'Unassigned'
 
+  // Store follow-up categories (Order Issues + Cleanliness + Closed Early)
+  const storeFollowUpCategories = ['order issue', 'order accuracy', 'sandwich made wrong', 'missing item', 'missing items', 'sandwich issue', 'cleanliness', 'closed early']
+  const autoEscalateCategories = ['out of product', 'rude service', 'possible food poisoning', 'rude', 'oop']
+
   if (type_of_feedback) {
     const typeNormalized = type_of_feedback.trim().toLowerCase()
     console.log(`🔀 ROUTING: type_of_feedback = "${type_of_feedback}" (normalized: "${typeNormalized}")`)
 
     if (typeNormalized === 'fyi') {
-      // FYI: acknowledge-only, assign to guest feedback manager
-      defaultAssignee = 'guestfeedback@atlaswe.com'
-      console.log('📋 ROUTING: FYI type → guestfeedback@atlaswe.com')
+      // FYI: still route store-level categories to the store
+      if (storeFollowUpCategories.includes(categoryLower)) {
+        defaultAssignee = await findStoreAssignee(store_number)
+        console.log(`📋 ROUTING: FYI + Store category → ${defaultAssignee}`)
+      } else {
+        defaultAssignee = 'guestfeedback@atlaswe.com'
+        console.log('📋 ROUTING: FYI type → guestfeedback@atlaswe.com')
+      }
     } else if (typeNormalized === 'guest support') {
       // Guest Support: route by category
-      // Order Issue = composite: sandwich made wrong, missing item, sandwich issue, order issue
-      const storeFollowUpCategories = ['order issue', 'sandwich made wrong', 'missing item', 'missing items', 'sandwich issue', 'cleanliness', 'closed early']
-      const autoEscalateCategories = ['out of product', 'rude service', 'possible food poisoning', 'rude', 'oop']
-
       if (storeFollowUpCategories.includes(categoryLower)) {
         defaultAssignee = await findStoreAssignee(store_number)
         console.log(`🏪 ROUTING: Guest Support + Store category → ${defaultAssignee}`)
@@ -368,7 +373,7 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     // === LEGACY: No type_of_feedback, use old category-based routing ===
     console.log('🔀 ROUTING: No type_of_feedback, using legacy category routing')
     
-    const storeLevelCategories = ['sandwich made wrong', 'praise', 'missing item', 'cleanliness']
+    const storeLevelCategories = ['sandwich made wrong', 'praise', 'missing item', 'cleanliness', 'order accuracy']
     const dmLevelCategories = ['rude service', 'out of product', 'possible food poisoning', 'closed early']
     const guestFeedbackCategories = ['slow service', 'product issue', 'credit card issue', 'bread quality', 'other', 'loyalty program issues']
     
@@ -597,7 +602,8 @@ Deno.serve(async (req) => {
     const shouldEscalate = validatedData.priority === 'Critical' || 
       (typeNorm === 'guest support' && autoEscalateCategories.includes(catNorm))
     
-    const initialStatus = shouldEscalate ? 'escalated' : 'unopened'
+    const isFyi = typeNorm === 'fyi'
+    const initialStatus = isFyi ? 'acknowledged' : (shouldEscalate ? 'escalated' : 'unopened')
     const escalatedAt = shouldEscalate ? new Date().toISOString() : null
     const slaDeadline = shouldEscalate 
       ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
