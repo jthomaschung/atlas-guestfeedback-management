@@ -32,104 +32,6 @@ const COMPLAINT_CATEGORIES = [
 const PRIORITIES = ["Praise", "Low", "Medium", "High", "Critical"] as const;
 const TYPES_OF_FEEDBACK = ["Guest Support", "FYI"] as const;
 
-const normalizeText = (value: string) => value.toLowerCase().trim().replace(/\s+/g, " ");
-
-const STORE_FOLLOW_UP_CATEGORIES = new Set([
-  "sandwich made wrong",
-  "missing item",
-  "missing items",
-  "sandwich issue",
-  "order issue",
-  "order accuracy",
-  "cleanliness",
-  "closed early",
-]);
-
-const AUTO_ESCALATE_CATEGORIES = new Set([
-  "out of product",
-  "rude service",
-  "possible food poisoning",
-  "oop",
-]);
-
-async function findDmEmailForMarket(market: string): Promise<string | null> {
-  try {
-    const normalizedMarket = market.replace(/\s+/g, "").toUpperCase();
-
-    const { data: permissionRows, error: permissionError } = await (supabase as any)
-      .from("user_market_permissions")
-      .select("user_id, markets")
-      .not("markets", "is", null);
-
-    if (permissionError || !permissionRows?.length) return null;
-
-    const matchingUserIds = permissionRows
-      .filter((row) =>
-        Array.isArray(row.markets) &&
-        row.markets.some(
-          (value) =>
-            typeof value === "string" &&
-            value.replace(/\s+/g, "").toUpperCase() === normalizedMarket
-        )
-      )
-      .map((row) => row.user_id)
-      .filter((userId): userId is string => typeof userId === "string");
-
-    if (!matchingUserIds.length) return null;
-
-    const { data: profiles, error: profileError } = await supabase
-      .from("profiles")
-      .select("user_id, email")
-      .in("user_id", matchingUserIds)
-      .not("email", "is", null)
-      .limit(1);
-
-    if (profileError || !profiles?.length) return null;
-
-    return profiles[0].email;
-  } catch (error) {
-    console.error("Error finding DM assignee:", error);
-    return null;
-  }
-}
-
-async function resolveInitialAssignee({
-  complaintCategory,
-  storeNumber,
-  market,
-  typeOfFeedback,
-}: {
-  complaintCategory: string;
-  storeNumber: string;
-  market: string;
-  typeOfFeedback: string;
-}): Promise<string> {
-  const normalizedType = normalizeText(typeOfFeedback || "Guest Support");
-  const normalizedCategory = normalizeText(complaintCategory);
-
-  if (normalizedType === "fyi") {
-    // FYI still routes store-level categories to the store
-    if (STORE_FOLLOW_UP_CATEGORIES.has(normalizedCategory)) {
-      return `store${storeNumber}@atlaswe.com`;
-    }
-    return "guestfeedback@atlaswe.com";
-  }
-
-  if (normalizedType !== "guest support") {
-    return "guestfeedback@atlaswe.com";
-  }
-
-  if (STORE_FOLLOW_UP_CATEGORIES.has(normalizedCategory)) {
-    return `store${storeNumber}@atlaswe.com`;
-  }
-
-  if (AUTO_ESCALATE_CATEGORIES.has(normalizedCategory)) {
-    return (await findDmEmailForMarket(market)) || "guestfeedback@atlaswe.com";
-  }
-
-  return "guestfeedback@atlaswe.com";
-}
-
 interface StoreInfo {
   store_number: string;
   region: string | null;
@@ -208,91 +110,7 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
     });
   };
 
-  const submitFeedbackInBackground = async (submission: typeof form, userId: string) => {
-    const startTime = Date.now();
-
-    const timeoutId = setTimeout(() => {
-      toast({
-        title: "Still working...",
-        description: "Your feedback is still processing in the background.",
-      });
-    }, 6000);
-
-    try {
-      let period: string | null = null;
-      const { data: periodData } = await supabase
-        .from("periods")
-        .select("name")
-        .lte("start_date", submission.feedback_date)
-        .gte("end_date", submission.feedback_date)
-        .maybeSingle();
-
-      if (periodData?.name) {
-        period = periodData.name;
-      }
-
-      const caseNumber = `CF-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
-
-      const assignee = await resolveInitialAssignee({
-        complaintCategory: submission.complaint_category,
-        storeNumber: submission.store_number,
-        market: submission.market,
-        typeOfFeedback: submission.type_of_feedback,
-      });
-
-      const { error } = await supabase.from("customer_feedback").insert({
-        feedback_date: submission.feedback_date,
-        store_number: submission.store_number,
-        market: submission.market,
-        complaint_category: submission.complaint_category,
-        feedback_text: submission.feedback_text || null,
-        customer_name: submission.customer_name || null,
-        customer_email: submission.customer_email || null,
-        customer_phone: submission.customer_phone || null,
-        priority: submission.priority,
-        type_of_feedback: submission.type_of_feedback || null,
-        ee_action: submission.ee_action || null,
-        order_number: submission.order_number || null,
-        reward: submission.reward || null,
-        channel: "RAP",
-        feedback_source: "Manual Entry",
-        case_number: caseNumber,
-        resolution_status: normalizeText(submission.type_of_feedback) === "fyi" ? "acknowledged" : "unopened",
-        assignee,
-        user_id: userId,
-        period,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (error) {
-        console.error("Insert error:", error);
-        toast({
-          variant: "destructive",
-          title: "Submission failed",
-          description: `Failed to add feedback: ${error.message}`,
-        });
-        return;
-      }
-
-      const elapsed = Date.now() - startTime;
-      console.log(`✅ Feedback insert completed in ${elapsed}ms`);
-      toast({ title: "Success", description: "Feedback added successfully." });
-
-      // Refresh data in the background (do not block submit UX)
-      onFeedbackAdded();
-    } catch (err) {
-      clearTimeout(timeoutId);
-      console.error("Submit error:", err);
-      toast({
-        variant: "destructive",
-        title: "Submission failed",
-        description: "An unexpected error occurred while saving feedback.",
-      });
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!form.store_number || !form.market || !form.complaint_category) {
@@ -313,15 +131,75 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
       return;
     }
 
-    const submission = { ...form };
-
-    // Close immediately so long-running DB triggers don't block the user experience
     setSubmitting(true);
-    setOpen(false);
-    resetForm();
-    setSubmitting(false);
 
-    void submitFeedbackInBackground(submission, user.id);
+    try {
+      // Optional period lookup — don't block insert if it fails
+      let period: string | null = null;
+      try {
+        const { data: periodData } = await supabase
+          .from("periods")
+          .select("name")
+          .lte("start_date", form.feedback_date)
+          .gte("end_date", form.feedback_date)
+          .maybeSingle();
+        if (periodData?.name) {
+          period = periodData.name;
+        }
+      } catch {
+        console.warn("Period lookup failed, continuing without period");
+      }
+
+      const caseNumber = `CF-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+      const normalizedType = (form.type_of_feedback || "Guest Support").toLowerCase().trim();
+
+      const { error } = await supabase.from("customer_feedback").insert({
+        feedback_date: form.feedback_date,
+        store_number: form.store_number,
+        market: form.market,
+        complaint_category: form.complaint_category,
+        feedback_text: form.feedback_text || null,
+        customer_name: form.customer_name || null,
+        customer_email: form.customer_email || null,
+        customer_phone: form.customer_phone || null,
+        priority: form.priority,
+        type_of_feedback: form.type_of_feedback || null,
+        ee_action: form.ee_action || null,
+        order_number: form.order_number || null,
+        reward: form.reward || null,
+        channel: "RAP",
+        feedback_source: "Manual Entry",
+        case_number: caseNumber,
+        resolution_status: normalizedType === "fyi" ? "acknowledged" : "unopened",
+        assignee: "guestfeedback@atlaswe.com",
+        user_id: user.id,
+        period,
+      });
+
+      if (error) {
+        console.error("Insert error:", error);
+        toast({
+          variant: "destructive",
+          title: "Submission failed",
+          description: `Failed to add feedback: ${error.message}`,
+        });
+        return;
+      }
+
+      toast({ title: "Success", description: "Feedback added successfully." });
+      resetForm();
+      setOpen(false);
+      onFeedbackAdded();
+    } catch (err) {
+      console.error("Submit error:", err);
+      toast({
+        variant: "destructive",
+        title: "Submission failed",
+        description: "An unexpected error occurred while saving feedback.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
