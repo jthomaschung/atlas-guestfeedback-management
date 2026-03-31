@@ -1,49 +1,39 @@
 
-## Why it likely hangs on “Adding…”
 
-I audited the current flow for **Manual Add Feedback** and found a likely bottleneck pattern:
+## Plan: Revert Add Feedback to reliable synchronous flow
 
-1. The dialog keeps the button in **“Adding…”** until one DB insert fully returns (`AddFeedbackDialog.handleSubmit`).
-2. That insert goes into `customer_feedback`, which currently has **many active triggers** (9), including multiple `AFTER INSERT` notifications.
-3. Several triggers call outbound notification paths (`net.http_post` to Edge Functions for Slack/escalation).
-4. I found evidence of intermittent outbound timeout behavior (`net._http_response` includes multiple **5000ms timeout** entries), which matches the “sometimes hangs” symptom.
+### Problem
+Manual feedback submissions are silently failing. The current "background submit" pattern closes the dialog immediately and runs the insert in a fire-and-forget async function, which swallows errors invisibly.
 
-So even when the record eventually saves, the synchronous insert path can become slow/unpredictable.
+### Root cause
+The background submit pattern (`submitFeedbackInBackground`) has no way to surface errors to the user after the dialog is already closed. Any failure in the period lookup, assignee resolution, or insert is lost.
 
-## Difference from pages that feel fast
+### What changes
 
-The slow behavior is specific to flows that write into `customer_feedback` and fire all insert triggers. Read-only pages (like historical views) avoid this trigger-heavy write path, so they feel stable.
+**File: `src/components/feedback/AddFeedbackDialog.tsx`**
 
-## Implementation plan
+1. **Remove background submit pattern** -- replace `submitFeedbackInBackground` with a direct `handleSubmit` that keeps the dialog open and shows "Adding..." until the insert completes or fails.
 
-1. **Instrument submit timing (frontend)**
-   - Add stage timing around: period lookup → assignee resolve → insert → refresh.
-   - Show a clearer timeout toast if insert exceeds a threshold (e.g. 8–10s), so users see status instead of indefinite “Adding…”.
+2. **Remove frontend DM lookup** -- the database BEFORE INSERT trigger (`auto_escalate_critical_feedback_before_insert`) already handles all assignee routing, priority mapping, and escalation logic. The frontend just needs to send a simple default assignee (`guestfeedback@atlaswe.com`) and let the trigger override it. This removes the `findDmEmailForMarket`, `resolveInitialAssignee`, and all the category routing constants from the frontend.
 
-2. **Decouple notifications from insert transaction (backend)**
-   - Move trigger HTTP work to a **queue-based** pattern:
-     - Insert trigger writes a lightweight event row only.
-     - Background worker/cron Edge Function processes queue and sends Slack/email/escalation.
-   - Keep the user insert fast and independent of external network latency.
+3. **Simplified submit flow**:
+   - Validate required fields
+   - Look up period (optional, non-blocking -- use null if lookup fails)
+   - Insert with minimal payload and default assignee
+   - On success: show toast, close dialog, call `onFeedbackAdded()` to refresh list
+   - On error: show error toast, keep dialog open so user can retry
 
-3. **Reduce post-submit UX blocking**
-   - On successful insert, close dialog immediately.
-   - Optimistically append the new ticket to local state.
-   - Refresh full dataset in background (don’t tie button state to full-page refetch).
+### What stays the same
+- All form fields and UI layout unchanged
+- Store dropdown and auto-market-fill unchanged
+- `onFeedbackAdded` callback (triggers `fetchFeedbacks` in Index.tsx) unchanged
+- Database triggers handle routing, priority, escalation as before
 
-4. **Trigger cleanup**
-   - Consolidate overlapping escalation/notification triggers so one insert emits one clean event path.
-   - Remove duplicate or legacy trigger logic that can stack latency.
+### Technical detail
+The BEFORE INSERT trigger `auto_escalate_critical_feedback_before_insert` already:
+- Maps category to priority
+- Routes to store, DM, or GFM based on category
+- Sets escalation status for critical categories
 
-5. **Validation**
-   - Re-test with the same payload you showed.
-   - Confirm insert response stays consistently fast (<2s typical) and button no longer appears stuck.
-   - Confirm notifications still deliver asynchronously from queue worker.
+So the frontend duplicating this logic is redundant and fragile. Removing it simplifies the code and eliminates the RLS-blocked `user_market_permissions` query as a failure point.
 
-## Technical scope
-
-- Frontend: `src/components/feedback/AddFeedbackDialog.tsx`, `src/pages/Index.tsx`
-- DB/trigger path: `customer_feedback` insert triggers (`on_feedback_created`, `trigger_critical_escalation_on_insert`, escalation-related before triggers)
-- Notification path: `send-feedback-slack-notification`, `send-critical-escalation`
-
-This plan directly targets the hanging symptom without losing notification behavior.
