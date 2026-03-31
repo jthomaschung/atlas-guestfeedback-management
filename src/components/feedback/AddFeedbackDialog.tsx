@@ -108,6 +108,10 @@ async function resolveInitialAssignee({
   const normalizedCategory = normalizeText(complaintCategory);
 
   if (normalizedType === "fyi") {
+    // FYI still routes store-level categories to the store
+    if (STORE_FOLLOW_UP_CATEGORIES.has(normalizedCategory)) {
+      return `store${storeNumber}@atlaswe.com`;
+    }
     return "guestfeedback@atlaswe.com";
   }
 
