@@ -602,7 +602,8 @@ Deno.serve(async (req) => {
     const shouldEscalate = validatedData.priority === 'Critical' || 
       (typeNorm === 'guest support' && autoEscalateCategories.includes(catNorm))
     
-    const initialStatus = shouldEscalate ? 'escalated' : 'unopened'
+    const isFyi = typeNorm === 'fyi'
+    const initialStatus = isFyi ? 'acknowledged' : (shouldEscalate ? 'escalated' : 'unopened')
     const escalatedAt = shouldEscalate ? new Date().toISOString() : null
     const slaDeadline = shouldEscalate 
       ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
