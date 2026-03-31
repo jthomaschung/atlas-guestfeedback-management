@@ -4015,22 +4015,7 @@ export type Database = {
           total_questions?: number
           training_version?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "harassment_test_results_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "harassment_test_results_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "v_employee_expense_summary"
-            referencedColumns: ["profile_id"]
-          },
-        ]
+        Relationships: []
       }
       house_account_credits: {
         Row: {
@@ -8207,7 +8192,7 @@ export type Database = {
       }
       sexual_harassment_training_completions: {
         Row: {
-          certificate_url: string
+          certificate_url: string | null
           completion_date: string
           created_at: string | null
           employee_id: string | null
@@ -8229,7 +8214,7 @@ export type Database = {
           uploaded_by: string | null
         }
         Insert: {
-          certificate_url: string
+          certificate_url?: string | null
           completion_date: string
           created_at?: string | null
           employee_id?: string | null
@@ -8251,7 +8236,7 @@ export type Database = {
           uploaded_by?: string | null
         }
         Update: {
-          certificate_url?: string
+          certificate_url?: string | null
           completion_date?: string
           created_at?: string | null
           employee_id?: string | null

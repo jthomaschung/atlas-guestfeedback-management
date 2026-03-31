@@ -11,21 +11,22 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 
 const COMPLAINT_CATEGORIES = [
-  "Sandwich Made Wrong",
-  "Missing Item",
-  "Slow Service",
-  "Rude Service",
-  "Cleanliness",
-  "Out of Product",
-  "Closed Early",
   "Bread Quality",
+  "Cleanliness",
+  "Closed Early",
   "Credit Card Issue",
-  "Possible Food Poisoning",
   "Loyalty Program Issues",
-  "Unauthorized Tip",
-  "Product Issue",
-  "Praise",
+  "Missing Item",
+  "Order Accuracy",
   "Other",
+  "Out of Product",
+  "Possible Food Poisoning",
+  "Praise",
+  "Product Issue",
+  "Rude Service",
+  "Sandwich Made Wrong",
+  "Slow Service",
+  "Unauthorized Tip",
 ];
 
 const PRIORITIES = ["Praise", "Low", "Medium", "High", "Critical"] as const;

@@ -55,6 +55,7 @@ const categoryOptions = [
   { value: 'Credit Card Issue', label: 'Credit Card Issue' },
   { value: 'Loyalty Program Issues', label: 'Loyalty Program Issues' },
   { value: 'Missing Item', label: 'Missing Item' },
+  { value: 'Order Accuracy', label: 'Order Accuracy' },
   { value: 'Other', label: 'Other' },
   { value: 'Out of Product', label: 'Out of Product' },
   { value: 'Possible Food Poisoning', label: 'Possible Food Poisoning' },
