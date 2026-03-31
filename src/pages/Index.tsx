@@ -513,8 +513,8 @@ const Index = () => {
         const updatedFeedback: CustomerFeedback = {
           id: data.id,
           feedback_date: data.feedback_date,
-          complaint_category: data.complaint_category as CustomerFeedback['complaint_category'],
-          channel: data.channel as CustomerFeedback['channel'],
+          complaint_category: data.complaint_category,
+          channel: data.channel,
           rating: data.rating,
           resolution_status: (data.resolution_status || 'unopened') as CustomerFeedback['resolution_status'],
           resolution_notes: data.resolution_notes,
@@ -531,7 +531,14 @@ const Index = () => {
           priority: (data.priority || 'Low') as CustomerFeedback['priority'],
           assignee: data.assignee || 'Unassigned',
           viewed: data.viewed || false,
-          customer_called: data.customer_called || false
+          customer_called: data.customer_called || false,
+          type_of_feedback: data.type_of_feedback,
+          reward: data.reward,
+          feedback_source: data.feedback_source,
+          ee_action: data.ee_action,
+          order_number: data.order_number,
+          period: data.period,
+          time_of_day: data.time_of_day,
         };
 
         // Update the feedbacks array (keep resolved items visible with lighter styling)
