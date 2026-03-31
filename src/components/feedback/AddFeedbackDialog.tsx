@@ -230,6 +230,16 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
     }
 
     setSubmitting(true);
+    const startTime = Date.now();
+    
+    // Show a warning toast if insert takes too long
+    const timeoutId = setTimeout(() => {
+      toast({
+        title: "Still working...",
+        description: "The submission is taking longer than usual. Please wait.",
+      });
+    }, 6000);
+    
     try {
       // Look up period
       let period: string | null = null;
@@ -275,6 +285,8 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
         period,
       });
 
+      clearTimeout(timeoutId);
+      
       if (error) {
         console.error("Insert error:", error);
         toast({
@@ -285,11 +297,20 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
         return;
       }
 
+      const elapsed = Date.now() - startTime;
+      console.log(`✅ Feedback insert completed in ${elapsed}ms`);
+
+      // Close dialog and show success immediately
       toast({ title: "Success", description: "Feedback added successfully." });
       resetForm();
+      setSubmitting(false);
       setOpen(false);
+      
+      // Refresh data in the background (don't block the UI)
       onFeedbackAdded();
+      return; // skip finally's setSubmitting since we already did it
     } catch (err) {
+      clearTimeout(timeoutId);
       console.error("Submit error:", err);
       toast({ variant: "destructive", title: "Error", description: "An unexpected error occurred." });
     } finally {
