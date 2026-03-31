@@ -208,7 +208,91 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const submitFeedbackInBackground = async (submission: typeof form, userId: string) => {
+    const startTime = Date.now();
+
+    const timeoutId = setTimeout(() => {
+      toast({
+        title: "Still working...",
+        description: "Your feedback is still processing in the background.",
+      });
+    }, 6000);
+
+    try {
+      let period: string | null = null;
+      const { data: periodData } = await supabase
+        .from("periods")
+        .select("name")
+        .lte("start_date", submission.feedback_date)
+        .gte("end_date", submission.feedback_date)
+        .maybeSingle();
+
+      if (periodData?.name) {
+        period = periodData.name;
+      }
+
+      const caseNumber = `CF-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+
+      const assignee = await resolveInitialAssignee({
+        complaintCategory: submission.complaint_category,
+        storeNumber: submission.store_number,
+        market: submission.market,
+        typeOfFeedback: submission.type_of_feedback,
+      });
+
+      const { error } = await supabase.from("customer_feedback").insert({
+        feedback_date: submission.feedback_date,
+        store_number: submission.store_number,
+        market: submission.market,
+        complaint_category: submission.complaint_category,
+        feedback_text: submission.feedback_text || null,
+        customer_name: submission.customer_name || null,
+        customer_email: submission.customer_email || null,
+        customer_phone: submission.customer_phone || null,
+        priority: submission.priority,
+        type_of_feedback: submission.type_of_feedback || null,
+        ee_action: submission.ee_action || null,
+        order_number: submission.order_number || null,
+        reward: submission.reward || null,
+        channel: "RAP",
+        feedback_source: "Manual Entry",
+        case_number: caseNumber,
+        resolution_status: normalizeText(submission.type_of_feedback) === "fyi" ? "acknowledged" : "unopened",
+        assignee,
+        user_id: userId,
+        period,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (error) {
+        console.error("Insert error:", error);
+        toast({
+          variant: "destructive",
+          title: "Submission failed",
+          description: `Failed to add feedback: ${error.message}`,
+        });
+        return;
+      }
+
+      const elapsed = Date.now() - startTime;
+      console.log(`✅ Feedback insert completed in ${elapsed}ms`);
+      toast({ title: "Success", description: "Feedback added successfully." });
+
+      // Refresh data in the background (do not block submit UX)
+      onFeedbackAdded();
+    } catch (err) {
+      clearTimeout(timeoutId);
+      console.error("Submit error:", err);
+      toast({
+        variant: "destructive",
+        title: "Submission failed",
+        description: "An unexpected error occurred while saving feedback.",
+      });
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!form.store_number || !form.market || !form.complaint_category) {
@@ -229,93 +313,15 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
       return;
     }
 
+    const submission = { ...form };
+
+    // Close immediately so long-running DB triggers don't block the user experience
     setSubmitting(true);
-    const startTime = Date.now();
-    
-    // Show a warning toast if insert takes too long
-    const timeoutId = setTimeout(() => {
-      toast({
-        title: "Still working...",
-        description: "The submission is taking longer than usual. Please wait.",
-      });
-    }, 6000);
-    
-    try {
-      // Look up period
-      let period: string | null = null;
-      const { data: periodData } = await supabase
-        .from("periods")
-        .select("name")
-        .lte("start_date", form.feedback_date)
-        .gte("end_date", form.feedback_date)
-        .maybeSingle();
-      if (periodData?.name) {
-        period = periodData.name;
-      }
+    setOpen(false);
+    resetForm();
+    setSubmitting(false);
 
-      const caseNumber = `CF-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
-
-      const assignee = await resolveInitialAssignee({
-        complaintCategory: form.complaint_category,
-        storeNumber: form.store_number,
-        market: form.market,
-        typeOfFeedback: form.type_of_feedback,
-      });
-
-      const { error } = await supabase.from("customer_feedback").insert({
-        feedback_date: form.feedback_date,
-        store_number: form.store_number,
-        market: form.market,
-        complaint_category: form.complaint_category,
-        feedback_text: form.feedback_text || null,
-        customer_name: form.customer_name || null,
-        customer_email: form.customer_email || null,
-        customer_phone: form.customer_phone || null,
-        priority: form.priority,
-        type_of_feedback: form.type_of_feedback || null,
-        ee_action: form.ee_action || null,
-        order_number: form.order_number || null,
-        reward: form.reward || null,
-        channel: "RAP",
-        feedback_source: "Manual Entry",
-        case_number: caseNumber,
-        resolution_status: normalizeText(form.type_of_feedback) === "fyi" ? "acknowledged" : "unopened",
-        assignee,
-        user_id: user.id,
-        period,
-      });
-
-      clearTimeout(timeoutId);
-      
-      if (error) {
-        console.error("Insert error:", error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: `Failed to add feedback: ${error.message}`,
-        });
-        return;
-      }
-
-      const elapsed = Date.now() - startTime;
-      console.log(`✅ Feedback insert completed in ${elapsed}ms`);
-
-      // Close dialog and show success immediately
-      toast({ title: "Success", description: "Feedback added successfully." });
-      resetForm();
-      setSubmitting(false);
-      setOpen(false);
-      
-      // Refresh data in the background (don't block the UI)
-      onFeedbackAdded();
-      return; // skip finally's setSubmitting since we already did it
-    } catch (err) {
-      clearTimeout(timeoutId);
-      console.error("Submit error:", err);
-      toast({ variant: "destructive", title: "Error", description: "An unexpected error occurred." });
-    } finally {
-      setSubmitting(false);
-    }
+    void submitFeedbackInBackground(submission, user.id);
   };
 
   return (
