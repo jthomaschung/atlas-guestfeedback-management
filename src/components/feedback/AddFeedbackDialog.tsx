@@ -31,6 +31,7 @@ const COMPLAINT_CATEGORIES = [
 
 const PRIORITIES = ["Praise", "Low", "Medium", "High", "Critical"] as const;
 const TYPES_OF_FEEDBACK = ["Guest Support", "FYI"] as const;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 interface StoreInfo {
   store_number: string;
@@ -113,7 +114,20 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!form.store_number || !form.market || !form.complaint_category) {
+    const trimmedEmail = form.customer_email.trim();
+    if (trimmedEmail && !EMAIL_REGEX.test(trimmedEmail)) {
+      toast({
+        variant: "destructive",
+        title: "Invalid email",
+        description: "Please enter a valid customer email address or leave it blank.",
+      });
+      return;
+    }
+
+    const selectedStore = stores.find((s) => s.store_number === form.store_number);
+    const resolvedMarket = form.market || selectedStore?.region || "";
+
+    if (!form.store_number || !resolvedMarket || !form.complaint_category) {
       toast({
         variant: "destructive",
         title: "Missing required fields",
@@ -122,11 +136,14 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
       return;
     }
 
-    if (!user?.id) {
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    const authenticatedUser = authData.user;
+
+    if (authError || !authenticatedUser?.id) {
       toast({
         variant: "destructive",
-        title: "Not authenticated",
-        description: "You must be logged in to add feedback.",
+        title: "Session expired",
+        description: "Please refresh and sign in again before adding feedback.",
       });
       return;
     }
@@ -156,11 +173,11 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
       const { error } = await supabase.from("customer_feedback").insert({
         feedback_date: form.feedback_date,
         store_number: form.store_number,
-        market: form.market,
+        market: resolvedMarket,
         complaint_category: form.complaint_category,
         feedback_text: form.feedback_text || null,
         customer_name: form.customer_name || null,
-        customer_email: form.customer_email || null,
+        customer_email: trimmedEmail || null,
         customer_phone: form.customer_phone || null,
         priority: form.priority,
         type_of_feedback: form.type_of_feedback || null,
@@ -172,7 +189,7 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
         case_number: caseNumber,
         resolution_status: normalizedType === "fyi" ? "acknowledged" : "unopened",
         assignee: "guestfeedback@atlaswe.com",
-        user_id: user.id,
+        user_id: authenticatedUser.id,
         period,
       });
 
@@ -214,7 +231,7 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
         <DialogHeader>
           <DialogTitle>Manually Add Feedback</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+        <form onSubmit={handleSubmit} noValidate className="space-y-4 mt-2">
           {/* Row 1: Date + Store + Market */}
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
