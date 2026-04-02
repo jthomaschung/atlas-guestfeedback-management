@@ -176,10 +176,15 @@ export default function GuestFeedbackManagement() {
             Manage and respond to guest feedback assigned to your account
           </p>
         </div>
-        <Badge variant="secondary" className="text-sm">
-          {filteredFeedbacks.length} Active Cases
-        </Badge>
-      </div>
+        <div className="flex items-center gap-3">
+          <Button onClick={() => setStandaloneRefundOpen(true)} variant="outline">
+            <DollarSign className="h-4 w-4 mr-2" />
+            Request Refund
+          </Button>
+          <Badge variant="secondary" className="text-sm">
+            {filteredFeedbacks.length} Active Cases
+          </Badge>
+        </div>
 
       <CustomerFeedbackStats feedbacks={filteredFeedbacks} />
 
