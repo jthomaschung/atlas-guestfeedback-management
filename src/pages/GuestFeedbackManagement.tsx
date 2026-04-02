@@ -5,12 +5,14 @@ import { CustomerFeedbackTable } from '@/components/feedback/CustomerFeedbackTab
 import { SimpleFeedbackFilters } from '@/components/feedback/SimpleFeedbackFilters';
 import { FeedbackDetailsDialog } from '@/components/feedback/FeedbackDetailsDialog';
 import { CustomerFeedbackStats } from '@/components/feedback/CustomerFeedbackStats';
+import { StandaloneRefundDialog } from '@/components/feedback/StandaloneRefundDialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useFeedbackLikes } from '@/hooks/useFeedbackLikes';
-import { Loader2, Star } from 'lucide-react';
+import { Loader2, Star, DollarSign } from 'lucide-react';
 
 export default function GuestFeedbackManagement() {
   const { user } = useAuth();
