@@ -123,6 +123,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
             {children}
             <FeedbackButton />
           </main>
+          <StandaloneRefundDialog
+            isOpen={refundDialogOpen}
+            onClose={() => setRefundDialogOpen(false)}
+          />
         </div>
       </div>
     </SidebarProvider>
