@@ -188,7 +188,7 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
         }
       }
 
-      toast.success('Refund request submitted successfully');
+      toast.success(needsApproval ? 'Refund request submitted for approval' : 'Refund approved automatically (under $25)');
       onClose();
       resetForm();
     } catch (error) {
