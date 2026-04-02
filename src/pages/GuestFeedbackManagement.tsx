@@ -185,6 +185,7 @@ export default function GuestFeedbackManagement() {
             {filteredFeedbacks.length} Active Cases
           </Badge>
         </div>
+      </div>
 
       <CustomerFeedbackStats feedbacks={filteredFeedbacks} />
 
