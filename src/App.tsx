@@ -50,6 +50,7 @@ const queryClient = new QueryClient({
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading, isProcessingTokens, signOut } = useAuth();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
+  const [refundDialogOpen, setRefundDialogOpen] = useState(false);
 
   // Show loading while auth or permissions are loading, or while processing tokens
   if (authLoading || permissionsLoading || isProcessingTokens) {
