@@ -9378,6 +9378,8 @@ export type Database = {
         Row: {
           assignee: string | null
           awaiting_response: boolean | null
+          awaiting_response_set_at: string | null
+          awaiting_response_set_by: string | null
           completed_at: string | null
           cost: number | null
           created_at: string
@@ -9412,6 +9414,8 @@ export type Database = {
         Insert: {
           assignee?: string | null
           awaiting_response?: boolean | null
+          awaiting_response_set_at?: string | null
+          awaiting_response_set_by?: string | null
           completed_at?: string | null
           cost?: number | null
           created_at?: string
@@ -9446,6 +9450,8 @@ export type Database = {
         Update: {
           assignee?: string | null
           awaiting_response?: boolean | null
+          awaiting_response_set_at?: string | null
+          awaiting_response_set_by?: string | null
           completed_at?: string | null
           cost?: number | null
           created_at?: string
@@ -9478,6 +9484,13 @@ export type Database = {
           viewed?: boolean | null
         }
         Relationships: [
+          {
+            foreignKeyName: "work_orders_recurrence_source_id_fkey"
+            columns: ["recurrence_source_id"]
+            isOneToOne: false
+            referencedRelation: "work_order_sla"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "work_orders_recurrence_source_id_fkey"
             columns: ["recurrence_source_id"]
@@ -10427,6 +10440,7 @@ export type Database = {
           avg_age_days: number | null
           awaiting_response_count: number | null
           critical_open: number | null
+          critical_overdue: number | null
           health_band: string | null
           health_score: number | null
           important_open: number | null
@@ -10549,6 +10563,27 @@ export type Database = {
         }
         Relationships: []
       }
+      work_order_sla: {
+        Row: {
+          assignee: string | null
+          business_days_elapsed: number | null
+          business_days_to_resolve: number | null
+          clock_paused: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          days_over_sla: number | null
+          id: string | null
+          market: string | null
+          priority: string | null
+          repair_type: string | null
+          sla_breached: boolean | null
+          sla_status: string | null
+          status: string | null
+          store_number: string | null
+          target_business_days: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_user_market_permission: {
@@ -10558,6 +10593,10 @@ export type Database = {
       add_user_store_permission: {
         Args: { target_store_number: string; target_user_id: string }
         Returns: undefined
+      }
+      business_days_between: {
+        Args: { end_date: string; start_date: string }
+        Returns: number
       }
       calculate_completion_metrics: {
         Args: { p_batch_id: string; p_metric_date: string }
