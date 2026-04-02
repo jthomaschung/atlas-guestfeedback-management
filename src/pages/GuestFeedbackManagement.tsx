@@ -5,12 +5,14 @@ import { CustomerFeedbackTable } from '@/components/feedback/CustomerFeedbackTab
 import { SimpleFeedbackFilters } from '@/components/feedback/SimpleFeedbackFilters';
 import { FeedbackDetailsDialog } from '@/components/feedback/FeedbackDetailsDialog';
 import { CustomerFeedbackStats } from '@/components/feedback/CustomerFeedbackStats';
+import { StandaloneRefundDialog } from '@/components/feedback/StandaloneRefundDialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useFeedbackLikes } from '@/hooks/useFeedbackLikes';
-import { Loader2, Star } from 'lucide-react';
+import { Loader2, Star, DollarSign } from 'lucide-react';
 
 export default function GuestFeedbackManagement() {
   const { user } = useAuth();
@@ -21,6 +23,7 @@ export default function GuestFeedbackManagement() {
   const [loading, setLoading] = useState(true);
   const [selectedFeedback, setSelectedFeedback] = useState<CustomerFeedback | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [standaloneRefundOpen, setStandaloneRefundOpen] = useState(false);
 
   useEffect(() => {
     document.title = 'Guest Feedback Management - Atlas';
@@ -173,9 +176,15 @@ export default function GuestFeedbackManagement() {
             Manage and respond to guest feedback assigned to your account
           </p>
         </div>
-        <Badge variant="secondary" className="text-sm">
-          {filteredFeedbacks.length} Active Cases
-        </Badge>
+        <div className="flex items-center gap-3">
+          <Button onClick={() => setStandaloneRefundOpen(true)} variant="outline">
+            <DollarSign className="h-4 w-4 mr-2" />
+            Request Refund
+          </Button>
+          <Badge variant="secondary" className="text-sm">
+            {filteredFeedbacks.length} Active Cases
+          </Badge>
+        </div>
       </div>
 
       <CustomerFeedbackStats feedbacks={filteredFeedbacks} />
@@ -244,6 +253,11 @@ export default function GuestFeedbackManagement() {
           onUpdate={loadGuestFeedbackManagerFeedback}
         />
       )}
+
+      <StandaloneRefundDialog
+        isOpen={standaloneRefundOpen}
+        onClose={() => setStandaloneRefundOpen(false)}
+      />
     </div>
   );
 }
