@@ -145,6 +145,7 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
       }
 
       const isCatering = reason === 'Catering Refund';
+      const needsApproval = parsedAmount > 25 || isCatering;
 
       const { data, error } = await supabase
         .from('refund_requests')
@@ -166,25 +167,28 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
           receipt_bypass_reason: bypassReceipt ? bypassReason : null,
           requires_director_approval: parsedAmount > 25,
           requires_catering_approval: isCatering,
+          status: needsApproval ? 'pending' : 'approved',
         })
         .select('id')
         .single();
 
       if (error) throw error;
 
-      // Send DM approval notification
-      try {
-        await supabase.functions.invoke('send-refund-approval-notification', {
-          body: {
-            refundRequestId: data?.id,
-            notificationType: 'new_refund',
-          },
-        });
-      } catch (notifErr) {
-        console.error('Failed to send refund notification:', notifErr);
+      // Only send DM approval notification if approval is needed
+      if (needsApproval) {
+        try {
+          await supabase.functions.invoke('send-refund-approval-notification', {
+            body: {
+              refundRequestId: data?.id,
+              notificationType: 'new_refund',
+            },
+          });
+        } catch (notifErr) {
+          console.error('Failed to send refund notification:', notifErr);
+        }
       }
 
-      toast.success('Refund request submitted successfully');
+      toast.success(needsApproval ? 'Refund request submitted for approval' : 'Refund approved automatically (under $25)');
       onClose();
       resetForm();
     } catch (error) {
