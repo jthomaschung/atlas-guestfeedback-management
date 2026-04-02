@@ -12,8 +12,9 @@ import { AppSidebar } from '@/components/AppSidebar';
 import { NotificationBell } from '@/components/NotificationBell';
 import { FeedbackButton } from '@/components/FeedbackButton';
 import { PortalSwitcher } from '@/components/PortalSwitcher';
+import { StandaloneRefundDialog } from '@/components/feedback/StandaloneRefundDialog';
 import { Button } from '@/components/ui/button';
-import { LogOut, Home } from 'lucide-react';
+import { LogOut, Home, DollarSign } from 'lucide-react';
 import Index from '@/pages/Index';
 import UserHierarchy from '@/pages/UserHierarchy';
 import ExecutiveOversight from '@/pages/ExecutiveOversight';
@@ -49,6 +50,7 @@ const queryClient = new QueryClient({
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading, isProcessingTokens, signOut } = useAuth();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
+  const [refundDialogOpen, setRefundDialogOpen] = useState(false);
 
   // Show loading while auth or permissions are loading, or while processing tokens
   if (authLoading || permissionsLoading || isProcessingTokens) {
@@ -89,6 +91,15 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
               <Button 
                 variant="ghost" 
                 size="sm" 
+                onClick={() => setRefundDialogOpen(true)}
+                className="text-foreground/80 hover:text-foreground hover:bg-muted transition-all duration-200 min-h-[44px] px-3 rounded-lg"
+              >
+                <DollarSign className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Request Refund</span>
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
                 onClick={() => window.location.href = 'https://atlas-masterportal.lovable.app/'}
                 className="text-foreground/80 hover:text-foreground hover:bg-muted transition-all duration-200 min-h-[44px] px-3 rounded-lg"
               >
@@ -112,6 +123,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
             {children}
             <FeedbackButton />
           </main>
+          <StandaloneRefundDialog
+            isOpen={refundDialogOpen}
+            onClose={() => setRefundDialogOpen(false)}
+          />
         </div>
       </div>
     </SidebarProvider>
