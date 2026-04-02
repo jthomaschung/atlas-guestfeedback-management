@@ -91,6 +91,15 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
               <Button 
                 variant="ghost" 
                 size="sm" 
+                onClick={() => setRefundDialogOpen(true)}
+                className="text-foreground/80 hover:text-foreground hover:bg-muted transition-all duration-200 min-h-[44px] px-3 rounded-lg"
+              >
+                <DollarSign className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Request Refund</span>
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
                 onClick={() => window.location.href = 'https://atlas-masterportal.lovable.app/'}
                 className="text-foreground/80 hover:text-foreground hover:bg-muted transition-all duration-200 min-h-[44px] px-3 rounded-lg"
               >
