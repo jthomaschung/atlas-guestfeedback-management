@@ -23,6 +23,7 @@ export default function GuestFeedbackManagement() {
   const [loading, setLoading] = useState(true);
   const [selectedFeedback, setSelectedFeedback] = useState<CustomerFeedback | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [standaloneRefundOpen, setStandaloneRefundOpen] = useState(false);
 
   useEffect(() => {
     document.title = 'Guest Feedback Management - Atlas';
