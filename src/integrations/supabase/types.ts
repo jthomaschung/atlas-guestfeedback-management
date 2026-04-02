@@ -7791,7 +7791,7 @@ export type Database = {
           director_approved_at: string | null
           director_approved_by: string | null
           director_notes: string | null
-          feedback_id: string
+          feedback_id: string | null
           final_approved_at: string | null
           final_approved_by: string | null
           final_notes: string | null
@@ -7833,7 +7833,7 @@ export type Database = {
           director_approved_at?: string | null
           director_approved_by?: string | null
           director_notes?: string | null
-          feedback_id: string
+          feedback_id?: string | null
           final_approved_at?: string | null
           final_approved_by?: string | null
           final_notes?: string | null
@@ -7875,7 +7875,7 @@ export type Database = {
           director_approved_at?: string | null
           director_approved_by?: string | null
           director_notes?: string | null
-          feedback_id?: string
+          feedback_id?: string | null
           final_approved_at?: string | null
           final_approved_by?: string | null
           final_notes?: string | null

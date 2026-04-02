@@ -1,0 +1,1 @@
+ALTER TABLE public.refund_requests ALTER COLUMN feedback_id DROP NOT NULL;
