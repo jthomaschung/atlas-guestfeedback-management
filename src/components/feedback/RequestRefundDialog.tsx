@@ -137,8 +137,9 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
       }
 
       const isCatering = (feedback.channel || '').toLowerCase() === 'catering' || reason === 'Catering Refund';
+      const needsApproval = parsedAmount > 25 || isCatering;
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('refund_requests')
         .insert({
           feedback_id: feedback.id,
@@ -158,26 +159,25 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
           receipt_bypass_reason: bypassReceipt ? bypassReason : null,
           requires_director_approval: parsedAmount > 25,
           requires_catering_approval: isCatering,
-        });
+          status: needsApproval ? 'pending' : 'approved',
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
 
-      // Send DM approval notification
-      try {
-        await supabase.functions.invoke('send-refund-approval-notification', {
-          body: {
-            refundRequestId: (await supabase
-              .from('refund_requests')
-              .select('id')
-              .eq('feedback_id', feedback.id)
-              .order('created_at', { ascending: false })
-              .limit(1)
-              .single()).data?.id,
-            notificationType: 'new_refund',
-          },
-        });
-      } catch (notifErr) {
-        console.error('Failed to send refund notification:', notifErr);
+      // Only send DM approval notification if approval is needed
+      if (needsApproval) {
+        try {
+          await supabase.functions.invoke('send-refund-approval-notification', {
+            body: {
+              refundRequestId: data?.id,
+              notificationType: 'new_refund',
+            },
+          });
+        } catch (notifErr) {
+          console.error('Failed to send refund notification:', notifErr);
+        }
       }
 
       toast.success('Refund request submitted successfully');
