@@ -253,6 +253,11 @@ export default function GuestFeedbackManagement() {
           onUpdate={loadGuestFeedbackManagerFeedback}
         />
       )}
+
+      <StandaloneRefundDialog
+        isOpen={standaloneRefundOpen}
+        onClose={() => setStandaloneRefundOpen(false)}
+      />
     </div>
   );
 }
