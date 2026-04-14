@@ -11629,6 +11629,21 @@ export type Database = {
         Args: { _role_name: string; _user_id: string }
         Returns: boolean
       }
+      insert_harassment_completion: {
+        Args: {
+          p_certificate_url: string
+          p_completion_date: string
+          p_employee_name: string
+          p_expires_at: string
+          p_is_california_employee: boolean
+          p_state: string
+          p_store_number: string
+          p_training_type: string
+          p_upload_notes: string
+          p_uploaded_by: string
+        }
+        Returns: undefined
+      }
       is_admin: { Args: { user_id: string }; Returns: boolean }
       is_admin_user: { Args: { user_uuid: string }; Returns: boolean }
       is_dm: { Args: { user_uuid: string }; Returns: boolean }
