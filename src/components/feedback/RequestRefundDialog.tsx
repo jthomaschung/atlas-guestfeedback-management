@@ -166,18 +166,16 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
 
       if (error) throw error;
 
-      // Only send DM approval notification if approval is needed
+      // Fire-and-forget: don't block UI on notification
       if (needsApproval) {
-        try {
-          await supabase.functions.invoke('send-refund-approval-notification', {
-            body: {
-              refundRequestId: data?.id,
-              notificationType: 'new_refund',
-            },
-          });
-        } catch (notifErr) {
+        supabase.functions.invoke('send-refund-approval-notification', {
+          body: {
+            refundRequestId: data?.id,
+            notificationType: 'new_refund',
+          },
+        }).catch((notifErr) => {
           console.error('Failed to send refund notification:', notifErr);
-        }
+        });
       }
 
       toast.success(needsApproval ? 'Refund request submitted for approval' : 'Refund approved automatically (under $25)');
