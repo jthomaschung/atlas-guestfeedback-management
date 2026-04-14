@@ -1,39 +1,42 @@
 
 
-## Plan: Revert Add Feedback to reliable synchronous flow
+## Plan: Fix Refund Request Infinite Spinner
 
-### Problem
-Manual feedback submissions are silently failing. The current "background submit" pattern closes the dialog immediately and runs the insert in a fire-and-forget async function, which swallows errors invisibly.
+### Root Cause
+The `await supabase.functions.invoke('send-refund-approval-notification')` on line 180 can hang indefinitely if the edge function is slow, undeployed, or encounters a network-level timeout. The inner `try/catch` only catches thrown errors, not indefinite hangs. This blocks the success toast and `setSubmitting(false)` from ever running.
 
-### Root cause
-The background submit pattern (`submitFeedbackInBackground`) has no way to surface errors to the user after the dialog is already closed. Any failure in the period lookup, assignee resolution, or insert is lost.
+### Fix
 
-### What changes
+**File: `src/components/feedback/StandaloneRefundDialog.tsx`**
 
-**File: `src/components/feedback/AddFeedbackDialog.tsx`**
+1. Make the edge function notification call **fire-and-forget** — remove the `await` so it doesn't block the UI. The refund record is already saved to the database at this point, so the notification is non-critical.
+2. Add `console.log` breadcrumbs before/after the DB insert and notification call for future debugging.
 
-1. **Remove background submit pattern** -- replace `submitFeedbackInBackground` with a direct `handleSubmit` that keeps the dialog open and shows "Adding..." until the insert completes or fails.
+**File: `src/components/feedback/RequestRefundDialog.tsx`**
 
-2. **Remove frontend DM lookup** -- the database BEFORE INSERT trigger (`auto_escalate_critical_feedback_before_insert`) already handles all assignee routing, priority mapping, and escalation logic. The frontend just needs to send a simple default assignee (`guestfeedback@atlaswe.com`) and let the trigger override it. This removes the `findDmEmailForMarket`, `resolveInitialAssignee`, and all the category routing constants from the frontend.
+3. Apply the same fire-and-forget fix to the feedback-linked refund dialog for consistency (line ~155 has the same blocking `await` pattern).
 
-3. **Simplified submit flow**:
-   - Validate required fields
-   - Look up period (optional, non-blocking -- use null if lookup fails)
-   - Insert with minimal payload and default assignee
-   - On success: show toast, close dialog, call `onFeedbackAdded()` to refresh list
-   - On error: show error toast, keep dialog open so user can retry
+### What changes look like
 
-### What stays the same
-- All form fields and UI layout unchanged
-- Store dropdown and auto-market-fill unchanged
-- `onFeedbackAdded` callback (triggers `fetchFeedbacks` in Index.tsx) unchanged
-- Database triggers handle routing, priority, escalation as before
+```typescript
+// BEFORE (blocks forever if edge function hangs)
+if (needsApproval) {
+  try {
+    await supabase.functions.invoke('send-refund-approval-notification', { ... });
+  } catch (notifErr) {
+    console.error('Failed to send refund notification:', notifErr);
+  }
+}
 
-### Technical detail
-The BEFORE INSERT trigger `auto_escalate_critical_feedback_before_insert` already:
-- Maps category to priority
-- Routes to store, DM, or GFM based on category
-- Sets escalation status for critical categories
+// AFTER (fire-and-forget, never blocks the user)
+if (needsApproval) {
+  supabase.functions.invoke('send-refund-approval-notification', {
+    body: { refundRequestId: data?.id, notificationType: 'new_refund' },
+  }).catch((notifErr) => {
+    console.error('Failed to send refund notification:', notifErr);
+  });
+}
+```
 
-So the frontend duplicating this logic is redundant and fragile. Removing it simplifies the code and eliminates the RLS-blocked `user_market_permissions` query as a failure point.
+### No database or edge function changes needed.
 
