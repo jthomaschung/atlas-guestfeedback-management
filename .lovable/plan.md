@@ -1,42 +1,46 @@
 
 
-## Plan: Fix Refund Request Infinite Spinner
+## Plan: Fix Refund Approval Failure (CHECK Constraint Mismatch)
 
 ### Root Cause
-The `await supabase.functions.invoke('send-refund-approval-notification')` on line 180 can hang indefinitely if the edge function is slow, undeployed, or encounters a network-level timeout. The inner `try/catch` only catches thrown errors, not indefinite hangs. This blocks the success toast and `setSubmitting(false)` from ever running.
+The `refund_requests.status` column has a CHECK constraint that only allows:
+`'pending'`, `'manager_approved'`, `'director_approved'`, `'approved'`, `'denied'`, `'completed'`
+
+But the application code (in `RefundProcessing.tsx`, `RefundDetailDialog.tsx`, and `statusConfig`) writes these values:
+`'pending'`, `'dm_approved'`, `'awaiting_director'`, `'awaiting_catering'`, `'approved'`, `'denied'`, `'completed'`
+
+When Michelle (or anyone) approves a $57.37 refund as DM, the code tries to set status to `'awaiting_director'` — which fails the CHECK constraint, returning a Postgres `23514` error. The catch block reports the generic "Failed to process refund request."
+
+This affects **every refund > $25 and every catering refund** — not specific to Michelle. It would fail for any user attempting the multi-stage approval flow. Sub-$25 refunds work because they jump straight to `'approved'`, which is in the allowed list.
 
 ### Fix
 
-**File: `src/components/feedback/StandaloneRefundDialog.tsx`**
+**Database migration** — Update the CHECK constraint to include the statuses the app actually uses:
 
-1. Make the edge function notification call **fire-and-forget** — remove the `await` so it doesn't block the UI. The refund record is already saved to the database at this point, so the notification is non-critical.
-2. Add `console.log` breadcrumbs before/after the DB insert and notification call for future debugging.
+```sql
+ALTER TABLE public.refund_requests
+  DROP CONSTRAINT refund_requests_status_check;
 
-**File: `src/components/feedback/RequestRefundDialog.tsx`**
-
-3. Apply the same fire-and-forget fix to the feedback-linked refund dialog for consistency (line ~155 has the same blocking `await` pattern).
-
-### What changes look like
-
-```typescript
-// BEFORE (blocks forever if edge function hangs)
-if (needsApproval) {
-  try {
-    await supabase.functions.invoke('send-refund-approval-notification', { ... });
-  } catch (notifErr) {
-    console.error('Failed to send refund notification:', notifErr);
-  }
-}
-
-// AFTER (fire-and-forget, never blocks the user)
-if (needsApproval) {
-  supabase.functions.invoke('send-refund-approval-notification', {
-    body: { refundRequestId: data?.id, notificationType: 'new_refund' },
-  }).catch((notifErr) => {
-    console.error('Failed to send refund notification:', notifErr);
-  });
-}
+ALTER TABLE public.refund_requests
+  ADD CONSTRAINT refund_requests_status_check
+  CHECK (status = ANY (ARRAY[
+    'pending',
+    'dm_approved',
+    'awaiting_director',
+    'awaiting_catering',
+    'approved',
+    'denied',
+    'completed'
+  ]));
 ```
 
-### No database or edge function changes needed.
+This single change unblocks the DM → Director → (Catering) → Approved → Completed flow without touching application code.
+
+### No code changes required
+The frontend logic, status labels, and approval routing are correct — only the DB constraint was out of sync.
+
+### Verification after deploy
+1. Have Michelle (or any DM/Director) re-approve the $57.37 case from the screenshot.
+2. Confirm it transitions to `'awaiting_director'` and the success toast appears.
+3. Approve as Director and confirm it lands in `'approved'`, then "Mark Complete" works.
 
