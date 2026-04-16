@@ -701,6 +701,7 @@ export type Database = {
       }
       cash_deposits: {
         Row: {
+          bank_transaction_number: string | null
           business_date: string
           created_at: string | null
           created_by_user_id: string | null
@@ -729,6 +730,7 @@ export type Database = {
           validated_by_user_id: string | null
         }
         Insert: {
+          bank_transaction_number?: string | null
           business_date: string
           created_at?: string | null
           created_by_user_id?: string | null
@@ -757,6 +759,7 @@ export type Database = {
           validated_by_user_id?: string | null
         }
         Update: {
+          bank_transaction_number?: string | null
           business_date?: string
           created_at?: string | null
           created_by_user_id?: string | null
@@ -4920,6 +4923,7 @@ export type Database = {
           rca_na: boolean | null
           rca_na_at: string | null
           rca_na_by: string | null
+          rca_na_fields: string[] | null
           rca_na_reason: string | null
           rca_ppe_required: boolean | null
           rca_ppe_required_missing: boolean | null
@@ -5020,6 +5024,7 @@ export type Database = {
           rca_na?: boolean | null
           rca_na_at?: string | null
           rca_na_by?: string | null
+          rca_na_fields?: string[] | null
           rca_na_reason?: string | null
           rca_ppe_required?: boolean | null
           rca_ppe_required_missing?: boolean | null
@@ -5120,6 +5125,7 @@ export type Database = {
           rca_na?: boolean | null
           rca_na_at?: string | null
           rca_na_by?: string | null
+          rca_na_fields?: string[] | null
           rca_na_reason?: string | null
           rca_ppe_required?: boolean | null
           rca_ppe_required_missing?: boolean | null
@@ -5963,6 +5969,8 @@ export type Database = {
           auto_archive_waived: boolean
           clearance_email_sent: boolean | null
           clearance_email_sent_at: string | null
+          company_email_setup: boolean | null
+          company_email_setup_at: string | null
           company_policies_complete: boolean | null
           company_policies_completed_at: string | null
           completed_at: string | null
@@ -6049,6 +6057,8 @@ export type Database = {
           auto_archive_waived?: boolean
           clearance_email_sent?: boolean | null
           clearance_email_sent_at?: string | null
+          company_email_setup?: boolean | null
+          company_email_setup_at?: string | null
           company_policies_complete?: boolean | null
           company_policies_completed_at?: string | null
           completed_at?: string | null
@@ -6135,6 +6145,8 @@ export type Database = {
           auto_archive_waived?: boolean
           clearance_email_sent?: boolean | null
           clearance_email_sent_at?: string | null
+          company_email_setup?: boolean | null
+          company_email_setup_at?: string | null
           company_policies_complete?: boolean | null
           company_policies_completed_at?: string | null
           completed_at?: string | null
@@ -6496,11 +6508,14 @@ export type Database = {
         Row: {
           amount_delta: number | null
           bank_deposit_date: string | null
+          bank_transaction_number: string | null
           cash_deposit_id: string | null
           confidence_score: number | null
           created_at: string | null
           date_delta_days: number | null
+          duplicate_detected: boolean | null
           id: string
+          late_night_adjustment: boolean | null
           manager_selected_date: string | null
           match_method: string | null
           ocr_amount: number | null
@@ -6516,11 +6531,14 @@ export type Database = {
         Insert: {
           amount_delta?: number | null
           bank_deposit_date?: string | null
+          bank_transaction_number?: string | null
           cash_deposit_id?: string | null
           confidence_score?: number | null
           created_at?: string | null
           date_delta_days?: number | null
+          duplicate_detected?: boolean | null
           id?: string
+          late_night_adjustment?: boolean | null
           manager_selected_date?: string | null
           match_method?: string | null
           ocr_amount?: number | null
@@ -6536,11 +6554,14 @@ export type Database = {
         Update: {
           amount_delta?: number | null
           bank_deposit_date?: string | null
+          bank_transaction_number?: string | null
           cash_deposit_id?: string | null
           confidence_score?: number | null
           created_at?: string | null
           date_delta_days?: number | null
+          duplicate_detected?: boolean | null
           id?: string
+          late_night_adjustment?: boolean | null
           manager_selected_date?: string | null
           match_method?: string | null
           ocr_amount?: number | null
@@ -6574,6 +6595,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_store_monthly_spending"
             referencedColumns: ["store_number"]
+          },
+          {
+            foreignKeyName: "ocr_date_audit_submitted_by_fk"
+            columns: ["submitted_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ocr_date_audit_submitted_by_fk"
+            columns: ["submitted_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "v_employee_expense_summary"
+            referencedColumns: ["profile_id"]
           },
         ]
       }
@@ -8276,6 +8311,7 @@ export type Database = {
           ocr_confidence: string | null
           ocr_detection_method: string | null
           ocr_expected_deposit: number | null
+          ocr_raw_timestamp: string | null
           resolution_type: string | null
           shift_type: string
           signer_1_name: string
@@ -8301,6 +8337,7 @@ export type Database = {
           ocr_confidence?: string | null
           ocr_detection_method?: string | null
           ocr_expected_deposit?: number | null
+          ocr_raw_timestamp?: string | null
           resolution_type?: string | null
           shift_type: string
           signer_1_name: string
@@ -8326,6 +8363,7 @@ export type Database = {
           ocr_confidence?: string | null
           ocr_detection_method?: string | null
           ocr_expected_deposit?: number | null
+          ocr_raw_timestamp?: string | null
           resolution_type?: string | null
           shift_type?: string
           signer_1_name?: string
@@ -8498,12 +8536,14 @@ export type Database = {
         Row: {
           address: string | null
           am_dmr_rate: number | null
+          business_day_cutoff_hour: number | null
           city: string | null
           created_at: string | null
           email: string | null
           entity: string | null
           is_active: boolean | null
           labor_goal: number | null
+          late_night_days: number[] | null
           latitude: number | null
           longitude: number | null
           manager: string | null
@@ -8519,12 +8559,14 @@ export type Database = {
         Insert: {
           address?: string | null
           am_dmr_rate?: number | null
+          business_day_cutoff_hour?: number | null
           city?: string | null
           created_at?: string | null
           email?: string | null
           entity?: string | null
           is_active?: boolean | null
           labor_goal?: number | null
+          late_night_days?: number[] | null
           latitude?: number | null
           longitude?: number | null
           manager?: string | null
@@ -8540,12 +8582,14 @@ export type Database = {
         Update: {
           address?: string | null
           am_dmr_rate?: number | null
+          business_day_cutoff_hour?: number | null
           city?: string | null
           created_at?: string | null
           email?: string | null
           entity?: string | null
           is_active?: boolean | null
           labor_goal?: number | null
+          late_night_days?: number[] | null
           latitude?: number | null
           longitude?: number | null
           manager?: string | null
@@ -10490,6 +10534,7 @@ export type Database = {
           am_signer_1: string | null
           am_signer_2: string | null
           bank_receipt_url: string | null
+          bank_transaction_number: string | null
           business_date: string | null
           daily_actual: number | null
           daily_expected: number | null
