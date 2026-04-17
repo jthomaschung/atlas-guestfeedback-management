@@ -1112,6 +1112,8 @@ export type Database = {
           event_date: string | null
           event_type: string | null
           expected_close_date: string | null
+          ffp_notes: string | null
+          ffp_provided: boolean | null
           frequency: string | null
           headcount: number | null
           id: string
@@ -1161,6 +1163,8 @@ export type Database = {
           event_date?: string | null
           event_type?: string | null
           expected_close_date?: string | null
+          ffp_notes?: string | null
+          ffp_provided?: boolean | null
           frequency?: string | null
           headcount?: number | null
           id?: string
@@ -1210,6 +1214,8 @@ export type Database = {
           event_date?: string | null
           event_type?: string | null
           expected_close_date?: string | null
+          ffp_notes?: string | null
+          ffp_provided?: boolean | null
           frequency?: string | null
           headcount?: number | null
           id?: string
