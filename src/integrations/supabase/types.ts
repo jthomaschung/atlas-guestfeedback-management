@@ -1131,6 +1131,9 @@ export type Database = {
           payment_method: string | null
           phone: string
           primary_contact_name: string | null
+          sample_count: number | null
+          sampling_notes: string | null
+          sampling_provided: boolean | null
           service_type: string | null
           setup_type: string | null
           source: string | null
@@ -1177,6 +1180,9 @@ export type Database = {
           payment_method?: string | null
           phone: string
           primary_contact_name?: string | null
+          sample_count?: number | null
+          sampling_notes?: string | null
+          sampling_provided?: boolean | null
           service_type?: string | null
           setup_type?: string | null
           source?: string | null
@@ -1223,6 +1229,9 @@ export type Database = {
           payment_method?: string | null
           phone?: string
           primary_contact_name?: string | null
+          sample_count?: number | null
+          sampling_notes?: string | null
+          sampling_provided?: boolean | null
           service_type?: string | null
           setup_type?: string | null
           source?: string | null
