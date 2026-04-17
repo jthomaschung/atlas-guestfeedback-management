@@ -415,7 +415,11 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     customer_email: data.customer_email || data.Email || null,
     customer_phone: data.customer_phone || data.Phone || data.ustomer_phone || null,
     case_number,
-    assignee: data.assignee || defaultAssignee,
+    // Only honor inbound assignee for GFM-bucketed categories.
+    // Store-routed and auto-escalate categories must always use our routing.
+    assignee: (defaultAssignee && defaultAssignee !== 'guestfeedback@atlaswe.com' && defaultAssignee !== 'Unassigned')
+      ? defaultAssignee
+      : (data.assignee || defaultAssignee),
     priority: data.priority || defaultPriority,
     ee_action: data.ee_action || data.Action || data['Action Item'] || null,
     period: finalPeriod,
