@@ -419,10 +419,16 @@ const OpenFeedback = () => {
             onEdit={handleEdit}
             onViewDetails={handleViewDetails}
             onDelete={handleDelete}
-            onCategoryChange={(feedback, newCategory, newAssignee) => {
-              setFeedbacks(prev => prev.map(fb => fb.id === feedback.id
-                ? { ...fb, complaint_category: newCategory, ...(newAssignee ? { assignee: newAssignee } : {}) }
-                : fb));
+            onCategoryChange={async (feedback) => {
+              // Re-fetch the single record so trigger-updated fields (assignee, priority, ee_action) refresh in the UI
+              const { data, error } = await supabase
+                .from('customer_feedback')
+                .select('*')
+                .eq('id', feedback.id)
+                .single();
+              if (error || !data) return;
+              const updated = mapFeedback(data);
+              setFeedbacks(prev => prev.map(fb => fb.id === feedback.id ? updated : fb));
             }}
             isAdmin={permissions.isAdmin}
             canDelete={permissions.isDirectorOrAbove}
