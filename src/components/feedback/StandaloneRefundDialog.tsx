@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -56,6 +56,27 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
   const [notes, setNotes] = useState('');
   const [storeNumber, setStoreNumber] = useState('');
   const [market, setMarket] = useState('');
+  const [stores, setStores] = useState<{ store_number: string; region: string }[]>([]);
+
+  useEffect(() => {
+    const fetchStores = async () => {
+      const { data } = await supabase
+        .from('stores')
+        .select('store_number, region')
+        .neq('store_number', 'Corp')
+        .order('store_number');
+      if (data) {
+        setStores(data.filter((s) => !s.store_number.includes('PLACEHOLDER')) as { store_number: string; region: string }[]);
+      }
+    };
+    fetchStores();
+  }, []);
+
+  const handleStoreChange = (value: string) => {
+    setStoreNumber(value);
+    const found = stores.find((s) => s.store_number === value);
+    setMarket(found?.region || '');
+  };
   const [customerName, setCustomerName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
@@ -214,20 +235,27 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label htmlFor="standalone-store">Store # *</Label>
-              <Input
-                id="standalone-store"
-                placeholder="e.g. 3391"
-                value={storeNumber}
-                onChange={(e) => setStoreNumber(e.target.value)}
-              />
+              <Select value={storeNumber} onValueChange={handleStoreChange}>
+                <SelectTrigger id="standalone-store">
+                  <SelectValue placeholder="Select store..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {stores.map((s) => (
+                    <SelectItem key={s.store_number} value={s.store_number}>
+                      {s.store_number}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="standalone-market">Market *</Label>
               <Input
                 id="standalone-market"
-                placeholder="e.g. DFW"
+                placeholder="Auto-filled from store"
                 value={market}
-                onChange={(e) => setMarket(e.target.value)}
+                readOnly
+                className="bg-muted"
               />
             </div>
           </div>
