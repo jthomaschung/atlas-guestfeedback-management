@@ -211,30 +211,34 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
       const needsApproval = parsedAmount > 25 || isCatering;
 
       console.log('[StandaloneRefund] Inserting refund_requests row...');
-      const { data, error } = await supabase
-        .from('refund_requests')
-        .insert({
-          feedback_id: null,
-          requested_by: user.id,
-          refund_amount: parsedAmount,
-          refund_reason: reason,
-          refund_method: method,
-          notes: notes || null,
-          store_number: storeNumber,
-          market: market,
-          customer_name: customerName || null,
-          customer_email: customerEmail || null,
-          customer_phone: customerPhone || null,
-          case_number: null,
-          receipt_image_url: receiptUrl,
-          receipt_bypassed: bypassReceipt,
-          receipt_bypass_reason: bypassReceipt ? bypassReason : null,
-          requires_director_approval: parsedAmount > 25,
-          requires_catering_approval: isCatering,
-          status: needsApproval ? 'pending' : 'approved',
-        })
-        .select('id')
-        .single();
+      const { data, error } = await withTimeout(
+        supabase
+          .from('refund_requests')
+          .insert({
+            feedback_id: null,
+            requested_by: user.id,
+            refund_amount: parsedAmount,
+            refund_reason: reason,
+            refund_method: method,
+            notes: notes || null,
+            store_number: storeNumber,
+            market: market,
+            customer_name: customerName || null,
+            customer_email: customerEmail || null,
+            customer_phone: customerPhone || null,
+            case_number: null,
+            receipt_image_url: receiptUrl,
+            receipt_bypassed: bypassReceipt,
+            receipt_bypass_reason: bypassReceipt ? bypassReason : null,
+            requires_director_approval: parsedAmount > 25,
+            requires_catering_approval: isCatering,
+            status: needsApproval ? 'pending' : 'approved',
+          })
+          .select('id')
+          .single(),
+        15000,
+        'Database insert'
+      );
 
       console.log('[StandaloneRefund] Insert response', { data, error });
       if (error) throw error;
