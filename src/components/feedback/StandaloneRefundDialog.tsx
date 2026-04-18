@@ -52,7 +52,7 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
   const { user } = useAuth();
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState('');
-  const [method, setMethod] = useState('');
+  const [method] = useState('Original Payment Method');
   const [notes, setNotes] = useState('');
   const [storeNumber, setStoreNumber] = useState('');
   const [market, setMarket] = useState('');
@@ -114,7 +114,7 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
   const resetForm = () => {
     setAmount('');
     setReason('');
-    setMethod('');
+    
     setNotes('');
     setStoreNumber('');
     setMarket('');
@@ -291,19 +291,6 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label>Refund Method *</Label>
-            <Select value={method} onValueChange={setMethod}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select method" />
-              </SelectTrigger>
-              <SelectContent>
-                {refundMethods.map((m) => (
-                  <SelectItem key={m} value={m}>{m}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
 
           <div className="space-y-2">
             <Label htmlFor="standalone-customer-name">Customer Name</Label>
