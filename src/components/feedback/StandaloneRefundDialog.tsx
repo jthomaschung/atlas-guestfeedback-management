@@ -148,8 +148,21 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
       return;
     }
 
+    if (!user?.id) {
+      toast.error('You must be signed in to submit a refund request');
+      return;
+    }
+
     setSubmitting(true);
-    console.log('[StandaloneRefund] Submit start', { user_id: user?.id, amount: parsedAmount, storeNumber, market });
+    console.log('[StandaloneRefund] Submit start', { user_id: user.id, amount: parsedAmount, storeNumber, market });
+
+    // Hard 30s safety net so UI never hangs forever
+    const timeoutId = setTimeout(() => {
+      console.error('[StandaloneRefund] Submission timed out after 30s');
+      toast.error('Submission timed out. Please try again.');
+      setSubmitting(false);
+    }, 30000);
+
     try {
       let receiptUrl: string | null = null;
 
@@ -176,7 +189,7 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
         .from('refund_requests')
         .insert({
           feedback_id: null,
-          requested_by: user?.id,
+          requested_by: user.id,
           refund_amount: parsedAmount,
           refund_reason: reason,
           refund_method: method,
@@ -215,10 +228,11 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
       toast.success(needsApproval ? 'Refund request submitted for approval' : 'Refund approved automatically (under $25)');
       onClose();
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting refund request:', error);
-      toast.error('Failed to submit refund request');
+      toast.error(`Failed to submit refund request: ${error?.message || 'Unknown error'}`);
     } finally {
+      clearTimeout(timeoutId);
       setSubmitting(false);
     }
   };
