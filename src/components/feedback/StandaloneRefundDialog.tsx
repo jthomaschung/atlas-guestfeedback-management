@@ -236,7 +236,7 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
         .select('id')
         .single()
         .then((res) => res);
-      const { data, error } = await withTimeout(insertPromise, 15000, 'Database insert');
+      const { data, error } = await withTimeout(Promise.resolve(insertPromise), 15000, 'Database insert');
 
       console.log('[StandaloneRefund] Insert response', { data, error });
       if (error) throw error;
