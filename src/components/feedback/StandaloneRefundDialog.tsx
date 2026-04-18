@@ -149,10 +149,12 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
     }
 
     setSubmitting(true);
+    console.log('[StandaloneRefund] Submit start', { user_id: user?.id, amount: parsedAmount, storeNumber, market });
     try {
       let receiptUrl: string | null = null;
 
       if (receiptFile) {
+        console.log('[StandaloneRefund] Uploading receipt...');
         const fileExt = receiptFile.name.split('.').pop();
         const filePath = `standalone/${Date.now()}.${fileExt}`;
         const { error: uploadError } = await supabase.storage
@@ -163,11 +165,13 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
           .from('refund-receipts')
           .getPublicUrl(filePath);
         receiptUrl = urlData.publicUrl;
+        console.log('[StandaloneRefund] Receipt uploaded');
       }
 
       const isCatering = reason === 'Catering Refund';
       const needsApproval = parsedAmount > 25 || isCatering;
 
+      console.log('[StandaloneRefund] Inserting refund_requests row...');
       const { data, error } = await supabase
         .from('refund_requests')
         .insert({
@@ -193,6 +197,7 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
         .select('id')
         .single();
 
+      console.log('[StandaloneRefund] Insert response', { data, error });
       if (error) throw error;
 
       // Fire-and-forget: don't block UI on notification
