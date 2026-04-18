@@ -154,31 +154,57 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
     }
 
     setSubmitting(true);
-    console.log('[StandaloneRefund] Submit start', { user_id: user.id, amount: parsedAmount, storeNumber, market });
+    console.log('[StandaloneRefund] Submit start', { user_id: user.id, amount: parsedAmount, storeNumber, market, hasReceipt: !!receiptFile, fileSize: receiptFile?.size });
 
-    // Hard 30s safety net so UI never hangs forever
+    // Verify auth session is actually live (not just stale user object)
+    const { data: sessionData, error: sessionErr } = await supabase.auth.getSession();
+    console.log('[StandaloneRefund] Session check', { hasSession: !!sessionData?.session, sessionErr });
+    if (!sessionData?.session) {
+      toast.error('Your session has expired. Please sign in again.');
+      setSubmitting(false);
+      return;
+    }
+
+    // Hard 45s safety net so UI never hangs forever
     const timeoutId = setTimeout(() => {
-      console.error('[StandaloneRefund] Submission timed out after 30s');
+      console.error('[StandaloneRefund] Submission timed out after 45s');
       toast.error('Submission timed out. Please try again.');
       setSubmitting(false);
-    }, 30000);
+    }, 45000);
+
+    // Helper: race a promise against a timeout
+    const withTimeout = <T,>(p: Promise<T>, ms: number, label: string): Promise<T> =>
+      Promise.race([
+        p,
+        new Promise<T>((_, reject) =>
+          setTimeout(() => reject(new Error(`${label} timed out after ${ms / 1000}s`)), ms)
+        ),
+      ]);
 
     try {
       let receiptUrl: string | null = null;
 
       if (receiptFile) {
-        console.log('[StandaloneRefund] Uploading receipt...');
+        console.log('[StandaloneRefund] Uploading receipt...', { size: receiptFile.size, type: receiptFile.type });
         const fileExt = receiptFile.name.split('.').pop();
         const filePath = `standalone/${Date.now()}.${fileExt}`;
-        const { error: uploadError } = await supabase.storage
-          .from('refund-receipts')
-          .upload(filePath, receiptFile);
-        if (uploadError) throw uploadError;
+        const { error: uploadError } = await withTimeout(
+          supabase.storage.from('refund-receipts').upload(filePath, receiptFile, {
+            contentType: receiptFile.type,
+            upsert: false,
+          }),
+          30000,
+          'Receipt upload'
+        );
+        if (uploadError) {
+          console.error('[StandaloneRefund] Upload error', uploadError);
+          throw uploadError;
+        }
         const { data: urlData } = supabase.storage
           .from('refund-receipts')
           .getPublicUrl(filePath);
         receiptUrl = urlData.publicUrl;
-        console.log('[StandaloneRefund] Receipt uploaded');
+        console.log('[StandaloneRefund] Receipt uploaded', { receiptUrl });
       }
 
       const isCatering = reason === 'Catering Refund';
