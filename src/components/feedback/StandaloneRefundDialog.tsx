@@ -52,7 +52,7 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
   const { user } = useAuth();
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState('');
-  const [method, setMethod] = useState('');
+  const [method] = useState('Original Payment Method');
   const [notes, setNotes] = useState('');
   const [storeNumber, setStoreNumber] = useState('');
   const [market, setMarket] = useState('');
