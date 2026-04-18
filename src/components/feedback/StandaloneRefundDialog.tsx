@@ -228,10 +228,11 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
       toast.success(needsApproval ? 'Refund request submitted for approval' : 'Refund approved automatically (under $25)');
       onClose();
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting refund request:', error);
-      toast.error('Failed to submit refund request');
+      toast.error(`Failed to submit refund request: ${error?.message || 'Unknown error'}`);
     } finally {
+      clearTimeout(timeoutId);
       setSubmitting(false);
     }
   };
