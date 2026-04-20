@@ -2,62 +2,82 @@
 
 ## Problem
 
-The Portal Switcher in the header is missing portals and showing the wrong set per user. Root causes:
+The `type_of_feedback` field arriving at the `ingest-feedback` webhook is the email **subject line** (e.g. `"Guest Contact: Appearance - Store # (2683-JJ)"`) instead of the parsed value from the email body (`"FYI"` or `"Guest Support"`).
 
-1. It reads access from the **deprecated `user_permissions` table** (via `useUserPermissions`) instead of `user_portal_access` — which is the master SSO source of truth used everywhere else (PortalGate, hasPortalAccess).
-2. The hardcoded portal list is **out of sync with the `portals` table**. DB has 9 portals; switcher lists 7. Missing: **HR Dashboard** (`incident_reporting`) and **Manager Payroll Dashboard** (`manager_payroll_dashboard`).
-3. **KPI and Accounting are hardcoded to `true`** — everyone sees them regardless of actual access.
-4. **Training piggybacks on `canAccessFacilities`** — wrong; training has its own portal row.
-5. Portal **keys don't match the DB** (`guest-feedback` vs `guest_feedback`, `kpi-dashboard` vs `kpi`).
+Confirmed in edge function logs: every recent payload has `type_of_feedback` set to the subject. So the field never lands in the DB as `"FYI"`, and routing/priority logic that depends on it never fires. Case CCC8642306 in the screenshot has `type_of_feedback = NULL` because the validator stores the subject string verbatim, then nothing downstream recognizes it as `"FYI"`.
+
+The screenshot of Mailparser shows the parsed value IS available upstream as `"FYI"` — so the real fix is mapping in Zapier. But we can also harden the edge function to recover the value from the email body, which is sent in `feedback_text`.
 
 ## Solution
 
-Rewrite `PortalSwitcher` to be data-driven from `user_portal_access` joined to `portals`, mirroring how `hasPortalAccess.ts` already validates access. The switcher will show exactly the portals the user is granted in the master portal — same logic that gates entry to each app.
+Two-part fix in `supabase/functions/ingest-feedback/index.ts`:
 
-### Changes
+### 1. Detect & strip subject-line garbage in `type_of_feedback`
 
-**1. `src/components/PortalSwitcher.tsx` — rewrite**
+If the incoming `type_of_feedback` looks like the email subject (starts with `"Guest Contact:"` or contains `"Store #"`), discard it — treat as if not provided.
 
-- Remove dependency on `useUserPermissions`.
-- On mount, fetch the user's accessible portals:
-  ```ts
-  supabase
-    .from('user_portal_access')
-    .select('portals!inner(key, name)')
-    .eq('user_id', user.id)
-  ```
-- Maintain a local **portal metadata map** (icon + external URL) keyed by the canonical DB key. Add the two missing portals:
+```ts
+function isSubjectLineGarbage(v: string): boolean {
+  if (!v) return false;
+  const t = v.trim().toLowerCase();
+  return t.startsWith('guest contact:') || /store\s*#/i.test(v);
+}
+```
 
-  | Key | Title | Icon | URL |
-  |---|---|---|---|
-  | `facilities` | Facilities | Wrench | `https://atlasfacilities.co/` |
-  | `catering` | Catering | UtensilsCrossed | `https://atlas-catering-operations.lovable.app` |
-  | `hr` | Human Resources | Users | `https://atlas-hr-management.lovable.app` |
-  | `training` | Training Dashboard | GraduationCap | `https://preview--trainingportal.lovable.app/welcome` |
-  | `guest_feedback` | Guest Feedback | MessageSquare | `https://guestfeedback.atlasteam.app/dashboard` (current portal) |
-  | `kpi` | KPI Dashboard | BarChart3 | `https://atlas-kpis.lovable.app` |
-  | `accounting` | Accounting | Calculator | `https://accounting.atlasteam.app` |
-  | `incident_reporting` | HR Dashboard | ClipboardList | (confirm URL — see Open Questions) |
-  | `manager_payroll_dashboard` | Manager Payroll | DollarSign | (confirm URL — see Open Questions) |
+### 2. Recover the real value from `feedback_text`
 
-- Render only portals that appear in BOTH the metadata map AND the `user_portal_access` result.
-- Update `getCurrentPortal()` to use `guest_feedback` (matches DB key).
-- Keep the existing `createAuthenticatedUrl` SSO handoff logic — already correct.
-- Keep behavior of hiding switcher when user has access to ≤1 portal.
+After step 1, if `type_of_feedback` is empty, scan `feedback_text` for either:
 
-**2. No DB changes** — the `portals` and `user_portal_access` tables are already populated and authoritative.
+- The literal phrase `"This is an FYI notification only"` (or `"FYI notification"`) → set to `"FYI"`
+- The phrase `"please reach out"` / `"please contact the guest"` / `"please call the guest"` → set to `"Guest Support"`
 
-### Verification
+This matches the language Jimmy John's RAP system uses in the body.
 
-1. As an admin user with all portal access → switcher shows all 9 portals.
-2. As a guest-feedback-only user → switcher hides (1 portal only).
-3. Click Catering / KPI / Accounting → SSO redirect carries session correctly.
-4. Confirm HR Dashboard and Manager Payroll appear for users with those grants.
+```ts
+function inferTypeOfFeedback(text: string): string | null {
+  if (!text) return null;
+  const t = text.toLowerCase();
+  if (t.includes('fyi notification')) return 'FYI';
+  if (t.includes('please reach out') || t.includes('please contact the guest') || t.includes('please call the guest')) return 'Guest Support';
+  return null;
+}
+```
 
-### Open Questions
+### 3. Backfill existing rows
 
-I need URLs for the two missing portals before I add their entries. If unknown, I'll add them with placeholder URLs and a TODO comment, and they'll appear in the dropdown but route to the placeholder.
+Run a one-time SQL update for rows where `type_of_feedback IS NULL` and `feedback_text` contains the FYI or Guest Support phrases:
 
-- **HR Dashboard** (`incident_reporting`) production URL?
-- **Manager Payroll Dashboard** (`manager_payroll_dashboard`) production URL?
+```sql
+UPDATE customer_feedback
+SET type_of_feedback = 'FYI'
+WHERE type_of_feedback IS NULL
+  AND feedback_text ILIKE '%FYI notification%';
+
+UPDATE customer_feedback
+SET type_of_feedback = 'Guest Support'
+WHERE type_of_feedback IS NULL
+  AND (feedback_text ILIKE '%please reach out%' OR feedback_text ILIKE '%please contact the guest%' OR feedback_text ILIKE '%please call the guest%');
+```
+
+I'll run a SELECT preview first showing how many rows match each pattern before issuing the UPDATE so you can confirm the scope.
+
+### 4. Routing recompute (optional, recommend)
+
+After backfill, the existing `type_of_feedback`-driven routing in the validator only runs at ingest time. For the backfilled rows, priority/assignee are already set based on category alone. I will NOT retroactively reroute existing rows — it would change in-flight assignments. New inbound traffic gets correct routing immediately.
+
+### 5. Note on upstream Zapier mapping
+
+The real long-term fix is in Zapier: map the Mailparser `Type of Feedback` field (which already extracts `"FYI"` correctly per the screenshot) into the webhook payload's `type_of_feedback` key, instead of the email subject. The edge-function inference above is a safety net for cases where the upstream mapping is wrong or missing.
+
+## Files Touched
+
+- `supabase/functions/ingest-feedback/index.ts` — add `isSubjectLineGarbage` + `inferTypeOfFeedback`, apply in `validateFeedbackData` around line 298.
+- One-time SQL migration to backfill `type_of_feedback` on existing rows.
+
+## Verification
+
+1. Send a test webhook with `type_of_feedback: "Guest Contact: ..."` and body containing `"This is an FYI notification only"` → row should land with `type_of_feedback = 'FYI'`.
+2. Send a test with no `type_of_feedback` and body containing `"please reach out"` → row should land with `type_of_feedback = 'Guest Support'`.
+3. Verify CCC8642306 is updated to `FYI` after backfill.
+4. Confirm new FYI rows route correctly per existing `type_of_feedback`-driven logic.
 
