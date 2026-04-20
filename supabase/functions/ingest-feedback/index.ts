@@ -295,7 +295,42 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
   const market = await lookupMarketByStore(store_number)
 
   // New pipeline fields
-  const type_of_feedback = data.type_of_feedback || data['Type of Feedback'] || data['Type of feedback'] || null
+  // Helper: detect when type_of_feedback was incorrectly populated with the email subject line
+  const isSubjectLineGarbage = (v: string | null | undefined): boolean => {
+    if (!v) return false
+    const t = String(v).trim().toLowerCase()
+    if (!t) return false
+    return t.startsWith('guest contact:') || /store\s*#/i.test(String(v))
+  }
+  // Helper: infer FYI / Guest Support from the email body when type_of_feedback is missing
+  const inferTypeOfFeedback = (text: string | null | undefined): string | null => {
+    if (!text) return null
+    const t = String(text).toLowerCase()
+    if (t.includes('fyi notification')) return 'FYI'
+    if (
+      t.includes('please reach out') ||
+      t.includes('please contact the guest') ||
+      t.includes('please call the guest')
+    ) return 'Guest Support'
+    return null
+  }
+
+  let type_of_feedback: string | null =
+    data.type_of_feedback || data['Type of Feedback'] || data['Type of feedback'] || null
+
+  if (isSubjectLineGarbage(type_of_feedback)) {
+    console.log(`🧹 Discarding subject-line garbage from type_of_feedback: "${type_of_feedback}"`)
+    type_of_feedback = null
+  }
+  if (!type_of_feedback) {
+    const bodyText = data.feedback_text || data.Feedback || data.complaint_text || ''
+    const inferred = inferTypeOfFeedback(bodyText)
+    if (inferred) {
+      console.log(`🔎 Inferred type_of_feedback from body text: "${inferred}"`)
+      type_of_feedback = inferred
+    }
+  }
+
   const reward = data.reward || data.Reward || null
   const feedback_source = data.feedback_source || data['Feedback Source'] || data.Source || channel
 
