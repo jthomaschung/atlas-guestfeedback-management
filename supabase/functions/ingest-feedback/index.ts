@@ -96,45 +96,52 @@ async function lookupPeriodByDate(feedbackDate: string): Promise<string | null> 
 
 async function findDmForMarket(market: string): Promise<string> {
   try {
-    const { data: marketDm } = await supabase
+    // Resolve the market_id from the markets table (exact, then normalized)
+    const { data: allMarkets } = await supabase
+      .from('markets')
+      .select('id, name')
+
+    if (!allMarkets || allMarkets.length === 0) return 'Unassigned'
+
+    const normalize = (s: string) => s.replace(/\s+/g, '').toUpperCase()
+    const target = normalize(market)
+    const matchedMarket =
+      allMarkets.find((m: any) => m.name === market) ||
+      allMarkets.find((m: any) => normalize(m.name) === target)
+
+    if (!matchedMarket) {
+      console.log(`No market row found for "${market}"`)
+      return 'Unassigned'
+    }
+
+    // Find users assigned to this market via user_market_permissions
+    const { data: perms } = await supabase
+      .from('user_market_permissions')
+      .select('user_id')
+      .eq('market_id', matchedMarket.id)
+
+    if (!perms || perms.length === 0) return 'Unassigned'
+
+    const userIds = perms.map((p: any) => p.user_id)
+
+    // Filter to users with the DM role
+    const { data: dms } = await supabase
       .from('user_hierarchy')
       .select('user_id')
       .eq('role', 'DM')
-      .limit(200)
-    
-    if (!marketDm || marketDm.length === 0) return 'Unassigned'
+      .in('user_id', userIds)
 
-    // Exact match first
-    for (const dm of marketDm) {
-      const [{ data: permissions }, { data: profile }] = await Promise.all([
-        supabase.from('user_permissions').select('markets').eq('user_id', dm.user_id).maybeSingle(),
-        supabase.from('profiles').select('email').eq('user_id', dm.user_id).maybeSingle(),
-      ])
-      const dmEmail = profile?.email || 'unknown'
-      if (permissions?.markets?.includes(market)) {
-        console.log(`Found DM for market ${market}: ${dmEmail}`)
-        return dmEmail
-      }
-    }
+    if (!dms || dms.length === 0) return 'Unassigned'
 
-    // Normalized match
-    const normalizedMarket = market.replace(/\s+/g, '').toUpperCase()
-    for (const dm of marketDm) {
-      const [{ data: permissions }, { data: profile }] = await Promise.all([
-        supabase.from('user_permissions').select('markets').eq('user_id', dm.user_id).maybeSingle(),
-        supabase.from('profiles').select('email').eq('user_id', dm.user_id).maybeSingle(),
-      ])
-      const dmEmail = profile?.email || 'unknown'
-      if (permissions?.markets) {
-        const hasMatch = permissions.markets.some((m: string) => 
-          m.replace(/\s+/g, '').toUpperCase() === normalizedMarket
-        )
-        if (hasMatch) {
-          console.log(`Found DM (normalized) for market ${market}: ${dmEmail}`)
-          return dmEmail
-        }
-      }
-    }
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('user_id', dms[0].user_id)
+      .maybeSingle()
+
+    const dmEmail = profile?.email || 'Unassigned'
+    console.log(`Found DM for market ${market}: ${dmEmail}`)
+    return dmEmail
   } catch (error) {
     console.error('Error finding DM for market:', error)
   }
