@@ -156,32 +156,34 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
     setSubmitting(true);
     console.log('[StandaloneRefund] Submit start', { user_id: user.id, amount: parsedAmount, storeNumber, market, hasReceipt: !!receiptFile, fileSize: receiptFile?.size });
 
-    // Verify auth session is actually live (not just stale user object)
-    const { data: sessionData, error: sessionErr } = await supabase.auth.getSession();
-    console.log('[StandaloneRefund] Session check', { hasSession: !!sessionData?.session, sessionErr });
-    if (!sessionData?.session) {
-      toast.error('Your session has expired. Please sign in again.');
-      setSubmitting(false);
-      return;
-    }
-
-    // Hard 45s safety net so UI never hangs forever
+    // Hard 45s safety net so UI never hangs forever — set BEFORE any await
     const timeoutId = setTimeout(() => {
-      console.error('[StandaloneRefund] Submission timed out after 45s');
+      console.error('[StandaloneRefund] Submission timed out after 45s (safety net)');
       toast.error('Submission timed out. Please try again.');
       setSubmitting(false);
     }, 45000);
 
-    // Helper: race a promise against a timeout
-    const withTimeout = <T,>(p: Promise<T>, ms: number, label: string): Promise<T> =>
+    // Helper: race a thenable/promise against a timeout
+    const withTimeout = <T,>(p: PromiseLike<T>, ms: number, label: string): Promise<T> =>
       Promise.race([
-        p,
+        Promise.resolve(p),
         new Promise<T>((_, reject) =>
           setTimeout(() => reject(new Error(`${label} timed out after ${ms / 1000}s`)), ms)
         ),
       ]);
 
     try {
+      // Verify auth session is actually live — with timeout so it never hangs
+      console.log('[StandaloneRefund] Checking session...');
+      const sessionResult = await withTimeout(supabase.auth.getSession(), 8000, 'Session check');
+      console.log('[StandaloneRefund] Session check done', { hasSession: !!sessionResult?.data?.session });
+      if (!sessionResult?.data?.session) {
+        clearTimeout(timeoutId);
+        toast.error('Your session has expired. Please sign in again.');
+        setSubmitting(false);
+        return;
+      }
+
       let receiptUrl: string | null = null;
 
       if (receiptFile) {
@@ -211,32 +213,34 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
       const needsApproval = parsedAmount > 25 || isCatering;
 
       console.log('[StandaloneRefund] Inserting refund_requests row...');
-      const insertPromise = supabase
-        .from('refund_requests')
-        .insert({
-          feedback_id: null,
-          requested_by: user.id,
-          refund_amount: parsedAmount,
-          refund_reason: reason,
-          refund_method: method,
-          notes: notes || null,
-          store_number: storeNumber,
-          market: market,
-          customer_name: customerName || null,
-          customer_email: customerEmail || null,
-          customer_phone: customerPhone || null,
-          case_number: null,
-          receipt_image_url: receiptUrl,
-          receipt_bypassed: bypassReceipt,
-          receipt_bypass_reason: bypassReceipt ? bypassReason : null,
-          requires_director_approval: parsedAmount > 25,
-          requires_catering_approval: isCatering,
-          status: needsApproval ? 'pending' : 'approved',
-        })
-        .select('id')
-        .single()
-        .then((res) => res);
-      const { data, error } = await withTimeout(Promise.resolve(insertPromise), 15000, 'Database insert');
+      const { data, error } = await withTimeout(
+        supabase
+          .from('refund_requests')
+          .insert({
+            feedback_id: null,
+            requested_by: user.id,
+            refund_amount: parsedAmount,
+            refund_reason: reason,
+            refund_method: method,
+            notes: notes || null,
+            store_number: storeNumber,
+            market: market,
+            customer_name: customerName || null,
+            customer_email: customerEmail || null,
+            customer_phone: customerPhone || null,
+            case_number: null,
+            receipt_image_url: receiptUrl,
+            receipt_bypassed: bypassReceipt,
+            receipt_bypass_reason: bypassReceipt ? bypassReason : null,
+            requires_director_approval: parsedAmount > 25,
+            requires_catering_approval: isCatering,
+            status: needsApproval ? 'pending' : 'approved',
+          })
+          .select('id')
+          .single(),
+        15000,
+        'Database insert'
+      );
 
       console.log('[StandaloneRefund] Insert response', { data, error });
       if (error) throw error;
