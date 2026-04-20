@@ -2,33 +2,62 @@
 
 ## Problem
 
-The card in the screenshot shows "Category: Order Issue" inside the description **text body**, but the actual DB `complaint_category` column is `"Hours"`. This is a Qualtrics → Zapier record that **bypassed the edge function** (channel = `qualtrics`, inserted directly), so:
+The Portal Switcher in the header is missing portals and showing the wrong set per user. Root causes:
 
-1. The category was never normalized (`"Hours"` should → `"Closed Early"`).
-2. The feedback_text arrived with a structured prefix: `"Category : Order Issue\nSub Category : Other\nDescription : ..."` — that prefix is displayed raw in the card body.
-3. Assignee stayed on `guestfeedback@atlaswe.com` because "Hours" / "Closed Early" isn't in my new DB trigger's store-level list.
-4. In reality, "Store and system closed 1 hour early" = **Closed Early** — which per `mem://features/feedback-automated-routing-logic` is a **DM-level** category, not store or guest.
+1. It reads access from the **deprecated `user_permissions` table** (via `useUserPermissions`) instead of `user_portal_access` — which is the master SSO source of truth used everywhere else (PortalGate, hasPortalAccess).
+2. The hardcoded portal list is **out of sync with the `portals` table**. DB has 9 portals; switcher lists 7. Missing: **HR Dashboard** (`incident_reporting`) and **Manager Payroll Dashboard** (`manager_payroll_dashboard`).
+3. **KPI and Accounting are hardcoded to `true`** — everyone sees them regardless of actual access.
+4. **Training piggybacks on `canAccessFacilities`** — wrong; training has its own portal row.
+5. Portal **keys don't match the DB** (`guest-feedback` vs `guest_feedback`, `kpi-dashboard` vs `kpi`).
 
-## Fix (two parts)
+## Solution
 
-### Part 1 — Extend the DB trigger to normalize category + route properly (Qualtrics-safe)
+Rewrite `PortalSwitcher` to be data-driven from `user_portal_access` joined to `portals`, mirroring how `hasPortalAccess.ts` already validates access. The switcher will show exactly the portals the user is granted in the master portal — same logic that gates entry to each app.
 
-Update `route_customer_feedback_assignee()` (the trigger created earlier) to also **normalize `complaint_category`** on insert, matching the edge function's mapping. Add routing tiers:
+### Changes
 
-- **Normalize**: `hours` → `Closed Early`, `order issue`/`sandwich issue`/`submitted incorrect order` → `Sandwich Made Wrong`, `team member complaint`/`rude` → `Rude Service`, `oop` → `Out of Product`, etc. (mirror edge function logic).
-- **Store-level** (→ `store{n}@atlaswe.com` if profile exists): Sandwich Made Wrong, Missing Item, Order Accuracy, Cleanliness, Praise, Bread Quality, Product Quality.
-- **DM-level** (→ market DM via `user_hierarchy`/`user_market_permissions`; fallback to `guestfeedback@atlaswe.com`): **Closed Early**, Rude Service, Out of Product, Possible Food Poisoning.
-- **Guest Feedback** (→ `guestfeedback@atlaswe.com`): Slow Service, Product Issue, Credit Card Issue, Loyalty Program Issues, Other.
+**1. `src/components/PortalSwitcher.tsx` — rewrite**
 
-Also strip the `"Category : X\nSub Category : Y\nDescription : "` prefix from `feedback_text` on insert so descriptions render cleanly.
+- Remove dependency on `useUserPermissions`.
+- On mount, fetch the user's accessible portals:
+  ```ts
+  supabase
+    .from('user_portal_access')
+    .select('portals!inner(key, name)')
+    .eq('user_id', user.id)
+  ```
+- Maintain a local **portal metadata map** (icon + external URL) keyed by the canonical DB key. Add the two missing portals:
 
-### Part 2 — Backfill existing misrouted/misnamed records
+  | Key | Title | Icon | URL |
+  |---|---|---|---|
+  | `facilities` | Facilities | Wrench | `https://atlasfacilities.co/` |
+  | `catering` | Catering | UtensilsCrossed | `https://atlas-catering-operations.lovable.app` |
+  | `hr` | Human Resources | Users | `https://atlas-hr-management.lovable.app` |
+  | `training` | Training Dashboard | GraduationCap | `https://preview--trainingportal.lovable.app/welcome` |
+  | `guest_feedback` | Guest Feedback | MessageSquare | `https://guestfeedback.atlasteam.app/dashboard` (current portal) |
+  | `kpi` | KPI Dashboard | BarChart3 | `https://atlas-kpis.lovable.app` |
+  | `accounting` | Accounting | Calculator | `https://accounting.atlasteam.app` |
+  | `incident_reporting` | HR Dashboard | ClipboardList | (confirm URL — see Open Questions) |
+  | `manager_payroll_dashboard` | Manager Payroll | DollarSign | (confirm URL — see Open Questions) |
 
-Re-run normalization + routing on all existing records where `complaint_category` is a raw Qualtrics value (`'Hours'`, `'Order Issue'`, `'OOP'`, `'Team Member Complaint'`, etc.) and clean up feedback_text prefixes for those same records.
+- Render only portals that appear in BOTH the metadata map AND the `user_portal_access` result.
+- Update `getCurrentPortal()` to use `guest_feedback` (matches DB key).
+- Keep the existing `createAuthenticatedUrl` SSO handoff logic — already correct.
+- Keep behavior of hiding switcher when user has access to ≤1 portal.
+
+**2. No DB changes** — the `portals` and `user_portal_access` tables are already populated and authoritative.
 
 ### Verification
 
-1. Query record `CCC8632787` → confirm `complaint_category = 'Closed Early'`, assignee = DM for TX 1 market (or `guestfeedback@atlaswe.com` if no DM mapped), feedback_text prefix stripped.
-2. Reload Open Feedback → card shows "Closed Early" as the title, clean description.
-3. Spot-check other Qualtrics-channel records.
+1. As an admin user with all portal access → switcher shows all 9 portals.
+2. As a guest-feedback-only user → switcher hides (1 portal only).
+3. Click Catering / KPI / Accounting → SSO redirect carries session correctly.
+4. Confirm HR Dashboard and Manager Payroll appear for users with those grants.
+
+### Open Questions
+
+I need URLs for the two missing portals before I add their entries. If unknown, I'll add them with placeholder URLs and a TODO comment, and they'll appear in the dropdown but route to the placeholder.
+
+- **HR Dashboard** (`incident_reporting`) production URL?
+- **Manager Payroll Dashboard** (`manager_payroll_dashboard`) production URL?
 
