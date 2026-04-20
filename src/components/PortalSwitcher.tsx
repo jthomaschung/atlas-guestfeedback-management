@@ -1,154 +1,175 @@
-import { useUserPermissions } from '@/hooks/useUserPermissions';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { ChevronDown, Wrench, UtensilsCrossed, Users, MessageSquare, BarChart3, Calculator } from 'lucide-react';
+import {
+  ChevronDown,
+  Wrench,
+  UtensilsCrossed,
+  Users,
+  MessageSquare,
+  BarChart3,
+  Calculator,
+  GraduationCap,
+  ClipboardList,
+  DollarSign,
+  type LucideIcon,
+} from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { createAuthenticatedUrl } from '@/utils/sessionToken';
 
-const portals = [
-  {
+type PortalMeta = {
+  key: string;
+  title: string;
+  icon: LucideIcon;
+  href?: string;
+  externalUrl: string;
+};
+
+// Canonical portal metadata, keyed by the DB `portals.key` value.
+const PORTAL_META: Record<string, PortalMeta> = {
+  facilities: {
     key: 'facilities',
     title: 'Facilities',
     icon: Wrench,
-    externalUrl: 'https://atlasfacilities.co/'
+    externalUrl: 'https://atlasfacilities.co/',
   },
-  {
+  catering: {
     key: 'catering',
     title: 'Catering',
     icon: UtensilsCrossed,
-    href: '/catering',
-    externalUrl: 'https://atlas-catering-operations.lovable.app' // Update with actual URL
+    externalUrl: 'https://atlas-catering-operations.lovable.app',
   },
-  {
+  hr: {
     key: 'hr',
     title: 'Human Resources',
     icon: Users,
-    href: '/hr',
-    externalUrl: 'https://atlas-hr-management.lovable.app' // Update with actual URL
+    externalUrl: 'https://atlas-hr-management.lovable.app',
   },
-  {
+  training: {
     key: 'training',
     title: 'Training Dashboard',
-    icon: Users,
-    href: '/training',
-    externalUrl: 'https://preview--trainingportal.lovable.app/welcome'
+    icon: GraduationCap,
+    externalUrl: 'https://preview--trainingportal.lovable.app/welcome',
   },
-  {
-    key: 'guest-feedback',
+  guest_feedback: {
+    key: 'guest_feedback',
     title: 'Guest Feedback',
     icon: MessageSquare,
     href: '/dashboard',
-    externalUrl: 'https://preview--atlas-guestfeedback-management.lovable.app/dashboard'
+    externalUrl: 'https://guestfeedback.atlasteam.app/dashboard',
   },
-  {
-    key: 'kpi-dashboard',
+  kpi: {
+    key: 'kpi',
     title: 'KPI Dashboard',
     icon: BarChart3,
-    href: '/kpi-dashboard',
-    externalUrl: 'https://atlas-kpis.lovable.app'
+    externalUrl: 'https://atlas-kpis.lovable.app',
   },
-  {
+  accounting: {
     key: 'accounting',
     title: 'Accounting',
     icon: Calculator,
-    href: '/accounting',
-    externalUrl: 'https://accounting.atlasteam.app'
-  }
-];
+    externalUrl: 'https://accounting.atlasteam.app',
+  },
+  incident_reporting: {
+    key: 'incident_reporting',
+    title: 'HR Dashboard',
+    icon: ClipboardList,
+    // TODO: confirm production URL for HR Dashboard (incident_reporting)
+    externalUrl: 'https://atlas-hr-management.lovable.app',
+  },
+  manager_payroll_dashboard: {
+    key: 'manager_payroll_dashboard',
+    title: 'Manager Payroll',
+    icon: DollarSign,
+    // TODO: confirm production URL for Manager Payroll Dashboard
+    externalUrl: 'https://atlas-hr-management.lovable.app',
+  },
+};
 
 export function PortalSwitcher() {
-  const { permissions } = useUserPermissions();
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [accessibleKeys, setAccessibleKeys] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Determine current portal based on route
+  useEffect(() => {
+    let cancelled = false;
+    const fetchAccess = async () => {
+      if (!user?.id) {
+        setAccessibleKeys([]);
+        setLoading(false);
+        return;
+      }
+      try {
+        const { data, error } = await supabase
+          .from('user_portal_access')
+          .select('portals!inner(key)')
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+        if (cancelled) return;
+
+        const keys = (data ?? [])
+          .map((row: any) => row?.portals?.key)
+          .filter((k: unknown): k is string => typeof k === 'string');
+        setAccessibleKeys(keys);
+      } catch (err) {
+        console.error('PortalSwitcher: failed to load portal access', err);
+        if (!cancelled) setAccessibleKeys([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    fetchAccess();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
+
+  // Determine current portal based on route. This app is the Guest Feedback portal.
   const getCurrentPortal = () => {
     if (location.pathname.startsWith('/catering')) return 'catering';
     if (location.pathname.startsWith('/hr')) return 'hr';
-    // Default to guest-feedback for this app
-    return 'guest-feedback';
+    return 'guest_feedback';
   };
 
-  // Handle portal navigation
-  const handlePortalNavigation = async (portal: typeof portals[0]) => {
-    console.log('🚀 Portal navigation started:', {
-      targetPortal: portal.key,
-      currentPortal: getCurrentPortal(),
-      externalUrl: portal.externalUrl,
-      hasExternalUrl: !!portal.externalUrl,
-      permissions: permissions
-    });
-
-    // If it's the current portal or has no external URL, use internal navigation
-    if (portal.key === getCurrentPortal() || !portal.externalUrl) {
-      console.log('🔄 Using internal navigation');
+  const handlePortalNavigation = async (portal: PortalMeta) => {
+    // Internal navigation if it's the current portal and we have a local route.
+    if (portal.key === getCurrentPortal() && portal.href) {
       navigate(portal.href);
       return;
     }
 
-    console.log('🌐 Starting external portal navigation...');
     try {
-      // For external portals, create authenticated URL and navigate
-      console.log('🔐 Creating authenticated URL...');
-      
-      // For facilities app, try to send directly to root with a hash to bypass welcome page
-      let targetUrl = portal.externalUrl;
-      if (portal.key === 'facilities') {
-        // Try sending to root with a hash fragment to potentially bypass welcome redirect
-        targetUrl = portal.externalUrl + '#authenticated';
-        console.log('🏢 Facilities-specific URL modification:', targetUrl);
-      }
-      
+      const targetUrl =
+        portal.key === 'facilities' ? `${portal.externalUrl}#authenticated` : portal.externalUrl;
       const authenticatedUrl = await createAuthenticatedUrl(targetUrl);
-      console.log('✅ Authenticated URL created:', {
-        originalUrl: portal.externalUrl,
-        targetUrl,
-        authenticatedUrl: authenticatedUrl.substring(0, 100) + '...',
-        hasTokens: authenticatedUrl.includes('access_token')
-      });
-      
-      console.log('🚀 Redirecting to authenticated URL...');
       window.location.href = authenticatedUrl;
     } catch (error) {
-      console.error('❌ Error creating authenticated URL:', error);
-      // Fallback to direct navigation
-      console.log('🔄 Falling back to direct navigation');
+      console.error('PortalSwitcher: error creating authenticated URL', error);
       window.location.href = portal.externalUrl;
     }
   };
 
-  // Check if user has access to multiple portals
-  const accessiblePortals = portals.filter(portal => {
-    switch (portal.key) {
-      case 'facilities':
-        return permissions.canAccessFacilities;
-      case 'catering':
-        return permissions.canAccessCatering;
-      case 'hr':
-        return permissions.canAccessHr;
-      case 'training':
-        return permissions.canAccessFacilities; // Use facilities permission for now
-      case 'guest-feedback':
-        return permissions.canAccessGuestFeedback;
-      case 'kpi-dashboard':
-        return true;
-      case 'accounting':
-        return true;
-      default:
-        return false;
-    }
-  });
+  const accessiblePortals = accessibleKeys
+    .map((key) => PORTAL_META[key])
+    .filter((p): p is PortalMeta => Boolean(p));
 
-  // Don't show switcher if user only has access to one portal
-  if (accessiblePortals.length <= 1) return null;
+  if (loading || accessiblePortals.length <= 1) return null;
 
-  const currentPortal = portals.find(p => p.key === getCurrentPortal());
+  const currentPortal = PORTAL_META[getCurrentPortal()];
   const CurrentIcon = currentPortal?.icon || Wrench;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="gap-2 text-foreground/80 hover:bg-muted hover:text-foreground transition-all duration-200 min-h-[44px] px-3 rounded-lg">
+        <Button
+          variant="ghost"
+          className="gap-2 text-foreground/80 hover:bg-muted hover:text-foreground transition-all duration-200 min-h-[44px] px-3 rounded-lg"
+        >
           <CurrentIcon className="h-4 w-4" />
           <span className="hidden sm:inline">{currentPortal?.title}</span>
           <ChevronDown className="h-4 w-4" />
@@ -158,12 +179,11 @@ export function PortalSwitcher() {
         {accessiblePortals.map((portal) => {
           const Icon = portal.icon;
           const isCurrent = portal.key === getCurrentPortal();
-          
           return (
             <DropdownMenuItem
               key={portal.key}
               onClick={() => handlePortalNavigation(portal)}
-              className={isCurrent ? "bg-accent" : ""}
+              className={isCurrent ? 'bg-accent' : ''}
             >
               <Icon className="mr-2 h-4 w-4" />
               {portal.title}
