@@ -455,7 +455,10 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     assignee: (defaultAssignee && defaultAssignee !== 'guestfeedback@atlaswe.com' && defaultAssignee !== 'Unassigned')
       ? defaultAssignee
       : (data.assignee || defaultAssignee),
-    priority: data.priority || defaultPriority,
+    // Force Critical for auto-escalate categories — never let inbound payload downgrade these
+    priority: autoEscalateCategories.includes(categoryLower) || defaultPriority === 'Critical'
+      ? 'Critical'
+      : (data.priority || defaultPriority),
     ee_action: data.ee_action || data.Action || data['Action Item'] || null,
     period: finalPeriod,
     time_of_day: data.time_of_day || data['Time of Day'] || data.time || null,
