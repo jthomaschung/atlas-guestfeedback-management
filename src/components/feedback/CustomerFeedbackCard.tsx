@@ -610,3 +610,4 @@ function CustomerFeedbackCardComponent({
     </>
   );
 }
+export const CustomerFeedbackCard = memo(CustomerFeedbackCardComponent);

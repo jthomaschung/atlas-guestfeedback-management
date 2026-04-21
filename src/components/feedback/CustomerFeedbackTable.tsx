@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { CustomerFeedback } from "@/types/feedback";
 import { CustomerFeedbackCard } from "./CustomerFeedbackCard";
 
@@ -15,6 +16,8 @@ interface CustomerFeedbackTableProps {
   onToggleLike?: (feedbackId: string) => void;
 }
 
+const BATCH_SIZE = 60;
+
 export function CustomerFeedbackTable({ 
   feedbacks, 
   onEdit, 
@@ -28,8 +31,31 @@ export function CustomerFeedbackTable({
   userLikes,
   onToggleLike,
 }: CustomerFeedbackTableProps) {
-  console.log('📋 CustomerFeedbackTable rendering with', feedbacks.length, 'items');
-  
+  const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  // Reset visible count when filtered list changes meaningfully
+  useEffect(() => {
+    setVisibleCount(BATCH_SIZE);
+  }, [feedbacks.length]);
+
+  useEffect(() => {
+    if (visibleCount >= feedbacks.length) return;
+    const el = sentinelRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setVisibleCount((c) => Math.min(c + BATCH_SIZE, feedbacks.length));
+        }
+      },
+      { rootMargin: "400px 0px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [visibleCount, feedbacks.length]);
+
   if (feedbacks.length === 0) {
     return (
       <div className="p-8 text-center border-2 border-dashed border-muted-foreground/25 rounded-lg">
@@ -38,11 +64,13 @@ export function CustomerFeedbackTable({
       </div>
     );
   }
-  
+
+  const visible = feedbacks.slice(0, visibleCount);
+
   return (
     <div className="space-y-4">
       <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
-        {feedbacks.map((feedback) => (
+        {visible.map((feedback) => (
           <CustomerFeedbackCard
             key={feedback.id}
             feedback={feedback}
@@ -59,6 +87,11 @@ export function CustomerFeedbackTable({
           />
         ))}
       </div>
+      {visibleCount < feedbacks.length && (
+        <div ref={sentinelRef} className="h-12 flex items-center justify-center text-sm text-muted-foreground">
+          Loading more…
+        </div>
+      )}
     </div>
   );
 }
