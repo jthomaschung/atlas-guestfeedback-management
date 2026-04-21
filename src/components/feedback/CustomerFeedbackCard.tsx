@@ -511,22 +511,22 @@ function CustomerFeedbackCardComponent({
             "flex flex-col gap-2 text-xs",
             isEscalated ? "text-white/80" : "text-muted-foreground"
           )}>
-            <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+            <div className="grid grid-cols-[auto_auto_1fr] items-center gap-x-3 gap-y-1">
               <div className="flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
+                <Calendar className="h-3 w-3 shrink-0" />
                 <span>{format(new Date(feedback.feedback_date + 'T00:00:00'), 'MMM d, yyyy')}</span>
               </div>
-              
+
               <div className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
+                <Clock className="h-3 w-3 shrink-0" />
                 <span className="truncate">{formatDistanceToNow(new Date(feedback.created_at), { addSuffix: true })}</span>
               </div>
-              
-              <div className="flex items-center gap-1">
-                <User className="h-3 w-3" />
-                <span className="truncate max-w-32">
-                  {feedback.assignee && feedback.assignee !== 'unassigned' 
-                    ? feedback.assignee 
+
+              <div className="flex items-center gap-1 min-w-0">
+                <User className="h-3 w-3 shrink-0" />
+                <span className="truncate">
+                  {feedback.assignee && feedback.assignee !== 'unassigned'
+                    ? feedback.assignee
                     : 'Unassigned'
                   }
                 </span>
