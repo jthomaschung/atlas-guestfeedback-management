@@ -1,83 +1,47 @@
 
 
-## Problem
+## Speed up the Open Feedback board
 
-The `type_of_feedback` field arriving at the `ingest-feedback` webhook is the email **subject line** (e.g. `"Guest Contact: Appearance - Store # (2683-JJ)"`) instead of the parsed value from the email body (`"FYI"` or `"Guest Support"`).
+The Open Feedback page (`/open-feedback`) currently loads slowly because of three bottlenecks. Below is what I'll change.
 
-Confirmed in edge function logs: every recent payload has `type_of_feedback` set to the subject. So the field never lands in the DB as `"FYI"`, and routing/priority logic that depends on it never fires. Case CCC8642306 in the screenshot has `type_of_feedback = NULL` because the validator stores the subject string verbatim, then nothing downstream recognizes it as `"FYI"`.
+### Findings
+- The query fetches `SELECT *` (every column, including long text fields) for every active ticket.
+- Pagination loops in 1000-row pages even though there are ~373 active tickets — this still issues one request, but always with the slowest path.
+- All ~373 cards render at once on first paint. Each card is a heavy component (Select, Textarea, Checkbox, Refund dialog wired up).
+- `useMemo` filtering recomputes against the full list, but the bigger cost is the initial mount of hundreds of card subtrees.
 
-The screenshot of Mailparser shows the parsed value IS available upstream as `"FYI"` — so the real fix is mapping in Zapier. But we can also harden the edge function to recover the value from the email body, which is sent in `feedback_text`.
+### Changes
 
-## Solution
+1. **Lighter initial query** (`src/pages/OpenFeedback.tsx`)
+   - Replace `select('*')` with an explicit column list that matches what the card/table actually displays. Drop `executive_notes`, `resolution_notes`, large `feedback_text` is still needed for cards/search — keep it, but exclude unused columns (`auto_escalated`, `customer_response_sentiment`, `outreach_method`, etc. that aren't shown on the card).
+   - Use a single `.range(0, 1999)` request instead of the while-loop (active tickets are well under 2000 — see DB count: ~373). This removes a wasted pagination round-trip in the common case, with a fallback to paginate only if exactly 2000 returned.
 
-Two-part fix in `supabase/functions/ingest-feedback/index.ts`:
+2. **Progressive rendering of cards** (`src/components/feedback/CustomerFeedbackTable.tsx` + `OpenFeedback.tsx`)
+   - Render the first 60 cards immediately, then mount the rest on `requestIdleCallback` / batched `setTimeout` so the page becomes interactive instantly.
+   - Add a "Load more" sentinel using `IntersectionObserver` to reveal the next batch when the user scrolls near the bottom (batch size 60). No virtualization library needed.
 
-### 1. Detect & strip subject-line garbage in `type_of_feedback`
+3. **Memoize card rendering** (`src/components/feedback/CustomerFeedbackCard.tsx`)
+   - Wrap `CustomerFeedbackCard` in `React.memo` with a shallow prop comparator so unrelated state changes (filter typing, dialog open/close) don't re-render every card. This makes filter typing feel instant.
 
-If the incoming `type_of_feedback` looks like the email subject (starts with `"Guest Contact:"` or contains `"Store #"`), discard it — treat as if not provided.
+4. **Defer secondary fetches** (`OpenFeedback.tsx`)
+   - Run `fetchPeriods()` and `fetchStores()` in parallel with `fetchFeedbacks()` (currently sequential `await`-style state hits). They're already independent calls — just confirm no `await` chain.
+   - Show the table skeleton as soon as `feedbacks` arrives, even if periods/stores are still loading (filters degrade gracefully).
 
-```ts
-function isSubjectLineGarbage(v: string): boolean {
-  if (!v) return false;
-  const t = v.trim().toLowerCase();
-  return t.startsWith('guest contact:') || /store\s*#/i.test(v);
-}
-```
+5. **Skeleton instead of "Loading…" text**
+   - Replace the centered "Loading open tickets…" with a lightweight 6-card skeleton grid so perceived load time drops.
 
-### 2. Recover the real value from `feedback_text`
+### Files to edit
+- `src/pages/OpenFeedback.tsx` — column list, single-range fetch, parallel secondary fetches, skeleton, progressive batch state.
+- `src/components/feedback/CustomerFeedbackTable.tsx` — accept `visibleCount`, render `feedbacks.slice(0, visibleCount)`, add IntersectionObserver sentinel.
+- `src/components/feedback/CustomerFeedbackCard.tsx` — wrap export in `React.memo`.
 
-After step 1, if `type_of_feedback` is empty, scan `feedback_text` for either:
+### Out of scope
+- No DB schema changes, no new indexes (active set is small enough that the column-list change is the meaningful win).
+- No changes to filter logic or card visuals.
+- No virtualization library — batched render keeps it simple and accessible.
 
-- The literal phrase `"This is an FYI notification only"` (or `"FYI notification"`) → set to `"FYI"`
-- The phrase `"please reach out"` / `"please contact the guest"` / `"please call the guest"` → set to `"Guest Support"`
-
-This matches the language Jimmy John's RAP system uses in the body.
-
-```ts
-function inferTypeOfFeedback(text: string): string | null {
-  if (!text) return null;
-  const t = text.toLowerCase();
-  if (t.includes('fyi notification')) return 'FYI';
-  if (t.includes('please reach out') || t.includes('please contact the guest') || t.includes('please call the guest')) return 'Guest Support';
-  return null;
-}
-```
-
-### 3. Backfill existing rows
-
-Run a one-time SQL update for rows where `type_of_feedback IS NULL` and `feedback_text` contains the FYI or Guest Support phrases:
-
-```sql
-UPDATE customer_feedback
-SET type_of_feedback = 'FYI'
-WHERE type_of_feedback IS NULL
-  AND feedback_text ILIKE '%FYI notification%';
-
-UPDATE customer_feedback
-SET type_of_feedback = 'Guest Support'
-WHERE type_of_feedback IS NULL
-  AND (feedback_text ILIKE '%please reach out%' OR feedback_text ILIKE '%please contact the guest%' OR feedback_text ILIKE '%please call the guest%');
-```
-
-I'll run a SELECT preview first showing how many rows match each pattern before issuing the UPDATE so you can confirm the scope.
-
-### 4. Routing recompute (optional, recommend)
-
-After backfill, the existing `type_of_feedback`-driven routing in the validator only runs at ingest time. For the backfilled rows, priority/assignee are already set based on category alone. I will NOT retroactively reroute existing rows — it would change in-flight assignments. New inbound traffic gets correct routing immediately.
-
-### 5. Note on upstream Zapier mapping
-
-The real long-term fix is in Zapier: map the Mailparser `Type of Feedback` field (which already extracts `"FYI"` correctly per the screenshot) into the webhook payload's `type_of_feedback` key, instead of the email subject. The edge-function inference above is a safety net for cases where the upstream mapping is wrong or missing.
-
-## Files Touched
-
-- `supabase/functions/ingest-feedback/index.ts` — add `isSubjectLineGarbage` + `inferTypeOfFeedback`, apply in `validateFeedbackData` around line 298.
-- One-time SQL migration to backfill `type_of_feedback` on existing rows.
-
-## Verification
-
-1. Send a test webhook with `type_of_feedback: "Guest Contact: ..."` and body containing `"This is an FYI notification only"` → row should land with `type_of_feedback = 'FYI'`.
-2. Send a test with no `type_of_feedback` and body containing `"please reach out"` → row should land with `type_of_feedback = 'Guest Support'`.
-3. Verify CCC8642306 is updated to `FYI` after backfill.
-4. Confirm new FYI rows route correctly per existing `type_of_feedback`-driven logic.
+### Expected result
+- Initial paint with the first batch of cards in well under 1s on a normal connection.
+- Smooth filter typing because non-visible cards are memoized and unmounted.
+- Same data, same UI, just faster.
 
