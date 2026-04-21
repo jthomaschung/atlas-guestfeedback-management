@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserPermissions } from "@/hooks/useUserPermissions";
 import { supabase } from "@/integrations/supabase/client";
+import { FeedbackGridSkeleton } from "@/components/feedback/FeedbackCardSkeleton";
 
 const OpenFeedback = () => {
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
@@ -359,9 +360,7 @@ const OpenFeedback = () => {
               <p className="text-sm text-muted-foreground">Active tickets requiring attention</p>
             </div>
           </div>
-          <div className="flex items-center justify-center h-64">
-            <div className="text-lg text-muted-foreground">Loading open tickets...</div>
-          </div>
+          <FeedbackGridSkeleton count={6} />
         </div>
       </div>
     );
