@@ -83,8 +83,8 @@ const OpenFeedback = () => {
   useEffect(() => {
     if (authUser && isSessionReady) {
       fetchFeedbacks();
-      fetchPeriods();
-      fetchStores();
+      // Run secondary fetches in parallel; don't block the main feedback load
+      Promise.all([fetchPeriods(), fetchStores()]);
     }
   }, [authUser?.id, isSessionReady]);
 
@@ -128,41 +128,54 @@ const OpenFeedback = () => {
     feedback_source: item.feedback_source,
   });
 
+  // Lighter column list — excludes large/unused fields to speed up the initial query
+  const FEEDBACK_COLUMNS = [
+    'id', 'feedback_date', 'complaint_category', 'channel', 'rating',
+    'resolution_status', 'resolution_notes', 'store_number', 'market',
+    'case_number', 'customer_name', 'customer_email', 'customer_phone',
+    'feedback_text', 'user_id', 'created_at', 'updated_at', 'priority',
+    'assignee', 'viewed', 'customer_called', 'outreach_sent_at',
+    'sla_deadline', 'escalated_at', 'time_of_day', 'order_number',
+    'period', 'ee_action', 'type_of_feedback', 'reward', 'feedback_source',
+  ].join(',');
+
   const fetchFeedbacks = async () => {
     try {
       setLoading(true);
-      let allData: any[] = [];
-      let from = 0;
-      const pageSize = 1000;
-      let hasMore = true;
-      
-      while (hasMore) {
-        const { data: pageData, error: pageError } = await supabase
-          .from('customer_feedback')
-          .select('*')
-          .not('resolution_status', 'in', '("resolved","acknowledged")')
-          .order('created_at', { ascending: false })
-          .range(from, from + pageSize - 1);
-        
-        if (pageError) {
-          toast({ variant: "destructive", title: "Error", description: "Failed to load feedback" });
-          return;
-        }
-        
-        allData = allData.concat(pageData || []);
-        hasMore = (pageData?.length || 0) === pageSize;
-        from += pageSize;
-      }
-      
-      const data = allData;
-      const error = null;
+      // Single request for the common case (active set is well under 2000)
+      const { data: firstPage, error } = await supabase
+        .from('customer_feedback')
+        .select(FEEDBACK_COLUMNS)
+        .not('resolution_status', 'in', '("resolved","acknowledged")')
+        .order('created_at', { ascending: false })
+        .range(0, 1999);
 
       if (error) {
         toast({ variant: "destructive", title: "Error", description: "Failed to load feedback" });
         return;
       }
 
-      setFeedbacks((data || []).map(mapFeedback));
+      let allData: any[] = firstPage || [];
+
+      // Fallback: only paginate further if we hit the cap
+      if (allData.length === 2000) {
+        let from = 2000;
+        const pageSize = 1000;
+        while (true) {
+          const { data: pageData, error: pageError } = await supabase
+            .from('customer_feedback')
+            .select(FEEDBACK_COLUMNS)
+            .not('resolution_status', 'in', '("resolved","acknowledged")')
+            .order('created_at', { ascending: false })
+            .range(from, from + pageSize - 1);
+          if (pageError) break;
+          allData = allData.concat(pageData || []);
+          if ((pageData?.length || 0) < pageSize) break;
+          from += pageSize;
+        }
+      }
+
+      setFeedbacks(allData.map(mapFeedback));
     } catch {
       toast({ variant: "destructive", title: "Error", description: "Failed to load feedback" });
     } finally {
