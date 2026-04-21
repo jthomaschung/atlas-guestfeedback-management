@@ -225,7 +225,7 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
                 </TableCell>
               </TableRow>
             </TableBody>
-          </Table>
+          </table>
         </div>
         
         {/* Legend */}
