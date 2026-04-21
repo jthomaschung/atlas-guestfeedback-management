@@ -147,18 +147,18 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto max-h-[600px] overflow-y-auto relative">
-          <Table>
-            <TableHeader className="sticky top-0 z-10 bg-background">
-              <TableRow className="bg-background">
-                <TableHead className="font-semibold bg-background">Store #</TableHead>
-                <TableHead className="font-semibold bg-background">Market</TableHead>
+        <div className="max-h-[600px] overflow-auto relative rounded-md border">
+          <table className="w-full caption-bottom text-sm">
+            <TableHeader className="[&_tr]:border-b">
+              <TableRow className="bg-background hover:bg-background">
+                <TableHead className="font-semibold bg-background sticky top-0 z-20 shadow-[inset_0_-1px_0_hsl(var(--border))]">Store #</TableHead>
+                <TableHead className="font-semibold bg-background sticky top-0 z-20 shadow-[inset_0_-1px_0_hsl(var(--border))]">Market</TableHead>
                 {categories.map(category => (
-                  <TableHead key={category} className="text-center font-semibold min-w-[100px] bg-background">
+                  <TableHead key={category} className="text-center font-semibold min-w-[100px] bg-background sticky top-0 z-20 shadow-[inset_0_-1px_0_hsl(var(--border))]">
                     {category}
                   </TableHead>
                 ))}
-                <TableHead className="text-center font-semibold bg-background">Total</TableHead>
+                <TableHead className="text-center font-semibold bg-background sticky top-0 z-20 shadow-[inset_0_-1px_0_hsl(var(--border))]">Total</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -225,7 +225,7 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
                 </TableCell>
               </TableRow>
             </TableBody>
-          </Table>
+          </table>
         </div>
         
         {/* Legend */}
