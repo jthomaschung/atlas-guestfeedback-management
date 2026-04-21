@@ -652,7 +652,9 @@ Deno.serve(async (req) => {
       (typeNorm === 'guest support' && autoEscalateCategories.includes(catNorm))
     
     const isFyi = typeNorm === 'fyi'
-    const initialStatus = isFyi ? 'acknowledged' : (shouldEscalate ? 'escalated' : 'unopened')
+    // FYI feedback now starts as 'unopened' so it appears on the Open Feedback board
+    // and a user must explicitly mark it as 'acknowledged'.
+    const initialStatus = shouldEscalate ? 'escalated' : 'unopened'
     const escalatedAt = shouldEscalate ? new Date().toISOString() : null
     const slaDeadline = shouldEscalate 
       ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()

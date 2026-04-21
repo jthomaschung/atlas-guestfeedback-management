@@ -187,7 +187,7 @@ export function AddFeedbackDialog({ onFeedbackAdded }: AddFeedbackDialogProps) {
         channel: "RAP",
         feedback_source: "Manual Entry",
         case_number: caseNumber,
-        resolution_status: normalizedType === "fyi" ? "acknowledged" : "unopened",
+        resolution_status: "unopened",
         assignee: "guestfeedback@atlaswe.com",
         user_id: authenticatedUser.id,
         period,
