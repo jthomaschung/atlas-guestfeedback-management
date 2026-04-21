@@ -470,91 +470,57 @@ function CustomerFeedbackCardComponent({
             </a>
           )}
           
-          {/* Time & Order Information */}
-          {(feedback.time_of_day || feedback.order_number || feedback.period) && (
-            <div className={cn(
-              "flex flex-wrap gap-3 text-xs",
-              isEscalated ? "text-white/80" : "text-muted-foreground"
-            )}>
-              {feedback.time_of_day && (
-                <div className={cn(
-                  "flex items-center gap-1.5",
-                  isEscalated ? "text-white/80" : "text-muted-foreground"
-                )}>
-                  <Clock className="h-3 w-3" />
-                  <span>{feedback.time_of_day}</span>
-                </div>
-              )}
-              {feedback.order_number && (
-                <div className={cn(
-                  "flex items-center gap-1.5",
-                  isEscalated ? "text-white/80" : "text-muted-foreground"
-                )}>
-                  <Hash className="h-3 w-3" />
-                  <span className="font-mono">{feedback.order_number}</span>
-                </div>
-              )}
-              {feedback.period && (
-                <div className={cn(
-                  "flex items-center gap-1.5",
-                  isEscalated ? "text-white/80" : "text-muted-foreground"
-                )}>
-                  <Calendar className="h-3 w-3" />
-                  <span>Period {feedback.period}</span>
-                </div>
-              )}
-            </div>
-          )}
-
           {/* Meta Information */}
           <div className={cn(
-            "flex flex-col gap-2 text-xs",
+            "grid grid-cols-1 gap-2 text-xs",
             isEscalated ? "text-white/80" : "text-muted-foreground"
           )}>
-            <div className="grid grid-cols-[auto_auto_1fr] items-center gap-x-3 gap-y-1">
-              <div className="flex items-center gap-1">
-                <Calendar className="h-3 w-3 shrink-0" />
-                <span>{format(new Date(feedback.feedback_date + 'T00:00:00'), 'MMM d, yyyy')}</span>
-              </div>
+            <div className="flex min-h-4 items-center gap-1.5 min-w-0">
+              <Calendar className="h-3 w-3 shrink-0" />
+              <span className="truncate">Period {feedback.period || '—'}</span>
+            </div>
 
-              <div className="flex items-center gap-1">
-                <Clock className="h-3 w-3 shrink-0" />
-                <span className="truncate">{formatDistanceToNow(new Date(feedback.created_at), { addSuffix: true })}</span>
+            <div className="grid min-h-4 grid-cols-[auto_1fr] items-center gap-3">
+              <div className="flex items-center gap-1 min-w-0">
+                <Calendar className="h-3 w-3 shrink-0" />
+                <span className="truncate">{format(new Date(feedback.feedback_date + 'T00:00:00'), 'MMM d, yyyy')}</span>
               </div>
 
               <div className="flex items-center gap-1 min-w-0">
-                <User className="h-3 w-3 shrink-0" />
-                <span className="truncate">
-                  {feedback.assignee && feedback.assignee !== 'unassigned'
-                    ? feedback.assignee
-                    : 'Unassigned'
-                  }
-                </span>
+                <Clock className="h-3 w-3 shrink-0" />
+                <span className="truncate">{formatDistanceToNow(new Date(feedback.created_at), { addSuffix: true })}</span>
               </div>
             </div>
-            
-            {/* Phone Number and Called Checkbox */}
-            {feedback.customer_phone && (
-              <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                <Phone className="h-3 w-3" />
-                <span className="truncate">{feedback.customer_phone}</span>
-                <div className="flex items-center gap-1 ml-2">
-                  <Checkbox
-                    id={`called-${feedback.id}`}
-                    checked={feedback.customer_called || false}
-                    onCheckedChange={handleCalledChange}
-                    disabled={isUpdatingCalled}
-                    className="h-3 w-3"
-                  />
-                  <label
-                    htmlFor={`called-${feedback.id}`}
-                    className="text-xs cursor-pointer select-none"
-                  >
-                    Called Customer
-                  </label>
-                </div>
+
+            <div className="flex min-h-4 items-center gap-1 min-w-0">
+              <User className="h-3 w-3 shrink-0" />
+              <span className="truncate">
+                {feedback.assignee && feedback.assignee !== 'unassigned'
+                  ? feedback.assignee
+                  : 'Unassigned'
+                }
+              </span>
+            </div>
+
+            <div className="flex min-h-4 items-center gap-2 min-w-0" onClick={(e) => e.stopPropagation()}>
+              <Phone className="h-3 w-3 shrink-0" />
+              <span className="truncate">{feedback.customer_phone || 'No phone'}</span>
+              <div className="flex items-center gap-1 ml-2 shrink-0">
+                <Checkbox
+                  id={`called-${feedback.id}`}
+                  checked={feedback.customer_called || false}
+                  onCheckedChange={handleCalledChange}
+                  disabled={isUpdatingCalled || !feedback.customer_phone}
+                  className="h-3 w-3"
+                />
+                <label
+                  htmlFor={`called-${feedback.id}`}
+                  className="text-xs cursor-pointer select-none"
+                >
+                  Called Customer
+                </label>
               </div>
-            )}
+            </div>
           </div>
 
           {/* Request Refund Button */}
