@@ -10760,6 +10760,7 @@ export type Database = {
           training_module_name: string
         }[]
       }
+      get_call_activity_stats: { Args: never; Returns: Json }
       get_catering_metrics: {
         Args: { cutoff_date?: string }
         Returns: {

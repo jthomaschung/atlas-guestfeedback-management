@@ -147,18 +147,18 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-h-[600px] overflow-y-auto relative">
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="font-semibold">Store #</TableHead>
-                <TableHead className="font-semibold">Market</TableHead>
+            <TableHeader className="sticky top-0 z-10 bg-background">
+              <TableRow className="bg-background">
+                <TableHead className="font-semibold bg-background">Store #</TableHead>
+                <TableHead className="font-semibold bg-background">Market</TableHead>
                 {categories.map(category => (
-                  <TableHead key={category} className="text-center font-semibold min-w-[100px]">
+                  <TableHead key={category} className="text-center font-semibold min-w-[100px] bg-background">
                     {category}
                   </TableHead>
                 ))}
-                <TableHead className="text-center font-semibold">Total</TableHead>
+                <TableHead className="text-center font-semibold bg-background">Total</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
