@@ -10760,7 +10760,10 @@ export type Database = {
           training_module_name: string
         }[]
       }
-      get_call_activity_stats: { Args: never; Returns: Json }
+      get_call_activity_stats: {
+        Args: { p_period_start?: string }
+        Returns: Json
+      }
       get_catering_metrics: {
         Args: { cutoff_date?: string }
         Returns: {
@@ -11004,6 +11007,7 @@ export type Database = {
           training_type: string
         }[]
       }
+      get_fiscal_period: { Args: { d: string }; Returns: Json }
       get_harassment_training_by_market: {
         Args: { p_region: string }
         Returns: {

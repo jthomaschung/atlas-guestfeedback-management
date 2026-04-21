@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Edit, Calendar, Eye, User, Clock, AlertTriangle, Trash2, Star, Phone, Hash, Save, X, ExternalLink, Heart, DollarSign } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, memo } from "react";
 import { RequestRefundDialog } from './RequestRefundDialog';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -79,9 +79,9 @@ const channelLabels = {
   jimmy_johns: "Jimmy John's"
 };
 
-export function CustomerFeedbackCard({ 
+function CustomerFeedbackCardComponent({ 
   feedback, 
-  onEdit, 
+  onEdit,
   onViewDetails, 
   onDelete, 
   onCategoryChange,
@@ -610,3 +610,4 @@ export function CustomerFeedbackCard({
     </>
   );
 }
+export const CustomerFeedbackCard = memo(CustomerFeedbackCardComponent);
