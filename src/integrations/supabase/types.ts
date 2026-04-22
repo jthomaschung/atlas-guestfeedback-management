@@ -10543,6 +10543,7 @@ export type Database = {
         Row: {
           am_actual: number | null
           am_expected: number | null
+          am_expected_source: string | null
           am_receipt_url: string | null
           am_resolution_type: string | null
           am_shift_id: string | null
@@ -10559,6 +10560,7 @@ export type Database = {
           overall_status: string | null
           pm_actual: number | null
           pm_expected: number | null
+          pm_expected_source: string | null
           pm_receipt_url: string | null
           pm_resolution_type: string | null
           pm_shift_id: string | null
@@ -11712,6 +11714,7 @@ export type Database = {
       is_admin: { Args: { user_id: string }; Returns: boolean }
       is_admin_user: { Args: { user_uuid: string }; Returns: boolean }
       is_dm: { Args: { user_uuid: string }; Returns: boolean }
+      is_excluded_employee: { Args: { _name: string }; Returns: boolean }
       is_executive: { Args: { user_uuid: string }; Returns: boolean }
       is_jsonb_array_of_strings: { Args: { j: Json }; Returns: boolean }
       is_portal_master_admin: { Args: { _user_id: string }; Returns: boolean }
