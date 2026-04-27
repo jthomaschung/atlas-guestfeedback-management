@@ -21,11 +21,11 @@ const marketToDistrict: Record<string, string> = {
   'NE 2': 'Mid West',
   'NE 3': 'Mid West',
   'NE 4': 'Mid West',
-  'FL 1': 'South East',
-  'FL 2': 'South East',
-  'MN 1': 'North East',
-  'MN 2': 'North East',
-  'PA 1': 'North East',
+  'FL 1': 'East Region',
+  'FL 2': 'East Region',
+  'MN 1': 'East Region',
+  'MN 2': 'East Region',
+  'PA 1': 'East Region',
 };
 
 const getDistrict = (market: string): string => {
