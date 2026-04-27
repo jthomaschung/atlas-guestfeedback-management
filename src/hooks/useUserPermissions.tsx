@@ -72,37 +72,41 @@ export function useUserPermissions() {
         isDirectorOrAbove: false
       };
 
-      // Fetch user role from hierarchy
-      const { data: hierarchyData } = await supabase
+      // Fetch all user roles from hierarchy (users can have multiple roles)
+      const { data: hierarchyRows } = await supabase
         .from('user_hierarchy')
         .select('role')
-        .eq('user_id', user.id)
-        .maybeSingle();
+        .eq('user_id', user.id);
+
+      const roles = (hierarchyRows || []).map(r => r.role).filter(Boolean);
+      const lowerRoles = roles.map(r => r.toLowerCase());
+      const executiveRoles = ['admin', 'director', 'vp', 'ceo'];
+      // Pick the highest-level executive role for display, fallback to first role
+      const primaryRole = lowerRoles.find(r => executiveRoles.includes(r)) || roles[0];
+      const hierarchyData = primaryRole ? { role: primaryRole } : null;
 
       if (hierarchyData?.role) {
         userPermissions.role = hierarchyData.role;
-        // Set director or above flag - include CEO and VP (case-insensitive)
-        userPermissions.isDirectorOrAbove = ['admin', 'director', 'vp', 'ceo'].includes(hierarchyData.role?.toLowerCase()) || adminCheck;
+        userPermissions.isDirectorOrAbove = executiveRoles.includes(hierarchyData.role.toLowerCase()) || adminCheck;
       } else {
         userPermissions.isDirectorOrAbove = adminCheck || false;
       }
 
-      // Fetch user permissions (both admin and non-admin users can have specific permissions)
-      const { data: permissions } = await (supabase as any)
-        .from('user_permissions')
-        .select('markets, stores, can_access_facilities_dev, can_access_catering_dev, can_access_hr_dev, can_access_guest_feedback_dev, is_development_user')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      // NOTE: legacy `user_permissions` table was removed. Market/store permissions
+      // now live in `user_market_permissions`; access flags are derived from role
+      // via `user_hierarchy`. We no longer query the deprecated table here because
+      // it caused the permissions hook to hang on pages like /executive-oversight.
+      const { data: marketPerms } = await supabase
+        .from('user_market_permissions')
+        .select('market')
+        .eq('user_id', user.id);
 
-      if (permissions) {
-        userPermissions.markets = permissions.markets || [];
-        userPermissions.stores = permissions.stores || [];
-        userPermissions.canAccessFacilities = permissions.can_access_facilities_dev ?? true;
-        userPermissions.canAccessCatering = permissions.can_access_catering_dev ?? false;
-        userPermissions.canAccessHr = permissions.can_access_hr_dev ?? false;
-        userPermissions.canAccessGuestFeedback = permissions.can_access_guest_feedback_dev ?? false;
-        userPermissions.isDevelopmentUser = permissions.is_development_user ?? false;
+      if (marketPerms && marketPerms.length > 0) {
+        userPermissions.markets = marketPerms.map((m: any) => m.market).filter(Boolean);
       }
+
+      // Guest Feedback access is granted to anyone with a hierarchy role or admin.
+      userPermissions.canAccessGuestFeedback = !!hierarchyData?.role || !!adminCheck;
 
       setPermissions(userPermissions);
     } catch (error) {

@@ -4037,7 +4037,7 @@ export type Database = {
       }
       house_account_credits: {
         Row: {
-          business_date: string
+          business_date: string | null
           cleared_at: string | null
           close_method: string | null
           closed_at: string | null
@@ -4055,7 +4055,7 @@ export type Database = {
           store_number: string
         }
         Insert: {
-          business_date: string
+          business_date?: string | null
           cleared_at?: string | null
           close_method?: string | null
           closed_at?: string | null
@@ -4073,7 +4073,7 @@ export type Database = {
           store_number: string
         }
         Update: {
-          business_date?: string
+          business_date?: string | null
           cleared_at?: string | null
           close_method?: string | null
           closed_at?: string | null
@@ -4140,134 +4140,43 @@ export type Database = {
         }
         Relationships: []
       }
-      house_account_invoice_items: {
-        Row: {
-          amount: number | null
-          created_at: string | null
-          description: string | null
-          id: number
-          invoice_date: string | null
-          invoice_number: string
-          is_sub_item: boolean | null
-          price_each: number | null
-          quantity: number | null
-          store_number: string | null
-        }
-        Insert: {
-          amount?: number | null
-          created_at?: string | null
-          description?: string | null
-          id?: number
-          invoice_date?: string | null
-          invoice_number: string
-          is_sub_item?: boolean | null
-          price_each?: number | null
-          quantity?: number | null
-          store_number?: string | null
-        }
-        Update: {
-          amount?: number | null
-          created_at?: string | null
-          description?: string | null
-          id?: number
-          invoice_date?: string | null
-          invoice_number?: string
-          is_sub_item?: boolean | null
-          price_each?: number | null
-          quantity?: number | null
-          store_number?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "house_account_invoice_items_invoice_number_fkey"
-            columns: ["invoice_number"]
-            isOneToOne: false
-            referencedRelation: "house_account_invoices"
-            referencedColumns: ["invoice_number"]
-          },
-        ]
-      }
-      house_account_invoices: {
-        Row: {
-          customer_address: string | null
-          customer_name: string | null
-          customer_phone: string | null
-          del_charge: number | null
-          delay_date: string | null
-          discounts: number | null
-          id: number
-          invoice_date: string | null
-          invoice_number: string
-          parsed_at: string | null
-          sales_tax: number | null
-          source_file: string | null
-          store_address: string | null
-          store_number: string
-          store_phone: string | null
-          subtotal: number | null
-          total: number | null
-        }
-        Insert: {
-          customer_address?: string | null
-          customer_name?: string | null
-          customer_phone?: string | null
-          del_charge?: number | null
-          delay_date?: string | null
-          discounts?: number | null
-          id?: number
-          invoice_date?: string | null
-          invoice_number: string
-          parsed_at?: string | null
-          sales_tax?: number | null
-          source_file?: string | null
-          store_address?: string | null
-          store_number: string
-          store_phone?: string | null
-          subtotal?: number | null
-          total?: number | null
-        }
-        Update: {
-          customer_address?: string | null
-          customer_name?: string | null
-          customer_phone?: string | null
-          del_charge?: number | null
-          delay_date?: string | null
-          discounts?: number | null
-          id?: number
-          invoice_date?: string | null
-          invoice_number?: string
-          parsed_at?: string | null
-          sales_tax?: number | null
-          source_file?: string | null
-          store_address?: string | null
-          store_number?: string
-          store_phone?: string | null
-          subtotal?: number | null
-          total?: number | null
-        }
-        Relationships: []
-      }
       house_account_payments: {
         Row: {
           address: string | null
           balance: number | null
+          bill_to_city_state_zip: string | null
           bus_date: string | null
           cust_id: string | null
           customer_name: string | null
+          delivery_charge: number | null
+          discount_implied: number | null
+          discount_printed: number | null
+          discount_validation_status: string | null
           grand_total: number | null
+          gratuity: number | null
           id: number
-          is_promo_discount: boolean | null
+          invoice_number: string | null
+          items_total_calculated: number | null
           order_id: string | null
           order_total: number | null
+          order_type: string | null
           parsed_at: string | null
           payments: number | null
           phone: string | null
           promo_emp: string | null
           promo_reason: string | null
           promo_type: string | null
+          record_type: string
           report_date_from: string | null
           report_date_to: string | null
           report_generated_at: string | null
+          sales_tax: number | null
+          ship_to_address: string | null
+          ship_to_city_state_zip: string | null
+          ship_to_cust_id: string | null
+          ship_to_name: string | null
+          ship_to_phone: string | null
+          signer_grand_total: number | null
           source_file: string | null
           store_number: string
           trans_desc: string | null
@@ -4275,23 +4184,39 @@ export type Database = {
         Insert: {
           address?: string | null
           balance?: number | null
+          bill_to_city_state_zip?: string | null
           bus_date?: string | null
           cust_id?: string | null
           customer_name?: string | null
+          delivery_charge?: number | null
+          discount_implied?: number | null
+          discount_printed?: number | null
+          discount_validation_status?: string | null
           grand_total?: number | null
+          gratuity?: number | null
           id?: number
-          is_promo_discount?: boolean | null
+          invoice_number?: string | null
+          items_total_calculated?: number | null
           order_id?: string | null
           order_total?: number | null
+          order_type?: string | null
           parsed_at?: string | null
           payments?: number | null
           phone?: string | null
           promo_emp?: string | null
           promo_reason?: string | null
           promo_type?: string | null
+          record_type?: string
           report_date_from?: string | null
           report_date_to?: string | null
           report_generated_at?: string | null
+          sales_tax?: number | null
+          ship_to_address?: string | null
+          ship_to_city_state_zip?: string | null
+          ship_to_cust_id?: string | null
+          ship_to_name?: string | null
+          ship_to_phone?: string | null
+          signer_grand_total?: number | null
           source_file?: string | null
           store_number: string
           trans_desc?: string | null
@@ -4299,111 +4224,44 @@ export type Database = {
         Update: {
           address?: string | null
           balance?: number | null
+          bill_to_city_state_zip?: string | null
           bus_date?: string | null
           cust_id?: string | null
           customer_name?: string | null
+          delivery_charge?: number | null
+          discount_implied?: number | null
+          discount_printed?: number | null
+          discount_validation_status?: string | null
           grand_total?: number | null
+          gratuity?: number | null
           id?: number
-          is_promo_discount?: boolean | null
+          invoice_number?: string | null
+          items_total_calculated?: number | null
           order_id?: string | null
           order_total?: number | null
+          order_type?: string | null
           parsed_at?: string | null
           payments?: number | null
           phone?: string | null
           promo_emp?: string | null
           promo_reason?: string | null
           promo_type?: string | null
+          record_type?: string
           report_date_from?: string | null
           report_date_to?: string | null
           report_generated_at?: string | null
+          sales_tax?: number | null
+          ship_to_address?: string | null
+          ship_to_city_state_zip?: string | null
+          ship_to_cust_id?: string | null
+          ship_to_name?: string | null
+          ship_to_phone?: string | null
+          signer_grand_total?: number | null
           source_file?: string | null
           store_number?: string
           trans_desc?: string | null
         }
         Relationships: []
-      }
-      house_account_transactions: {
-        Row: {
-          closed_at: string | null
-          closed_by_user_id: string | null
-          created_at: string | null
-          created_by_user_id: string | null
-          house_account_customer_id: string
-          id: string
-          notes: string | null
-          order_amount: number
-          order_date: string
-          paid_date: string | null
-          payment_method: string | null
-          payment_notes: string | null
-          status: string
-          store_number: string
-          updated_at: string | null
-        }
-        Insert: {
-          closed_at?: string | null
-          closed_by_user_id?: string | null
-          created_at?: string | null
-          created_by_user_id?: string | null
-          house_account_customer_id: string
-          id?: string
-          notes?: string | null
-          order_amount: number
-          order_date: string
-          paid_date?: string | null
-          payment_method?: string | null
-          payment_notes?: string | null
-          status?: string
-          store_number: string
-          updated_at?: string | null
-        }
-        Update: {
-          closed_at?: string | null
-          closed_by_user_id?: string | null
-          created_at?: string | null
-          created_by_user_id?: string | null
-          house_account_customer_id?: string
-          id?: string
-          notes?: string | null
-          order_amount?: number
-          order_date?: string
-          paid_date?: string | null
-          payment_method?: string | null
-          payment_notes?: string | null
-          status?: string
-          store_number?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "house_account_transactions_house_account_customer_id_fkey"
-            columns: ["house_account_customer_id"]
-            isOneToOne: false
-            referencedRelation: "house_account_customers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "house_account_transactions_store_number_fkey"
-            columns: ["store_number"]
-            isOneToOne: false
-            referencedRelation: "stores"
-            referencedColumns: ["store_number"]
-          },
-          {
-            foreignKeyName: "house_account_transactions_store_number_fkey"
-            columns: ["store_number"]
-            isOneToOne: false
-            referencedRelation: "v_employee_expense_summary"
-            referencedColumns: ["store_number"]
-          },
-          {
-            foreignKeyName: "house_account_transactions_store_number_fkey"
-            columns: ["store_number"]
-            isOneToOne: false
-            referencedRelation: "v_store_monthly_spending"
-            referencedColumns: ["store_number"]
-          },
-        ]
       }
       hr_notification_log: {
         Row: {
@@ -4412,6 +4270,8 @@ export type Database = {
           email_subject: string | null
           error_message: string | null
           id: string
+          metadata: Json | null
+          new_hire_id: string | null
           notification_type: string
           read_at: string | null
           recipient_email: string
@@ -4425,6 +4285,8 @@ export type Database = {
           email_subject?: string | null
           error_message?: string | null
           id?: string
+          metadata?: Json | null
+          new_hire_id?: string | null
           notification_type: string
           read_at?: string | null
           recipient_email: string
@@ -4438,6 +4300,8 @@ export type Database = {
           email_subject?: string | null
           error_message?: string | null
           id?: string
+          metadata?: Json | null
+          new_hire_id?: string | null
           notification_type?: string
           read_at?: string | null
           recipient_email?: string
@@ -4446,6 +4310,13 @@ export type Database = {
           ticket_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "hr_notification_log_new_hire_id_fkey"
+            columns: ["new_hire_id"]
+            isOneToOne: false
+            referencedRelation: "new_hire_submissions"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "hr_notification_log_ticket_id_fkey"
             columns: ["ticket_id"]
@@ -10416,6 +10287,66 @@ export type Database = {
         }
         Relationships: []
       }
+      z_report_house_account_summary: {
+        Row: {
+          bus_date: string
+          flagged: boolean | null
+          ha_cash_amount: number | null
+          ha_cash_qty: number | null
+          ha_cash_transbreak_amount: number | null
+          ha_check_amount: number | null
+          ha_check_qty: number | null
+          ha_credit_card_amount: number | null
+          ha_credit_card_qty: number | null
+          id: number
+          is_manual: boolean
+          manual_note: string | null
+          manually_entered_at: string | null
+          manually_entered_by: string | null
+          parsed_at: string
+          report_generated_at: string | null
+          store_number: string
+        }
+        Insert: {
+          bus_date: string
+          flagged?: boolean | null
+          ha_cash_amount?: number | null
+          ha_cash_qty?: number | null
+          ha_cash_transbreak_amount?: number | null
+          ha_check_amount?: number | null
+          ha_check_qty?: number | null
+          ha_credit_card_amount?: number | null
+          ha_credit_card_qty?: number | null
+          id?: number
+          is_manual?: boolean
+          manual_note?: string | null
+          manually_entered_at?: string | null
+          manually_entered_by?: string | null
+          parsed_at?: string
+          report_generated_at?: string | null
+          store_number: string
+        }
+        Update: {
+          bus_date?: string
+          flagged?: boolean | null
+          ha_cash_amount?: number | null
+          ha_cash_qty?: number | null
+          ha_cash_transbreak_amount?: number | null
+          ha_check_amount?: number | null
+          ha_check_qty?: number | null
+          ha_credit_card_amount?: number | null
+          ha_credit_card_qty?: number | null
+          id?: number
+          is_manual?: boolean
+          manual_note?: string | null
+          manually_entered_at?: string | null
+          manually_entered_by?: string | null
+          parsed_at?: string
+          report_generated_at?: string | null
+          store_number?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       certified_managers_registry: {
@@ -10555,8 +10486,6 @@ export type Database = {
           daily_actual: number | null
           daily_expected: number | null
           expectation_variance: number | null
-          ha_credit: number | null
-          ha_pending_count: number | null
           overall_status: string | null
           pm_actual: number | null
           pm_expected: number | null
@@ -10580,6 +10509,9 @@ export type Database = {
           wsr_expected: number | null
           wsr_pm_expected: number | null
           wsr_variance: number | null
+          z_ha_cash_misc: number | null
+          z_ha_cash_qty: number | null
+          z_ha_cash_transbreak: number | null
         }
         Relationships: []
       }
@@ -10608,6 +10540,21 @@ export type Database = {
           month: string | null
           total_amount: number | null
           transaction_count: number | null
+        }
+        Relationships: []
+      }
+      v_house_account_ar_balance: {
+        Row: {
+          account_key: string | null
+          account_name: string | null
+          balance_outstanding: number | null
+          invoice_count: number | null
+          last_activity_date: string | null
+          payment_count: number | null
+          promo_count: number | null
+          store_number: string | null
+          total_charged: number | null
+          total_credited: number | null
         }
         Relationships: []
       }
