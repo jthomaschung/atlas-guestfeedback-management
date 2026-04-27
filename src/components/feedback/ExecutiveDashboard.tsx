@@ -71,8 +71,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
   const regionalGroups = {
     'west-coast': ['AZ 1', 'AZ 2', 'AZ 3', 'AZ 4', 'AZ 5', 'IE/LA', 'OC'],
     'mid-west': ['NE 1', 'NE 2', 'NE 3', 'NE 4'],
-    'south-east': ['FL 1', 'FL 2'],
-    'north-east': ['MN 1', 'MN 2', 'PA 1']
+    'east': ['MN 1', 'MN 2', 'PA 1', 'FL 1', 'FL 2']
   };
 
   useEffect(() => {
@@ -475,8 +474,7 @@ export function ExecutiveDashboard({ userRole }: ExecutiveDashboardProps) {
                 <SelectItem value="all">All Regions</SelectItem>
                 <SelectItem value="west-coast">West Coast (Tanner)</SelectItem>
                 <SelectItem value="mid-west">Mid West (Michelle)</SelectItem>
-                <SelectItem value="south-east">South East (Don)</SelectItem>
-                <SelectItem value="north-east">North East</SelectItem>
+                <SelectItem value="east">East Region (Don)</SelectItem>
               </SelectContent>
             </Select>
           </div>
