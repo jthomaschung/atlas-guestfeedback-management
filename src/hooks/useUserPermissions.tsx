@@ -72,17 +72,22 @@ export function useUserPermissions() {
         isDirectorOrAbove: false
       };
 
-      // Fetch user role from hierarchy
-      const { data: hierarchyData } = await supabase
+      // Fetch all user roles from hierarchy (users can have multiple roles)
+      const { data: hierarchyRows } = await supabase
         .from('user_hierarchy')
         .select('role')
-        .eq('user_id', user.id)
-        .maybeSingle();
+        .eq('user_id', user.id);
+
+      const roles = (hierarchyRows || []).map(r => r.role).filter(Boolean);
+      const lowerRoles = roles.map(r => r.toLowerCase());
+      const executiveRoles = ['admin', 'director', 'vp', 'ceo'];
+      // Pick the highest-level executive role for display, fallback to first role
+      const primaryRole = lowerRoles.find(r => executiveRoles.includes(r)) || roles[0];
+      const hierarchyData = primaryRole ? { role: primaryRole } : null;
 
       if (hierarchyData?.role) {
         userPermissions.role = hierarchyData.role;
-        // Set director or above flag - include CEO and VP (case-insensitive)
-        userPermissions.isDirectorOrAbove = ['admin', 'director', 'vp', 'ceo'].includes(hierarchyData.role?.toLowerCase()) || adminCheck;
+        userPermissions.isDirectorOrAbove = executiveRoles.includes(hierarchyData.role.toLowerCase()) || adminCheck;
       } else {
         userPermissions.isDirectorOrAbove = adminCheck || false;
       }
