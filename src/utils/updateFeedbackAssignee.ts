@@ -12,11 +12,11 @@ export async function updateFeedbackAssigneeOnce() {
     const { data: sessionData } = await supabase.auth.getSession();
     if (!sessionData.session) {
       console.log('No session yet; will retry after auth state change.');
-      const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
         if (session) {
           // Unsubscribe immediately after first session
           listener.subscription.unsubscribe();
-          await updateFeedbackAssigneeOnce();
+          void updateFeedbackAssigneeOnce();
         }
       });
       return { success: false, waitingForSession: true } as const;
@@ -37,7 +37,7 @@ export async function updateFeedbackAssigneeOnce() {
     localStorage.setItem(flagKey, 'done');
     console.log('Successfully updated feedback:', data);
     return { success: true, data } as const;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Function call error:', error);
     return { success: false, error } as const;
   }
