@@ -302,7 +302,7 @@ const Index = () => {
       periodsAvailable: periods.length
     });
     
-    let filtered = feedbacks.filter(fb => {
+    const filtered = feedbacks.filter(fb => {
       const matchesSearch = !searchTerm || 
                            fb.feedback_text?.toLowerCase().includes(searchTerm.toLowerCase()) || 
                            fb.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
