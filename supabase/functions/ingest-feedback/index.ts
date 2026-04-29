@@ -340,6 +340,7 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
 
   const reward = data.reward || data.Reward || null
   const feedback_source = data.feedback_source || data['Feedback Source'] || data.Source || channel
+  console.log(`📥 Pipeline fields → type_of_feedback: "${type_of_feedback}", reward: "${reward}", feedback_source: "${feedback_source}"`)
 
   // Generate case number if not provided
   const case_number = data.case_number || `CF-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`
