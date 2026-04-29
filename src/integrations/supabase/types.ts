@@ -439,6 +439,33 @@ export type Database = {
         }
         Relationships: []
       }
+      bonus_config: {
+        Row: {
+          base_salary: number
+          created_at: string | null
+          effective_date: string
+          id: string
+          target_bonus_pct: number
+          user_id: string | null
+        }
+        Insert: {
+          base_salary: number
+          created_at?: string | null
+          effective_date: string
+          id?: string
+          target_bonus_pct: number
+          user_id?: string | null
+        }
+        Update: {
+          base_salary?: number
+          created_at?: string | null
+          effective_date?: string
+          id?: string
+          target_bonus_pct?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       bonus_eligibility_results: {
         Row: {
           am_completion: number | null
@@ -519,6 +546,48 @@ export type Database = {
           period_name?: string
           start_date?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      bonus_settings: {
+        Row: {
+          description: string | null
+          id: string
+          label: string
+          setting_group: string
+          setting_key: string
+          setting_value: number
+          updated_at: string | null
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          label: string
+          setting_group: string
+          setting_key: string
+          setting_value: number
+          updated_at?: string | null
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          label?: string
+          setting_group?: string
+          setting_key?: string
+          setting_value?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      bonus_tracker_access: {
+        Row: {
+          user_id: string
+        }
+        Insert: {
+          user_id: string
+        }
+        Update: {
+          user_id?: string
         }
         Relationships: []
       }
@@ -1108,6 +1177,7 @@ export type Database = {
           delivery_time_type: string | null
           dietary_restrictions: string | null
           email: string
+          email_normalized: string | null
           estimated_order_value: number | null
           event_date: string | null
           event_type: string | null
@@ -1124,6 +1194,7 @@ export type Database = {
           marketing_consent: boolean | null
           message: string | null
           name: string
+          name_normalized: string | null
           next_callback_at: string | null
           next_follow_up_date: string | null
           notes: string | null
@@ -1132,6 +1203,7 @@ export type Database = {
           other_decision_makers: string | null
           payment_method: string | null
           phone: string
+          phone_normalized: string | null
           primary_contact_name: string | null
           sample_count: number | null
           sampling_notes: string | null
@@ -1159,6 +1231,7 @@ export type Database = {
           delivery_time_type?: string | null
           dietary_restrictions?: string | null
           email: string
+          email_normalized?: string | null
           estimated_order_value?: number | null
           event_date?: string | null
           event_type?: string | null
@@ -1175,6 +1248,7 @@ export type Database = {
           marketing_consent?: boolean | null
           message?: string | null
           name: string
+          name_normalized?: string | null
           next_callback_at?: string | null
           next_follow_up_date?: string | null
           notes?: string | null
@@ -1183,6 +1257,7 @@ export type Database = {
           other_decision_makers?: string | null
           payment_method?: string | null
           phone: string
+          phone_normalized?: string | null
           primary_contact_name?: string | null
           sample_count?: number | null
           sampling_notes?: string | null
@@ -1210,6 +1285,7 @@ export type Database = {
           delivery_time_type?: string | null
           dietary_restrictions?: string | null
           email?: string
+          email_normalized?: string | null
           estimated_order_value?: number | null
           event_date?: string | null
           event_type?: string | null
@@ -1226,6 +1302,7 @@ export type Database = {
           marketing_consent?: boolean | null
           message?: string | null
           name?: string
+          name_normalized?: string | null
           next_callback_at?: string | null
           next_follow_up_date?: string | null
           notes?: string | null
@@ -1234,6 +1311,7 @@ export type Database = {
           other_decision_makers?: string | null
           payment_method?: string | null
           phone?: string
+          phone_normalized?: string | null
           primary_contact_name?: string | null
           sample_count?: number | null
           sampling_notes?: string | null
@@ -3904,6 +3982,33 @@ export type Database = {
             referencedColumns: ["profile_id"]
           },
         ]
+      }
+      facilities_budget: {
+        Row: {
+          budgeted_amount: number
+          created_at: string | null
+          id: string
+          notes: string | null
+          quarter: string
+          updated_at: string | null
+        }
+        Insert: {
+          budgeted_amount: number
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          quarter: string
+          updated_at?: string | null
+        }
+        Update: {
+          budgeted_amount?: number
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          quarter?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       feedback_likes: {
         Row: {
@@ -8293,6 +8398,39 @@ export type Database = {
           },
         ]
       }
+      store_health_snapshots: {
+        Row: {
+          created_at: string | null
+          health_band: string
+          health_score: number
+          id: string
+          market: string
+          quarter: string
+          snapshot_date: string
+          store_number: string
+        }
+        Insert: {
+          created_at?: string | null
+          health_band: string
+          health_score: number
+          id?: string
+          market: string
+          quarter: string
+          snapshot_date: string
+          store_number: string
+        }
+        Update: {
+          created_at?: string | null
+          health_band?: string
+          health_score?: number
+          id?: string
+          market?: string
+          quarter?: string
+          snapshot_date?: string
+          store_number?: string
+        }
+        Relationships: []
+      }
       store_labor_goal_history: {
         Row: {
           changed_at: string | null
@@ -8370,6 +8508,33 @@ export type Database = {
           store_number?: string
           updated_at?: string | null
           year?: number
+        }
+        Relationships: []
+      }
+      store_refresh_targets: {
+        Row: {
+          completed: number
+          id: string
+          notes: string | null
+          planned: number
+          quarter: string
+          updated_at: string | null
+        }
+        Insert: {
+          completed?: number
+          id?: string
+          notes?: string | null
+          planned?: number
+          quarter: string
+          updated_at?: string | null
+        }
+        Update: {
+          completed?: number
+          id?: string
+          notes?: string | null
+          planned?: number
+          quarter?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -8564,6 +8729,87 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      third_party_fulfillment: {
+        Row: {
+          bus_date: string
+          dropoff_actual_at: string | null
+          dropoff_estimate_at: string | null
+          id: number
+          order_id: string
+          parsed_at: string
+          pickup_actual_at: string | null
+          pickup_estimate_at: string | null
+          provider_id: string | null
+          quote_fee: number | null
+          quote_order_total: number | null
+          quote_requested_at: string | null
+          quote_tip: number | null
+          report_date_from: string | null
+          report_date_to: string | null
+          report_generated_at: string | null
+          service_desc: string
+          status: string | null
+          status_id: string | null
+          store_cancelled_qty: number | null
+          store_cancelled_total: number | null
+          store_number: string
+          store_total: number | null
+          store_total_qty: number | null
+        }
+        Insert: {
+          bus_date: string
+          dropoff_actual_at?: string | null
+          dropoff_estimate_at?: string | null
+          id?: number
+          order_id: string
+          parsed_at?: string
+          pickup_actual_at?: string | null
+          pickup_estimate_at?: string | null
+          provider_id?: string | null
+          quote_fee?: number | null
+          quote_order_total?: number | null
+          quote_requested_at?: string | null
+          quote_tip?: number | null
+          report_date_from?: string | null
+          report_date_to?: string | null
+          report_generated_at?: string | null
+          service_desc: string
+          status?: string | null
+          status_id?: string | null
+          store_cancelled_qty?: number | null
+          store_cancelled_total?: number | null
+          store_number: string
+          store_total?: number | null
+          store_total_qty?: number | null
+        }
+        Update: {
+          bus_date?: string
+          dropoff_actual_at?: string | null
+          dropoff_estimate_at?: string | null
+          id?: number
+          order_id?: string
+          parsed_at?: string
+          pickup_actual_at?: string | null
+          pickup_estimate_at?: string | null
+          provider_id?: string | null
+          quote_fee?: number | null
+          quote_order_total?: number | null
+          quote_requested_at?: string | null
+          quote_tip?: number | null
+          report_date_from?: string | null
+          report_date_to?: string | null
+          report_generated_at?: string | null
+          service_desc?: string
+          status?: string | null
+          status_id?: string | null
+          store_cancelled_qty?: number | null
+          store_cancelled_total?: number | null
+          store_number?: string
+          store_total?: number | null
+          store_total_qty?: number | null
         }
         Relationships: []
       }
@@ -10572,6 +10818,57 @@ export type Database = {
         }
         Relationships: []
       }
+      v_third_party_fulfillment_timing: {
+        Row: {
+          bus_date: string | null
+          dropoff_lateness_min: number | null
+          id: number | null
+          order_id: string | null
+          pickup_lateness_min: number | null
+          prep_time_min: number | null
+          provider_id: string | null
+          quote_fee: number | null
+          quote_order_total: number | null
+          quote_tip: number | null
+          service_desc: string | null
+          status: string | null
+          store_number: string | null
+          transit_time_min: number | null
+        }
+        Insert: {
+          bus_date?: string | null
+          dropoff_lateness_min?: never
+          id?: number | null
+          order_id?: string | null
+          pickup_lateness_min?: never
+          prep_time_min?: never
+          provider_id?: string | null
+          quote_fee?: number | null
+          quote_order_total?: number | null
+          quote_tip?: number | null
+          service_desc?: string | null
+          status?: string | null
+          store_number?: string | null
+          transit_time_min?: never
+        }
+        Update: {
+          bus_date?: string | null
+          dropoff_lateness_min?: never
+          id?: number | null
+          order_id?: string | null
+          pickup_lateness_min?: never
+          prep_time_min?: never
+          provider_id?: string | null
+          quote_fee?: number | null
+          quote_order_total?: number | null
+          quote_tip?: number | null
+          service_desc?: string | null
+          status?: string | null
+          store_number?: string | null
+          transit_time_min?: never
+        }
+        Relationships: []
+      }
       work_order_sla: {
         Row: {
           assignee: string | null
@@ -10673,12 +10970,22 @@ export type Database = {
           work_order_id: string
         }[]
       }
+      find_or_create_catering_lead: {
+        Args: {
+          p_email: string
+          p_extra?: Json
+          p_name: string
+          p_phone: string
+        }
+        Returns: Json
+      }
       generate_display_name: {
         Args: { email: string; first_name: string; last_name: string }
         Returns: string
       }
       generate_id_upload_token: { Args: never; Returns: string }
       generate_incident_number: { Args: never; Returns: string }
+      get_accounting_setting: { Args: { key: string }; Returns: number }
       get_aggregated_customers: {
         Args: never
         Returns: {
@@ -10709,10 +11016,9 @@ export type Database = {
           training_module_name: string
         }[]
       }
-      get_call_activity_stats: {
-        Args: { p_period_start?: string }
-        Returns: Json
-      }
+      get_call_activity_stats:
+        | { Args: { p_mode: string; p_start?: string }; Returns: Json }
+        | { Args: { p_period_start: string }; Returns: Json }
       get_catering_metrics: {
         Args: { cutoff_date?: string }
         Returns: {
@@ -11779,6 +12085,24 @@ export type Database = {
               report_number: string
             }[]
           }
+      submit_harassment_test: {
+        Args: {
+          p_employee_email?: string
+          p_employee_name: string
+          p_incorrect_items: Json
+          p_is_supervisor: boolean
+          p_passed: boolean
+          p_percentage: number
+          p_profile_id?: string
+          p_score: number
+          p_state: string
+          p_store_number: string
+          p_time_taken_seconds: number
+          p_total_questions: number
+          p_training_version?: string
+        }
+        Returns: string
+      }
       swap_shift_types: {
         Args: { id_a: string; id_b: string }
         Returns: undefined
