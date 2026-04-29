@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from '@/hooks/useAuth';
 import { useUserPermissions } from '@/hooks/useUserPermissions';
@@ -47,7 +47,7 @@ const queryClient = new QueryClient({
   },
 });
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ProtectedRoute({ children }: { children?: React.ReactNode }) {
   const { user, loading: authLoading, isProcessingTokens, signOut } = useAuth();
   const { permissions, loading: permissionsLoading } = useUserPermissions();
   const [refundDialogOpen, setRefundDialogOpen] = useState(false);
@@ -120,7 +120,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
             </div>
           </header>
           <main className="flex-1 overflow-auto bg-background p-2 sm:p-4 md:p-6">
-            {children}
+            {children ?? <Outlet />}
             <FeedbackButton />
           </main>
           <StandaloneRefundDialog
@@ -148,154 +148,27 @@ function App() {
             <FeedbackUpdater />
             <Router>
               <Routes>
-              <Route 
-                path="/summary" 
-                element={
-                  <ProtectedRoute>
-                    <Summary />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/dashboard" 
-                element={
-                  <ProtectedRoute>
-                    <Index />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route
-                path="/feedback-reporting" 
-                element={
-                  <ProtectedRoute>
-                    <FeedbackReporting />
-                  </ProtectedRoute>
-                } 
-               />
-               <Route 
-                 path="/red-carpet-leaders" 
-                 element={
-                   <ProtectedRoute>
-                     <RedCarpetLeaders />
-                   </ProtectedRoute>
-                 } 
-               />
-               <Route
-                 path="/user-hierarchy" 
-                 element={
-                   <ProtectedRoute>
-                     <UserHierarchy />
-                   </ProtectedRoute>
-                 } 
-               />
-               <Route
-                 path="/executive-oversight" 
-                 element={
-                   <ProtectedRoute>
-                     <ExecutiveOversight />
-                   </ProtectedRoute>
-                 } 
-               />
-              <Route 
-                path="/gfm" 
-                element={
-                  <ProtectedRoute>
-                    <GFM />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/feedback-archive" 
-                element={
-                  <ProtectedRoute>
-                    <FeedbackArchive />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/settings" 
-                element={
-                  <ProtectedRoute>
-                    <Settings />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/internal-feedback" 
-                element={
-                  <ProtectedRoute>
-                    <InternalFeedback />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/accuracy" 
-                element={
-                  <ProtectedRoute>
-                    <Accuracy />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/training" 
-                element={
-                  <ProtectedRoute>
-                    <Training />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/email-templates" 
-                element={
-                  <ProtectedRoute>
-                    <EmailTemplates />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/open-feedback" 
-                element={
-                  <ProtectedRoute>
-                    <OpenFeedback />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/praise-board" 
-                element={
-                  <ProtectedRoute>
-                    <PraiseBoard />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/refund-processing" 
-                element={
-                  <ProtectedRoute>
-                    <RefundProcessing />
-                  </ProtectedRoute>
-                } 
-              />
-               <Route
-                path="/" 
-                element={
-                  <ProtectedRoute>
-                    {(() => {
-                      console.log('🏠 ROOT PATH: Rendering Index component for root path');
-                      return <Index />;
-                    })()}
-                  </ProtectedRoute>
-                } 
-               />
-              <Route 
-                path="*" 
-                element={
-                  <ProtectedRoute>
-                    <SmartRedirect />
-                  </ProtectedRoute>
-                } 
-              />
-            </Routes>
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/summary" element={<Summary />} />
+                  <Route path="/dashboard" element={<Index />} />
+                  <Route path="/feedback-reporting" element={<FeedbackReporting />} />
+                  <Route path="/red-carpet-leaders" element={<RedCarpetLeaders />} />
+                  <Route path="/user-hierarchy" element={<UserHierarchy />} />
+                  <Route path="/executive-oversight" element={<ExecutiveOversight />} />
+                  <Route path="/gfm" element={<GFM />} />
+                  <Route path="/feedback-archive" element={<FeedbackArchive />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/internal-feedback" element={<InternalFeedback />} />
+                  <Route path="/accuracy" element={<Accuracy />} />
+                  <Route path="/training" element={<Training />} />
+                  <Route path="/email-templates" element={<EmailTemplates />} />
+                  <Route path="/open-feedback" element={<OpenFeedback />} />
+                  <Route path="/praise-board" element={<PraiseBoard />} />
+                  <Route path="/refund-processing" element={<RefundProcessing />} />
+                  <Route path="*" element={<SmartRedirect />} />
+                </Route>
+              </Routes>
               <Toaster />
               <Sonner />
             </Router>
