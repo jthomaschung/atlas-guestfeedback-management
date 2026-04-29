@@ -15,6 +15,9 @@ import { useUserPermissions } from "@/hooks/useUserPermissions";
 import { useFeedbackLikes } from "@/hooks/useFeedbackLikes";
 import { supabase } from "@/integrations/supabase/client";
 import { AddFeedbackDialog } from "@/components/feedback/AddFeedbackDialog";
+import { Database } from "@/integrations/supabase/types";
+
+type FeedbackRow = Database['public']['Tables']['customer_feedback']['Row'];
 
 const Index = () => {
   const [feedbacks, setFeedbacks] = useState<CustomerFeedback[]>([]);
@@ -151,7 +154,7 @@ const Index = () => {
         authUserId: authUser?.id
       });
 
-      const mapFeedback = (item: any): CustomerFeedback => ({
+      const mapFeedback = (item: FeedbackRow): CustomerFeedback => ({
         id: item.id,
         feedback_date: item.feedback_date,
         complaint_category: item.complaint_category as CustomerFeedback['complaint_category'],
@@ -183,7 +186,7 @@ const Index = () => {
       
       // Fetch feedback in pages. Render the first page immediately so route changes
       // don't appear stuck while older records continue loading in the background.
-      let allData: any[] = [];
+      let allData: FeedbackRow[] = [];
       let from = 0;
       const pageSize = 1000;
       let hasMore = true;
