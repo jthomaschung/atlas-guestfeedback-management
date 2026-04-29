@@ -132,70 +132,26 @@ const Index = () => {
       console.log('Auth user available, fetching data...', {
         authUserId: authUser.id,
       });
-      fetchFeedbacks();
+      const controller = new AbortController();
+      fetchFeedbacks(controller.signal);
       fetchPeriods();
       fetchStores();
+
+      return () => {
+        controller.abort();
+      };
     }
   }, [authUser?.id]);
 
-  const fetchFeedbacks = async () => {
+  const fetchFeedbacks = async (signal?: AbortSignal) => {
     try {
       setLoading(true);
       console.log('Starting feedback fetch...', {
         hasAuthUser: !!authUser,
         authUserId: authUser?.id
       });
-      
-      // Fetch ALL feedback (including resolved) for charts
-      // Supabase default limit is 1000 rows, so we need to paginate
-      let allData: any[] = [];
-      let from = 0;
-      const pageSize = 1000;
-      let hasMore = true;
-      
-      while (hasMore) {
-        const { data: pageData, error: pageError } = await supabase
-          .from('customer_feedback')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .range(from, from + pageSize - 1);
-        
-        if (pageError) {
-          console.error('Error fetching feedback:', pageError);
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Failed to load customer feedback"
-          });
-          return;
-        }
-        
-        allData = allData.concat(pageData || []);
-        hasMore = (pageData?.length || 0) === pageSize;
-        from += pageSize;
-      }
-      
-      const data = allData;
-      const error = null;
 
-      if (error) {
-        console.error('Error fetching feedback:', error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to load customer feedback"
-        });
-        return;
-      }
-
-      console.log(`Fetched ${data?.length || 0} feedbacks`);
-      
-      if (authUser && data?.length === 0) {
-        console.warn('User is authenticated but no feedback data returned - possible RLS issue');
-      }
-
-      // Map database records to CustomerFeedback interface
-      const mappedFeedbacks: CustomerFeedback[] = (data || []).map(item => ({
+      const mapFeedback = (item: any): CustomerFeedback => ({
         id: item.id,
         feedback_date: item.feedback_date,
         complaint_category: item.complaint_category as CustomerFeedback['complaint_category'],
@@ -213,7 +169,6 @@ const Index = () => {
         user_id: item.user_id,
         created_at: item.created_at,
         updated_at: item.updated_at,
-        // Set default values for fields that might be missing
         priority: (item.priority || 'Low') as CustomerFeedback['priority'],
         assignee: item.assignee || 'Unassigned',
         viewed: item.viewed || false,
@@ -224,15 +179,63 @@ const Index = () => {
         order_number: item.order_number,
         period: item.period,
         time_of_day: item.time_of_day,
-      }));
-
-      // Store ALL feedbacks for charts
-      setAllFeedbacks(mappedFeedbacks);
+      });
       
-      // Include all feedbacks (including resolved) for the table/dashboard
-      // Resolved items will be styled differently in the UI
-      setFeedbacks(mappedFeedbacks);
+      // Fetch feedback in pages. Render the first page immediately so route changes
+      // don't appear stuck while older records continue loading in the background.
+      let allData: any[] = [];
+      let from = 0;
+      const pageSize = 1000;
+      let hasMore = true;
+      let firstPageRendered = false;
+      
+      while (hasMore) {
+        if (signal?.aborted) return;
+
+        let query = supabase
+          .from('customer_feedback')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .range(from, from + pageSize - 1);
+
+        if (signal) {
+          query = query.abortSignal(signal);
+        }
+
+        const { data: pageData, error: pageError } = await query;
+        if (signal?.aborted) return;
+        
+        if (pageError) {
+          console.error('Error fetching feedback:', pageError);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to load customer feedback"
+          });
+          return;
+        }
+        
+        allData = allData.concat(pageData || []);
+        hasMore = (pageData?.length || 0) === pageSize;
+        from += pageSize;
+
+        const mappedFeedbacks = allData.map(mapFeedback);
+        setAllFeedbacks(mappedFeedbacks);
+        setFeedbacks(mappedFeedbacks);
+
+        if (!firstPageRendered) {
+          firstPageRendered = true;
+          setLoading(false);
+        }
+      }
+
+      console.log(`Fetched ${allData.length} feedbacks`);
+      
+      if (authUser && allData.length === 0) {
+        console.warn('User is authenticated but no feedback data returned - possible RLS issue');
+      }
     } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
       console.error('Error fetching feedback:', error);
       toast({
         variant: "destructive", 
