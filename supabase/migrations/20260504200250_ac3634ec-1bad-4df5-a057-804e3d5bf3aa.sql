@@ -1,0 +1,1 @@
+UPDATE public.customer_feedback SET type_of_feedback = 'FYI' WHERE type_of_feedback IS NULL AND lower(feedback_text) LIKE '%fyi notification%';
