@@ -880,6 +880,42 @@ export type Database = {
           },
         ]
       }
+      catering_calendar_event_links: {
+        Row: {
+          calendar_id: string
+          created_at: string
+          google_event_id: string
+          id: string
+          last_synced_at: string
+          source_id: string
+          source_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          calendar_id?: string
+          created_at?: string
+          google_event_id: string
+          id?: string
+          last_synced_at?: string
+          source_id: string
+          source_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          calendar_id?: string
+          created_at?: string
+          google_event_id?: string
+          id?: string
+          last_synced_at?: string
+          source_id?: string
+          source_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       catering_campaign_recipients: {
         Row: {
           bounced_at: string | null
@@ -938,39 +974,51 @@ export type Database = {
           assigned_to: string | null
           callback_type: string
           completed_at: string | null
+          confirmation_sent_at: string | null
           created_at: string | null
           created_by: string | null
           id: string
           lead_id: string
           notes: string | null
           priority: string
+          reminder_sent_at: string | null
           scheduled_for: string
+          send_confirmation: boolean
+          send_reminder: boolean
           updated_at: string | null
         }
         Insert: {
           assigned_to?: string | null
           callback_type: string
           completed_at?: string | null
+          confirmation_sent_at?: string | null
           created_at?: string | null
           created_by?: string | null
           id?: string
           lead_id: string
           notes?: string | null
           priority?: string
+          reminder_sent_at?: string | null
           scheduled_for: string
+          send_confirmation?: boolean
+          send_reminder?: boolean
           updated_at?: string | null
         }
         Update: {
           assigned_to?: string | null
           callback_type?: string
           completed_at?: string | null
+          confirmation_sent_at?: string | null
           created_at?: string | null
           created_by?: string | null
           id?: string
           lead_id?: string
           notes?: string | null
           priority?: string
+          reminder_sent_at?: string | null
           scheduled_for?: string
+          send_confirmation?: boolean
+          send_reminder?: boolean
           updated_at?: string | null
         }
         Relationships: [
@@ -1180,10 +1228,13 @@ export type Database = {
           email_normalized: string | null
           estimated_order_value: number | null
           event_date: string | null
+          event_date_calendar_sync: boolean
           event_type: string | null
           expected_close_date: string | null
           ffp_notes: string | null
           ffp_provided: boolean | null
+          ffp_scheduled_for: string | null
+          follow_up_calendar_sync: boolean
           frequency: string | null
           headcount: number | null
           id: string
@@ -1234,10 +1285,13 @@ export type Database = {
           email_normalized?: string | null
           estimated_order_value?: number | null
           event_date?: string | null
+          event_date_calendar_sync?: boolean
           event_type?: string | null
           expected_close_date?: string | null
           ffp_notes?: string | null
           ffp_provided?: boolean | null
+          ffp_scheduled_for?: string | null
+          follow_up_calendar_sync?: boolean
           frequency?: string | null
           headcount?: number | null
           id?: string
@@ -1288,10 +1342,13 @@ export type Database = {
           email_normalized?: string | null
           estimated_order_value?: number | null
           event_date?: string | null
+          event_date_calendar_sync?: boolean
           event_type?: string | null
           expected_close_date?: string | null
           ffp_notes?: string | null
           ffp_provided?: boolean | null
+          ffp_scheduled_for?: string | null
+          follow_up_calendar_sync?: boolean
           frequency?: string | null
           headcount?: number | null
           id?: string
@@ -2839,6 +2896,285 @@ export type Database = {
           template_name?: string
           updated_at?: string
           updated_by?: string | null
+        }
+        Relationships: []
+      }
+      employee_change_comments: {
+        Row: {
+          author_id: string | null
+          author_name: string | null
+          author_role: string | null
+          body: string
+          created_at: string
+          id: string
+          is_internal: boolean
+          ticket_id: string
+        }
+        Insert: {
+          author_id?: string | null
+          author_name?: string | null
+          author_role?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean
+          ticket_id: string
+        }
+        Update: {
+          author_id?: string | null
+          author_name?: string | null
+          author_role?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_change_comments_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "employee_change_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_change_history: {
+        Row: {
+          action: string
+          changed_at: string
+          changed_by: string | null
+          field_changed: string | null
+          id: string
+          new_value: string | null
+          notes: string | null
+          old_value: string | null
+          ticket_id: string
+        }
+        Insert: {
+          action: string
+          changed_at?: string
+          changed_by?: string | null
+          field_changed?: string | null
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+          ticket_id: string
+        }
+        Update: {
+          action?: string
+          changed_at?: string
+          changed_by?: string | null
+          field_changed?: string | null
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_change_history_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "employee_change_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_change_tasks: {
+        Row: {
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          id: string
+          is_required: boolean
+          notes: string | null
+          skip_reason: string | null
+          skipped_at: string | null
+          skipped_by: string | null
+          sort_order: number
+          status: string
+          system: string
+          task_key: string
+          task_label: string
+          ticket_id: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          id?: string
+          is_required?: boolean
+          notes?: string | null
+          skip_reason?: string | null
+          skipped_at?: string | null
+          skipped_by?: string | null
+          sort_order?: number
+          status?: string
+          system: string
+          task_key: string
+          task_label: string
+          ticket_id: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          id?: string
+          is_required?: boolean
+          notes?: string | null
+          skip_reason?: string | null
+          skipped_at?: string | null
+          skipped_by?: string | null
+          sort_order?: number
+          status?: string
+          system?: string
+          task_key?: string
+          task_label?: string
+          ticket_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_change_tasks_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "employee_change_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_change_tickets: {
+        Row: {
+          affected_employee_id: string | null
+          affected_employee_name: string
+          approval_notes: string | null
+          approved_action: string | null
+          approved_at: string | null
+          approver_id: string | null
+          assigned_to: string | null
+          attachments: Json | null
+          change_type: Database["public"]["Enums"]["employee_change_type"]
+          closed_at: string | null
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          current_market: string
+          current_store_number: string
+          description: string
+          effective_date: string | null
+          eligible_for_rehire: boolean | null
+          expected_return_date: string | null
+          hr_specialist: string | null
+          id: string
+          internal_notes: string[] | null
+          last_day_worked: string | null
+          leave_type: string | null
+          manager_email: string | null
+          manager_name: string | null
+          new_pay_rate: number | null
+          new_position: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          review_status: Database["public"]["Enums"]["employee_change_review_status"]
+          status: Database["public"]["Enums"]["employee_change_status"]
+          sub_type: string | null
+          submitted_by: string
+          ticket_number: string
+          to_market: string | null
+          to_store_number: string | null
+          type_specific_data: Json | null
+          updated_at: string
+          urgency_level: string
+        }
+        Insert: {
+          affected_employee_id?: string | null
+          affected_employee_name: string
+          approval_notes?: string | null
+          approved_action?: string | null
+          approved_at?: string | null
+          approver_id?: string | null
+          assigned_to?: string | null
+          attachments?: Json | null
+          change_type: Database["public"]["Enums"]["employee_change_type"]
+          closed_at?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          current_market: string
+          current_store_number: string
+          description: string
+          effective_date?: string | null
+          eligible_for_rehire?: boolean | null
+          expected_return_date?: string | null
+          hr_specialist?: string | null
+          id?: string
+          internal_notes?: string[] | null
+          last_day_worked?: string | null
+          leave_type?: string | null
+          manager_email?: string | null
+          manager_name?: string | null
+          new_pay_rate?: number | null
+          new_position?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          review_status?: Database["public"]["Enums"]["employee_change_review_status"]
+          status?: Database["public"]["Enums"]["employee_change_status"]
+          sub_type?: string | null
+          submitted_by: string
+          ticket_number?: string
+          to_market?: string | null
+          to_store_number?: string | null
+          type_specific_data?: Json | null
+          updated_at?: string
+          urgency_level?: string
+        }
+        Update: {
+          affected_employee_id?: string | null
+          affected_employee_name?: string
+          approval_notes?: string | null
+          approved_action?: string | null
+          approved_at?: string | null
+          approver_id?: string | null
+          assigned_to?: string | null
+          attachments?: Json | null
+          change_type?: Database["public"]["Enums"]["employee_change_type"]
+          closed_at?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          current_market?: string
+          current_store_number?: string
+          description?: string
+          effective_date?: string | null
+          eligible_for_rehire?: boolean | null
+          expected_return_date?: string | null
+          hr_specialist?: string | null
+          id?: string
+          internal_notes?: string[] | null
+          last_day_worked?: string | null
+          leave_type?: string | null
+          manager_email?: string | null
+          manager_name?: string | null
+          new_pay_rate?: number | null
+          new_position?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          review_status?: Database["public"]["Enums"]["employee_change_review_status"]
+          status?: Database["public"]["Enums"]["employee_change_status"]
+          sub_type?: string | null
+          submitted_by?: string
+          ticket_number?: string
+          to_market?: string | null
+          to_store_number?: string | null
+          type_specific_data?: Json | null
+          updated_at?: string
+          urgency_level?: string
         }
         Relationships: []
       }
@@ -6518,6 +6854,8 @@ export type Database = {
           submission_timestamp: string | null
           submitted_amount: number | null
           submitted_by_user_id: string | null
+          suggested_date: string | null
+          suggestion_accepted: boolean | null
         }
         Insert: {
           amount_delta?: number | null
@@ -6541,6 +6879,8 @@ export type Database = {
           submission_timestamp?: string | null
           submitted_amount?: number | null
           submitted_by_user_id?: string | null
+          suggested_date?: string | null
+          suggestion_accepted?: boolean | null
         }
         Update: {
           amount_delta?: number | null
@@ -6564,6 +6904,8 @@ export type Database = {
           submission_timestamp?: string | null
           submitted_amount?: number | null
           submitted_by_user_id?: string | null
+          suggested_date?: string | null
+          suggestion_accepted?: boolean | null
         }
         Relationships: [
           {
@@ -7798,6 +8140,45 @@ export type Database = {
             referencedColumns: ["store_id"]
           },
         ]
+      }
+      public_submission_errors: {
+        Row: {
+          business_date: string | null
+          created_at: string
+          deposit_amount: number | null
+          error_code: string | null
+          error_message: string | null
+          id: string
+          online_status: boolean | null
+          phase: string | null
+          store_number: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          business_date?: string | null
+          created_at?: string
+          deposit_amount?: number | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          online_status?: boolean | null
+          phase?: string | null
+          store_number?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          business_date?: string | null
+          created_at?: string
+          deposit_amount?: number | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          online_status?: boolean | null
+          phase?: string | null
+          store_number?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
       }
       refund_requests: {
         Row: {
@@ -9204,6 +9585,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_google_calendar_tokens: {
+        Row: {
+          access_token: string
+          calendar_id: string
+          created_at: string
+          expiry: string
+          google_email: string | null
+          refresh_token: string
+          scope: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          calendar_id?: string
+          created_at?: string
+          expiry: string
+          google_email?: string | null
+          refresh_token: string
+          scope?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          calendar_id?: string
+          created_at?: string
+          expiry?: string
+          google_email?: string | null
+          refresh_token?: string
+          scope?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_hierarchy: {
         Row: {
@@ -10731,6 +11148,7 @@ export type Database = {
           business_date: string | null
           daily_actual: number | null
           daily_expected: number | null
+          effective_variance: number | null
           expectation_variance: number | null
           overall_status: string | null
           pm_actual: number | null
@@ -10983,6 +11401,11 @@ export type Database = {
         Args: { email: string; first_name: string; last_name: string }
         Returns: string
       }
+      generate_employee_change_tasks: {
+        Args: { p_ticket_id: string }
+        Returns: undefined
+      }
+      generate_employee_change_ticket_number: { Args: never; Returns: string }
       generate_id_upload_token: { Args: never; Returns: string }
       generate_incident_number: { Args: never; Returns: string }
       get_accounting_setting: { Args: { key: string }; Returns: number }
@@ -11017,7 +11440,11 @@ export type Database = {
         }[]
       }
       get_call_activity_stats:
-        | { Args: { p_mode: string; p_start?: string }; Returns: Json }
+        | { Args: { p_mode: string; p_start: string }; Returns: Json }
+        | {
+            Args: { p_activity_type?: string; p_mode: string; p_start?: string }
+            Returns: Json
+          }
         | { Args: { p_period_start: string }; Returns: Json }
       get_catering_metrics: {
         Args: { cutoff_date?: string }
@@ -11539,6 +11966,10 @@ export type Database = {
           can_view: boolean
           role_names: string
         }[]
+      }
+      get_receipt_deadline: {
+        Args: { p_business_date: string }
+        Returns: string
       }
       get_required_approvers_for_feedback: {
         Args: { feedback_market: string; feedback_store: string }
@@ -12108,6 +12539,18 @@ export type Database = {
         Returns: undefined
       }
       touch_last_active: { Args: never; Returns: undefined }
+      user_can_approve_employee_change: {
+        Args: {
+          _ticket: Database["public"]["Tables"]["employee_change_tickets"]["Row"]
+        }
+        Returns: boolean
+      }
+      user_can_view_employee_change: {
+        Args: {
+          _ticket: Database["public"]["Tables"]["employee_change_tickets"]["Row"]
+        }
+        Returns: boolean
+      }
       user_has_market_access: {
         Args: { target_market: string; user_id: string }
         Returns: boolean
@@ -12147,6 +12590,27 @@ export type Database = {
         | "cleanliness"
         | "possible_food_poisoning"
         | "loyalty_program_issues"
+      employee_change_review_status:
+        | "needs_leadership_approval"
+        | "approved"
+        | "rejected"
+        | "not_required"
+      employee_change_status:
+        | "new"
+        | "pending_approval"
+        | "approved"
+        | "in_progress"
+        | "resolved"
+        | "closed"
+        | "rejected"
+      employee_change_type:
+        | "termination"
+        | "promotion"
+        | "demotion"
+        | "transfer"
+        | "leave"
+        | "position_change"
+        | "pay_change_only"
       feedback_channel: "yelp" | "qualtrics" | "jimmy_johns"
       portal_role_type:
         | "master_admin"
@@ -12313,6 +12777,30 @@ export const Constants = {
         "cleanliness",
         "possible_food_poisoning",
         "loyalty_program_issues",
+      ],
+      employee_change_review_status: [
+        "needs_leadership_approval",
+        "approved",
+        "rejected",
+        "not_required",
+      ],
+      employee_change_status: [
+        "new",
+        "pending_approval",
+        "approved",
+        "in_progress",
+        "resolved",
+        "closed",
+        "rejected",
+      ],
+      employee_change_type: [
+        "termination",
+        "promotion",
+        "demotion",
+        "transfer",
+        "leave",
+        "position_change",
+        "pay_change_only",
       ],
       feedback_channel: ["yelp", "qualtrics", "jimmy_johns"],
       portal_role_type: [
