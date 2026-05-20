@@ -983,6 +983,7 @@ export type Database = {
           priority: string
           reminder_sent_at: string | null
           scheduled_for: string
+          scheduler_timezone: string | null
           send_confirmation: boolean
           send_reminder: boolean
           updated_at: string | null
@@ -1000,6 +1001,7 @@ export type Database = {
           priority?: string
           reminder_sent_at?: string | null
           scheduled_for: string
+          scheduler_timezone?: string | null
           send_confirmation?: boolean
           send_reminder?: boolean
           updated_at?: string | null
@@ -1017,6 +1019,7 @@ export type Database = {
           priority?: string
           reminder_sent_at?: string | null
           scheduled_for?: string
+          scheduler_timezone?: string | null
           send_confirmation?: boolean
           send_reminder?: boolean
           updated_at?: string | null
@@ -3053,7 +3056,10 @@ export type Database = {
         Row: {
           affected_employee_id: string | null
           affected_employee_name: string
+          approval_decided_via: string | null
           approval_notes: string | null
+          approval_token: string | null
+          approval_token_expires_at: string | null
           approved_action: string | null
           approved_at: string | null
           approver_id: string | null
@@ -3095,7 +3101,10 @@ export type Database = {
         Insert: {
           affected_employee_id?: string | null
           affected_employee_name: string
+          approval_decided_via?: string | null
           approval_notes?: string | null
+          approval_token?: string | null
+          approval_token_expires_at?: string | null
           approved_action?: string | null
           approved_at?: string | null
           approver_id?: string | null
@@ -3137,7 +3146,10 @@ export type Database = {
         Update: {
           affected_employee_id?: string | null
           affected_employee_name?: string
+          approval_decided_via?: string | null
           approval_notes?: string | null
+          approval_token?: string | null
+          approval_token_expires_at?: string | null
           approved_action?: string | null
           approved_at?: string | null
           approver_id?: string | null
@@ -4478,6 +4490,7 @@ export type Database = {
       }
       house_account_credits: {
         Row: {
+          bank_cleared_date: string | null
           business_date: string | null
           cleared_at: string | null
           close_method: string | null
@@ -4496,6 +4509,7 @@ export type Database = {
           store_number: string
         }
         Insert: {
+          bank_cleared_date?: string | null
           business_date?: string | null
           cleared_at?: string | null
           close_method?: string | null
@@ -4514,6 +4528,7 @@ export type Database = {
           store_number: string
         }
         Update: {
+          bank_cleared_date?: string | null
           business_date?: string | null
           cleared_at?: string | null
           close_method?: string | null
@@ -6296,6 +6311,8 @@ export type Database = {
           auto_archive_waived: boolean
           clearance_email_sent: boolean | null
           clearance_email_sent_at: string | null
+          company_email_login: string | null
+          company_email_password: string | null
           company_email_setup: boolean | null
           company_email_setup_at: string | null
           company_policies_complete: boolean | null
@@ -6384,6 +6401,8 @@ export type Database = {
           auto_archive_waived?: boolean
           clearance_email_sent?: boolean | null
           clearance_email_sent_at?: string | null
+          company_email_login?: string | null
+          company_email_password?: string | null
           company_email_setup?: boolean | null
           company_email_setup_at?: string | null
           company_policies_complete?: boolean | null
@@ -6472,6 +6491,8 @@ export type Database = {
           auto_archive_waived?: boolean
           clearance_email_sent?: boolean | null
           clearance_email_sent_at?: string | null
+          company_email_login?: string | null
+          company_email_password?: string | null
           company_email_setup?: boolean | null
           company_email_setup_at?: string | null
           company_policies_complete?: boolean | null
@@ -6613,7 +6634,7 @@ export type Database = {
           store_number: string
           submitted_by: string | null
           updated_at: string
-          wage: number
+          wage: number | null
           wage_within_scale: string | null
           will_be_driving: boolean | null
           work_schedule: string | null
@@ -6678,7 +6699,7 @@ export type Database = {
           store_number: string
           submitted_by?: string | null
           updated_at?: string
-          wage: number
+          wage?: number | null
           wage_within_scale?: string | null
           will_be_driving?: boolean | null
           work_schedule?: string | null
@@ -6743,7 +6764,7 @@ export type Database = {
           store_number?: string
           submitted_by?: string | null
           updated_at?: string
-          wage?: number
+          wage?: number | null
           wage_within_scale?: string | null
           will_be_driving?: boolean | null
           work_schedule?: string | null
@@ -6849,6 +6870,7 @@ export type Database = {
           ocr_amount_confidence: string | null
           ocr_date_confidence: string | null
           ocr_extracted_date: string | null
+          ocr_failure_reason: string | null
           pro_scan_triggered: boolean | null
           store_number: string | null
           submission_timestamp: string | null
@@ -6874,6 +6896,7 @@ export type Database = {
           ocr_amount_confidence?: string | null
           ocr_date_confidence?: string | null
           ocr_extracted_date?: string | null
+          ocr_failure_reason?: string | null
           pro_scan_triggered?: boolean | null
           store_number?: string | null
           submission_timestamp?: string | null
@@ -6899,6 +6922,7 @@ export type Database = {
           ocr_amount_confidence?: string | null
           ocr_date_confidence?: string | null
           ocr_extracted_date?: string | null
+          ocr_failure_reason?: string | null
           pro_scan_triggered?: boolean | null
           store_number?: string | null
           submission_timestamp?: string | null
@@ -7529,6 +7553,7 @@ export type Database = {
           manager_review_notes: string | null
           manager_reviewed_at: string | null
           market: string
+          operational_impact: string | null
           pay_period_end: string | null
           pay_period_start: string | null
           payroll_id: string | null
@@ -7580,6 +7605,7 @@ export type Database = {
           manager_review_notes?: string | null
           manager_reviewed_at?: string | null
           market: string
+          operational_impact?: string | null
           pay_period_end?: string | null
           pay_period_start?: string | null
           payroll_id?: string | null
@@ -7631,6 +7657,7 @@ export type Database = {
           manager_review_notes?: string | null
           manager_reviewed_at?: string | null
           market?: string
+          operational_impact?: string | null
           pay_period_end?: string | null
           pay_period_start?: string | null
           payroll_id?: string | null
@@ -9996,6 +10023,10 @@ export type Database = {
           recurrence_reason: string | null
           recurrence_source_id: string | null
           repair_type: string
+          resolution_recorded_at: string | null
+          resolution_recorded_by: string | null
+          resolution_summary: string | null
+          resolution_type: string | null
           status: string
           store_number: string
           updated_at: string
@@ -10032,6 +10063,10 @@ export type Database = {
           recurrence_reason?: string | null
           recurrence_source_id?: string | null
           repair_type: string
+          resolution_recorded_at?: string | null
+          resolution_recorded_by?: string | null
+          resolution_summary?: string | null
+          resolution_type?: string | null
           status?: string
           store_number: string
           updated_at?: string
@@ -10068,6 +10103,10 @@ export type Database = {
           recurrence_reason?: string | null
           recurrence_source_id?: string | null
           repair_type?: string
+          resolution_recorded_at?: string | null
+          resolution_recorded_by?: string | null
+          resolution_summary?: string | null
+          resolution_type?: string | null
           status?: string
           store_number?: string
           updated_at?: string
@@ -11150,6 +11189,8 @@ export type Database = {
           daily_expected: number | null
           effective_variance: number | null
           expectation_variance: number | null
+          has_statement_pending: boolean | null
+          has_statement_verified: boolean | null
           overall_status: string | null
           pm_actual: number | null
           pm_expected: number | null
