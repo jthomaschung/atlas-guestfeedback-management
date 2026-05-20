@@ -1227,6 +1227,9 @@ export type Database = {
           delivery_address: string | null
           delivery_time_type: string | null
           dietary_restrictions: string | null
+          disqualified_at: string | null
+          disqualified_by: string | null
+          disqualified_reason: string | null
           email: string
           email_normalized: string | null
           estimated_order_value: number | null
@@ -1284,6 +1287,9 @@ export type Database = {
           delivery_address?: string | null
           delivery_time_type?: string | null
           dietary_restrictions?: string | null
+          disqualified_at?: string | null
+          disqualified_by?: string | null
+          disqualified_reason?: string | null
           email: string
           email_normalized?: string | null
           estimated_order_value?: number | null
@@ -1341,6 +1347,9 @@ export type Database = {
           delivery_address?: string | null
           delivery_time_type?: string | null
           dietary_restrictions?: string | null
+          disqualified_at?: string | null
+          disqualified_by?: string | null
+          disqualified_reason?: string | null
           email?: string
           email_normalized?: string | null
           estimated_order_value?: number | null
