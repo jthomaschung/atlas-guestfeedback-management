@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { DollarSign, Loader2, Camera, X, ImageIcon } from 'lucide-react';
+import { ReceiptExampleHint } from './ReceiptExampleHint';
 
 interface StandaloneRefundDialogProps {
   isOpen: boolean;
