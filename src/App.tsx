@@ -33,6 +33,7 @@ import EmailTemplates from '@/pages/EmailTemplates';
 import PraiseBoard from '@/pages/PraiseBoard';
 import OpenFeedback from '@/pages/OpenFeedback';
 import RefundProcessing from '@/pages/RefundProcessing';
+import RefundArchive from '@/pages/RefundArchive';
 import { AuthGate } from '@/components/AuthGate';
 import { PortalGate } from '@/auth/PortalGate';
 
