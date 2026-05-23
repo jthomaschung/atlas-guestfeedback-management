@@ -400,6 +400,159 @@ export type Database = {
         }
         Relationships: []
       }
+      archive_audit_log: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          event_type: string
+          from_state: string | null
+          id: string
+          payload: Json | null
+          to_state: string | null
+          workflow_id: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type: string
+          from_state?: string | null
+          id?: string
+          payload?: Json | null
+          to_state?: string | null
+          workflow_id: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type?: string
+          from_state?: string | null
+          id?: string
+          payload?: Json | null
+          to_state?: string | null
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "archive_audit_log_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "archive_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      archive_tasks: {
+        Row: {
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          id: string
+          is_required: boolean
+          notes: string | null
+          status: Database["public"]["Enums"]["archive_task_status"]
+          task_key: string
+          task_label: string
+          updated_at: string
+          workflow_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          id?: string
+          is_required?: boolean
+          notes?: string | null
+          status?: Database["public"]["Enums"]["archive_task_status"]
+          task_key: string
+          task_label: string
+          updated_at?: string
+          workflow_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          id?: string
+          is_required?: boolean
+          notes?: string | null
+          status?: Database["public"]["Enums"]["archive_task_status"]
+          task_key?: string
+          task_label?: string
+          updated_at?: string
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "archive_tasks_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "archive_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      archive_workflows: {
+        Row: {
+          archive_reason: string | null
+          candidate_type: Database["public"]["Enums"]["archive_candidate_type"]
+          created_at: string
+          finalized_at: string | null
+          finalized_by: string | null
+          id: string
+          new_hire_id: string
+          notes: string | null
+          reopened_at: string | null
+          reopened_by: string | null
+          state: string
+          trigger_type: Database["public"]["Enums"]["archive_trigger_type"]
+          triggered_at: string
+          triggered_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          archive_reason?: string | null
+          candidate_type?: Database["public"]["Enums"]["archive_candidate_type"]
+          created_at?: string
+          finalized_at?: string | null
+          finalized_by?: string | null
+          id?: string
+          new_hire_id: string
+          notes?: string | null
+          reopened_at?: string | null
+          reopened_by?: string | null
+          state?: string
+          trigger_type: Database["public"]["Enums"]["archive_trigger_type"]
+          triggered_at?: string
+          triggered_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          archive_reason?: string | null
+          candidate_type?: Database["public"]["Enums"]["archive_candidate_type"]
+          created_at?: string
+          finalized_at?: string | null
+          finalized_by?: string | null
+          id?: string
+          new_hire_id?: string
+          notes?: string | null
+          reopened_at?: string | null
+          reopened_by?: string | null
+          state?: string
+          trigger_type?: Database["public"]["Enums"]["archive_trigger_type"]
+          triggered_at?: string
+          triggered_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "archive_workflows_new_hire_id_fkey"
+            columns: ["new_hire_id"]
+            isOneToOne: false
+            referencedRelation: "new_hire_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: string
@@ -4367,6 +4520,30 @@ export type Database = {
         }
         Relationships: []
       }
+      facilities_portal_settings: {
+        Row: {
+          id: string
+          key: string
+          updated_at: string | null
+          updated_by: string | null
+          value: string
+        }
+        Insert: {
+          id?: string
+          key: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value: string
+        }
+        Update: {
+          id?: string
+          key?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
       feedback_likes: {
         Row: {
           created_at: string
@@ -6316,6 +6493,7 @@ export type Database = {
           airport_fingerprint_appointment_date: string | null
           airport_fingerprinting_complete: boolean | null
           airport_fingerprinting_complete_at: string | null
+          archive_warning_sent_at: string | null
           associate_id: string | null
           auto_archive_waived: boolean
           clearance_email_sent: boolean | null
@@ -6406,6 +6584,7 @@ export type Database = {
           airport_fingerprint_appointment_date?: string | null
           airport_fingerprinting_complete?: boolean | null
           airport_fingerprinting_complete_at?: string | null
+          archive_warning_sent_at?: string | null
           associate_id?: string | null
           auto_archive_waived?: boolean
           clearance_email_sent?: boolean | null
@@ -6496,6 +6675,7 @@ export type Database = {
           airport_fingerprint_appointment_date?: string | null
           airport_fingerprinting_complete?: boolean | null
           airport_fingerprinting_complete_at?: string | null
+          archive_warning_sent_at?: string | null
           associate_id?: string | null
           auto_archive_waived?: boolean
           clearance_email_sent?: boolean | null
@@ -6834,27 +7014,39 @@ export type Database = {
       notification_preferences: {
         Row: {
           created_at: string
+          email_awaiting_response_cleared: boolean | null
+          email_critical_market: boolean | null
           email_on_assignment: boolean | null
           email_on_completion: boolean | null
           email_on_tagged: boolean | null
+          email_recurring_issue_alerts: boolean | null
+          email_weekly_digest: boolean | null
           id: string
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          email_awaiting_response_cleared?: boolean | null
+          email_critical_market?: boolean | null
           email_on_assignment?: boolean | null
           email_on_completion?: boolean | null
           email_on_tagged?: boolean | null
+          email_recurring_issue_alerts?: boolean | null
+          email_weekly_digest?: boolean | null
           id?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
+          email_awaiting_response_cleared?: boolean | null
+          email_critical_market?: boolean | null
           email_on_assignment?: boolean | null
           email_on_completion?: boolean | null
           email_on_tagged?: boolean | null
+          email_recurring_issue_alerts?: boolean | null
+          email_weekly_digest?: boolean | null
           id?: string
           updated_at?: string
           user_id?: string
@@ -7337,7 +7529,7 @@ export type Database = {
           state: string | null
           status: string
           store_name: string | null
-          store_number: string
+          store_number: string | null
           tracking_number: string | null
           updated_at: string
           zip: string | null
@@ -7359,7 +7551,7 @@ export type Database = {
           state?: string | null
           status?: string
           store_name?: string | null
-          store_number: string
+          store_number?: string | null
           tracking_number?: string | null
           updated_at?: string
           zip?: string | null
@@ -7381,7 +7573,7 @@ export type Database = {
           state?: string | null
           status?: string
           store_name?: string | null
-          store_number?: string
+          store_number?: string | null
           tracking_number?: string | null
           updated_at?: string
           zip?: string | null
@@ -7866,6 +8058,30 @@ export type Database = {
           store_number?: string | null
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      portal_settings: {
+        Row: {
+          id: string
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: string
+        }
+        Insert: {
+          id?: string
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: string
+        }
+        Update: {
+          id?: string
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: string
         }
         Relationships: []
       }
@@ -9004,11 +9220,14 @@ export type Database = {
         Row: {
           address: string | null
           am_dmr_rate: number | null
+          bank_account_last4: string | null
+          bank_name: string | null
           business_day_cutoff_hour: number | null
           city: string | null
           created_at: string | null
           email: string | null
           entity: string | null
+          entity_name: string | null
           is_active: boolean | null
           labor_goal: number | null
           late_night_days: number[] | null
@@ -9027,11 +9246,14 @@ export type Database = {
         Insert: {
           address?: string | null
           am_dmr_rate?: number | null
+          bank_account_last4?: string | null
+          bank_name?: string | null
           business_day_cutoff_hour?: number | null
           city?: string | null
           created_at?: string | null
           email?: string | null
           entity?: string | null
+          entity_name?: string | null
           is_active?: boolean | null
           labor_goal?: number | null
           late_night_days?: number[] | null
@@ -9050,11 +9272,14 @@ export type Database = {
         Update: {
           address?: string | null
           am_dmr_rate?: number | null
+          bank_account_last4?: string | null
+          bank_name?: string | null
           business_day_cutoff_hour?: number | null
           city?: string | null
           created_at?: string | null
           email?: string | null
           entity?: string | null
+          entity_name?: string | null
           is_active?: boolean | null
           labor_goal?: number | null
           late_night_days?: number[] | null
@@ -11426,6 +11651,10 @@ export type Database = {
           state: string
         }[]
       }
+      finalize_archive_workflow: {
+        Args: { _workflow_id: string }
+        Returns: undefined
+      }
       find_critical_orders_without_notifications: {
         Args: { days_back?: number }
         Returns: {
@@ -12469,7 +12698,31 @@ export type Database = {
         Args: { target_store_number: string; target_user_id: string }
         Returns: undefined
       }
+      reopen_archive: {
+        Args: { _reason?: string; _workflow_id: string }
+        Returns: undefined
+      }
       rollback_work_orders_migration: { Args: never; Returns: undefined }
+      start_archive_workflow:
+        | {
+            Args: {
+              _new_hire_id: string
+              _notes?: string
+              _reason?: string
+              _trigger_type: Database["public"]["Enums"]["archive_trigger_type"]
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              _candidate_type?: Database["public"]["Enums"]["archive_candidate_type"]
+              _new_hire_id: string
+              _notes?: string
+              _reason?: string
+              _trigger_type: Database["public"]["Enums"]["archive_trigger_type"]
+            }
+            Returns: string
+          }
       submit_approval_request: {
         Args: { p_employee_id: string; p_template_item_id: string }
         Returns: string
@@ -12589,6 +12842,10 @@ export type Database = {
         Returns: undefined
       }
       touch_last_active: { Args: never; Returns: undefined }
+      user_can_access_new_hire: {
+        Args: { _new_hire_id: string; _user_id: string }
+        Returns: boolean
+      }
       user_can_approve_employee_change: {
         Args: {
           _ticket: Database["public"]["Tables"]["employee_change_tickets"]["Row"]
@@ -12625,6 +12882,9 @@ export type Database = {
     Enums: {
       access_scope_type: "none" | "store" | "region" | "all"
       app_role: "admin" | "director" | "manager" | "user" | "vp" | "ceo"
+      archive_candidate_type: "new_hire" | "rehire"
+      archive_task_status: "not_started" | "in_progress" | "completed"
+      archive_trigger_type: "system_auto" | "manager_requested"
       complaint_category:
         | "sandwich_made_wrong"
         | "slow_service"
@@ -12812,6 +13072,9 @@ export const Constants = {
     Enums: {
       access_scope_type: ["none", "store", "region", "all"],
       app_role: ["admin", "director", "manager", "user", "vp", "ceo"],
+      archive_candidate_type: ["new_hire", "rehire"],
+      archive_task_status: ["not_started", "in_progress", "completed"],
+      archive_trigger_type: ["system_auto", "manager_requested"],
       complaint_category: [
         "sandwich_made_wrong",
         "slow_service",
