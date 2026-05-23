@@ -33,6 +33,7 @@ import EmailTemplates from '@/pages/EmailTemplates';
 import PraiseBoard from '@/pages/PraiseBoard';
 import OpenFeedback from '@/pages/OpenFeedback';
 import RefundProcessing from '@/pages/RefundProcessing';
+import RefundArchive from '@/pages/RefundArchive';
 import { AuthGate } from '@/components/AuthGate';
 import { PortalGate } from '@/auth/PortalGate';
 
@@ -166,6 +167,7 @@ function App() {
                   <Route path="/open-feedback" element={<OpenFeedback />} />
                   <Route path="/praise-board" element={<PraiseBoard />} />
                   <Route path="/refund-processing" element={<RefundProcessing />} />
+                  <Route path="/refund-archive" element={<RefundArchive />} />
                   <Route path="*" element={<SmartRedirect />} />
                 </Route>
               </Routes>
