@@ -110,6 +110,7 @@ export default function RefundProcessing() {
       const { data, error } = await supabase
         .from('refund_requests')
         .select('*')
+        .not('status', 'in', '(completed,denied)')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -122,6 +123,7 @@ export default function RefundProcessing() {
     }
   };
 
+
   const filteredRequests = statusFilter === 'all'
     ? requests
     : requests.filter(r => r.status === statusFilter);
@@ -129,11 +131,11 @@ export default function RefundProcessing() {
   const stats = {
     pending: requests.filter(r => r.status === 'pending').length,
     inProgress: requests.filter(r => ['dm_approved', 'awaiting_director', 'awaiting_catering'].includes(r.status)).length,
+    awaitingInfo: requests.filter(r => r.status === 'awaiting_information').length,
     approved: requests.filter(r => r.status === 'approved').length,
-    completed: requests.filter(r => r.status === 'completed').length,
-    denied: requests.filter(r => r.status === 'denied').length,
-    totalAmount: requests.filter(r => r.status !== 'denied').reduce((sum, r) => sum + Number(r.refund_amount), 0),
+    totalAmount: requests.reduce((sum, r) => sum + Number(r.refund_amount), 0),
   };
+
 
   const openAction = (request: RefundRequest, type: 'approve' | 'deny' | 'complete' | 'awaiting_info' | 'resume') => {
     setSelectedRequest(request);
@@ -322,18 +324,13 @@ export default function RefundProcessing() {
             <p className="text-xs text-muted-foreground">Approved</p>
           </CardContent>
         </Card>
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setStatusFilter('completed')}>
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setStatusFilter('awaiting_information')}>
           <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-emerald-600">{stats.completed}</p>
-            <p className="text-xs text-muted-foreground">Completed</p>
+            <p className="text-2xl font-bold text-yellow-600">{stats.awaitingInfo}</p>
+            <p className="text-xs text-muted-foreground">Awaiting Info</p>
           </CardContent>
         </Card>
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setStatusFilter('denied')}>
-          <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-red-600">{stats.denied}</p>
-            <p className="text-xs text-muted-foreground">Denied</p>
-          </CardContent>
-        </Card>
+
         <Card>
           <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold text-primary">${stats.totalAmount.toFixed(2)}</p>
@@ -355,10 +352,9 @@ export default function RefundProcessing() {
             <SelectItem value="awaiting_catering">Awaiting Catering</SelectItem>
             <SelectItem value="awaiting_information">Awaiting Information</SelectItem>
             <SelectItem value="approved">Fully Approved</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
-            <SelectItem value="denied">Denied</SelectItem>
           </SelectContent>
         </Select>
+
         <Badge variant="secondary">{filteredRequests.length} requests</Badge>
       </div>
 
