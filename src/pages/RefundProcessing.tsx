@@ -18,6 +18,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { HelpCircle } from 'lucide-react';
 import {
   Select,
   SelectContent,
