@@ -181,6 +181,27 @@ export default function RefundProcessing() {
           completed_by: user.id,
           completed_at: new Date().toISOString(),
         };
+      } else if (actionType === 'awaiting_info') {
+        updateFields = {
+          ...updateFields,
+          status: 'awaiting_information',
+          manager_notes: actionNotes
+            ? `${selectedRequest.manager_notes ? selectedRequest.manager_notes + '\n\n' : ''}[Awaiting Info] ${actionNotes}`
+            : selectedRequest.manager_notes,
+        };
+      } else if (actionType === 'resume') {
+        // Recompute proper status from existing approval fields
+        let resumed: string = 'pending';
+        if (!selectedRequest.manager_approved_at) {
+          resumed = 'pending';
+        } else if (selectedRequest.requires_director_approval && !selectedRequest.director_approved_at) {
+          resumed = 'awaiting_director';
+        } else if (selectedRequest.requires_catering_approval && !selectedRequest.catering_approved_at) {
+          resumed = 'awaiting_catering';
+        } else {
+          resumed = 'approved';
+        }
+        updateFields.status = resumed;
       } else {
         // Determine which approval this is
         const next = getNextApproval(selectedRequest);
