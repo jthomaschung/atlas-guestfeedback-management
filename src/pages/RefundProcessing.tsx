@@ -526,7 +526,7 @@ export default function RefundProcessing() {
               variant={actionType === 'deny' ? 'destructive' : 'default'}
             >
               {processing && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-              {actionType === 'approve' ? 'Approve' : actionType === 'deny' ? 'Deny' : 'Complete'}
+              {actionType === 'approve' ? 'Approve' : actionType === 'deny' ? 'Deny' : actionType === 'complete' ? 'Complete' : actionType === 'awaiting_info' ? 'Set Awaiting Info' : 'Resume'}
             </Button>
           </DialogFooter>
         </DialogContent>
