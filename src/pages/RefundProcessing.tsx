@@ -135,7 +135,7 @@ export default function RefundProcessing() {
     totalAmount: requests.filter(r => r.status !== 'denied').reduce((sum, r) => sum + Number(r.refund_amount), 0),
   };
 
-  const openAction = (request: RefundRequest, type: 'approve' | 'deny' | 'complete') => {
+  const openAction = (request: RefundRequest, type: 'approve' | 'deny' | 'complete' | 'awaiting_info' | 'resume') => {
     setSelectedRequest(request);
     setActionType(type);
     setActionNotes('');
