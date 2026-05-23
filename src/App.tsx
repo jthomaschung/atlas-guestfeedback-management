@@ -167,6 +167,7 @@ function App() {
                   <Route path="/open-feedback" element={<OpenFeedback />} />
                   <Route path="/praise-board" element={<PraiseBoard />} />
                   <Route path="/refund-processing" element={<RefundProcessing />} />
+                  <Route path="/refund-archive" element={<RefundArchive />} />
                   <Route path="*" element={<SmartRedirect />} />
                 </Route>
               </Routes>
