@@ -18,6 +18,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { HelpCircle } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -79,6 +80,7 @@ const statusConfig: Record<string, { label: string; color: string; icon: React.C
   dm_approved: { label: 'DM Approved', color: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400', icon: ChevronRight },
   awaiting_director: { label: 'Awaiting Director', color: 'bg-violet-100 text-violet-800 border-violet-200 dark:bg-violet-900/20 dark:text-violet-400', icon: Clock },
   awaiting_catering: { label: 'Awaiting Catering', color: 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400', icon: Clock },
+  awaiting_information: { label: 'Awaiting Information', color: 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400', icon: HelpCircle },
   approved: { label: 'Fully Approved', color: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400', icon: CheckCircle2 },
   denied: { label: 'Denied', color: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400', icon: XCircle },
   completed: { label: 'Completed', color: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400', icon: CheckCircle2 },
@@ -93,7 +95,7 @@ export default function RefundProcessing() {
   const [selectedRequest, setSelectedRequest] = useState<RefundRequest | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [actionDialogOpen, setActionDialogOpen] = useState(false);
-  const [actionType, setActionType] = useState<'approve' | 'deny' | 'complete'>('approve');
+  const [actionType, setActionType] = useState<'approve' | 'deny' | 'complete' | 'awaiting_info' | 'resume'>('approve');
   const [actionNotes, setActionNotes] = useState('');
   const [processing, setProcessing] = useState(false);
 
@@ -133,7 +135,7 @@ export default function RefundProcessing() {
     totalAmount: requests.filter(r => r.status !== 'denied').reduce((sum, r) => sum + Number(r.refund_amount), 0),
   };
 
-  const openAction = (request: RefundRequest, type: 'approve' | 'deny' | 'complete') => {
+  const openAction = (request: RefundRequest, type: 'approve' | 'deny' | 'complete' | 'awaiting_info' | 'resume') => {
     setSelectedRequest(request);
     setActionType(type);
     setActionNotes('');
@@ -179,6 +181,27 @@ export default function RefundProcessing() {
           completed_by: user.id,
           completed_at: new Date().toISOString(),
         };
+      } else if (actionType === 'awaiting_info') {
+        updateFields = {
+          ...updateFields,
+          status: 'awaiting_information',
+          manager_notes: actionNotes
+            ? `${selectedRequest.manager_notes ? selectedRequest.manager_notes + '\n\n' : ''}[Awaiting Info] ${actionNotes}`
+            : selectedRequest.manager_notes,
+        };
+      } else if (actionType === 'resume') {
+        // Recompute proper status from existing approval fields
+        let resumed: string = 'pending';
+        if (!selectedRequest.manager_approved_at) {
+          resumed = 'pending';
+        } else if (selectedRequest.requires_director_approval && !selectedRequest.director_approved_at) {
+          resumed = 'awaiting_director';
+        } else if (selectedRequest.requires_catering_approval && !selectedRequest.catering_approved_at) {
+          resumed = 'awaiting_catering';
+        } else {
+          resumed = 'approved';
+        }
+        updateFields.status = resumed;
       } else {
         // Determine which approval this is
         const next = getNextApproval(selectedRequest);
@@ -248,7 +271,7 @@ export default function RefundProcessing() {
         }
       }
 
-      toast({ title: 'Success', description: `Refund request ${actionType === 'deny' ? 'denied' : actionType === 'complete' ? 'completed' : 'approved'} successfully.` });
+      toast({ title: 'Success', description: `Refund request ${actionType === 'deny' ? 'denied' : actionType === 'complete' ? 'completed' : actionType === 'awaiting_info' ? 'marked as awaiting information' : actionType === 'resume' ? 'resumed' : 'approved'} successfully.` });
       setActionDialogOpen(false);
       await loadRefundRequests();
     } catch (error) {
@@ -330,6 +353,7 @@ export default function RefundProcessing() {
             <SelectItem value="pending">Pending DM</SelectItem>
             <SelectItem value="awaiting_director">Awaiting Director</SelectItem>
             <SelectItem value="awaiting_catering">Awaiting Catering</SelectItem>
+            <SelectItem value="awaiting_information">Awaiting Information</SelectItem>
             <SelectItem value="approved">Fully Approved</SelectItem>
             <SelectItem value="completed">Completed</SelectItem>
             <SelectItem value="denied">Denied</SelectItem>
@@ -402,7 +426,7 @@ export default function RefundProcessing() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                            {getNextApproval(request) && request.status !== 'approved' && request.status !== 'completed' && request.status !== 'denied' && (
+                            {getNextApproval(request) && !['approved', 'completed', 'denied', 'awaiting_information'].includes(request.status) && (
                               <>
                                 <Button
                                   size="sm"
@@ -411,6 +435,33 @@ export default function RefundProcessing() {
                                   onClick={() => openAction(request, 'approve')}
                                 >
                                   {getNextApprovalLabel(request)}
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-7 text-xs"
+                                  onClick={() => openAction(request, 'awaiting_info')}
+                                >
+                                  Awaiting Info
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-7 text-xs text-destructive hover:text-destructive"
+                                  onClick={() => openAction(request, 'deny')}
+                                >
+                                  Deny
+                                </Button>
+                              </>
+                            )}
+                            {request.status === 'awaiting_information' && (
+                              <>
+                                <Button
+                                  size="sm"
+                                  className="h-7 text-xs"
+                                  onClick={() => openAction(request, 'resume')}
+                                >
+                                  Resume
                                 </Button>
                                 <Button
                                   size="sm"
@@ -448,7 +499,7 @@ export default function RefundProcessing() {
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {actionType === 'approve' ? 'Approve Refund' : actionType === 'deny' ? 'Deny Refund' : 'Complete Refund'}
+              {actionType === 'approve' ? 'Approve Refund' : actionType === 'deny' ? 'Deny Refund' : actionType === 'complete' ? 'Complete Refund' : actionType === 'awaiting_info' ? 'Mark as Awaiting Information' : 'Resume Refund'}
             </DialogTitle>
             <DialogDescription>
               {selectedRequest && (
@@ -458,7 +509,7 @@ export default function RefundProcessing() {
           </DialogHeader>
           <div className="space-y-3 py-2">
             <Textarea
-              placeholder={actionType === 'deny' ? 'Reason for denial...' : 'Add notes (optional)...'}
+              placeholder={actionType === 'deny' ? 'Reason for denial...' : actionType === 'awaiting_info' ? 'What information are you waiting on?' : 'Add notes (optional)...'}
               value={actionNotes}
               onChange={(e) => setActionNotes(e.target.value)}
               className="min-h-[80px] resize-none"
@@ -475,7 +526,7 @@ export default function RefundProcessing() {
               variant={actionType === 'deny' ? 'destructive' : 'default'}
             >
               {processing && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-              {actionType === 'approve' ? 'Approve' : actionType === 'deny' ? 'Deny' : 'Complete'}
+              {actionType === 'approve' ? 'Approve' : actionType === 'deny' ? 'Deny' : actionType === 'complete' ? 'Complete' : actionType === 'awaiting_info' ? 'Set Awaiting Info' : 'Resume'}
             </Button>
           </DialogFooter>
         </DialogContent>
