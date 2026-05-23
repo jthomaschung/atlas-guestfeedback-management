@@ -509,7 +509,7 @@ export default function RefundProcessing() {
           </DialogHeader>
           <div className="space-y-3 py-2">
             <Textarea
-              placeholder={actionType === 'deny' ? 'Reason for denial...' : 'Add notes (optional)...'}
+              placeholder={actionType === 'deny' ? 'Reason for denial...' : actionType === 'awaiting_info' ? 'What information are you waiting on?' : 'Add notes (optional)...'}
               value={actionNotes}
               onChange={(e) => setActionNotes(e.target.value)}
               className="min-h-[80px] resize-none"
