@@ -352,10 +352,9 @@ export default function RefundProcessing() {
             <SelectItem value="awaiting_catering">Awaiting Catering</SelectItem>
             <SelectItem value="awaiting_information">Awaiting Information</SelectItem>
             <SelectItem value="approved">Fully Approved</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
-            <SelectItem value="denied">Denied</SelectItem>
           </SelectContent>
         </Select>
+
         <Badge variant="secondary">{filteredRequests.length} requests</Badge>
       </div>
 
