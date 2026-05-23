@@ -499,7 +499,7 @@ export default function RefundProcessing() {
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {actionType === 'approve' ? 'Approve Refund' : actionType === 'deny' ? 'Deny Refund' : 'Complete Refund'}
+              {actionType === 'approve' ? 'Approve Refund' : actionType === 'deny' ? 'Deny Refund' : actionType === 'complete' ? 'Complete Refund' : actionType === 'awaiting_info' ? 'Mark as Awaiting Information' : 'Resume Refund'}
             </DialogTitle>
             <DialogDescription>
               {selectedRequest && (
