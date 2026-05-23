@@ -271,7 +271,7 @@ export default function RefundProcessing() {
         }
       }
 
-      toast({ title: 'Success', description: `Refund request ${actionType === 'deny' ? 'denied' : actionType === 'complete' ? 'completed' : 'approved'} successfully.` });
+      toast({ title: 'Success', description: `Refund request ${actionType === 'deny' ? 'denied' : actionType === 'complete' ? 'completed' : actionType === 'awaiting_info' ? 'marked as awaiting information' : actionType === 'resume' ? 'resumed' : 'approved'} successfully.` });
       setActionDialogOpen(false);
       await loadRefundRequests();
     } catch (error) {
