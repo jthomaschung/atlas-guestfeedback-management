@@ -95,7 +95,7 @@ export default function RefundProcessing() {
   const [selectedRequest, setSelectedRequest] = useState<RefundRequest | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [actionDialogOpen, setActionDialogOpen] = useState(false);
-  const [actionType, setActionType] = useState<'approve' | 'deny' | 'complete'>('approve');
+  const [actionType, setActionType] = useState<'approve' | 'deny' | 'complete' | 'awaiting_info' | 'resume'>('approve');
   const [actionNotes, setActionNotes] = useState('');
   const [processing, setProcessing] = useState(false);
 
