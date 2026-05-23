@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DollarSign, Loader2, Camera, X, ImageIcon } from 'lucide-react';
+import { DollarSign, Loader2, Camera, X, ImageIcon, User, Mail } from 'lucide-react';
 
 interface RequestRefundDialogProps {
   feedback: CustomerFeedback;
@@ -56,6 +56,8 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
   const [reason, setReason] = useState('');
   const [method, setMethod] = useState('');
   const [notes, setNotes] = useState('');
+  const [customerName, setCustomerName] = useState(feedback.customer_name || '');
+  const [customerEmail, setCustomerEmail] = useState(feedback.customer_email || '');
   const [submitting, setSubmitting] = useState(false);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
@@ -92,13 +94,15 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
     setReason('');
     setMethod('');
     setNotes('');
+    setCustomerName(feedback.customer_name || '');
+    setCustomerEmail(feedback.customer_email || '');
     clearReceipt();
     setBypassReceipt(false);
     setBypassReason('');
   };
 
   const handleSubmit = async () => {
-    if (!amount || !reason || !method) {
+    if (!amount || !reason || !method || !customerName.trim() || !customerEmail.trim()) {
       toast.error('Please fill in all required fields');
       return;
     }
@@ -150,8 +154,8 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
           notes: notes || null,
           store_number: feedback.store_number,
           market: feedback.market,
-          customer_name: feedback.customer_name || null,
-          customer_email: feedback.customer_email || null,
+          customer_name: customerName.trim() || null,
+          customer_email: customerEmail.trim() || null,
           customer_phone: feedback.customer_phone || null,
           case_number: feedback.case_number || null,
           receipt_image_url: receiptUrl,
@@ -203,6 +207,35 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
         </DialogHeader>
 
         <div className="space-y-4 py-2">
+          <div className="space-y-2">
+            <Label htmlFor="customer-name">Customer Name *</Label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="customer-name"
+                placeholder="Enter customer name"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="customer-email">Customer Email *</Label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="customer-email"
+                type="email"
+                placeholder="Enter customer email"
+                value={customerEmail}
+                onChange={(e) => setCustomerEmail(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="refund-amount">Refund Amount *</Label>
             <div className="relative">
