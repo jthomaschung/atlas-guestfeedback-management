@@ -312,14 +312,17 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
                 </Button>
               </div>
             ) : !bypassReceipt ? (
-              <div
-                className="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-muted-foreground/30 p-6 cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Camera className="h-8 w-8 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground text-center">
-                  Tap to take a photo or upload receipt
-                </p>
+              <div className="space-y-2">
+                <ReceiptExampleHint />
+                <div
+                  className="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-muted-foreground/30 p-6 cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Camera className="h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground text-center">
+                    Tap to take a photo or upload receipt
+                  </p>
+                </div>
               </div>
             ) : (
               <div className="flex items-center gap-2 rounded-md border border-dashed border-muted-foreground/30 p-4 text-muted-foreground">
