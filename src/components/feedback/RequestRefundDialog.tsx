@@ -94,6 +94,8 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
     setReason('');
     setMethod('');
     setNotes('');
+    setCustomerName(feedback.customer_name || '');
+    setCustomerEmail(feedback.customer_email || '');
     clearReceipt();
     setBypassReceipt(false);
     setBypassReason('');
