@@ -470,13 +470,23 @@ export default function RefundProcessing() {
                               </>
                             )}
                             {request.status === 'approved' && (
-                              <Button
-                                size="sm"
-                                className="h-7 text-xs"
-                                onClick={() => openAction(request, 'complete')}
-                              >
-                                Mark Complete
-                              </Button>
+                              <>
+                                <Button
+                                  size="sm"
+                                  className="h-7 text-xs"
+                                  onClick={() => openAction(request, 'complete')}
+                                >
+                                  Mark Complete
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-7 text-xs"
+                                  onClick={() => openAction(request, 'awaiting_info')}
+                                >
+                                  Awaiting Info
+                                </Button>
+                              </>
                             )}
                           </div>
                         </TableCell>
