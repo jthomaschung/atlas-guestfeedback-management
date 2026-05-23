@@ -80,6 +80,7 @@ const statusConfig: Record<string, { label: string; color: string; icon: React.C
   dm_approved: { label: 'DM Approved', color: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400', icon: ChevronRight },
   awaiting_director: { label: 'Awaiting Director', color: 'bg-violet-100 text-violet-800 border-violet-200 dark:bg-violet-900/20 dark:text-violet-400', icon: Clock },
   awaiting_catering: { label: 'Awaiting Catering', color: 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400', icon: Clock },
+  awaiting_information: { label: 'Awaiting Information', color: 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400', icon: HelpCircle },
   approved: { label: 'Fully Approved', color: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400', icon: CheckCircle2 },
   denied: { label: 'Denied', color: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400', icon: XCircle },
   completed: { label: 'Completed', color: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400', icon: CheckCircle2 },
