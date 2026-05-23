@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { DollarSign, Loader2, Camera, X, ImageIcon, User, Mail } from 'lucide-react';
+import { ReceiptExampleHint } from './ReceiptExampleHint';
 
 interface RequestRefundDialogProps {
   feedback: CustomerFeedback;
