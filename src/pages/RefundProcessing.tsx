@@ -353,6 +353,7 @@ export default function RefundProcessing() {
             <SelectItem value="pending">Pending DM</SelectItem>
             <SelectItem value="awaiting_director">Awaiting Director</SelectItem>
             <SelectItem value="awaiting_catering">Awaiting Catering</SelectItem>
+            <SelectItem value="awaiting_information">Awaiting Information</SelectItem>
             <SelectItem value="approved">Fully Approved</SelectItem>
             <SelectItem value="completed">Completed</SelectItem>
             <SelectItem value="denied">Denied</SelectItem>
