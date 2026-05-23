@@ -102,7 +102,7 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
   };
 
   const handleSubmit = async () => {
-    if (!amount || !reason || !method) {
+    if (!amount || !reason || !method || !customerName.trim() || !customerEmail.trim()) {
       toast.error('Please fill in all required fields');
       return;
     }
