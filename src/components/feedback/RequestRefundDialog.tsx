@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DollarSign, Loader2, Camera, X, ImageIcon } from 'lucide-react';
+import { DollarSign, Loader2, Camera, X, ImageIcon, User, Mail } from 'lucide-react';
 
 interface RequestRefundDialogProps {
   feedback: CustomerFeedback;
