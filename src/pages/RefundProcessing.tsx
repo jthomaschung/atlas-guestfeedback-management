@@ -324,18 +324,13 @@ export default function RefundProcessing() {
             <p className="text-xs text-muted-foreground">Approved</p>
           </CardContent>
         </Card>
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setStatusFilter('completed')}>
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setStatusFilter('awaiting_information')}>
           <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-emerald-600">{stats.completed}</p>
-            <p className="text-xs text-muted-foreground">Completed</p>
+            <p className="text-2xl font-bold text-yellow-600">{stats.awaitingInfo}</p>
+            <p className="text-xs text-muted-foreground">Awaiting Info</p>
           </CardContent>
         </Card>
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setStatusFilter('denied')}>
-          <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-red-600">{stats.denied}</p>
-            <p className="text-xs text-muted-foreground">Denied</p>
-          </CardContent>
-        </Card>
+
         <Card>
           <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold text-primary">${stats.totalAmount.toFixed(2)}</p>
