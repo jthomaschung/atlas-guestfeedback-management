@@ -208,6 +208,35 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
 
         <div className="space-y-4 py-2">
           <div className="space-y-2">
+            <Label htmlFor="customer-name">Customer Name *</Label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="customer-name"
+                placeholder="Enter customer name"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="customer-email">Customer Email *</Label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="customer-email"
+                type="email"
+                placeholder="Enter customer email"
+                value={customerEmail}
+                onChange={(e) => setCustomerEmail(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="refund-amount">Refund Amount *</Label>
             <div className="relative">
               <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
