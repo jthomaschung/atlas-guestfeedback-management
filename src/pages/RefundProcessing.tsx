@@ -426,7 +426,7 @@ export default function RefundProcessing() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                            {getNextApproval(request) && request.status !== 'approved' && request.status !== 'completed' && request.status !== 'denied' && (
+                            {getNextApproval(request) && !['approved', 'completed', 'denied', 'awaiting_information'].includes(request.status) && (
                               <>
                                 <Button
                                   size="sm"
@@ -435,6 +435,33 @@ export default function RefundProcessing() {
                                   onClick={() => openAction(request, 'approve')}
                                 >
                                   {getNextApprovalLabel(request)}
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-7 text-xs"
+                                  onClick={() => openAction(request, 'awaiting_info')}
+                                >
+                                  Awaiting Info
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-7 text-xs text-destructive hover:text-destructive"
+                                  onClick={() => openAction(request, 'deny')}
+                                >
+                                  Deny
+                                </Button>
+                              </>
+                            )}
+                            {request.status === 'awaiting_information' && (
+                              <>
+                                <Button
+                                  size="sm"
+                                  className="h-7 text-xs"
+                                  onClick={() => openAction(request, 'resume')}
+                                >
+                                  Resume
                                 </Button>
                                 <Button
                                   size="sm"
