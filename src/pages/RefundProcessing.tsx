@@ -131,11 +131,11 @@ export default function RefundProcessing() {
   const stats = {
     pending: requests.filter(r => r.status === 'pending').length,
     inProgress: requests.filter(r => ['dm_approved', 'awaiting_director', 'awaiting_catering'].includes(r.status)).length,
+    awaitingInfo: requests.filter(r => r.status === 'awaiting_information').length,
     approved: requests.filter(r => r.status === 'approved').length,
-    completed: requests.filter(r => r.status === 'completed').length,
-    denied: requests.filter(r => r.status === 'denied').length,
-    totalAmount: requests.filter(r => r.status !== 'denied').reduce((sum, r) => sum + Number(r.refund_amount), 0),
+    totalAmount: requests.reduce((sum, r) => sum + Number(r.refund_amount), 0),
   };
+
 
   const openAction = (request: RefundRequest, type: 'approve' | 'deny' | 'complete' | 'awaiting_info' | 'resume') => {
     setSelectedRequest(request);
