@@ -110,6 +110,7 @@ export default function RefundProcessing() {
       const { data, error } = await supabase
         .from('refund_requests')
         .select('*')
+        .not('status', 'in', '(completed,denied)')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -121,6 +122,7 @@ export default function RefundProcessing() {
       setLoading(false);
     }
   };
+
 
   const filteredRequests = statusFilter === 'all'
     ? requests
