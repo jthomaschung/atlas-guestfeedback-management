@@ -56,6 +56,8 @@ export function RequestRefundDialog({ feedback, isOpen, onClose }: RequestRefund
   const [reason, setReason] = useState('');
   const [method, setMethod] = useState('');
   const [notes, setNotes] = useState('');
+  const [customerName, setCustomerName] = useState(feedback.customer_name || '');
+  const [customerEmail, setCustomerEmail] = useState(feedback.customer_email || '');
   const [submitting, setSubmitting] = useState(false);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
