@@ -61,6 +61,7 @@ const categoryOptions = [
   { value: 'Closed Early', label: 'Closed Early' },
   { value: 'Credit Card Issue', label: 'Credit Card Issue' },
   { value: 'Loyalty Program Issues', label: 'Loyalty Program Issues' },
+  { value: 'Order Accuracy', label: 'Order Accuracy' },
   { value: 'Order Issues', label: 'Order Issues' },
   { value: 'Other', label: 'Other' },
   { value: 'Out of Product', label: 'Out of Product' },

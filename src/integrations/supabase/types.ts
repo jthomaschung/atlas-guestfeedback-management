@@ -6498,6 +6498,7 @@ export type Database = {
           auto_archive_waived: boolean
           clearance_email_sent: boolean | null
           clearance_email_sent_at: string | null
+          clearance_needed_notice_sent_at: string | null
           company_email_login: string | null
           company_email_password: string | null
           company_email_setup: boolean | null
@@ -6589,6 +6590,7 @@ export type Database = {
           auto_archive_waived?: boolean
           clearance_email_sent?: boolean | null
           clearance_email_sent_at?: string | null
+          clearance_needed_notice_sent_at?: string | null
           company_email_login?: string | null
           company_email_password?: string | null
           company_email_setup?: boolean | null
@@ -6680,6 +6682,7 @@ export type Database = {
           auto_archive_waived?: boolean
           clearance_email_sent?: boolean | null
           clearance_email_sent_at?: string | null
+          clearance_needed_notice_sent_at?: string | null
           company_email_login?: string | null
           company_email_password?: string | null
           company_email_setup?: boolean | null

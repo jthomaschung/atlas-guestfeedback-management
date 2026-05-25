@@ -58,6 +58,7 @@ const categoryOptions = [
   { value: 'Cleanliness', label: 'Cleanliness' },
   { value: 'Closed Early', label: 'Closed Early' },
   { value: 'Missing Item', label: 'Missing Item' },
+  { value: 'Order Accuracy', label: 'Order Accuracy' },
   { value: 'Other', label: 'Other' },
   { value: 'Out Of Product', label: 'Out Of Product' },
   { value: 'Praise', label: 'Praise' },
