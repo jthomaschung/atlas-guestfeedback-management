@@ -243,7 +243,7 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>Category *</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -296,7 +296,7 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
               name="pageContext"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Page / Context</FormLabel>
+                  <FormLabel>Page / Context *</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -321,7 +321,7 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>Title *</FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="Brief summary of your feedback" 
@@ -338,7 +338,7 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Description *</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Provide detailed information about your feedback, bug report, or feature request. Include steps to reproduce for bugs."
