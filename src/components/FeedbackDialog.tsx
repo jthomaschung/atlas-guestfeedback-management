@@ -33,10 +33,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Bug, Lightbulb, MessageCircle, Upload, X, Image, User } from "lucide-react";
 
 const feedbackSchema = z.object({
-  category: z.enum(["Bug", "Feedback", "Wishlist"]),
+  category: z.enum(["Bug", "Feedback", "Wishlist"], { required_error: "Category is required" }),
   title: z.string().min(1, "Title is required").max(100, "Title must be less than 100 characters"),
   description: z.string().min(10, "Description must be at least 10 characters").max(1000, "Description must be less than 1000 characters"),
-  pageContext: z.string().optional(),
+  pageContext: z.string().min(1, "Page / Context is required"),
 });
 
 type FeedbackForm = z.infer<typeof feedbackSchema>;
