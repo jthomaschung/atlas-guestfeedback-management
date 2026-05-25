@@ -33,10 +33,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Bug, Lightbulb, MessageCircle, Upload, X, Image, User } from "lucide-react";
 
 const feedbackSchema = z.object({
-  category: z.enum(["Bug", "Feedback", "Wishlist"]),
+  category: z.enum(["Bug", "Feedback", "Wishlist"], { required_error: "Category is required" }),
   title: z.string().min(1, "Title is required").max(100, "Title must be less than 100 characters"),
   description: z.string().min(10, "Description must be at least 10 characters").max(1000, "Description must be less than 1000 characters"),
-  pageContext: z.string().optional(),
+  pageContext: z.string().min(1, "Page / Context is required"),
 });
 
 type FeedbackForm = z.infer<typeof feedbackSchema>;
@@ -243,7 +243,7 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>Category *</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -296,7 +296,7 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
               name="pageContext"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Page / Context</FormLabel>
+                  <FormLabel>Page / Context *</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -321,7 +321,7 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>Title *</FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="Brief summary of your feedback" 
@@ -338,7 +338,7 @@ export function FeedbackDialog({ isOpen, onClose }: FeedbackDialogProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Description *</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Provide detailed information about your feedback, bug report, or feature request. Include steps to reproduce for bugs."
