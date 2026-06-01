@@ -6792,6 +6792,11 @@ export type Database = {
           id: string
           id_expiration_date: string | null
           id_number: string | null
+          id_ocr_extracted: Json | null
+          id_ocr_raw: Json | null
+          id_ocr_scanned_at: string | null
+          id_ocr_status: string | null
+          id_ocr_verification: Json | null
           id_photo_back_url: string | null
           id_photo_front_url: string | null
           id_photo_uploaded_at: string | null
@@ -6857,6 +6862,11 @@ export type Database = {
           id?: string
           id_expiration_date?: string | null
           id_number?: string | null
+          id_ocr_extracted?: Json | null
+          id_ocr_raw?: Json | null
+          id_ocr_scanned_at?: string | null
+          id_ocr_status?: string | null
+          id_ocr_verification?: Json | null
           id_photo_back_url?: string | null
           id_photo_front_url?: string | null
           id_photo_uploaded_at?: string | null
@@ -6922,6 +6932,11 @@ export type Database = {
           id?: string
           id_expiration_date?: string | null
           id_number?: string | null
+          id_ocr_extracted?: Json | null
+          id_ocr_raw?: Json | null
+          id_ocr_scanned_at?: string | null
+          id_ocr_status?: string | null
+          id_ocr_verification?: Json | null
           id_photo_back_url?: string | null
           id_photo_front_url?: string | null
           id_photo_uploaded_at?: string | null
@@ -8426,6 +8441,122 @@ export type Database = {
           },
         ]
       }
+      protein_stackers_completions: {
+        Row: {
+          attempt_number: number
+          completed_at: string
+          completion_date: string
+          created_at: string
+          employee_id: string | null
+          employee_name: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          market: string | null
+          passed: boolean
+          percentage: number
+          position_name: string | null
+          region: string | null
+          score: number
+          state: string | null
+          store_number: string
+          total_questions: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          attempt_number?: number
+          completed_at?: string
+          completion_date?: string
+          created_at?: string
+          employee_id?: string | null
+          employee_name: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          market?: string | null
+          passed?: boolean
+          percentage: number
+          position_name?: string | null
+          region?: string | null
+          score: number
+          state?: string | null
+          store_number: string
+          total_questions: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          attempt_number?: number
+          completed_at?: string
+          completion_date?: string
+          created_at?: string
+          employee_id?: string | null
+          employee_name?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          market?: string | null
+          passed?: boolean
+          percentage?: number
+          position_name?: string | null
+          region?: string | null
+          score?: number
+          state?: string | null
+          store_number?: string
+          total_questions?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      protein_stackers_test_results: {
+        Row: {
+          completion_id: string | null
+          correct_answer: string | null
+          created_at: string
+          employee_name: string
+          id: string
+          is_correct: boolean
+          question_id: string
+          question_text: string | null
+          selected_answer: string | null
+          store_number: string | null
+        }
+        Insert: {
+          completion_id?: string | null
+          correct_answer?: string | null
+          created_at?: string
+          employee_name: string
+          id?: string
+          is_correct: boolean
+          question_id: string
+          question_text?: string | null
+          selected_answer?: string | null
+          store_number?: string | null
+        }
+        Update: {
+          completion_id?: string | null
+          correct_answer?: string | null
+          created_at?: string
+          employee_name?: string
+          id?: string
+          is_correct?: boolean
+          question_id?: string
+          question_text?: string | null
+          selected_answer?: string | null
+          store_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "protein_stackers_test_results_completion_id_fkey"
+            columns: ["completion_id"]
+            isOneToOne: false
+            referencedRelation: "protein_stackers_completions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       public_submission_errors: {
         Row: {
           business_date: string | null
@@ -9066,34 +9197,55 @@ export type Database = {
       }
       store_health_snapshots: {
         Row: {
+          avg_age_days: number | null
+          awaiting_response_count: number | null
           created_at: string | null
+          critical_open: number | null
+          critical_overdue: number | null
           health_band: string
           health_score: number
           id: string
           market: string
+          open_tickets: number | null
+          past_vendor_date: number | null
           quarter: string
           snapshot_date: string
           store_number: string
+          unassigned_open: number | null
         }
         Insert: {
+          avg_age_days?: number | null
+          awaiting_response_count?: number | null
           created_at?: string | null
+          critical_open?: number | null
+          critical_overdue?: number | null
           health_band: string
           health_score: number
           id?: string
           market: string
+          open_tickets?: number | null
+          past_vendor_date?: number | null
           quarter: string
-          snapshot_date: string
+          snapshot_date?: string
           store_number: string
+          unassigned_open?: number | null
         }
         Update: {
+          avg_age_days?: number | null
+          awaiting_response_count?: number | null
           created_at?: string | null
+          critical_open?: number | null
+          critical_overdue?: number | null
           health_band?: string
           health_score?: number
           id?: string
           market?: string
+          open_tickets?: number | null
+          past_vendor_date?: number | null
           quarter?: string
           snapshot_date?: string
           store_number?: string
+          unassigned_open?: number | null
         }
         Relationships: []
       }
@@ -11479,6 +11631,7 @@ export type Database = {
           store_number: string | null
           wsr_am_expected: number | null
           wsr_expected: number | null
+          wsr_pending: boolean | null
           wsr_pm_expected: number | null
           wsr_variance: number | null
           z_ha_cash_misc: number | null
@@ -12279,6 +12432,20 @@ export type Database = {
           role_names: string
         }[]
       }
+      get_protein_stackers_employees: {
+        Args: never
+        Returns: {
+          completion_date: string
+          employee_name: string
+          hire_date: string
+          market: string
+          passed: boolean
+          percentage: number
+          position_name: string
+          status: string
+          store_number: string
+        }[]
+      }
       get_receipt_deadline: {
         Args: { p_business_date: string }
         Returns: string
@@ -12721,6 +12888,24 @@ export type Database = {
       process_approval: {
         Args: { p_notes?: string; p_notification_id: string; p_status: string }
         Returns: boolean
+      }
+      record_protein_stackers_completion: {
+        Args: {
+          p_answers?: Json
+          p_employee_id?: string
+          p_employee_name: string
+          p_first_name?: string
+          p_last_name?: string
+          p_market?: string
+          p_position_name?: string
+          p_region?: string
+          p_score: number
+          p_state?: string
+          p_store_number: string
+          p_total_questions: number
+          p_user_id?: string
+        }
+        Returns: string
       }
       refresh_wsr_analytics: { Args: never; Returns: undefined }
       remove_user_market_permission: {
