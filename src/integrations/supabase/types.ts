@@ -7514,6 +7514,36 @@ export type Database = {
         }
         Relationships: []
       }
+      overdue_receipt_notifications: {
+        Row: {
+          business_date: string
+          created_at: string
+          email_message_id: string | null
+          id: string
+          notified_at: string
+          resolved_before_send: boolean
+          store_number: string
+        }
+        Insert: {
+          business_date: string
+          created_at?: string
+          email_message_id?: string | null
+          id?: string
+          notified_at?: string
+          resolved_before_send?: boolean
+          store_number: string
+        }
+        Update: {
+          business_date?: string
+          created_at?: string
+          email_message_id?: string | null
+          id?: string
+          notified_at?: string
+          resolved_before_send?: boolean
+          store_number?: string
+        }
+        Relationships: []
+      }
       patch_shipments: {
         Row: {
           carrier: string | null
