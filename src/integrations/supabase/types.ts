@@ -930,6 +930,9 @@ export type Database = {
           deposit_amount: number
           deposit_date: string
           deposited_by_name: string
+          found_receipt_image_url: string | null
+          found_receipt_ocr_mismatch: number | null
+          found_receipt_uploaded_at: string | null
           id: string
           notes: string | null
           ocr_amount_confidence: string | null
@@ -959,6 +962,9 @@ export type Database = {
           deposit_amount: number
           deposit_date: string
           deposited_by_name: string
+          found_receipt_image_url?: string | null
+          found_receipt_ocr_mismatch?: number | null
+          found_receipt_uploaded_at?: string | null
           id?: string
           notes?: string | null
           ocr_amount_confidence?: string | null
@@ -988,6 +994,9 @@ export type Database = {
           deposit_amount?: number
           deposit_date?: string
           deposited_by_name?: string
+          found_receipt_image_url?: string | null
+          found_receipt_ocr_mismatch?: number | null
+          found_receipt_uploaded_at?: string | null
           id?: string
           notes?: string | null
           ocr_amount_confidence?: string | null
@@ -6066,6 +6075,8 @@ export type Database = {
       manager_certification_requests: {
         Row: {
           approved_at: string | null
+          archived_at: string | null
+          archived_by: string | null
           created_at: string
           dm_email: string
           dm_name: string
@@ -6104,6 +6115,8 @@ export type Database = {
         }
         Insert: {
           approved_at?: string | null
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           dm_email?: string
           dm_name?: string
@@ -6142,6 +6155,8 @@ export type Database = {
         }
         Update: {
           approved_at?: string | null
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           dm_email?: string
           dm_name?: string
@@ -6797,6 +6812,9 @@ export type Database = {
           id_ocr_scanned_at: string | null
           id_ocr_status: string | null
           id_ocr_verification: Json | null
+          id_ocr_verified_at: string | null
+          id_ocr_verified_by: string | null
+          id_ocr_verified_note: string | null
           id_photo_back_url: string | null
           id_photo_front_url: string | null
           id_photo_uploaded_at: string | null
@@ -6867,6 +6885,9 @@ export type Database = {
           id_ocr_scanned_at?: string | null
           id_ocr_status?: string | null
           id_ocr_verification?: Json | null
+          id_ocr_verified_at?: string | null
+          id_ocr_verified_by?: string | null
+          id_ocr_verified_note?: string | null
           id_photo_back_url?: string | null
           id_photo_front_url?: string | null
           id_photo_uploaded_at?: string | null
@@ -6937,6 +6958,9 @@ export type Database = {
           id_ocr_scanned_at?: string | null
           id_ocr_status?: string | null
           id_ocr_verification?: Json | null
+          id_ocr_verified_at?: string | null
+          id_ocr_verified_by?: string | null
+          id_ocr_verified_note?: string | null
           id_photo_back_url?: string | null
           id_photo_front_url?: string | null
           id_photo_uploaded_at?: string | null
@@ -9092,6 +9116,10 @@ export type Database = {
           created_by_user_id: string | null
           deposit_amount: number
           dual_custody_sheet_url: string | null
+          expected_adjustment: number | null
+          expected_adjustment_at: string | null
+          expected_adjustment_by: string | null
+          expected_adjustment_reason: string | null
           expected_deposit: number
           id: string
           notes: string | null
@@ -9118,6 +9146,10 @@ export type Database = {
           created_by_user_id?: string | null
           deposit_amount: number
           dual_custody_sheet_url?: string | null
+          expected_adjustment?: number | null
+          expected_adjustment_at?: string | null
+          expected_adjustment_by?: string | null
+          expected_adjustment_reason?: string | null
           expected_deposit?: number
           id?: string
           notes?: string | null
@@ -9144,6 +9176,10 @@ export type Database = {
           created_by_user_id?: string | null
           deposit_amount?: number
           dual_custody_sheet_url?: string | null
+          expected_adjustment?: number | null
+          expected_adjustment_at?: string | null
+          expected_adjustment_by?: string | null
+          expected_adjustment_reason?: string | null
           expected_deposit?: number
           id?: string
           notes?: string | null
@@ -9371,6 +9407,51 @@ export type Database = {
           created_at?: string | null
           market?: string
           region_group?: string
+        }
+        Relationships: []
+      }
+      store_staffing_target_notes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          created_by_email: string | null
+          delta: number
+          id: string
+          mentioned_emails: string[]
+          mentioned_user_ids: string[]
+          new_target: number | null
+          note: string
+          position: string
+          previous_target: number | null
+          store_number: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          created_by_email?: string | null
+          delta?: number
+          id?: string
+          mentioned_emails?: string[]
+          mentioned_user_ids?: string[]
+          new_target?: number | null
+          note: string
+          position: string
+          previous_target?: number | null
+          store_number: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          created_by_email?: string | null
+          delta?: number
+          id?: string
+          mentioned_emails?: string[]
+          mentioned_user_ids?: string[]
+          new_target?: number | null
+          note?: string
+          position?: string
+          previous_target?: number | null
+          store_number?: string
         }
         Relationships: []
       }
@@ -10410,6 +10491,113 @@ export type Database = {
           source_file?: string | null
           store_number?: string
           week_ending?: string | null
+        }
+        Relationships: []
+      }
+      wep_cash_counts: {
+        Row: {
+          business_date: string
+          created_at: string
+          id: string
+          market: string
+          notes: string | null
+          safe_actual: number
+          safe_variance: number | null
+          store_number: string
+          submitted_at: string
+          submitted_by: string
+          till1_actual: number | null
+          till1_variance: number | null
+          till2_actual: number | null
+          till2_variance: number | null
+          till3_actual: number | null
+          till3_variance: number | null
+          total_variance: number | null
+          week_number: string
+        }
+        Insert: {
+          business_date: string
+          created_at?: string
+          id?: string
+          market: string
+          notes?: string | null
+          safe_actual: number
+          safe_variance?: number | null
+          store_number: string
+          submitted_at?: string
+          submitted_by: string
+          till1_actual?: number | null
+          till1_variance?: number | null
+          till2_actual?: number | null
+          till2_variance?: number | null
+          till3_actual?: number | null
+          till3_variance?: number | null
+          total_variance?: number | null
+          week_number: string
+        }
+        Update: {
+          business_date?: string
+          created_at?: string
+          id?: string
+          market?: string
+          notes?: string | null
+          safe_actual?: number
+          safe_variance?: number | null
+          store_number?: string
+          submitted_at?: string
+          submitted_by?: string
+          till1_actual?: number | null
+          till1_variance?: number | null
+          till2_actual?: number | null
+          till2_variance?: number | null
+          till3_actual?: number | null
+          till3_variance?: number | null
+          total_variance?: number | null
+          week_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wep_cash_counts_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "wep_change_fund_targets"
+            referencedColumns: ["store_number"]
+          },
+        ]
+      }
+      wep_change_fund_targets: {
+        Row: {
+          created_at: string
+          has_till3: boolean
+          market: string
+          safe_target: number
+          store_number: string
+          till1_target: number
+          till2_target: number
+          till3_target: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          has_till3?: boolean
+          market: string
+          safe_target?: number
+          store_number: string
+          till1_target?: number
+          till2_target?: number
+          till3_target?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          has_till3?: boolean
+          market?: string
+          safe_target?: number
+          store_number?: string
+          till1_target?: number
+          till2_target?: number
+          till3_target?: number | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -11594,7 +11782,9 @@ export type Database = {
       v_daily_summary: {
         Row: {
           am_actual: number | null
+          am_adjustment_reason: string | null
           am_expected: number | null
+          am_expected_adjustment: number | null
           am_expected_source: string | null
           am_receipt_url: string | null
           am_resolution_type: string | null
@@ -11612,7 +11802,9 @@ export type Database = {
           has_statement_verified: boolean | null
           overall_status: string | null
           pm_actual: number | null
+          pm_adjustment_reason: string | null
           pm_expected: number | null
+          pm_expected_adjustment: number | null
           pm_expected_source: string | null
           pm_receipt_url: string | null
           pm_resolution_type: string | null
@@ -12884,6 +13076,14 @@ export type Database = {
       is_role_admin: { Args: { _user_id: string }; Returns: boolean }
       is_system_admin: { Args: { user_id: string }; Returns: boolean }
       jsonb_try_parse: { Args: { txt: string }; Returns: Json }
+      list_atlas_users: {
+        Args: never
+        Returns: {
+          display_name: string
+          email: string
+          id: string
+        }[]
+      }
       normalize_market: { Args: { market_name: string }; Returns: string }
       process_approval: {
         Args: { p_notes?: string; p_notification_id: string; p_status: string }
