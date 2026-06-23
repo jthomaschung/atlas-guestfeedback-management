@@ -8547,29 +8547,41 @@ export type Database = {
       }
       property_manager_contacts: {
         Row: {
+          alternate_email: string | null
+          alternate_phone: string | null
           created_at: string
           email: string | null
           id: string
           name: string
           phone: string | null
+          role: string | null
+          sort_order: number
           store_id: number
           updated_at: string
         }
         Insert: {
+          alternate_email?: string | null
+          alternate_phone?: string | null
           created_at?: string
           email?: string | null
           id?: string
           name: string
           phone?: string | null
+          role?: string | null
+          sort_order?: number
           store_id: number
           updated_at?: string
         }
         Update: {
+          alternate_email?: string | null
+          alternate_phone?: string | null
           created_at?: string
           email?: string | null
           id?: string
           name?: string
           phone?: string | null
+          role?: string | null
+          sort_order?: number
           store_id?: number
           updated_at?: string
         }
@@ -9424,8 +9436,11 @@ export type Database = {
           internet_pin_number: string | null
           internet_provider: string | null
           key_holder_names: string | null
+          notice_required: string | null
           phone_account_number: string | null
           phone_provider: string | null
+          property_address: string | null
+          property_management_company: string | null
           roof_access_notes: string | null
           safe_code: string | null
           store_id: number
@@ -9451,8 +9466,11 @@ export type Database = {
           internet_pin_number?: string | null
           internet_provider?: string | null
           key_holder_names?: string | null
+          notice_required?: string | null
           phone_account_number?: string | null
           phone_provider?: string | null
+          property_address?: string | null
+          property_management_company?: string | null
           roof_access_notes?: string | null
           safe_code?: string | null
           store_id: number
@@ -9478,8 +9496,11 @@ export type Database = {
           internet_pin_number?: string | null
           internet_provider?: string | null
           key_holder_names?: string | null
+          notice_required?: string | null
           phone_account_number?: string | null
           phone_provider?: string | null
+          property_address?: string | null
+          property_management_company?: string | null
           roof_access_notes?: string | null
           safe_code?: string | null
           store_id?: number
@@ -13101,8 +13122,11 @@ export type Database = {
           internet_pin_number: string | null
           internet_provider: string | null
           key_holder_names: string | null
+          notice_required: string | null
           phone_account_number: string | null
           phone_provider: string | null
+          property_address: string | null
+          property_management_company: string | null
           roof_access_notes: string | null
           safe_code: string | null
           store_id: number
