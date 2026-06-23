@@ -6087,10 +6087,12 @@ export type Database = {
           host_name: string | null
           hosting_fee: string | null
           id: string
+          instore_scheduled_at: string | null
           is_external_candidate: boolean | null
           market: string
           position_name: string
           pretest_deadline: string | null
+          pretest_registered_at: string | null
           pretest_score: number | null
           rejected_at: string | null
           rejection_reason: string | null
@@ -6112,6 +6114,8 @@ export type Database = {
           training_location: string | null
           training_start_date: string | null
           updated_at: string
+          virtual_registered_at: string | null
+          virtual_session_date: string | null
         }
         Insert: {
           approved_at?: string | null
@@ -6127,10 +6131,12 @@ export type Database = {
           host_name?: string | null
           hosting_fee?: string | null
           id?: string
+          instore_scheduled_at?: string | null
           is_external_candidate?: boolean | null
           market: string
           position_name: string
           pretest_deadline?: string | null
+          pretest_registered_at?: string | null
           pretest_score?: number | null
           rejected_at?: string | null
           rejection_reason?: string | null
@@ -6152,6 +6158,8 @@ export type Database = {
           training_location?: string | null
           training_start_date?: string | null
           updated_at?: string
+          virtual_registered_at?: string | null
+          virtual_session_date?: string | null
         }
         Update: {
           approved_at?: string | null
@@ -6167,10 +6175,12 @@ export type Database = {
           host_name?: string | null
           hosting_fee?: string | null
           id?: string
+          instore_scheduled_at?: string | null
           is_external_candidate?: boolean | null
           market?: string
           position_name?: string
           pretest_deadline?: string | null
+          pretest_registered_at?: string | null
           pretest_score?: number | null
           rejected_at?: string | null
           rejection_reason?: string | null
@@ -6192,6 +6202,8 @@ export type Database = {
           training_location?: string | null
           training_start_date?: string | null
           updated_at?: string
+          virtual_registered_at?: string | null
+          virtual_session_date?: string | null
         }
         Relationships: []
       }
@@ -7209,6 +7221,74 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_employee_expense_summary"
             referencedColumns: ["profile_id"]
+          },
+        ]
+      }
+      onboarding_feedback_surveys: {
+        Row: {
+          audience: string
+          completed_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          q1_score: number | null
+          q2_score: number | null
+          q3_choice: string | null
+          q4_choice: string | null
+          q5_text: string | null
+          recipient_email: string
+          recipient_name: string | null
+          responses: Json | null
+          sent_at: string | null
+          submission_id: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          audience: string
+          completed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          q1_score?: number | null
+          q2_score?: number | null
+          q3_choice?: string | null
+          q4_choice?: string | null
+          q5_text?: string | null
+          recipient_email: string
+          recipient_name?: string | null
+          responses?: Json | null
+          sent_at?: string | null
+          submission_id: string
+          token?: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string
+          completed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          q1_score?: number | null
+          q2_score?: number | null
+          q3_choice?: string | null
+          q4_choice?: string | null
+          q5_text?: string | null
+          recipient_email?: string
+          recipient_name?: string | null
+          responses?: Json | null
+          sent_at?: string | null
+          submission_id?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_feedback_surveys_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "new_hire_submissions"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -10513,7 +10593,8 @@ export type Database = {
           till3_actual: number | null
           till3_variance: number | null
           total_variance: number | null
-          week_number: string
+          wednesday_date: string
+          week_number: string | null
         }
         Insert: {
           business_date: string
@@ -10533,7 +10614,8 @@ export type Database = {
           till3_actual?: number | null
           till3_variance?: number | null
           total_variance?: number | null
-          week_number: string
+          wednesday_date?: string
+          week_number?: string | null
         }
         Update: {
           business_date?: string
@@ -10553,7 +10635,8 @@ export type Database = {
           till3_actual?: number | null
           till3_variance?: number | null
           total_variance?: number | null
-          week_number?: string
+          wednesday_date?: string
+          week_number?: string | null
         }
         Relationships: [
           {
@@ -12096,6 +12179,13 @@ export type Database = {
           training_module_name: string
         }[]
       }
+      get_all_harassment_completion_names: {
+        Args: never
+        Returns: {
+          employee_name: string
+          store_number: string
+        }[]
+      }
       get_call_activity_stats:
         | { Args: { p_mode: string; p_start: string }; Returns: Json }
         | {
@@ -12290,6 +12380,14 @@ export type Database = {
           training_module_name: string
         }[]
       }
+      get_employee_harassment_completion: {
+        Args: { _employee_name: string }
+        Returns: {
+          completion_date: string
+          expires_at: string
+          status: string
+        }[]
+      }
       get_employee_lto_completions: {
         Args: { store_num: string; training_title: string }
         Returns: {
@@ -12347,6 +12445,18 @@ export type Database = {
         }[]
       }
       get_fiscal_period: { Args: { d: string }; Returns: Json }
+      get_harassment_completions_for_export: {
+        Args: never
+        Returns: {
+          completion_date: string
+          employee_name: string
+          expires_at: string
+          state: string
+          status: string
+          store_number: string
+          training_type: string
+        }[]
+      }
       get_harassment_training_by_market: {
         Args: { p_region: string }
         Returns: {
@@ -12587,6 +12697,21 @@ export type Database = {
           qualification_type: string
           store_number: string
           total_royalty: number
+        }[]
+      }
+      get_onboarding_survey_by_token: {
+        Args: { _token: string }
+        Returns: {
+          audience: string
+          completed_at: string
+          expires_at: string
+          hire_first_name: string
+          hire_last_name: string
+          hire_position: string
+          hire_store_number: string
+          id: string
+          recipient_email: string
+          recipient_name: string
         }[]
       }
       get_overdue_menu_test_employees: {
@@ -13254,6 +13379,21 @@ export type Database = {
           p_training_version?: string
         }
         Returns: string
+      }
+      submit_onboarding_survey_response: {
+        Args: {
+          _q1_score: number
+          _q2_score: number
+          _q3_choice: string
+          _q4_choice: string
+          _q5_text: string
+          _responses?: Json
+          _token: string
+        }
+        Returns: {
+          message: string
+          success: boolean
+        }[]
       }
       swap_shift_types: {
         Args: { id_a: string; id_b: string }
