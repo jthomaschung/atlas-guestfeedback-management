@@ -8545,6 +8545,51 @@ export type Database = {
           },
         ]
       }
+      property_manager_contacts: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          store_id: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          store_id: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          store_id?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_manager_contacts_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["store_id"]
+          },
+          {
+            foreignKeyName: "property_manager_contacts_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "v_store_monthly_spending"
+            referencedColumns: ["store_id"]
+          },
+        ]
+      }
       protein_stackers_completions: {
         Row: {
           attempt_number: number
@@ -9364,6 +9409,150 @@ export type Database = {
           unassigned_open?: number | null
         }
         Relationships: []
+      }
+      store_information: {
+        Row: {
+          alarm_code: string | null
+          computer_password: string | null
+          created_at: string
+          electric_account_number: string | null
+          electric_provider: string | null
+          gas_account_number: string | null
+          gas_provider: string | null
+          id: string
+          internet_account_number: string | null
+          internet_pin_number: string | null
+          internet_provider: string | null
+          key_holder_names: string | null
+          phone_account_number: string | null
+          phone_provider: string | null
+          roof_access_notes: string | null
+          safe_code: string | null
+          store_id: number
+          trash_account_number: string | null
+          trash_provider: string | null
+          updated_at: string
+          water_account_number: string | null
+          water_provider: string | null
+          water_shutoff_location: string | null
+          wifi_network_name: string | null
+          wifi_password: string | null
+        }
+        Insert: {
+          alarm_code?: string | null
+          computer_password?: string | null
+          created_at?: string
+          electric_account_number?: string | null
+          electric_provider?: string | null
+          gas_account_number?: string | null
+          gas_provider?: string | null
+          id?: string
+          internet_account_number?: string | null
+          internet_pin_number?: string | null
+          internet_provider?: string | null
+          key_holder_names?: string | null
+          phone_account_number?: string | null
+          phone_provider?: string | null
+          roof_access_notes?: string | null
+          safe_code?: string | null
+          store_id: number
+          trash_account_number?: string | null
+          trash_provider?: string | null
+          updated_at?: string
+          water_account_number?: string | null
+          water_provider?: string | null
+          water_shutoff_location?: string | null
+          wifi_network_name?: string | null
+          wifi_password?: string | null
+        }
+        Update: {
+          alarm_code?: string | null
+          computer_password?: string | null
+          created_at?: string
+          electric_account_number?: string | null
+          electric_provider?: string | null
+          gas_account_number?: string | null
+          gas_provider?: string | null
+          id?: string
+          internet_account_number?: string | null
+          internet_pin_number?: string | null
+          internet_provider?: string | null
+          key_holder_names?: string | null
+          phone_account_number?: string | null
+          phone_provider?: string | null
+          roof_access_notes?: string | null
+          safe_code?: string | null
+          store_id?: number
+          trash_account_number?: string | null
+          trash_provider?: string | null
+          updated_at?: string
+          water_account_number?: string | null
+          water_provider?: string | null
+          water_shutoff_location?: string | null
+          wifi_network_name?: string | null
+          wifi_password?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_information_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: true
+            referencedRelation: "stores"
+            referencedColumns: ["store_id"]
+          },
+          {
+            foreignKeyName: "store_information_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: true
+            referencedRelation: "v_store_monthly_spending"
+            referencedColumns: ["store_id"]
+          },
+        ]
+      }
+      store_information_audit_log: {
+        Row: {
+          changed_at: string
+          field_name: string
+          id: string
+          new_value: string | null
+          old_value: string | null
+          store_id: number
+          user_id: string | null
+        }
+        Insert: {
+          changed_at?: string
+          field_name: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          store_id: number
+          user_id?: string | null
+        }
+        Update: {
+          changed_at?: string
+          field_name?: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          store_id?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_information_audit_log_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["store_id"]
+          },
+          {
+            foreignKeyName: "store_information_audit_log_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "v_store_monthly_spending"
+            referencedColumns: ["store_id"]
+          },
+        ]
       }
       store_labor_goal_history: {
         Row: {
@@ -12079,6 +12268,18 @@ export type Database = {
         }
         Returns: number
       }
+      can_edit_store_information: {
+        Args: { _store_id: number; _user_id: string }
+        Returns: boolean
+      }
+      can_view_sensitive_store_information: {
+        Args: { _store_id: number; _user_id: string }
+        Returns: boolean
+      }
+      can_view_store_information: {
+        Args: { _store_id: number; _user_id: string }
+        Returns: boolean
+      }
       check_critical_feedback_approvals: {
         Args: { feedback_id_param: string }
         Returns: boolean
@@ -12884,6 +13085,42 @@ export type Database = {
           store_number: string
           total_employees: number
         }[]
+      }
+      get_store_information: {
+        Args: { _store_id: number }
+        Returns: {
+          alarm_code: string | null
+          computer_password: string | null
+          created_at: string
+          electric_account_number: string | null
+          electric_provider: string | null
+          gas_account_number: string | null
+          gas_provider: string | null
+          id: string
+          internet_account_number: string | null
+          internet_pin_number: string | null
+          internet_provider: string | null
+          key_holder_names: string | null
+          phone_account_number: string | null
+          phone_provider: string | null
+          roof_access_notes: string | null
+          safe_code: string | null
+          store_id: number
+          trash_account_number: string | null
+          trash_provider: string | null
+          updated_at: string
+          water_account_number: string | null
+          water_provider: string | null
+          water_shutoff_location: string | null
+          wifi_network_name: string | null
+          wifi_password: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "store_information"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       get_store_lto_completion_trends: {
         Args: { target_market: string; training_title: string }
