@@ -9425,14 +9425,24 @@ export type Database = {
       store_information: {
         Row: {
           alarm_code: string | null
+          co2_account_number: string | null
+          co2_contact_phone: string | null
+          co2_password: string | null
+          co2_provider: string | null
           computer_password: string | null
           created_at: string
           electric_account_number: string | null
+          electric_contact_phone: string | null
+          electric_password: string | null
           electric_provider: string | null
           gas_account_number: string | null
+          gas_contact_phone: string | null
+          gas_password: string | null
           gas_provider: string | null
           id: string
           internet_account_number: string | null
+          internet_contact_phone: string | null
+          internet_password: string | null
           internet_pin_number: string | null
           internet_provider: string | null
           key_holder_names: string | null
@@ -9445,9 +9455,13 @@ export type Database = {
           safe_code: string | null
           store_id: number
           trash_account_number: string | null
+          trash_contact_phone: string | null
+          trash_password: string | null
           trash_provider: string | null
           updated_at: string
           water_account_number: string | null
+          water_contact_phone: string | null
+          water_password: string | null
           water_provider: string | null
           water_shutoff_location: string | null
           wifi_network_name: string | null
@@ -9455,14 +9469,24 @@ export type Database = {
         }
         Insert: {
           alarm_code?: string | null
+          co2_account_number?: string | null
+          co2_contact_phone?: string | null
+          co2_password?: string | null
+          co2_provider?: string | null
           computer_password?: string | null
           created_at?: string
           electric_account_number?: string | null
+          electric_contact_phone?: string | null
+          electric_password?: string | null
           electric_provider?: string | null
           gas_account_number?: string | null
+          gas_contact_phone?: string | null
+          gas_password?: string | null
           gas_provider?: string | null
           id?: string
           internet_account_number?: string | null
+          internet_contact_phone?: string | null
+          internet_password?: string | null
           internet_pin_number?: string | null
           internet_provider?: string | null
           key_holder_names?: string | null
@@ -9475,9 +9499,13 @@ export type Database = {
           safe_code?: string | null
           store_id: number
           trash_account_number?: string | null
+          trash_contact_phone?: string | null
+          trash_password?: string | null
           trash_provider?: string | null
           updated_at?: string
           water_account_number?: string | null
+          water_contact_phone?: string | null
+          water_password?: string | null
           water_provider?: string | null
           water_shutoff_location?: string | null
           wifi_network_name?: string | null
@@ -9485,14 +9513,24 @@ export type Database = {
         }
         Update: {
           alarm_code?: string | null
+          co2_account_number?: string | null
+          co2_contact_phone?: string | null
+          co2_password?: string | null
+          co2_provider?: string | null
           computer_password?: string | null
           created_at?: string
           electric_account_number?: string | null
+          electric_contact_phone?: string | null
+          electric_password?: string | null
           electric_provider?: string | null
           gas_account_number?: string | null
+          gas_contact_phone?: string | null
+          gas_password?: string | null
           gas_provider?: string | null
           id?: string
           internet_account_number?: string | null
+          internet_contact_phone?: string | null
+          internet_password?: string | null
           internet_pin_number?: string | null
           internet_provider?: string | null
           key_holder_names?: string | null
@@ -9505,9 +9543,13 @@ export type Database = {
           safe_code?: string | null
           store_id?: number
           trash_account_number?: string | null
+          trash_contact_phone?: string | null
+          trash_password?: string | null
           trash_provider?: string | null
           updated_at?: string
           water_account_number?: string | null
+          water_contact_phone?: string | null
+          water_password?: string | null
           water_provider?: string | null
           water_shutoff_location?: string | null
           wifi_network_name?: string | null
@@ -12359,6 +12401,25 @@ export type Database = {
         }
         Returns: Json
       }
+      fn_find_dm_for_market: { Args: { _market: string }; Returns: string }
+      fn_find_store_assignee: {
+        Args: { _store_number: string }
+        Returns: string
+      }
+      fn_resolve_feedback_routing: {
+        Args: {
+          _category: string
+          _feedback_text: string
+          _market: string
+          _store_number: string
+          _type_of_feedback: string
+        }
+        Returns: {
+          assignee: string
+          priority: string
+          should_escalate: boolean
+        }[]
+      }
       generate_display_name: {
         Args: { email: string; first_name: string; last_name: string }
         Returns: string
@@ -13111,14 +13172,24 @@ export type Database = {
         Args: { _store_id: number }
         Returns: {
           alarm_code: string | null
+          co2_account_number: string | null
+          co2_contact_phone: string | null
+          co2_password: string | null
+          co2_provider: string | null
           computer_password: string | null
           created_at: string
           electric_account_number: string | null
+          electric_contact_phone: string | null
+          electric_password: string | null
           electric_provider: string | null
           gas_account_number: string | null
+          gas_contact_phone: string | null
+          gas_password: string | null
           gas_provider: string | null
           id: string
           internet_account_number: string | null
+          internet_contact_phone: string | null
+          internet_password: string | null
           internet_pin_number: string | null
           internet_provider: string | null
           key_holder_names: string | null
@@ -13131,9 +13202,13 @@ export type Database = {
           safe_code: string | null
           store_id: number
           trash_account_number: string | null
+          trash_contact_phone: string | null
+          trash_password: string | null
           trash_provider: string | null
           updated_at: string
           water_account_number: string | null
+          water_contact_phone: string | null
+          water_password: string | null
           water_provider: string | null
           water_shutoff_location: string | null
           wifi_network_name: string | null

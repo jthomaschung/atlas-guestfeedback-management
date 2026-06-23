@@ -259,10 +259,13 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     // Rude Service
     'team member friendliness': 'Rude Service',
     'team member complaint': 'Rude Service',
+    'team member': 'Rude Service',
+    'complaint about a team member': 'Rude Service',
     'rude service': 'Rude Service',
     // Closed Early
     'hours': 'Closed Early',
     'closed early': 'Closed Early',
+    'unable to pick up': 'Closed Early',
     // Out of Product
     'oop': 'Out of Product',
     'out of stock': 'Out of Product',
@@ -277,6 +280,11 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     'gift card issue': 'Credit Card Issue',
     'incorrect change': 'Credit Card Issue',
     'pricing issue': 'Credit Card Issue',
+    'charges': 'Credit Card Issue',
+    // Slow Service
+    'time to receive order': 'Slow Service',
+    // Loyalty
+    'loyalty program issue': 'Loyalty Program Issues',
     // Product Quality → Product Issue
     'product quality': 'Product Issue',
     // Portion → Other
@@ -288,6 +296,11 @@ async function validateFeedbackData(data: any): Promise<FeedbackWebhookData | nu
     'online ordering issues': 'Other',
     'duplicate order': 'Other',
     'employment and hiring': 'Other',
+    'employment verification restaurant': 'Other',
+    'franchisee criminal activity': 'Other',
+    'tax forms': 'Other',
+    'receipt': 'Other',
+    'audio': 'Other',
     'menu question': 'Other',
     'no feedback provided': 'Other',
     'not honored': 'Other',
