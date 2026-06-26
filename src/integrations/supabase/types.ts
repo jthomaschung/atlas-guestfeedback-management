@@ -3743,6 +3743,60 @@ export type Database = {
           },
         ]
       }
+      eod_lowcost_processing_status: {
+        Row: {
+          bus_date: string
+          created_at: string
+          gmail_subject: string | null
+          gmail_thread_id: string | null
+          id: number
+          last_error: string | null
+          last_error_at: string | null
+          payments_status: string | null
+          processed_at: string | null
+          records_inserted: number
+          records_skipped: number
+          status: string
+          store_number: string
+          updated_at: string
+          z_report_status: string | null
+        }
+        Insert: {
+          bus_date: string
+          created_at?: string
+          gmail_subject?: string | null
+          gmail_thread_id?: string | null
+          id?: number
+          last_error?: string | null
+          last_error_at?: string | null
+          payments_status?: string | null
+          processed_at?: string | null
+          records_inserted?: number
+          records_skipped?: number
+          status?: string
+          store_number: string
+          updated_at?: string
+          z_report_status?: string | null
+        }
+        Update: {
+          bus_date?: string
+          created_at?: string
+          gmail_subject?: string | null
+          gmail_thread_id?: string | null
+          id?: number
+          last_error?: string | null
+          last_error_at?: string | null
+          payments_status?: string | null
+          processed_at?: string | null
+          records_inserted?: number
+          records_skipped?: number
+          status?: string
+          store_number?: string
+          updated_at?: string
+          z_report_status?: string | null
+        }
+        Relationships: []
+      }
       er_case_attachments: {
         Row: {
           created_at: string
@@ -6293,6 +6347,70 @@ export type Database = {
           },
         ]
       }
+      market_restructure_log: {
+        Row: {
+          error_message: string | null
+          executed_at: string | null
+          executed_by: string | null
+          from_market: string
+          from_market_id: string | null
+          id: string
+          notes: string | null
+          rows_affected: Json | null
+          status: string | null
+          to_market: string
+          to_market_id: string | null
+        }
+        Insert: {
+          error_message?: string | null
+          executed_at?: string | null
+          executed_by?: string | null
+          from_market: string
+          from_market_id?: string | null
+          id?: string
+          notes?: string | null
+          rows_affected?: Json | null
+          status?: string | null
+          to_market: string
+          to_market_id?: string | null
+        }
+        Update: {
+          error_message?: string | null
+          executed_at?: string | null
+          executed_by?: string | null
+          from_market?: string
+          from_market_id?: string | null
+          id?: string
+          notes?: string | null
+          rows_affected?: Json | null
+          status?: string | null
+          to_market?: string
+          to_market_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_restructure_log_executed_by_fkey"
+            columns: ["executed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "market_restructure_log_from_market_id_fkey"
+            columns: ["from_market_id"]
+            isOneToOne: false
+            referencedRelation: "markets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "market_restructure_log_to_market_id_fkey"
+            columns: ["to_market_id"]
+            isOneToOne: false
+            referencedRelation: "markets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       market_sales_by_period: {
         Row: {
           avg_order_value: number | null
@@ -7110,15 +7228,19 @@ export type Database = {
       ocr_date_audit: {
         Row: {
           amount_delta: number | null
+          amount_matched_ocr: boolean | null
           bank_deposit_date: string | null
           bank_transaction_number: string | null
           cash_deposit_id: string | null
           confidence_score: number | null
           created_at: string | null
           date_delta_days: number | null
+          date_matched_ocr: boolean | null
           duplicate_detected: boolean | null
           id: string
           late_night_adjustment: boolean | null
+          manager_confirmed_amount: number | null
+          manager_confirmed_date: string | null
           manager_selected_date: string | null
           match_method: string | null
           ocr_amount: number | null
@@ -7136,15 +7258,19 @@ export type Database = {
         }
         Insert: {
           amount_delta?: number | null
+          amount_matched_ocr?: boolean | null
           bank_deposit_date?: string | null
           bank_transaction_number?: string | null
           cash_deposit_id?: string | null
           confidence_score?: number | null
           created_at?: string | null
           date_delta_days?: number | null
+          date_matched_ocr?: boolean | null
           duplicate_detected?: boolean | null
           id?: string
           late_night_adjustment?: boolean | null
+          manager_confirmed_amount?: number | null
+          manager_confirmed_date?: string | null
           manager_selected_date?: string | null
           match_method?: string | null
           ocr_amount?: number | null
@@ -7162,15 +7288,19 @@ export type Database = {
         }
         Update: {
           amount_delta?: number | null
+          amount_matched_ocr?: boolean | null
           bank_deposit_date?: string | null
           bank_transaction_number?: string | null
           cash_deposit_id?: string | null
           confidence_score?: number | null
           created_at?: string | null
           date_delta_days?: number | null
+          date_matched_ocr?: boolean | null
           duplicate_detected?: boolean | null
           id?: string
           late_night_adjustment?: boolean | null
+          manager_confirmed_amount?: number | null
+          manager_confirmed_date?: string | null
           manager_selected_date?: string | null
           match_method?: string | null
           ocr_amount?: number | null
@@ -9365,6 +9495,66 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "customer_feedback"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_compliance_docs: {
+        Row: {
+          created_at: string | null
+          doc_type: string
+          expiration_date: string | null
+          file_name: string | null
+          file_url: string | null
+          id: string
+          issuing_agency: string | null
+          notes: string | null
+          permit_number: string | null
+          store_id: number
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          doc_type: string
+          expiration_date?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          issuing_agency?: string | null
+          notes?: string | null
+          permit_number?: string | null
+          store_id: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          doc_type?: string
+          expiration_date?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          issuing_agency?: string | null
+          notes?: string | null
+          permit_number?: string | null
+          store_id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_compliance_docs_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["store_id"]
+          },
+          {
+            foreignKeyName: "store_compliance_docs_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "v_store_monthly_spending"
+            referencedColumns: ["store_id"]
           },
         ]
       }
@@ -12376,9 +12566,46 @@ export type Database = {
           state: string
         }[]
       }
+      execute_market_restructure: {
+        Args: {
+          p_acting_user_id: string
+          p_from_market: string
+          p_notes?: string
+          p_to_market: string
+        }
+        Returns: Json
+      }
+      execute_single_store_move: {
+        Args: {
+          p_acting_user_id: string
+          p_from_market: string
+          p_notes?: string
+          p_store_number: string
+          p_to_market: string
+        }
+        Returns: Json
+      }
+      execute_store_market_reassignment: {
+        Args: {
+          p_acting_user_id: string
+          p_assignments: Json
+          p_from_market: string
+          p_notes?: string
+        }
+        Returns: Json
+      }
       finalize_archive_workflow: {
         Args: { _workflow_id: string }
         Returns: undefined
+      }
+      finalize_market_disband: {
+        Args: {
+          p_acting_user_id: string
+          p_from_market: string
+          p_notes?: string
+          p_stores_moved: number
+        }
+        Returns: Json
       }
       find_critical_orders_without_notifications: {
         Args: { days_back?: number }
@@ -12915,6 +13142,10 @@ export type Database = {
       get_market_r2r_completion_rate: {
         Args: { target_market: string }
         Returns: number
+      }
+      get_market_restructure_preview: {
+        Args: { p_from_market: string }
+        Returns: Json
       }
       get_menu_test_company_avg: {
         Args: never
