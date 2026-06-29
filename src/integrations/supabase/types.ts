@@ -10980,6 +10980,147 @@ export type Database = {
           },
         ]
       }
+      vendor_appointments: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          outcome: string | null
+          outcome_notes: string | null
+          scheduled_date: string
+          scheduled_timeframe: string
+          updated_at: string | null
+          vendor_id: string | null
+          vendor_name_override: string | null
+          work_order_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          outcome?: string | null
+          outcome_notes?: string | null
+          scheduled_date: string
+          scheduled_timeframe: string
+          updated_at?: string | null
+          vendor_id?: string | null
+          vendor_name_override?: string | null
+          work_order_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          outcome?: string | null
+          outcome_notes?: string | null
+          scheduled_date?: string
+          scheduled_timeframe?: string
+          updated_at?: string | null
+          vendor_id?: string | null
+          vendor_name_override?: string | null
+          work_order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_appointments_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_appointments_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "work_order_sla"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_appointments_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "work_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_service_areas: {
+        Row: {
+          created_at: string | null
+          id: string
+          market: string | null
+          repair_type: string | null
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          market?: string | null
+          repair_type?: string | null
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          market?: string | null
+          repair_type?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_service_areas_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendors: {
+        Row: {
+          company_name: string | null
+          contact_name: string | null
+          created_at: string | null
+          created_by: string | null
+          email: string | null
+          id: string
+          is_active: boolean | null
+          is_preferred: boolean | null
+          name: string
+          notes: string | null
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          company_name?: string | null
+          contact_name?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_preferred?: boolean | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          company_name?: string | null
+          contact_name?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_preferred?: boolean | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       weekly_sales_expected: {
         Row: {
           am_expected: number | null
