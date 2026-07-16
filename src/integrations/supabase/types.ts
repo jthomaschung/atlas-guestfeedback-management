@@ -592,6 +592,84 @@ export type Database = {
         }
         Relationships: []
       }
+      beta_work_order_intake: {
+        Row: {
+          answers: Json
+          attachments: Json
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          converted_to_work_order_id: string | null
+          created_at: string
+          generated_summary: string | null
+          id: string
+          issue_type: string | null
+          market: string | null
+          operations_impacted: string | null
+          priority_override_reason: string | null
+          priority_selected: string | null
+          priority_suggested: string | null
+          qa_review: Json
+          repair_type: string | null
+          status: string
+          store_number: string | null
+          submitted_by: string | null
+          submitted_by_display: string | null
+          submitted_source: string | null
+          updated_at: string
+        }
+        Insert: {
+          answers?: Json
+          attachments?: Json
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          converted_to_work_order_id?: string | null
+          created_at?: string
+          generated_summary?: string | null
+          id?: string
+          issue_type?: string | null
+          market?: string | null
+          operations_impacted?: string | null
+          priority_override_reason?: string | null
+          priority_selected?: string | null
+          priority_suggested?: string | null
+          qa_review?: Json
+          repair_type?: string | null
+          status?: string
+          store_number?: string | null
+          submitted_by?: string | null
+          submitted_by_display?: string | null
+          submitted_source?: string | null
+          updated_at?: string
+        }
+        Update: {
+          answers?: Json
+          attachments?: Json
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          converted_to_work_order_id?: string | null
+          created_at?: string
+          generated_summary?: string | null
+          id?: string
+          issue_type?: string | null
+          market?: string | null
+          operations_impacted?: string | null
+          priority_override_reason?: string | null
+          priority_selected?: string | null
+          priority_suggested?: string | null
+          qa_review?: Json
+          repair_type?: string | null
+          status?: string
+          store_number?: string | null
+          submitted_by?: string | null
+          submitted_by_display?: string | null
+          submitted_source?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bonus_config: {
         Row: {
           base_salary: number
@@ -741,6 +819,87 @@ export type Database = {
         }
         Update: {
           user_id?: string
+        }
+        Relationships: []
+      }
+      business_card_submissions: {
+        Row: {
+          address: string | null
+          city: string | null
+          company_name: string | null
+          contact_name: string | null
+          created_at: string
+          email: string | null
+          extraction_error: string | null
+          extraction_raw: Json | null
+          id: string
+          image_path: string
+          lead_id: string | null
+          market: string | null
+          notes: string | null
+          office_phone: string | null
+          phone: string | null
+          rejected_reason: string | null
+          state: string | null
+          status: string
+          store_number: string
+          title: string | null
+          updated_at: string
+          uploaded_by: string | null
+          website: string | null
+          zip: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          company_name?: string | null
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          extraction_error?: string | null
+          extraction_raw?: Json | null
+          id?: string
+          image_path: string
+          lead_id?: string | null
+          market?: string | null
+          notes?: string | null
+          office_phone?: string | null
+          phone?: string | null
+          rejected_reason?: string | null
+          state?: string | null
+          status?: string
+          store_number: string
+          title?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+          website?: string | null
+          zip?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          company_name?: string | null
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          extraction_error?: string | null
+          extraction_raw?: Json | null
+          id?: string
+          image_path?: string
+          lead_id?: string | null
+          market?: string | null
+          notes?: string | null
+          office_phone?: string | null
+          phone?: string | null
+          rejected_reason?: string | null
+          state?: string | null
+          status?: string
+          store_number?: string
+          title?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+          website?: string | null
+          zip?: string | null
         }
         Relationships: []
       }
@@ -3508,6 +3667,8 @@ export type Database = {
           created_at: string
           created_by: string | null
           details: string | null
+          duplicate_of_id: string | null
+          duplicate_of_number: string | null
           harassment_type: string | null
           id: string
           incident_date: string | null
@@ -3534,6 +3695,9 @@ export type Database = {
           transferred_to_id: string | null
           transferred_to_type: string | null
           updated_at: string
+          void_reason: string | null
+          voided_at: string | null
+          voided_by: string | null
           witnesses: Json | null
         }
         Insert: {
@@ -3543,6 +3707,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           details?: string | null
+          duplicate_of_id?: string | null
+          duplicate_of_number?: string | null
           harassment_type?: string | null
           id?: string
           incident_date?: string | null
@@ -3569,6 +3735,9 @@ export type Database = {
           transferred_to_id?: string | null
           transferred_to_type?: string | null
           updated_at?: string
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
           witnesses?: Json | null
         }
         Update: {
@@ -3578,6 +3747,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           details?: string | null
+          duplicate_of_id?: string | null
+          duplicate_of_number?: string | null
           harassment_type?: string | null
           id?: string
           incident_date?: string | null
@@ -3604,6 +3775,9 @@ export type Database = {
           transferred_to_id?: string | null
           transferred_to_type?: string | null
           updated_at?: string
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
           witnesses?: Json | null
         }
         Relationships: []
@@ -3981,6 +4155,10 @@ export type Database = {
           interview_party_type: string | null
           interview_time: string | null
           interview_type: string
+          location_address: string | null
+          location_name: string | null
+          location_store_number: string | null
+          location_type: string | null
           notes: string | null
           report_id: string
           updated_at: string
@@ -3996,6 +4174,10 @@ export type Database = {
           interview_party_type?: string | null
           interview_time?: string | null
           interview_type: string
+          location_address?: string | null
+          location_name?: string | null
+          location_store_number?: string | null
+          location_type?: string | null
           notes?: string | null
           report_id: string
           updated_at?: string
@@ -4011,6 +4193,10 @@ export type Database = {
           interview_party_type?: string | null
           interview_time?: string | null
           interview_type?: string
+          location_address?: string | null
+          location_name?: string | null
+          location_store_number?: string | null
+          location_type?: string | null
           notes?: string | null
           report_id?: string
           updated_at?: string
@@ -5263,6 +5449,8 @@ export type Database = {
           customer_email: string | null
           customer_name: string | null
           customer_phone: string | null
+          duplicate_of_id: string | null
+          duplicate_of_number: string | null
           has_injury: boolean | null
           id: string
           immediate_action_taken: string | null
@@ -5312,6 +5500,9 @@ export type Database = {
           transferred_to_id: string | null
           transferred_to_type: string | null
           updated_at: string | null
+          void_reason: string | null
+          voided_at: string | null
+          voided_by: string | null
           witnesses: Json | null
         }
         Insert: {
@@ -5323,6 +5514,8 @@ export type Database = {
           customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
+          duplicate_of_id?: string | null
+          duplicate_of_number?: string | null
           has_injury?: boolean | null
           id?: string
           immediate_action_taken?: string | null
@@ -5372,6 +5565,9 @@ export type Database = {
           transferred_to_id?: string | null
           transferred_to_type?: string | null
           updated_at?: string | null
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
           witnesses?: Json | null
         }
         Update: {
@@ -5383,6 +5579,8 @@ export type Database = {
           customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
+          duplicate_of_id?: string | null
+          duplicate_of_number?: string | null
           has_injury?: boolean | null
           id?: string
           immediate_action_taken?: string | null
@@ -5432,6 +5630,9 @@ export type Database = {
           transferred_to_id?: string | null
           transferred_to_type?: string | null
           updated_at?: string | null
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
           witnesses?: Json | null
         }
         Relationships: []
@@ -6978,6 +7179,7 @@ export type Database = {
           status: string | null
           store_number: string
           submitted_by: string | null
+          suffix: string | null
           updated_at: string
           wage: number | null
           wage_within_scale: string | null
@@ -7051,6 +7253,7 @@ export type Database = {
           status?: string | null
           store_number: string
           submitted_by?: string | null
+          suffix?: string | null
           updated_at?: string
           wage?: number | null
           wage_within_scale?: string | null
@@ -7124,6 +7327,7 @@ export type Database = {
           status?: string | null
           store_number?: string
           submitted_by?: string | null
+          suffix?: string | null
           updated_at?: string
           wage?: number | null
           wage_within_scale?: string | null
@@ -7132,6 +7336,41 @@ export type Database = {
           zip?: string | null
         }
         Relationships: []
+      }
+      new_hire_user_notes: {
+        Row: {
+          created_at: string
+          hire_id: string
+          id: string
+          note: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          hire_id: string
+          id?: string
+          note?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          hire_id?: string
+          id?: string
+          note?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "new_hire_user_notes_hire_id_fkey"
+            columns: ["hire_id"]
+            isOneToOne: false
+            referencedRelation: "new_hire_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notification_log: {
         Row: {
@@ -9144,6 +9383,911 @@ export type Database = {
           },
         ]
       }
+      ring_accounts: {
+        Row: {
+          access_token: string
+          access_token_expires_at: string
+          id: string
+          is_active: boolean | null
+          label: string | null
+          last_refreshed_at: string | null
+          refresh_token: string
+          refresh_token_expires_at: string
+        }
+        Insert: {
+          access_token: string
+          access_token_expires_at: string
+          id?: string
+          is_active?: boolean | null
+          label?: string | null
+          last_refreshed_at?: string | null
+          refresh_token: string
+          refresh_token_expires_at: string
+        }
+        Update: {
+          access_token?: string
+          access_token_expires_at?: string
+          id?: string
+          is_active?: boolean | null
+          label?: string | null
+          last_refreshed_at?: string | null
+          refresh_token?: string
+          refresh_token_expires_at?: string
+        }
+        Relationships: []
+      }
+      ring_app_connections: {
+        Row: {
+          attempted_token_count: number | null
+          connected_at: string | null
+          created_at: string | null
+          email: string | null
+          error_message: string | null
+          error_stage: string | null
+          id: string
+          matched_ring_account_id: string | null
+          nonce: string | null
+          ring_patch_response: string | null
+          ring_patch_status: number | null
+          ring_post_response: string | null
+          ring_post_status: number | null
+          ring_query_params: Json | null
+          ring_time: string | null
+          selected_unclaimed_token_id: string | null
+          source: string | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          attempted_token_count?: number | null
+          connected_at?: string | null
+          created_at?: string | null
+          email?: string | null
+          error_message?: string | null
+          error_stage?: string | null
+          id?: string
+          matched_ring_account_id?: string | null
+          nonce?: string | null
+          ring_patch_response?: string | null
+          ring_patch_status?: number | null
+          ring_post_response?: string | null
+          ring_post_status?: number | null
+          ring_query_params?: Json | null
+          ring_time?: string | null
+          selected_unclaimed_token_id?: string | null
+          source?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          attempted_token_count?: number | null
+          connected_at?: string | null
+          created_at?: string | null
+          email?: string | null
+          error_message?: string | null
+          error_stage?: string | null
+          id?: string
+          matched_ring_account_id?: string | null
+          nonce?: string | null
+          ring_patch_response?: string | null
+          ring_patch_status?: number | null
+          ring_post_response?: string | null
+          ring_post_status?: number | null
+          ring_query_params?: Json | null
+          ring_time?: string | null
+          selected_unclaimed_token_id?: string | null
+          source?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      ring_camera_daily_summary: {
+        Row: {
+          last_motion_at: string | null
+          motion_count: number
+          ring_camera_id: string
+          store_id: string | null
+          summary_date: string
+          updated_at: string
+        }
+        Insert: {
+          last_motion_at?: string | null
+          motion_count?: number
+          ring_camera_id: string
+          store_id?: string | null
+          summary_date: string
+          updated_at?: string
+        }
+        Update: {
+          last_motion_at?: string | null
+          motion_count?: number
+          ring_camera_id?: string
+          store_id?: string | null
+          summary_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ring_camera_events: {
+        Row: {
+          amazon_vision_account_id: string | null
+          amazon_vision_device_id: string | null
+          created_at: string | null
+          event_sub_type: string | null
+          event_timestamp: string | null
+          event_type: string
+          has_video: boolean | null
+          id: string
+          raw_event: Json | null
+          received_at: string | null
+          ring_camera_id: string | null
+          store_id: string | null
+          video_fetch_error: string | null
+          video_fetch_status: string | null
+          video_request_body: Json | null
+          video_response_body: string | null
+          video_response_status: number | null
+          video_url_last_fetched_at: string | null
+        }
+        Insert: {
+          amazon_vision_account_id?: string | null
+          amazon_vision_device_id?: string | null
+          created_at?: string | null
+          event_sub_type?: string | null
+          event_timestamp?: string | null
+          event_type: string
+          has_video?: boolean | null
+          id?: string
+          raw_event?: Json | null
+          received_at?: string | null
+          ring_camera_id?: string | null
+          store_id?: string | null
+          video_fetch_error?: string | null
+          video_fetch_status?: string | null
+          video_request_body?: Json | null
+          video_response_body?: string | null
+          video_response_status?: number | null
+          video_url_last_fetched_at?: string | null
+        }
+        Update: {
+          amazon_vision_account_id?: string | null
+          amazon_vision_device_id?: string | null
+          created_at?: string | null
+          event_sub_type?: string | null
+          event_timestamp?: string | null
+          event_type?: string
+          has_video?: boolean | null
+          id?: string
+          raw_event?: Json | null
+          received_at?: string | null
+          ring_camera_id?: string | null
+          store_id?: string | null
+          video_fetch_error?: string | null
+          video_fetch_status?: string | null
+          video_request_body?: Json | null
+          video_response_body?: string | null
+          video_response_status?: number | null
+          video_url_last_fetched_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ring_camera_events_ring_camera_id_fkey"
+            columns: ["ring_camera_id"]
+            isOneToOne: false
+            referencedRelation: "ring_cameras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ring_camera_status: {
+        Row: {
+          consecutive_offline_polls: number | null
+          id: string
+          is_online: boolean
+          last_polled_at: string | null
+          ring_camera_id: string | null
+          updated_at: string | null
+          went_offline_at: string | null
+          went_online_at: string | null
+        }
+        Insert: {
+          consecutive_offline_polls?: number | null
+          id?: string
+          is_online: boolean
+          last_polled_at?: string | null
+          ring_camera_id?: string | null
+          updated_at?: string | null
+          went_offline_at?: string | null
+          went_online_at?: string | null
+        }
+        Update: {
+          consecutive_offline_polls?: number | null
+          id?: string
+          is_online?: boolean
+          last_polled_at?: string | null
+          ring_camera_id?: string | null
+          updated_at?: string | null
+          went_offline_at?: string | null
+          went_online_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ring_camera_status_ring_camera_id_fkey"
+            columns: ["ring_camera_id"]
+            isOneToOne: true
+            referencedRelation: "ring_cameras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ring_camera_status_log: {
+        Row: {
+          downtime_minutes: number | null
+          id: string
+          is_online: boolean
+          polled_at: string | null
+          ring_camera_id: string | null
+        }
+        Insert: {
+          downtime_minutes?: number | null
+          id?: string
+          is_online: boolean
+          polled_at?: string | null
+          ring_camera_id?: string | null
+        }
+        Update: {
+          downtime_minutes?: number | null
+          id?: string
+          is_online?: boolean
+          polled_at?: string | null
+          ring_camera_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ring_camera_status_log_ring_camera_id_fkey"
+            columns: ["ring_camera_id"]
+            isOneToOne: false
+            referencedRelation: "ring_cameras"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ring_cameras: {
+        Row: {
+          amazon_vision_account_id: string | null
+          amazon_vision_device_id: string | null
+          assigned_at: string | null
+          assignment_method: string | null
+          battery_level: number | null
+          camera_location: string | null
+          capabilities: Json | null
+          created_at: string
+          developer_location_id: string | null
+          developer_metadata: Json | null
+          device_kind: string | null
+          device_name: string | null
+          discovered_at: string | null
+          discovery_source: string | null
+          display_name: string | null
+          health_status: string | null
+          id: string
+          integration_source: string
+          is_active: boolean | null
+          last_device_sync_at: string | null
+          last_motion_at: string | null
+          last_offline_at: string | null
+          last_online_at: string | null
+          last_status_check_at: string | null
+          last_status_error: string | null
+          last_status_http_status: number | null
+          last_status_response_text: string | null
+          last_webhook_at: string | null
+          last_webhook_event_type: string | null
+          legacy_ring_device_id: string | null
+          market: string | null
+          migrated_from_legacy: boolean
+          needs_manual_review: boolean | null
+          needs_review: boolean | null
+          notes: string | null
+          offline_check_count: number | null
+          offline_detected_at: string | null
+          online_status: string | null
+          raw_device: Json | null
+          raw_included: Json | null
+          raw_location: Json | null
+          raw_status: Json | null
+          ring_connected_account_id: string | null
+          ring_description: string | null
+          ring_device_id: string | null
+          ring_device_name: string | null
+          ring_location_id: string | null
+          ring_location_name: string | null
+          ring_room_name: string | null
+          role_name: string | null
+          store_id: string
+          store_name: string | null
+          store_number: string | null
+          suggested_market: string | null
+          suggested_store_id: string | null
+          suggested_store_name: string | null
+          suggested_store_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          amazon_vision_account_id?: string | null
+          amazon_vision_device_id?: string | null
+          assigned_at?: string | null
+          assignment_method?: string | null
+          battery_level?: number | null
+          camera_location?: string | null
+          capabilities?: Json | null
+          created_at?: string
+          developer_location_id?: string | null
+          developer_metadata?: Json | null
+          device_kind?: string | null
+          device_name?: string | null
+          discovered_at?: string | null
+          discovery_source?: string | null
+          display_name?: string | null
+          health_status?: string | null
+          id?: string
+          integration_source?: string
+          is_active?: boolean | null
+          last_device_sync_at?: string | null
+          last_motion_at?: string | null
+          last_offline_at?: string | null
+          last_online_at?: string | null
+          last_status_check_at?: string | null
+          last_status_error?: string | null
+          last_status_http_status?: number | null
+          last_status_response_text?: string | null
+          last_webhook_at?: string | null
+          last_webhook_event_type?: string | null
+          legacy_ring_device_id?: string | null
+          market?: string | null
+          migrated_from_legacy?: boolean
+          needs_manual_review?: boolean | null
+          needs_review?: boolean | null
+          notes?: string | null
+          offline_check_count?: number | null
+          offline_detected_at?: string | null
+          online_status?: string | null
+          raw_device?: Json | null
+          raw_included?: Json | null
+          raw_location?: Json | null
+          raw_status?: Json | null
+          ring_connected_account_id?: string | null
+          ring_description?: string | null
+          ring_device_id?: string | null
+          ring_device_name?: string | null
+          ring_location_id?: string | null
+          ring_location_name?: string | null
+          ring_room_name?: string | null
+          role_name?: string | null
+          store_id: string
+          store_name?: string | null
+          store_number?: string | null
+          suggested_market?: string | null
+          suggested_store_id?: string | null
+          suggested_store_name?: string | null
+          suggested_store_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amazon_vision_account_id?: string | null
+          amazon_vision_device_id?: string | null
+          assigned_at?: string | null
+          assignment_method?: string | null
+          battery_level?: number | null
+          camera_location?: string | null
+          capabilities?: Json | null
+          created_at?: string
+          developer_location_id?: string | null
+          developer_metadata?: Json | null
+          device_kind?: string | null
+          device_name?: string | null
+          discovered_at?: string | null
+          discovery_source?: string | null
+          display_name?: string | null
+          health_status?: string | null
+          id?: string
+          integration_source?: string
+          is_active?: boolean | null
+          last_device_sync_at?: string | null
+          last_motion_at?: string | null
+          last_offline_at?: string | null
+          last_online_at?: string | null
+          last_status_check_at?: string | null
+          last_status_error?: string | null
+          last_status_http_status?: number | null
+          last_status_response_text?: string | null
+          last_webhook_at?: string | null
+          last_webhook_event_type?: string | null
+          legacy_ring_device_id?: string | null
+          market?: string | null
+          migrated_from_legacy?: boolean
+          needs_manual_review?: boolean | null
+          needs_review?: boolean | null
+          notes?: string | null
+          offline_check_count?: number | null
+          offline_detected_at?: string | null
+          online_status?: string | null
+          raw_device?: Json | null
+          raw_included?: Json | null
+          raw_location?: Json | null
+          raw_status?: Json | null
+          ring_connected_account_id?: string | null
+          ring_description?: string | null
+          ring_device_id?: string | null
+          ring_device_name?: string | null
+          ring_location_id?: string | null
+          ring_location_name?: string | null
+          ring_room_name?: string | null
+          role_name?: string | null
+          store_id?: string
+          store_name?: string | null
+          store_number?: string | null
+          suggested_market?: string | null
+          suggested_store_id?: string | null
+          suggested_store_name?: string | null
+          suggested_store_number?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ring_connected_accounts: {
+        Row: {
+          access_token: string
+          access_token_expires_at: string | null
+          created_at: string
+          email: string | null
+          id: string
+          last_refreshed_at: string | null
+          refresh_token: string
+          refresh_token_expires_at: string | null
+          ring_account_id: string
+          ring_client_id: string | null
+          status: string
+          token_type: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          access_token_expires_at?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_refreshed_at?: string | null
+          refresh_token: string
+          refresh_token_expires_at?: string | null
+          ring_account_id: string
+          ring_client_id?: string | null
+          status?: string
+          token_type?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          access_token_expires_at?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_refreshed_at?: string | null
+          refresh_token?: string
+          refresh_token_expires_at?: string | null
+          ring_account_id?: string
+          ring_client_id?: string | null
+          status?: string
+          token_type?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ring_live_view_sessions: {
+        Row: {
+          camera_id: string | null
+          connected_at: string | null
+          created_at: string
+          ended_at: string | null
+          error_message: string | null
+          error_stage: string | null
+          id: string
+          session_reference: string | null
+          started_at: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          camera_id?: string | null
+          connected_at?: string | null
+          created_at?: string
+          ended_at?: string | null
+          error_message?: string | null
+          error_stage?: string | null
+          id?: string
+          session_reference?: string | null
+          started_at?: string
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          camera_id?: string | null
+          connected_at?: string | null
+          created_at?: string
+          ended_at?: string | null
+          error_message?: string | null
+          error_stage?: string | null
+          id?: string
+          session_reference?: string | null
+          started_at?: string
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      ring_location_map: {
+        Row: {
+          location_name: string | null
+          ring_location_id: string
+          store_id: string
+        }
+        Insert: {
+          location_name?: string | null
+          ring_location_id: string
+          store_id: string
+        }
+        Update: {
+          location_name?: string | null
+          ring_location_id?: string
+          store_id?: string
+        }
+        Relationships: []
+      }
+      ring_oauth_codes: {
+        Row: {
+          code: string
+          created_at: string | null
+          email: string | null
+          expires_at: string
+          id: string
+          nonce: string | null
+          ring_time: string | null
+          status: string | null
+          used_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          email?: string | null
+          expires_at?: string
+          id?: string
+          nonce?: string | null
+          ring_time?: string | null
+          status?: string | null
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          email?: string | null
+          expires_at?: string
+          id?: string
+          nonce?: string | null
+          ring_time?: string | null
+          status?: string | null
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      ring_oauth_tokens: {
+        Row: {
+          access_token: string
+          created_at: string | null
+          email: string | null
+          expires_at: string | null
+          id: string
+          nonce: string | null
+          refresh_token: string
+          ring_time: string | null
+          user_id: string | null
+        }
+        Insert: {
+          access_token: string
+          created_at?: string | null
+          email?: string | null
+          expires_at?: string | null
+          id?: string
+          nonce?: string | null
+          refresh_token: string
+          ring_time?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          access_token?: string
+          created_at?: string | null
+          email?: string | null
+          expires_at?: string | null
+          id?: string
+          nonce?: string | null
+          refresh_token?: string
+          ring_time?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      ring_permission_payloads: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          payload: Json
+          source_name: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          payload: Json
+          source_name?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          payload?: Json
+          source_name?: string | null
+        }
+        Relationships: []
+      }
+      ring_status_refresh_runs: {
+        Row: {
+          api_calls_attempted: number | null
+          checked_count: number | null
+          error: string | null
+          error_count: number | null
+          finished_at: string | null
+          id: string
+          started_at: string | null
+          success_count: number | null
+          summary: Json | null
+          token_missing_count: number | null
+          triggered_by: string | null
+        }
+        Insert: {
+          api_calls_attempted?: number | null
+          checked_count?: number | null
+          error?: string | null
+          error_count?: number | null
+          finished_at?: string | null
+          id?: string
+          started_at?: string | null
+          success_count?: number | null
+          summary?: Json | null
+          token_missing_count?: number | null
+          triggered_by?: string | null
+        }
+        Update: {
+          api_calls_attempted?: number | null
+          checked_count?: number | null
+          error?: string | null
+          error_count?: number | null
+          finished_at?: string | null
+          id?: string
+          started_at?: string | null
+          success_count?: number | null
+          summary?: Json | null
+          token_missing_count?: number | null
+          triggered_by?: string | null
+        }
+        Relationships: []
+      }
+      ring_token_exchange_events: {
+        Row: {
+          client_secret_length: number | null
+          error: string | null
+          extracted_ring_account_id: string | null
+          has_client_secret: boolean | null
+          has_redirect_uri: boolean | null
+          headers: Json | null
+          id: string
+          method: string | null
+          oauth_auth_method: string | null
+          oauth_response_headers: Json | null
+          oauth_response_text: string | null
+          oauth_status: number | null
+          oauth_url: string | null
+          outbound_client_id: string | null
+          outbound_grant_type: string | null
+          outbound_param_names: string[] | null
+          outbound_redirect_uri: string | null
+          payload: Json | null
+          raw_body: string | null
+          received_at: string | null
+          redirect_uri_length: number | null
+          status: string | null
+          users_me_response_text: string | null
+          users_me_status: number | null
+        }
+        Insert: {
+          client_secret_length?: number | null
+          error?: string | null
+          extracted_ring_account_id?: string | null
+          has_client_secret?: boolean | null
+          has_redirect_uri?: boolean | null
+          headers?: Json | null
+          id?: string
+          method?: string | null
+          oauth_auth_method?: string | null
+          oauth_response_headers?: Json | null
+          oauth_response_text?: string | null
+          oauth_status?: number | null
+          oauth_url?: string | null
+          outbound_client_id?: string | null
+          outbound_grant_type?: string | null
+          outbound_param_names?: string[] | null
+          outbound_redirect_uri?: string | null
+          payload?: Json | null
+          raw_body?: string | null
+          received_at?: string | null
+          redirect_uri_length?: number | null
+          status?: string | null
+          users_me_response_text?: string | null
+          users_me_status?: number | null
+        }
+        Update: {
+          client_secret_length?: number | null
+          error?: string | null
+          extracted_ring_account_id?: string | null
+          has_client_secret?: boolean | null
+          has_redirect_uri?: boolean | null
+          headers?: Json | null
+          id?: string
+          method?: string | null
+          oauth_auth_method?: string | null
+          oauth_response_headers?: Json | null
+          oauth_response_text?: string | null
+          oauth_status?: number | null
+          oauth_url?: string | null
+          outbound_client_id?: string | null
+          outbound_grant_type?: string | null
+          outbound_param_names?: string[] | null
+          outbound_redirect_uri?: string | null
+          payload?: Json | null
+          raw_body?: string | null
+          received_at?: string | null
+          redirect_uri_length?: number | null
+          status?: string | null
+          users_me_response_text?: string | null
+          users_me_status?: number | null
+        }
+        Relationships: []
+      }
+      ring_unclaimed_tokens: {
+        Row: {
+          access_token: string
+          claimed_at: string | null
+          claimed_by_email: string | null
+          claimed_by_user_id: string | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          raw_token_response: Json | null
+          raw_user_response: Json | null
+          refresh_token: string
+          ring_account_id: string
+          status: string | null
+          token_type: string | null
+        }
+        Insert: {
+          access_token: string
+          claimed_at?: string | null
+          claimed_by_email?: string | null
+          claimed_by_user_id?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          raw_token_response?: Json | null
+          raw_user_response?: Json | null
+          refresh_token: string
+          ring_account_id: string
+          status?: string | null
+          token_type?: string | null
+        }
+        Update: {
+          access_token?: string
+          claimed_at?: string | null
+          claimed_by_email?: string | null
+          claimed_by_user_id?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          raw_token_response?: Json | null
+          raw_user_response?: Json | null
+          refresh_token?: string
+          ring_account_id?: string
+          status?: string | null
+          token_type?: string | null
+        }
+        Relationships: []
+      }
+      ring_video_download_jobs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          event_id: string
+          http_status: number | null
+          id: string
+          requested_by: string | null
+          status: string
+          updated_at: string
+          video_url: string | null
+          video_url_expires_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          event_id: string
+          http_status?: number | null
+          id?: string
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+          video_url?: string | null
+          video_url_expires_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          event_id?: string
+          http_status?: number | null
+          id?: string
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+          video_url?: string | null
+          video_url_expires_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ring_video_download_jobs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "ring_camera_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ring_webhook_events: {
+        Row: {
+          event_type: string | null
+          headers: Json | null
+          id: string
+          payload: Json | null
+          raw_body: string | null
+          received_at: string
+        }
+        Insert: {
+          event_type?: string | null
+          headers?: Json | null
+          id?: string
+          payload?: Json | null
+          raw_body?: string | null
+          received_at?: string
+        }
+        Update: {
+          event_type?: string | null
+          headers?: Json | null
+          id?: string
+          payload?: Json | null
+          raw_body?: string | null
+          received_at?: string
+        }
+        Relationships: []
+      }
       role_definitions: {
         Row: {
           created_at: string | null
@@ -9637,6 +10781,10 @@ export type Database = {
           internet_provider: string | null
           key_holder_names: string | null
           notice_required: string | null
+          pest_account_number: string | null
+          pest_contact_phone: string | null
+          pest_password: string | null
+          pest_provider: string | null
           phone_account_number: string | null
           phone_provider: string | null
           property_address: string | null
@@ -9681,6 +10829,10 @@ export type Database = {
           internet_provider?: string | null
           key_holder_names?: string | null
           notice_required?: string | null
+          pest_account_number?: string | null
+          pest_contact_phone?: string | null
+          pest_password?: string | null
+          pest_provider?: string | null
           phone_account_number?: string | null
           phone_provider?: string | null
           property_address?: string | null
@@ -9725,6 +10877,10 @@ export type Database = {
           internet_provider?: string | null
           key_holder_names?: string | null
           notice_required?: string | null
+          pest_account_number?: string | null
+          pest_contact_phone?: string | null
+          pest_password?: string | null
+          pest_provider?: string | null
           phone_account_number?: string | null
           phone_provider?: string | null
           property_address?: string | null
@@ -10085,6 +11241,60 @@ export type Database = {
         }
         Relationships: []
       }
+      survey_store_department_score: {
+        Row: {
+          audit_date: string
+          bread_baking: number | null
+          cleanliness: number | null
+          customer_service: number | null
+          equipment: number | null
+          formulas_product_freshness: number | null
+          franchisee: string | null
+          id: number
+          ingested_at: string
+          overall_score: number | null
+          sandwich_preparation: number | null
+          source_file: string | null
+          store_number: number
+          systems_procedures: number | null
+          uniforms: number | null
+        }
+        Insert: {
+          audit_date: string
+          bread_baking?: number | null
+          cleanliness?: number | null
+          customer_service?: number | null
+          equipment?: number | null
+          formulas_product_freshness?: number | null
+          franchisee?: string | null
+          id?: never
+          ingested_at?: string
+          overall_score?: number | null
+          sandwich_preparation?: number | null
+          source_file?: string | null
+          store_number: number
+          systems_procedures?: number | null
+          uniforms?: number | null
+        }
+        Update: {
+          audit_date?: string
+          bread_baking?: number | null
+          cleanliness?: number | null
+          customer_service?: number | null
+          equipment?: number | null
+          formulas_product_freshness?: number | null
+          franchisee?: string | null
+          id?: never
+          ingested_at?: string
+          overall_score?: number | null
+          sandwich_preparation?: number | null
+          source_file?: string | null
+          store_number?: number
+          systems_procedures?: number | null
+          uniforms?: number | null
+        }
+        Relationships: []
+      }
       sync_history: {
         Row: {
           connection_id: string
@@ -10131,6 +11341,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      system_cleanup_runs: {
+        Row: {
+          deleted_counts: Json
+          error: string | null
+          finished_at: string | null
+          id: string
+          job_name: string
+          started_at: string
+        }
+        Insert: {
+          deleted_counts?: Json
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          job_name: string
+          started_at?: string
+        }
+        Update: {
+          deleted_counts?: Json
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          job_name?: string
+          started_at?: string
+        }
+        Relationships: []
       }
       systems_access: {
         Row: {
@@ -11156,6 +12393,41 @@ export type Database = {
           week_ending?: string | null
         }
         Relationships: []
+      }
+      wep_cash_count_notes: {
+        Row: {
+          count_id: string
+          created_at: string
+          created_by_name: string
+          created_by_user_id: string | null
+          id: string
+          note_text: string
+        }
+        Insert: {
+          count_id: string
+          created_at?: string
+          created_by_name: string
+          created_by_user_id?: string | null
+          id?: string
+          note_text: string
+        }
+        Update: {
+          count_id?: string
+          created_at?: string
+          created_by_name?: string
+          created_by_user_id?: string | null
+          id?: string
+          note_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wep_cash_count_notes_count_id_fkey"
+            columns: ["count_id"]
+            isOneToOne: false
+            referencedRelation: "wep_cash_counts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       wep_cash_counts: {
         Row: {
@@ -12637,6 +13909,10 @@ export type Database = {
         Args: { target_store_number: string; target_user_id: string }
         Returns: undefined
       }
+      archive_new_hire_now: {
+        Args: { _new_hire_id: string; _notes?: string; _reason: string }
+        Returns: string
+      }
       business_days_between: {
         Args: { end_date: string; start_date: string }
         Returns: number
@@ -13161,6 +14437,23 @@ export type Database = {
           training_type: string
         }[]
       }
+      get_lead_reps_summary:
+        | {
+            Args: never
+            Returns: {
+              created_by: string
+              interaction_count: number
+              lead_id: string
+            }[]
+          }
+        | {
+            Args: { _limit?: number; _offset?: number }
+            Returns: {
+              created_by: string
+              interaction_count: number
+              lead_id: string
+            }[]
+          }
       get_manager_approval_requests: {
         Args: { p_manager_user_id?: string }
         Returns: {
@@ -13566,6 +14859,10 @@ export type Database = {
           internet_provider: string | null
           key_holder_names: string | null
           notice_required: string | null
+          pest_account_number: string | null
+          pest_contact_phone: string | null
+          pest_password: string | null
+          pest_provider: string | null
           phone_account_number: string | null
           phone_provider: string | null
           property_address: string | null
@@ -13954,6 +15251,7 @@ export type Database = {
         Returns: undefined
       }
       rollback_work_orders_migration: { Args: never; Returns: undefined }
+      run_ring_cleanup: { Args: never; Returns: string }
       start_archive_workflow:
         | {
             Args: {
@@ -14087,6 +15385,22 @@ export type Database = {
           p_training_version?: string
         }
         Returns: string
+      }
+      submit_incident_rca: {
+        Args: {
+          p_completed_by: string
+          p_incident_id: string
+          p_rca_comments: string
+          p_rca_employee_rushing: boolean
+          p_rca_employee_trained: boolean
+          p_rca_equipment_used: string
+          p_rca_equipment_working_order: boolean
+          p_rca_ppe_required: boolean
+          p_rca_ppe_used: boolean
+          p_rca_surface_wet: boolean
+          p_rca_work_area_lit: boolean
+        }
+        Returns: undefined
       }
       submit_onboarding_survey_response: {
         Args: {
