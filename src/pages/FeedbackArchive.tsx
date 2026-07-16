@@ -318,7 +318,7 @@ export default function FeedbackArchive() {
               Feedback Archive
             </h1>
             <p className="text-muted-foreground mt-1">
-              Browse and manage resolved feedback cases
+              Browse resolved and acknowledged feedback cases
             </p>
           </div>
           <div className="flex items-center gap-2">
