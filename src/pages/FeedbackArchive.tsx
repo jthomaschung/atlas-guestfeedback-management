@@ -60,7 +60,7 @@ export default function FeedbackArchive() {
       const { data, error } = await supabase
         .from('customer_feedback')
         .select('*')
-        .eq('resolution_status', 'resolved')
+        .in('resolution_status', ['resolved', 'acknowledged'])
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
@@ -318,7 +318,7 @@ export default function FeedbackArchive() {
               Feedback Archive
             </h1>
             <p className="text-muted-foreground mt-1">
-              Browse and manage resolved feedback cases
+              Browse resolved and acknowledged feedback cases
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -327,7 +327,7 @@ export default function FeedbackArchive() {
               Export CSV
             </Button>
             <Badge variant="secondary" className="text-sm">
-              {filteredFeedbacks.length} Resolved Cases
+              {filteredFeedbacks.length} Archived Cases
             </Badge>
           </div>
         </div>
@@ -337,9 +337,9 @@ export default function FeedbackArchive() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Resolved Feedback Cases</CardTitle>
+          <CardTitle>Archived Feedback Cases</CardTitle>
           <CardDescription>
-            Feedback cases that have been marked as resolved
+            Feedback cases that have been resolved or acknowledged (FYI)
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -389,7 +389,7 @@ export default function FeedbackArchive() {
             {filteredFeedbacks.length === 0 ? (
               <div className="text-center py-8">
                 <Archive className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No resolved feedback cases found.</p>
+                <p className="text-muted-foreground">No archived feedback cases found.</p>
               </div>
             ) : (
               <CustomerFeedbackTable
