@@ -337,9 +337,9 @@ export default function FeedbackArchive() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Resolved Feedback Cases</CardTitle>
+          <CardTitle>Archived Feedback Cases</CardTitle>
           <CardDescription>
-            Feedback cases that have been marked as resolved
+            Feedback cases that have been resolved or acknowledged (FYI)
           </CardDescription>
         </CardHeader>
         <CardContent>
