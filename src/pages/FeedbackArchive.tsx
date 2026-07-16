@@ -60,7 +60,7 @@ export default function FeedbackArchive() {
       const { data, error } = await supabase
         .from('customer_feedback')
         .select('*')
-        .eq('resolution_status', 'resolved')
+        .in('resolution_status', ['resolved', 'acknowledged'])
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
