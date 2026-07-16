@@ -327,7 +327,7 @@ export default function FeedbackArchive() {
               Export CSV
             </Button>
             <Badge variant="secondary" className="text-sm">
-              {filteredFeedbacks.length} Resolved Cases
+              {filteredFeedbacks.length} Archived Cases
             </Badge>
           </div>
         </div>
