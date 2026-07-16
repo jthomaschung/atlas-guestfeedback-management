@@ -389,7 +389,7 @@ export default function FeedbackArchive() {
             {filteredFeedbacks.length === 0 ? (
               <div className="text-center py-8">
                 <Archive className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No resolved feedback cases found.</p>
+                <p className="text-muted-foreground">No archived feedback cases found.</p>
               </div>
             ) : (
               <CustomerFeedbackTable
