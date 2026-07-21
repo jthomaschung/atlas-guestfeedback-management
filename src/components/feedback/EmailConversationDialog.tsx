@@ -132,6 +132,7 @@ export function EmailConversationDialog({
 
   useEffect(() => {
     if (isOpen && feedbackId) {
+      acknowledgedRef.current = false;
       loadEmailConversation();
     }
   }, [isOpen, feedbackId]);
