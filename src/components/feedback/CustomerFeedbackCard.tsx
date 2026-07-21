@@ -252,7 +252,7 @@ function CustomerFeedbackCardComponent({
                   {feedback.case_number}
                 </Badge>
               )}
-              {feedback.customer_responded_at && (
+              {feedback.customer_responded_at && (!feedback.customer_response_acknowledged_at || new Date(feedback.customer_response_acknowledged_at) < new Date(feedback.customer_responded_at)) && (
                 <Badge
                   className={cn(
                     "text-xs flex items-center gap-1 animate-pulse",

@@ -2260,6 +2260,7 @@ export type Database = {
           customer_name: string | null
           customer_phone: string | null
           customer_responded_at: string | null
+          customer_response_acknowledged_at: string | null
           customer_response_sentiment: string | null
           director_approved_at: string | null
           dm_approved_at: string | null
@@ -2306,6 +2307,7 @@ export type Database = {
           customer_name?: string | null
           customer_phone?: string | null
           customer_responded_at?: string | null
+          customer_response_acknowledged_at?: string | null
           customer_response_sentiment?: string | null
           director_approved_at?: string | null
           dm_approved_at?: string | null
@@ -2352,6 +2354,7 @@ export type Database = {
           customer_name?: string | null
           customer_phone?: string | null
           customer_responded_at?: string | null
+          customer_response_acknowledged_at?: string | null
           customer_response_sentiment?: string | null
           director_approved_at?: string | null
           dm_approved_at?: string | null

@@ -184,6 +184,7 @@ const Index = () => {
         time_of_day: item.time_of_day,
         customer_responded_at: item.customer_responded_at,
         customer_response_sentiment: item.customer_response_sentiment,
+        customer_response_acknowledged_at: item.customer_response_acknowledged_at,
         outreach_sent_at: item.outreach_sent_at,
         outreach_method: item.outreach_method,
       });
@@ -551,6 +552,7 @@ const Index = () => {
           time_of_day: data.time_of_day,
           customer_responded_at: data.customer_responded_at,
           customer_response_sentiment: data.customer_response_sentiment,
+          customer_response_acknowledged_at: data.customer_response_acknowledged_at,
           outreach_sent_at: data.outreach_sent_at,
           outreach_method: data.outreach_method,
         };

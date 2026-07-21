@@ -115,6 +115,7 @@ const OpenFeedback = () => {
     outreach_method: item.outreach_method,
     customer_responded_at: item.customer_responded_at,
     customer_response_sentiment: item.customer_response_sentiment,
+    customer_response_acknowledged_at: item.customer_response_acknowledged_at,
     escalated_at: item.escalated_at,
     escalated_by: item.escalated_by,
     executive_notes: item.executive_notes,
@@ -136,7 +137,7 @@ const OpenFeedback = () => {
     'case_number', 'customer_name', 'customer_email', 'customer_phone',
     'feedback_text', 'user_id', 'created_at', 'updated_at', 'priority',
     'assignee', 'viewed', 'customer_called', 'outreach_sent_at',
-    'outreach_method', 'customer_responded_at', 'customer_response_sentiment',
+    'outreach_method', 'customer_responded_at', 'customer_response_sentiment', 'customer_response_acknowledged_at',
     'sla_deadline', 'escalated_at', 'time_of_day', 'order_number',
     'period', 'ee_action', 'type_of_feedback', 'reward', 'feedback_source',
   ].join(',');
