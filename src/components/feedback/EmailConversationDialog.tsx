@@ -68,6 +68,7 @@ export function EmailConversationDialog({
   };
 
   const acknowledgedRef = useRef(false);
+  const userScrolledRef = useRef(false);
   const markResponseAcknowledged = async () => {
     if (acknowledgedRef.current) return;
     acknowledgedRef.current = true;
@@ -82,6 +83,14 @@ export function EmailConversationDialog({
       acknowledgedRef.current = false;
     }
   };
+
+  // Reset per-open guards
+  useEffect(() => {
+    if (isOpen) {
+      acknowledgedRef.current = false;
+      userScrolledRef.current = false;
+    }
+  }, [isOpen, feedbackId]);
 
   // Check if feedback is critical or escalated - requires custom message only
   const isCriticalOrEscalated = feedback?.priority === 'Critical' || 
