@@ -51,7 +51,21 @@ export function EmailConversationDialog({
   const [actionTaken, setActionTaken] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [loading, setLoading] = useState(false);
+  const replyTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const { toast } = useToast();
+
+  // Detect if the customer has replied and it's still awaiting a response from us
+  const lastMessage = messages[messages.length - 1];
+  const awaitingResponse = lastMessage?.direction === 'inbound';
+
+  const handleRespondToCustomer = () => {
+    setSelectedTemplate('custom');
+    setShowAddCustomerReply(false);
+    setTimeout(() => {
+      replyTextareaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      replyTextareaRef.current?.focus();
+    }, 50);
+  };
 
   // Check if feedback is critical or escalated - requires custom message only
   const isCriticalOrEscalated = feedback?.priority === 'Critical' || 
