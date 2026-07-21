@@ -67,6 +67,18 @@ export function EmailConversationDialog({
     }, 50);
   };
 
+  const markResponseAcknowledged = async () => {
+    try {
+      await supabase
+        .from('customer_feedback')
+        .update({ customer_response_acknowledged_at: new Date().toISOString() })
+        .eq('id', feedbackId);
+      onConversationUpdated?.();
+    } catch (err) {
+      console.error('Failed to mark response acknowledged:', err);
+    }
+  };
+
   // Check if feedback is critical or escalated - requires custom message only
   const isCriticalOrEscalated = feedback?.priority === 'Critical' || 
                                  feedback?.resolution_status === 'escalated';
