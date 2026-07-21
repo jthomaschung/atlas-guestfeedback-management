@@ -182,6 +182,10 @@ const Index = () => {
         order_number: item.order_number,
         period: item.period,
         time_of_day: item.time_of_day,
+        customer_responded_at: item.customer_responded_at,
+        customer_response_sentiment: item.customer_response_sentiment,
+        outreach_sent_at: item.outreach_sent_at,
+        outreach_method: item.outreach_method,
       });
       
       // Fetch feedback in pages. Render the first page immediately so route changes
