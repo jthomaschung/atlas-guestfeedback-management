@@ -115,6 +115,7 @@ const OpenFeedback = () => {
     outreach_method: item.outreach_method,
     customer_responded_at: item.customer_responded_at,
     customer_response_sentiment: item.customer_response_sentiment,
+    customer_response_acknowledged_at: item.customer_response_acknowledged_at,
     escalated_at: item.escalated_at,
     escalated_by: item.escalated_by,
     executive_notes: item.executive_notes,
