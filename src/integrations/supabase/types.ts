@@ -3154,6 +3154,312 @@ export type Database = {
         }
         Relationships: []
       }
+      dmr_report_archives: {
+        Row: {
+          approval_reminder_count: number
+          approval_reminder_last_sent_at: string | null
+          approval_reminder_recipient: string
+          approval_reminder_started_at: string | null
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          filename: string
+          id: string
+          period_end: string
+          period_number: number
+          period_start: string
+          range_end: string
+          range_start: string
+          recipients: string[]
+          reps_count: number
+          sendgrid_status: string | null
+          sent_at: string
+          storage_path: string
+          total_approvable_miles: number
+          total_miles: number
+          total_trips: number
+          triggered_by: string
+          triggered_by_user_id: string | null
+        }
+        Insert: {
+          approval_reminder_count?: number
+          approval_reminder_last_sent_at?: string | null
+          approval_reminder_recipient?: string
+          approval_reminder_started_at?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          filename: string
+          id?: string
+          period_end: string
+          period_number: number
+          period_start: string
+          range_end: string
+          range_start: string
+          recipients?: string[]
+          reps_count?: number
+          sendgrid_status?: string | null
+          sent_at?: string
+          storage_path: string
+          total_approvable_miles?: number
+          total_miles?: number
+          total_trips?: number
+          triggered_by?: string
+          triggered_by_user_id?: string | null
+        }
+        Update: {
+          approval_reminder_count?: number
+          approval_reminder_last_sent_at?: string | null
+          approval_reminder_recipient?: string
+          approval_reminder_started_at?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          filename?: string
+          id?: string
+          period_end?: string
+          period_number?: number
+          period_start?: string
+          range_end?: string
+          range_start?: string
+          recipients?: string[]
+          reps_count?: number
+          sendgrid_status?: string | null
+          sent_at?: string
+          storage_path?: string
+          total_approvable_miles?: number
+          total_miles?: number
+          total_trips?: number
+          triggered_by?: string
+          triggered_by_user_id?: string | null
+        }
+        Relationships: []
+      }
+      ecosure_assessments: {
+        Row: {
+          address: string | null
+          advisor_id: string | null
+          brand: string | null
+          city: string | null
+          created_at: string | null
+          email_message_id: string | null
+          end_datetime: string | null
+          id: string
+          manager_name: string | null
+          manager_signature_date: string | null
+          parse_warnings: Json | null
+          report_generated: string | null
+          restaurant_name: string | null
+          risk_level: string | null
+          score_pct: number | null
+          source_pdf_path: string | null
+          start_datetime: string | null
+          state: string | null
+          store_type: string | null
+          summary: Json | null
+          unit_number: string
+          visit: number | null
+          zip: string | null
+        }
+        Insert: {
+          address?: string | null
+          advisor_id?: string | null
+          brand?: string | null
+          city?: string | null
+          created_at?: string | null
+          email_message_id?: string | null
+          end_datetime?: string | null
+          id?: string
+          manager_name?: string | null
+          manager_signature_date?: string | null
+          parse_warnings?: Json | null
+          report_generated?: string | null
+          restaurant_name?: string | null
+          risk_level?: string | null
+          score_pct?: number | null
+          source_pdf_path?: string | null
+          start_datetime?: string | null
+          state?: string | null
+          store_type?: string | null
+          summary?: Json | null
+          unit_number: string
+          visit?: number | null
+          zip?: string | null
+        }
+        Update: {
+          address?: string | null
+          advisor_id?: string | null
+          brand?: string | null
+          city?: string | null
+          created_at?: string | null
+          email_message_id?: string | null
+          end_datetime?: string | null
+          id?: string
+          manager_name?: string | null
+          manager_signature_date?: string | null
+          parse_warnings?: Json | null
+          report_generated?: string | null
+          restaurant_name?: string | null
+          risk_level?: string | null
+          score_pct?: number | null
+          source_pdf_path?: string | null
+          start_datetime?: string | null
+          state?: string | null
+          store_type?: string | null
+          summary?: Json | null
+          unit_number?: string
+          visit?: number | null
+          zip?: string | null
+        }
+        Relationships: []
+      }
+      ecosure_detailed_standards: {
+        Row: {
+          answer: string | null
+          assessment_id: string
+          category: string | null
+          code: string | null
+          created_at: string | null
+          id: string
+          passed: boolean | null
+          question: string | null
+        }
+        Insert: {
+          answer?: string | null
+          assessment_id: string
+          category?: string | null
+          code?: string | null
+          created_at?: string | null
+          id?: string
+          passed?: boolean | null
+          question?: string | null
+        }
+        Update: {
+          answer?: string | null
+          assessment_id?: string
+          category?: string | null
+          code?: string | null
+          created_at?: string | null
+          id?: string
+          passed?: boolean | null
+          question?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ecosure_detailed_standards_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "ecosure_assessment_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecosure_detailed_standards_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "ecosure_assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ecosure_photos: {
+        Row: {
+          assessment_id: string
+          created_at: string | null
+          id: string
+          page: number | null
+          photo_index: number | null
+          public_url: string | null
+          storage_path: string | null
+          violation_code: string | null
+        }
+        Insert: {
+          assessment_id: string
+          created_at?: string | null
+          id?: string
+          page?: number | null
+          photo_index?: number | null
+          public_url?: string | null
+          storage_path?: string | null
+          violation_code?: string | null
+        }
+        Update: {
+          assessment_id?: string
+          created_at?: string | null
+          id?: string
+          page?: number | null
+          photo_index?: number | null
+          public_url?: string | null
+          storage_path?: string | null
+          violation_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ecosure_photos_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "ecosure_assessment_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecosure_photos_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "ecosure_assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ecosure_violations: {
+        Row: {
+          assessment_id: string
+          category: string | null
+          code: string | null
+          created_at: string | null
+          findings: Json | null
+          id: string
+          priority: string | null
+          question: string | null
+          response: string | null
+        }
+        Insert: {
+          assessment_id: string
+          category?: string | null
+          code?: string | null
+          created_at?: string | null
+          findings?: Json | null
+          id?: string
+          priority?: string | null
+          question?: string | null
+          response?: string | null
+        }
+        Update: {
+          assessment_id?: string
+          category?: string | null
+          code?: string | null
+          created_at?: string | null
+          findings?: Json | null
+          id?: string
+          priority?: string | null
+          question?: string | null
+          response?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ecosure_violations_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "ecosure_assessment_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecosure_violations_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "ecosure_assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_campaigns: {
         Row: {
           content: Json
@@ -6824,6 +7130,134 @@ export type Database = {
             referencedColumns: ["profile_id"]
           },
         ]
+      }
+      mileage_approvals: {
+        Row: {
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          id: string
+          notes: string | null
+          period_end: string
+          period_start: string
+          reimbursement: number
+          status: string
+          total_miles: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          notes?: string | null
+          period_end: string
+          period_start: string
+          reimbursement?: number
+          status?: string
+          total_miles?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          notes?: string | null
+          period_end?: string
+          period_start?: string
+          reimbursement?: number
+          status?: string
+          total_miles?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mileage_trip_stops: {
+        Row: {
+          created_at: string
+          custom_address: string | null
+          custom_label: string | null
+          id: string
+          leg_miles_from_previous: number
+          sequence: number
+          store_number: string | null
+          trip_id: string
+        }
+        Insert: {
+          created_at?: string
+          custom_address?: string | null
+          custom_label?: string | null
+          id?: string
+          leg_miles_from_previous?: number
+          sequence: number
+          store_number?: string | null
+          trip_id: string
+        }
+        Update: {
+          created_at?: string
+          custom_address?: string | null
+          custom_label?: string | null
+          id?: string
+          leg_miles_from_previous?: number
+          sequence?: number
+          store_number?: string | null
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mileage_trip_stops_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "mileage_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mileage_trips: {
+        Row: {
+          created_at: string
+          excluded_at: string | null
+          excluded_by: string | null
+          excluded_from_approval: boolean
+          home_store_number: string
+          id: string
+          notes: string | null
+          total_miles: number
+          trip_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          excluded_at?: string | null
+          excluded_by?: string | null
+          excluded_from_approval?: boolean
+          home_store_number: string
+          id?: string
+          notes?: string | null
+          total_miles?: number
+          trip_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          excluded_at?: string | null
+          excluded_by?: string | null
+          excluded_from_approval?: boolean
+          home_store_number?: string
+          id?: string
+          notes?: string | null
+          total_miles?: number
+          trip_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       new_hire_setup_tasks: {
         Row: {
@@ -13635,6 +14069,54 @@ export type Database = {
             referencedColumns: ["store_number"]
           },
         ]
+      }
+      ecosure_assessment_overview: {
+        Row: {
+          city: string | null
+          critical_count: number | null
+          id: string | null
+          major_count: number | null
+          minor_count: number | null
+          photo_count: number | null
+          restaurant_name: string | null
+          risk_level: string | null
+          score_pct: number | null
+          start_datetime: string | null
+          state: string | null
+          unit_number: string | null
+          violation_count: number | null
+        }
+        Insert: {
+          city?: string | null
+          critical_count?: never
+          id?: string | null
+          major_count?: never
+          minor_count?: never
+          photo_count?: never
+          restaurant_name?: string | null
+          risk_level?: string | null
+          score_pct?: number | null
+          start_datetime?: string | null
+          state?: string | null
+          unit_number?: string | null
+          violation_count?: never
+        }
+        Update: {
+          city?: string | null
+          critical_count?: never
+          id?: string | null
+          major_count?: never
+          minor_count?: never
+          photo_count?: never
+          restaurant_name?: string | null
+          risk_level?: string | null
+          score_pct?: number | null
+          start_datetime?: string | null
+          state?: string | null
+          unit_number?: string | null
+          violation_count?: never
+        }
+        Relationships: []
       }
       house_account_open_balances: {
         Row: {
