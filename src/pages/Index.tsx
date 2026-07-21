@@ -552,6 +552,7 @@ const Index = () => {
           time_of_day: data.time_of_day,
           customer_responded_at: data.customer_responded_at,
           customer_response_sentiment: data.customer_response_sentiment,
+          customer_response_acknowledged_at: data.customer_response_acknowledged_at,
           outreach_sent_at: data.outreach_sent_at,
           outreach_method: data.outreach_method,
         };
