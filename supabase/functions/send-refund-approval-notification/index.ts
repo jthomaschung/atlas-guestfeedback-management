@@ -96,7 +96,7 @@ serve(async (req: Request) => {
         },
         body: JSON.stringify({
           personalizations: [{ to: [{ email: customEmail.to }], subject: customEmail.subject }],
-          from: { email: "guest.feedback@atlaswe.com", name: "Guest Feedback System" },
+          from: { email: "guestfeedback@feedback.atlaswe.com", name: "Guest Feedback System" },
           content: [{ type: "text/html", value: customHtml }],
         }),
       });
@@ -171,7 +171,7 @@ serve(async (req: Request) => {
               { to: [{ email: r.email }], subject: `${subject} (${r.role})` },
             ],
             from: {
-              email: "guest.feedback@atlaswe.com",
+              email: "guestfeedback@feedback.atlaswe.com",
               name: "Guest Feedback System",
             },
             content: [{ type: "text/html", value: htmlContent }],
