@@ -1,0 +1,1 @@
+UPDATE public.customer_feedback SET customer_response_acknowledged_at = NULL WHERE case_number = 'TEST-20260721204943';
