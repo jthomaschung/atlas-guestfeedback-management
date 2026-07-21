@@ -219,6 +219,7 @@ export function EmailConversationDialog({
       setResolutionNotes("");
       setActionTaken("");
       loadEmailConversation(); // Reload to show the new message
+      markResponseAcknowledged();
       onConversationUpdated?.();
     } catch (error) {
       console.error('Error sending reply:', error);
