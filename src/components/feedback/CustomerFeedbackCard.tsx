@@ -252,6 +252,20 @@ function CustomerFeedbackCardComponent({
                   {feedback.case_number}
                 </Badge>
               )}
+              {feedback.customer_responded_at && (
+                <Badge
+                  className={cn(
+                    "text-xs flex items-center gap-1 animate-pulse",
+                    isEscalated
+                      ? "bg-white text-red-600"
+                      : "bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700"
+                  )}
+                  title={`Customer replied ${format(new Date(feedback.customer_responded_at), 'MMM d, yyyy h:mm a')}`}
+                >
+                  <MessageCircle className="h-3 w-3" />
+                  New Reply
+                </Badge>
+              )}
             </div>
             
             {canEditCategory ? (
