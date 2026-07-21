@@ -20,6 +20,11 @@ import { CleanlinessEmail } from './_templates/cleanliness-email.tsx';
 import { LoyaltyIssuesEmail } from './_templates/loyalty-issues-email.tsx';
 import { FoodPoisoningEmail } from './_templates/food-poisoning-email.tsx';
 
+type SupabaseClient = ReturnType<typeof createClient>;
+
+const DEFAULT_OUTREACH_FROM_EMAIL = 'guestfeedback@feedback.atlaswe.com';
+const DEFAULT_OUTREACH_REPLY_TO_EMAIL = 'guestfeedback@feedback.atlaswe.com';
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -79,7 +84,10 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     
-    console.log('Using SendGrid API key (first 10 chars):', sendGridApiKey.substring(0, 10));
+    const fromEmail = Deno.env.get('SENDGRID_FROM_EMAIL')?.trim() || DEFAULT_OUTREACH_FROM_EMAIL;
+    const replyToEmail = Deno.env.get('SENDGRID_REPLY_TO_EMAIL')?.trim() || DEFAULT_OUTREACH_REPLY_TO_EMAIL;
+
+    console.log('SendGrid API key configured:', !!sendGridApiKey);
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
@@ -130,7 +138,7 @@ const handler = async (req: Request): Promise<Response> => {
         message_content: messageContent || `Thank you for your feedback regarding your visit to our store #${feedback.store_number}. We take all customer feedback seriously and are working to address your concerns.`,
         delivery_status: 'pending',
         email_thread_id: emailThreadId,
-        from_email: 'guest.feedback@atlaswe.com',
+        from_email: fromEmail,
         to_email: feedback.customer_email
       })
       .select()
@@ -151,6 +159,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailContent = await generateEmailContent(
       selectedTemplateType,
       feedback,
+      supabase,
       {
         messageContent,
         customSubject,
@@ -163,7 +172,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     try {
       console.log('Attempting to send email with config:', {
-        from: 'guest.feedback@atlaswe.com',
+        from: fromEmail,
         to: feedback.customer_email,
         subject: emailContent.subject,
         htmlLength: emailContent.html.length
@@ -181,11 +190,11 @@ const handler = async (req: Request): Promise<Response> => {
           }
         ],
         from: {
-          email: 'guest.feedback@atlaswe.com',
+          email: fromEmail,
           name: 'Guest Feedback Team'
         },
         reply_to: {
-          email: 'guest.feedback@atlaswe.com',
+          email: replyToEmail,
           name: 'Guest Feedback Team'
         },
         subject: emailContent.subject,
@@ -212,7 +221,13 @@ const handler = async (req: Request): Promise<Response> => {
       if (!sendGridResponse.ok) {
         const errorText = await sendGridResponse.text();
         console.error('SendGrid API error:', sendGridResponse.status, errorText);
-        throw new Error(`SendGrid API error: ${sendGridResponse.status} ${errorText}`);
+        let senderDiagnostics: SendGridSenderDiagnostics | null = null;
+        if (sendGridResponse.status === 403 && errorText.includes('verified Sender Identity')) {
+          senderDiagnostics = await getSendGridSenderDiagnostics(sendGridApiKey, fromEmail);
+          console.error('SendGrid sender diagnostics:', senderDiagnostics);
+        }
+
+        throw new SendGridError(sendGridResponse.status, errorText, fromEmail, senderDiagnostics);
       }
 
       console.log('Email sent successfully via SendGrid');
@@ -264,13 +279,21 @@ const handler = async (req: Request): Promise<Response> => {
         .update({ delivery_status: 'failed' })
         .eq('id', outreachLog.id);
 
+      const isSendGridError = emailError instanceof SendGridError;
+      const responseStatus = isSendGridError && emailError.status >= 400 && emailError.status < 500 ? 502 : 500;
+
       return new Response(
         JSON.stringify({ 
-          error: 'Failed to send email: ' + emailError.message,
+          error: isSendGridError
+            ? `SendGrid rejected the configured sender: ${emailError.fromEmail}`
+            : 'Failed to send email: ' + emailError.message,
           errorType: emailError.constructor.name,
-          details: emailError.toString()
+          details: emailError.toString(),
+          sendGridStatus: isSendGridError ? emailError.status : undefined,
+          fromEmail: isSendGridError ? emailError.fromEmail : undefined,
+          senderDiagnostics: isSendGridError ? emailError.senderDiagnostics : undefined
         }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: responseStatus, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -308,6 +331,7 @@ function determineTemplateType(feedback: any): 'acknowledgment' | 'resolution' |
 async function generateEmailContent(
   templateType: string,
   feedback: any,
+  supabase: SupabaseClient,
   options: {
     messageContent?: string;
     customSubject?: string;
@@ -524,6 +548,75 @@ async function generateEmailContent(
 
   const html = await renderAsync(emailComponent);
   return { subject, html };
+}
+
+interface SendGridSenderDiagnostics {
+  targetFromEmail: string;
+  targetDomain: string;
+  verifiedSenderMatch: boolean;
+  authenticatedDomainMatch: boolean;
+  verifiedSendersCheck: 'checked' | 'failed';
+  authenticatedDomainsCheck: 'checked' | 'failed';
+}
+
+class SendGridError extends Error {
+  constructor(
+    public status: number,
+    public body: string,
+    public fromEmail: string,
+    public senderDiagnostics: SendGridSenderDiagnostics | null
+  ) {
+    super(`SendGrid API error: ${status} ${body}`);
+    this.name = 'SendGridError';
+  }
+}
+
+async function getSendGridSenderDiagnostics(apiKey: string, fromEmail: string): Promise<SendGridSenderDiagnostics> {
+  const targetDomain = fromEmail.split('@')[1]?.toLowerCase() || '';
+  const diagnostics: SendGridSenderDiagnostics = {
+    targetFromEmail: fromEmail,
+    targetDomain,
+    verifiedSenderMatch: false,
+    authenticatedDomainMatch: false,
+    verifiedSendersCheck: 'failed',
+    authenticatedDomainsCheck: 'failed',
+  };
+
+  const headers = { Authorization: `Bearer ${apiKey}` };
+
+  try {
+    const verifiedSendersResponse = await fetch('https://api.sendgrid.com/v3/verified_senders', { headers });
+    if (verifiedSendersResponse.ok) {
+      const verifiedSenders = await verifiedSendersResponse.json();
+      const senders = Array.isArray(verifiedSenders?.results) ? verifiedSenders.results : [];
+      diagnostics.verifiedSenderMatch = senders.some((sender: any) =>
+        String(sender?.from_email || '').toLowerCase() === fromEmail.toLowerCase() && sender?.verified === true
+      );
+      diagnostics.verifiedSendersCheck = 'checked';
+    } else {
+      console.error('Unable to check SendGrid verified senders:', verifiedSendersResponse.status, await verifiedSendersResponse.text());
+    }
+  } catch (error) {
+    console.error('Unable to check SendGrid verified senders:', error);
+  }
+
+  try {
+    const domainsResponse = await fetch('https://api.sendgrid.com/v3/whitelabel/domains', { headers });
+    if (domainsResponse.ok) {
+      const domains = await domainsResponse.json();
+      const authenticatedDomains = Array.isArray(domains) ? domains : [];
+      diagnostics.authenticatedDomainMatch = authenticatedDomains.some((domain: any) =>
+        domain?.valid === true && String(domain?.domain || '').toLowerCase() === targetDomain
+      );
+      diagnostics.authenticatedDomainsCheck = 'checked';
+    } else {
+      console.error('Unable to check SendGrid authenticated domains:', domainsResponse.status, await domainsResponse.text());
+    }
+  } catch (error) {
+    console.error('Unable to check SendGrid authenticated domains:', error);
+  }
+
+  return diagnostics;
 }
 
 serve(handler);
