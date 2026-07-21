@@ -182,6 +182,10 @@ const Index = () => {
         order_number: item.order_number,
         period: item.period,
         time_of_day: item.time_of_day,
+        customer_responded_at: item.customer_responded_at,
+        customer_response_sentiment: item.customer_response_sentiment,
+        outreach_sent_at: item.outreach_sent_at,
+        outreach_method: item.outreach_method,
       });
       
       // Fetch feedback in pages. Render the first page immediately so route changes
@@ -545,6 +549,10 @@ const Index = () => {
           order_number: data.order_number,
           period: data.period,
           time_of_day: data.time_of_day,
+          customer_responded_at: data.customer_responded_at,
+          customer_response_sentiment: data.customer_response_sentiment,
+          outreach_sent_at: data.outreach_sent_at,
+          outreach_method: data.outreach_method,
         };
 
         // Update the feedbacks array (keep resolved items visible with lighter styling)
