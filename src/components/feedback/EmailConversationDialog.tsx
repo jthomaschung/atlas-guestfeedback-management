@@ -342,7 +342,17 @@ export function EmailConversationDialog({
 
         <div className="flex flex-col h-[60vh]">
           {/* Email conversation history */}
-          <ScrollArea className="flex-1 border rounded-lg p-4">
+          <ScrollArea
+            className="flex-1 border rounded-lg p-4 scrollbar-prominent"
+            onScrollCapture={(e) => {
+              if (!awaitingResponse) return;
+              const el = e.target as HTMLElement;
+              if (!el || typeof el.scrollTop !== 'number') return;
+              if (el.scrollHeight - el.scrollTop - el.clientHeight < 24) {
+                markResponseAcknowledged();
+              }
+            }}
+          >
             {loading ? (
               <div className="text-center py-8 text-muted-foreground">
                 Loading conversation...
