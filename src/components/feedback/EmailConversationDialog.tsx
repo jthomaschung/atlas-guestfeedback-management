@@ -358,10 +358,15 @@ export function EmailConversationDialog({
           {/* Email conversation history */}
           <ScrollArea
             className="flex-1 border rounded-lg p-4 scrollbar-prominent"
+            onWheelCapture={() => { userScrolledRef.current = true; }}
+            onTouchMoveCapture={() => { userScrolledRef.current = true; }}
+            onKeyDownCapture={() => { userScrolledRef.current = true; }}
             onScrollCapture={(e) => {
               if (!awaitingResponse) return;
+              if (!userScrolledRef.current) return;
               const el = e.target as HTMLElement;
               if (!el || typeof el.scrollTop !== 'number') return;
+              if (el.scrollHeight - el.clientHeight < 40) return; // no meaningful scroll room
               if (el.scrollHeight - el.scrollTop - el.clientHeight < 24) {
                 markResponseAcknowledged();
               }
