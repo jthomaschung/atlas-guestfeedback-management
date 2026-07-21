@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { Edit, Calendar, Eye, User, Clock, AlertTriangle, Trash2, Star, Phone, Hash, Save, X, ExternalLink, Heart, DollarSign } from "lucide-react";
+import { Edit, Calendar, Eye, User, Clock, AlertTriangle, Trash2, Star, Phone, Hash, Save, X, ExternalLink, Heart, DollarSign, MessageCircle } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useState, memo } from "react";
@@ -250,6 +250,20 @@ function CustomerFeedbackCardComponent({
                 )}>
                   <Hash className="h-3 w-3" />
                   {feedback.case_number}
+                </Badge>
+              )}
+              {feedback.customer_responded_at && (
+                <Badge
+                  className={cn(
+                    "text-xs flex items-center gap-1 animate-pulse",
+                    isEscalated
+                      ? "bg-white text-red-600"
+                      : "bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700"
+                  )}
+                  title={`Customer replied ${format(new Date(feedback.customer_responded_at), 'MMM d, yyyy h:mm a')}`}
+                >
+                  <MessageCircle className="h-3 w-3" />
+                  New Reply
                 </Badge>
               )}
             </div>
