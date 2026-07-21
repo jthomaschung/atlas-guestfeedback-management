@@ -136,6 +136,7 @@ const OpenFeedback = () => {
     'case_number', 'customer_name', 'customer_email', 'customer_phone',
     'feedback_text', 'user_id', 'created_at', 'updated_at', 'priority',
     'assignee', 'viewed', 'customer_called', 'outreach_sent_at',
+    'outreach_method', 'customer_responded_at', 'customer_response_sentiment',
     'sla_deadline', 'escalated_at', 'time_of_day', 'order_number',
     'period', 'ee_action', 'type_of_feedback', 'reward', 'feedback_source',
   ].join(',');
