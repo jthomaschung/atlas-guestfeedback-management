@@ -23,6 +23,7 @@ export interface CustomerFeedback {
   outreach_method?: string;
   customer_responded_at?: string;
   customer_response_sentiment?: string;
+  customer_response_acknowledged_at?: string;
   calculated_score?: number;
   // New escalation fields
   escalated_at?: string;
