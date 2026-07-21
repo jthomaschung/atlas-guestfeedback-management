@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -51,7 +51,21 @@ export function EmailConversationDialog({
   const [actionTaken, setActionTaken] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [loading, setLoading] = useState(false);
+  const replyTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const { toast } = useToast();
+
+  // Detect if the customer has replied and it's still awaiting a response from us
+  const lastMessage = messages[messages.length - 1];
+  const awaitingResponse = lastMessage?.direction === 'inbound';
+
+  const handleRespondToCustomer = () => {
+    setSelectedTemplate('custom');
+    setShowAddCustomerReply(false);
+    setTimeout(() => {
+      replyTextareaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      replyTextareaRef.current?.focus();
+    }, 50);
+  };
 
   // Check if feedback is critical or escalated - requires custom message only
   const isCriticalOrEscalated = feedback?.priority === 'Critical' || 
@@ -293,6 +307,25 @@ export function EmailConversationDialog({
             Email Conversation with {customerName || customerEmail}
           </DialogTitle>
         </DialogHeader>
+
+        {awaitingResponse && (
+          <div className="flex items-center justify-between gap-3 p-3 rounded-lg border border-emerald-200 bg-emerald-50">
+            <div className="flex items-center gap-2 text-emerald-800">
+              <Reply className="w-4 h-4" />
+              <span className="text-sm font-medium">
+                {customerName || 'The customer'} replied — awaiting your response
+              </span>
+            </div>
+            <Button
+              size="sm"
+              onClick={handleRespondToCustomer}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              <Send className="w-4 h-4 mr-2" />
+              Respond to Customer
+            </Button>
+          </div>
+        )}
 
         <div className="flex flex-col h-[60vh]">
           {/* Email conversation history */}
@@ -547,6 +580,7 @@ export function EmailConversationDialog({
                 {selectedTemplate === 'custom' ? 'Custom Message' : 'Additional Personal Note (Optional)'}
               </Label>
               <Textarea
+                ref={replyTextareaRef}
                 id="reply-content"
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
