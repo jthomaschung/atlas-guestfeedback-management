@@ -67,7 +67,10 @@ export function EmailConversationDialog({
     }, 50);
   };
 
+  const acknowledgedRef = useRef(false);
   const markResponseAcknowledged = async () => {
+    if (acknowledgedRef.current) return;
+    acknowledgedRef.current = true;
     try {
       await supabase
         .from('customer_feedback')
@@ -76,6 +79,7 @@ export function EmailConversationDialog({
       onConversationUpdated?.();
     } catch (err) {
       console.error('Failed to mark response acknowledged:', err);
+      acknowledgedRef.current = false;
     }
   };
 
