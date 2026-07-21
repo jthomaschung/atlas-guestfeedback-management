@@ -2077,6 +2077,7 @@ Customer Service Team`);
           customerName={feedback.customer_name || feedback.customer_email}
           isOpen={showEmailConversation}
           onOpenChange={setShowEmailConversation}
+          onConversationUpdated={onUpdate}
         />
       )}
       
