@@ -29,6 +29,7 @@ interface EmailConversationDialogProps {
   customerName: string;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onConversationUpdated?: () => void;
   feedback?: any; // Full feedback object for template selection
 }
 
@@ -38,6 +39,7 @@ export function EmailConversationDialog({
   customerName,
   isOpen,
   onOpenChange,
+  onConversationUpdated,
   feedback,
 }: EmailConversationDialogProps) {
   const [messages, setMessages] = useState<EmailMessage[]>([]);
@@ -128,6 +130,9 @@ export function EmailConversationDialog({
       }));
       
       setMessages(transformedMessages);
+      if (transformedMessages.some(message => message.direction === 'inbound')) {
+        onConversationUpdated?.();
+      }
     } catch (error) {
       console.error('Error loading email conversation:', error);
       toast({
@@ -188,6 +193,7 @@ export function EmailConversationDialog({
       setResolutionNotes("");
       setActionTaken("");
       loadEmailConversation(); // Reload to show the new message
+      onConversationUpdated?.();
     } catch (error) {
       console.error('Error sending reply:', error);
       toast({
@@ -247,6 +253,7 @@ export function EmailConversationDialog({
       setCustomerReplyContent("");
       setShowAddCustomerReply(false);
       loadEmailConversation(); // Reload to show the new message
+      onConversationUpdated?.();
     } catch (error) {
       console.error('Error adding customer reply:', error);
       toast({
