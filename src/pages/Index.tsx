@@ -549,6 +549,10 @@ const Index = () => {
           order_number: data.order_number,
           period: data.period,
           time_of_day: data.time_of_day,
+          customer_responded_at: data.customer_responded_at,
+          customer_response_sentiment: data.customer_response_sentiment,
+          outreach_sent_at: data.outreach_sent_at,
+          outreach_method: data.outreach_method,
         };
 
         // Update the feedbacks array (keep resolved items visible with lighter styling)
