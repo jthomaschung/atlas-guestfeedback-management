@@ -68,6 +68,7 @@ export function EmailConversationDialog({
   };
 
   const acknowledgedRef = useRef(false);
+  const userScrolledRef = useRef(false);
   const markResponseAcknowledged = async () => {
     if (acknowledgedRef.current) return;
     acknowledgedRef.current = true;
@@ -82,6 +83,14 @@ export function EmailConversationDialog({
       acknowledgedRef.current = false;
     }
   };
+
+  // Reset per-open guards
+  useEffect(() => {
+    if (isOpen) {
+      acknowledgedRef.current = false;
+      userScrolledRef.current = false;
+    }
+  }, [isOpen, feedbackId]);
 
   // Check if feedback is critical or escalated - requires custom message only
   const isCriticalOrEscalated = feedback?.priority === 'Critical' || 
@@ -349,10 +358,15 @@ export function EmailConversationDialog({
           {/* Email conversation history */}
           <ScrollArea
             className="flex-1 border rounded-lg p-4 scrollbar-prominent"
+            onWheelCapture={() => { userScrolledRef.current = true; }}
+            onTouchMoveCapture={() => { userScrolledRef.current = true; }}
+            onKeyDownCapture={() => { userScrolledRef.current = true; }}
             onScrollCapture={(e) => {
               if (!awaitingResponse) return;
+              if (!userScrolledRef.current) return;
               const el = e.target as HTMLElement;
               if (!el || typeof el.scrollTop !== 'number') return;
+              if (el.scrollHeight - el.clientHeight < 40) return; // no meaningful scroll room
               if (el.scrollHeight - el.scrollTop - el.clientHeight < 24) {
                 markResponseAcknowledged();
               }
