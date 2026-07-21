@@ -1,0 +1,1 @@
+ALTER TABLE public.customer_feedback ADD COLUMN IF NOT EXISTS customer_response_acknowledged_at TIMESTAMPTZ;
