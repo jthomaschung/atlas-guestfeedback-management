@@ -580,6 +580,7 @@ export function EmailConversationDialog({
                 {selectedTemplate === 'custom' ? 'Custom Message' : 'Additional Personal Note (Optional)'}
               </Label>
               <Textarea
+                ref={replyTextareaRef}
                 id="reply-content"
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
