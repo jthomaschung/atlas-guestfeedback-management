@@ -308,6 +308,25 @@ export function EmailConversationDialog({
           </DialogTitle>
         </DialogHeader>
 
+        {awaitingResponse && (
+          <div className="flex items-center justify-between gap-3 p-3 rounded-lg border border-emerald-200 bg-emerald-50">
+            <div className="flex items-center gap-2 text-emerald-800">
+              <Reply className="w-4 h-4" />
+              <span className="text-sm font-medium">
+                {customerName || 'The customer'} replied — awaiting your response
+              </span>
+            </div>
+            <Button
+              size="sm"
+              onClick={handleRespondToCustomer}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              <Send className="w-4 h-4 mr-2" />
+              Respond to Customer
+            </Button>
+          </div>
+        )}
+
         <div className="flex flex-col h-[60vh]">
           {/* Email conversation history */}
           <ScrollArea className="flex-1 border rounded-lg p-4">
