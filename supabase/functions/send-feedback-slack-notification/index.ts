@@ -604,7 +604,7 @@ const handler = async (req: Request): Promise<Response> => {
                   personalizations: [{
                     to: [{ email: taggedUser.email }]
                   }],
-                  from: { email: 'guestfeedback@feedback.atlaswe.com', name: 'Guest Feedback' },
+                  from: { email: 'guest.feedback@atlaswe.com', name: 'Guest Feedback' },
                   subject: `You've been tagged in Case ${feedback.case_number}`,
                   content: [{
                     type: 'text/html',
@@ -835,7 +835,7 @@ const handler = async (req: Request): Promise<Response> => {
                     personalizations: [{
                       to: [{ email: assigneeProfile.email }]
                     }],
-                    from: { email: 'guestfeedback@feedback.atlaswe.com', name: 'Guest Feedback' },
+                    from: { email: 'guest.feedback@atlaswe.com', name: 'Guest Feedback' },
                     subject: `Case ${feedback.case_number} - Status Updated to ${newStatus}`,
                     content: [{
                       type: 'text/html',

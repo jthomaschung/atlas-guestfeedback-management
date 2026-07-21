@@ -232,11 +232,11 @@ const handler = async (req: Request): Promise<Response> => {
           },
         ],
         from: {
-          email: 'guestfeedback@feedback.atlaswe.com',
+          email: 'guest.feedback@atlaswe.com',
           name: 'Internal Feedback System',
         },
         reply_to: {
-          email: 'guestfeedback@feedback.atlaswe.com',
+          email: 'guest.feedback@atlaswe.com',
           name: 'Guest Feedback',
         },
         content: [

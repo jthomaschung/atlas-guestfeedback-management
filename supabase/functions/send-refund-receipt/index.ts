@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
         },
         body: JSON.stringify({
           personalizations: [{ to: [{ email }] }],
-          from: { email: 'guestfeedback@feedback.atlaswe.com', name: 'Atlas Guest Feedback' },
+          from: { email: 'guest.feedback@atlaswe.com', name: 'Atlas Guest Feedback' },
           subject: `Refund Receipt — Case #${refund.case_number || refundRequestId.slice(0, 8)} — $${Number(refund.refund_amount).toFixed(2)}`,
           content: [{ type: 'text/html', value: emailContent }],
         }),
