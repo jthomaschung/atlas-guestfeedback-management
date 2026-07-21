@@ -182,7 +182,7 @@ export function EmailConversationView({
       </div>
 
       {/* Message History */}
-      <div className="space-y-4 max-h-96 overflow-y-auto">
+      <div className="space-y-4 max-h-96 overflow-y-auto scrollbar-prominent pr-2">
         {messages.map((message) => (
           <Card 
             key={message.id} 
