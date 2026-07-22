@@ -3240,8 +3240,10 @@ export type Database = {
       }
       ecosure_assessments: {
         Row: {
+          activity_number: string | null
           address: string | null
           advisor_id: string | null
+          assessor: string | null
           brand: string | null
           city: string | null
           created_at: string | null
@@ -3255,6 +3257,7 @@ export type Database = {
           restaurant_name: string | null
           risk_level: string | null
           score_pct: number | null
+          source: string
           source_pdf_path: string | null
           start_datetime: string | null
           state: string | null
@@ -3265,8 +3268,10 @@ export type Database = {
           zip: string | null
         }
         Insert: {
+          activity_number?: string | null
           address?: string | null
           advisor_id?: string | null
+          assessor?: string | null
           brand?: string | null
           city?: string | null
           created_at?: string | null
@@ -3280,6 +3285,7 @@ export type Database = {
           restaurant_name?: string | null
           risk_level?: string | null
           score_pct?: number | null
+          source?: string
           source_pdf_path?: string | null
           start_datetime?: string | null
           state?: string | null
@@ -3290,8 +3296,10 @@ export type Database = {
           zip?: string | null
         }
         Update: {
+          activity_number?: string | null
           address?: string | null
           advisor_id?: string | null
+          assessor?: string | null
           brand?: string | null
           city?: string | null
           created_at?: string | null
@@ -3305,6 +3313,7 @@ export type Database = {
           restaurant_name?: string | null
           risk_level?: string | null
           score_pct?: number | null
+          source?: string
           source_pdf_path?: string | null
           start_datetime?: string | null
           state?: string | null
@@ -14075,45 +14084,54 @@ export type Database = {
       }
       ecosure_assessment_overview: {
         Row: {
+          assessor: string | null
           city: string | null
           critical_count: number | null
           id: string | null
+          ihr_count: number | null
           major_count: number | null
           minor_count: number | null
           photo_count: number | null
           restaurant_name: string | null
           risk_level: string | null
           score_pct: number | null
+          source: string | null
           start_datetime: string | null
           state: string | null
           unit_number: string | null
           violation_count: number | null
         }
         Insert: {
+          assessor?: string | null
           city?: string | null
           critical_count?: never
           id?: string | null
+          ihr_count?: never
           major_count?: never
           minor_count?: never
           photo_count?: never
           restaurant_name?: string | null
           risk_level?: string | null
           score_pct?: number | null
+          source?: string | null
           start_datetime?: string | null
           state?: string | null
           unit_number?: string | null
           violation_count?: never
         }
         Update: {
+          assessor?: string | null
           city?: string | null
           critical_count?: never
           id?: string | null
+          ihr_count?: never
           major_count?: never
           minor_count?: never
           photo_count?: never
           restaurant_name?: string | null
           risk_level?: string | null
           score_pct?: number | null
+          source?: string | null
           start_datetime?: string | null
           state?: string | null
           unit_number?: string | null
