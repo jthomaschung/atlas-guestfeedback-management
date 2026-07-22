@@ -203,7 +203,7 @@ export function FeedbackDetailsDialog({ feedback, isOpen, onClose, onUpdate }: F
 
   // Extract @mentions from text
   const extractMentions = (text: string): string[] => {
-    const mentionRegex = /@([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g;
+    const mentionRegex = /@([A-Z][a-z]+(?:\s+(?:[A-Z][a-z]+|\d+))*)/g;
     const matches = text.matchAll(mentionRegex);
     const mentions: string[] = [];
     for (const match of matches) {
