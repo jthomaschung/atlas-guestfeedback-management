@@ -537,16 +537,18 @@ const handler = async (req: Request): Promise<Response> => {
           taggedUser = exactMatch[0];
           console.log(`✅ Found exact match: ${taggedUser.display_name} (${taggedUser.email})`);
         } else {
-          // Try partial match
+          // Try partial match - but only accept if unambiguous (exactly 1 result)
           const { data: partialMatch, error: partialError } = await supabase
             .from('profiles')
             .select('user_id, email, display_name')
             .ilike('display_name', `%${taggedDisplayName}%`)
-            .limit(1);
+            .limit(2);
           
-          if (partialMatch && partialMatch.length > 0) {
+          if (partialMatch && partialMatch.length === 1) {
             taggedUser = partialMatch[0];
             console.log(`✅ Found partial match: ${taggedUser.display_name} (${taggedUser.email})`);
+          } else if (partialMatch && partialMatch.length > 1) {
+            console.warn(`⚠️ Ambiguous partial match for "${taggedDisplayName}" (${partialMatch.length}+ candidates) — refusing to send to avoid misrouting.`);
           } else {
             console.warn(`⚠️ No user found matching display_name: "${taggedDisplayName}"`);
             console.log(`📝 Exact error: ${exactError?.message}, Partial error: ${partialError?.message}`);
