@@ -46,6 +46,12 @@ export default function Accuracy() {
     }
   }, [user?.id, selectedPeriod]);
 
+  useEffect(() => {
+    if (user) {
+      fetchStores();
+    }
+  }, [user?.id]);
+
   const fetchPeriods = async () => {
     const { data, error } = await supabase
       .from('periods')
