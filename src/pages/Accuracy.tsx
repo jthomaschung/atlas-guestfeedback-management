@@ -12,7 +12,7 @@ import { CustomerFeedbackTable } from "@/components/feedback/CustomerFeedbackTab
 import { SimpleFeedbackFilters } from "@/components/feedback/SimpleFeedbackFilters";
 import { FeedbackDetailsDialog } from "@/components/feedback/FeedbackDetailsDialog";
 import { AccuracyTrendsChart } from "@/components/accuracy/AccuracyTrendsChart";
-import { StoreRankingsTable } from "@/components/accuracy/StoreRankingsTable";
+import { StoreRankingsTable, StoreInfo } from "@/components/accuracy/StoreRankingsTable";
 import { MarketRankingsTable } from "@/components/accuracy/MarketRankingsTable";
 import { CategoryComparisonChart } from "@/components/accuracy/CategoryComparisonChart";
 import { Badge } from "@/components/ui/badge";
