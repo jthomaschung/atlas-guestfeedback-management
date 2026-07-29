@@ -20,7 +20,7 @@ interface AccuracyDrillDownDialogProps {
   feedbacks: CustomerFeedback[];
 }
 
-type Level = "region" | "district" | "store";
+type Level = "region" | "district" | "store" | "feedback";
 
 interface Row {
   key: string;
