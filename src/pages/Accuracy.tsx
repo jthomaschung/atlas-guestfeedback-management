@@ -421,6 +421,7 @@ export default function Accuracy() {
             feedbacks={feedbacks} 
             periods={periods}
             selectedPeriod={selectedPeriod}
+            stores={stores}
           />
         </TabsContent>
 
