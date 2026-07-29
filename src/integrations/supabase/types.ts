@@ -11268,6 +11268,30 @@ export type Database = {
         }
         Relationships: []
       }
+      store_hierarchy: {
+        Row: {
+          active: boolean
+          district: string
+          region: string
+          store_name: string | null
+          store_number: string
+        }
+        Insert: {
+          active?: boolean
+          district: string
+          region: string
+          store_name?: string | null
+          store_number: string
+        }
+        Update: {
+          active?: boolean
+          district?: string
+          region?: string
+          store_name?: string | null
+          store_number?: string
+        }
+        Relationships: []
+      }
       store_information: {
         Row: {
           alarm_code: string | null
@@ -12345,6 +12369,165 @@ export type Database = {
         }
         Relationships: []
       }
+      upk_category_summary: {
+        Row: {
+          actual_cogs_pct: number | null
+          category_gl: string | null
+          category_name: string
+          cogs_variance_pct: number | null
+          created_at: string
+          fiscal_year: number
+          id: number
+          store_location: string | null
+          store_number: string
+          theoretical_cogs_pct: number | null
+          updated_at: string
+          week_ending: string
+          week_number: number
+        }
+        Insert: {
+          actual_cogs_pct?: number | null
+          category_gl?: string | null
+          category_name: string
+          cogs_variance_pct?: number | null
+          created_at?: string
+          fiscal_year: number
+          id?: number
+          store_location?: string | null
+          store_number: string
+          theoretical_cogs_pct?: number | null
+          updated_at?: string
+          week_ending: string
+          week_number: number
+        }
+        Update: {
+          actual_cogs_pct?: number | null
+          category_gl?: string | null
+          category_name?: string
+          cogs_variance_pct?: number | null
+          created_at?: string
+          fiscal_year?: number
+          id?: number
+          store_location?: string | null
+          store_number?: string
+          theoretical_cogs_pct?: number | null
+          updated_at?: string
+          week_ending?: string
+          week_number?: number
+        }
+        Relationships: []
+      }
+      upk_expected_usage: {
+        Row: {
+          actual_upk: number | null
+          actual_usage: number | null
+          average_upk: number | null
+          category_gl: string | null
+          category_name: string | null
+          created_at: string
+          fiscal_year: number
+          id: number
+          item_name: string
+          store_location: string | null
+          store_number: string
+          theoretical_usage: number | null
+          unit: string | null
+          updated_at: string
+          upk_variance: number | null
+          usage_variance: number | null
+          usage_variance_dollars: number | null
+          week_ending: string
+          week_number: number
+        }
+        Insert: {
+          actual_upk?: number | null
+          actual_usage?: number | null
+          average_upk?: number | null
+          category_gl?: string | null
+          category_name?: string | null
+          created_at?: string
+          fiscal_year: number
+          id?: number
+          item_name: string
+          store_location?: string | null
+          store_number: string
+          theoretical_usage?: number | null
+          unit?: string | null
+          updated_at?: string
+          upk_variance?: number | null
+          usage_variance?: number | null
+          usage_variance_dollars?: number | null
+          week_ending: string
+          week_number: number
+        }
+        Update: {
+          actual_upk?: number | null
+          actual_usage?: number | null
+          average_upk?: number | null
+          category_gl?: string | null
+          category_name?: string | null
+          created_at?: string
+          fiscal_year?: number
+          id?: number
+          item_name?: string
+          store_location?: string | null
+          store_number?: string
+          theoretical_usage?: number | null
+          unit?: string | null
+          updated_at?: string
+          upk_variance?: number | null
+          usage_variance?: number | null
+          usage_variance_dollars?: number | null
+          week_ending?: string
+          week_number?: number
+        }
+        Relationships: []
+      }
+      upk_store_summary: {
+        Row: {
+          actual_cogs_pct: number | null
+          adjusted_sales: number | null
+          cogs_variance_pct: number | null
+          created_at: string
+          fiscal_year: number
+          id: number
+          store_location: string | null
+          store_number: string
+          theoretical_cogs_pct: number | null
+          updated_at: string
+          week_ending: string
+          week_number: number
+        }
+        Insert: {
+          actual_cogs_pct?: number | null
+          adjusted_sales?: number | null
+          cogs_variance_pct?: number | null
+          created_at?: string
+          fiscal_year: number
+          id?: number
+          store_location?: string | null
+          store_number: string
+          theoretical_cogs_pct?: number | null
+          updated_at?: string
+          week_ending: string
+          week_number: number
+        }
+        Update: {
+          actual_cogs_pct?: number | null
+          adjusted_sales?: number | null
+          cogs_variance_pct?: number | null
+          created_at?: string
+          fiscal_year?: number
+          id?: number
+          store_location?: string | null
+          store_number?: string
+          theoretical_cogs_pct?: number | null
+          updated_at?: string
+          week_ending?: string
+          week_number?: number
+        }
+        Relationships: []
+      }
       user_achievements: {
         Row: {
           achievement_id: string
@@ -12555,6 +12738,36 @@ export type Database = {
           assigned_by?: string | null
           id?: string
           portal_role_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          created_at: string
+          district: string | null
+          full_name: string | null
+          region: string | null
+          role: string
+          store_number: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          district?: string | null
+          full_name?: string | null
+          region?: string | null
+          role: string
+          store_number?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          district?: string | null
+          full_name?: string | null
+          region?: string | null
+          role?: string
+          store_number?: string | null
           user_id?: string
         }
         Relationships: []
@@ -14513,6 +14726,44 @@ export type Database = {
         }
         Relationships: []
       }
+      v_upk_item_offenders: {
+        Row: {
+          actual_upk: number | null
+          actual_usage: number | null
+          average_upk: number | null
+          category_name: string | null
+          district: string | null
+          item_name: string | null
+          region: string | null
+          store_name: string | null
+          store_number: string | null
+          theoretical_usage: number | null
+          unit: string | null
+          upk_variance: number | null
+          usage_variance: number | null
+          usage_variance_dollars: number | null
+          week_ending: string | null
+          week_number: number | null
+        }
+        Relationships: []
+      }
+      v_upk_store_week: {
+        Row: {
+          actual_cogs_pct: number | null
+          adjusted_sales: number | null
+          cogs_variance_pct: number | null
+          district: string | null
+          fiscal_year: number | null
+          region: string | null
+          store_name: string | null
+          store_number: string | null
+          theoretical_cogs_pct: number | null
+          variance_dollars: number | null
+          week_ending: string | null
+          week_number: number | null
+        }
+        Relationships: []
+      }
       work_order_sla: {
         Row: {
           assignee: string | null
@@ -16097,6 +16348,7 @@ export type Database = {
           status: string
         }[]
       }
+      visible_stores: { Args: never; Returns: string[] }
     }
     Enums: {
       access_scope_type: "none" | "store" | "region" | "all"
