@@ -150,7 +150,7 @@ function App() {
             <Router>
               <Routes>
                 <Route element={<ProtectedRoute />}>
-                  <Route path="/" element={<Index />} />
+                  <Route path="/" element={<Accuracy />} />
                   <Route path="/summary" element={<Summary />} />
                   <Route path="/dashboard" element={<Index />} />
                   <Route path="/feedback-reporting" element={<FeedbackReporting />} />

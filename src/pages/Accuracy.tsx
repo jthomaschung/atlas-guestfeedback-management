@@ -77,7 +77,12 @@ export default function Accuracy() {
       const { data: allData, error: allError } = await supabase
         .from("customer_feedback")
         .select("*")
-        .or("complaint_category.ilike.%missing item%,complaint_category.ilike.%sandwich made wrong%")
+        .or([
+          "complaint_category.ilike.%missing item%",
+          "complaint_category.ilike.%sandwich made wrong%",
+          "complaint_category.ilike.%order accuracy%",
+          "type_of_feedback.ilike.%order accuracy%",
+        ].join(","))
         .order("feedback_date", { ascending: false });
 
       if (allError) throw allError;
@@ -125,6 +130,12 @@ export default function Accuracy() {
   
   const sandwichMadeWrong = filteredFeedbacks.filter(
     (fb) => fb.complaint_category?.toLowerCase().includes('sandwich made wrong')
+  ).length;
+
+  const orderAccuracy = filteredFeedbacks.filter(
+    (fb) =>
+      fb.type_of_feedback?.toLowerCase().includes('order accuracy') ||
+      (fb.complaint_category?.toLowerCase().includes('order accuracy') ?? false)
   ).length;
 
   const totalAccuracyIssues = filteredFeedbacks.length;
@@ -188,6 +199,13 @@ export default function Accuracy() {
       previousValue: prevSandwichWrong,
     },
     {
+      title: "Order Accuracy",
+      value: orderAccuracy,
+      icon: AlertCircle,
+      color: "text-blue-600",
+      trend: null,
+    },
+    {
       title: "Resolution Rate",
       value: `${resolutionRate}%`,
       icon: TrendingUp,
@@ -200,7 +218,7 @@ export default function Accuracy() {
     return (
       <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
         <Skeleton className="h-12 w-64" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {[1, 2, 3, 4].map((i) => (
             <Skeleton key={i} className="h-32" />
           ))}
@@ -215,7 +233,7 @@ export default function Accuracy() {
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl sm:text-3xl font-bold">Accuracy Dashboard</h1>
           <p className="text-muted-foreground">
-            Track and analyze Missing Items and Sandwich Made Wrong complaints
+            Track and analyze all Order Accuracy feedback, including Missing Items and Sandwich Made Wrong
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -233,7 +251,7 @@ export default function Accuracy() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {stats.map((stat) => (
           <Card key={stat.title} className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
