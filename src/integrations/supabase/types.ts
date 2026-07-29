@@ -2139,6 +2139,69 @@ export type Database = {
           },
         ]
       }
+      cmx_audit_activity: {
+        Row: {
+          activity_group: string | null
+          adj_completed: number | null
+          adj_max: number | null
+          adj_pct: number | null
+          audit_pct: number | null
+          audits_completed: number | null
+          created_at: string | null
+          fiscal_year: number | null
+          id: number
+          max_audits: number | null
+          note: string | null
+          period_end: string
+          period_start: string
+          source_message_id: string | null
+          store_number: number
+          tier: string | null
+          updated_at: string | null
+          week_number: number | null
+        }
+        Insert: {
+          activity_group?: string | null
+          adj_completed?: number | null
+          adj_max?: number | null
+          adj_pct?: number | null
+          audit_pct?: number | null
+          audits_completed?: number | null
+          created_at?: string | null
+          fiscal_year?: number | null
+          id?: never
+          max_audits?: number | null
+          note?: string | null
+          period_end: string
+          period_start: string
+          source_message_id?: string | null
+          store_number: number
+          tier?: string | null
+          updated_at?: string | null
+          week_number?: number | null
+        }
+        Update: {
+          activity_group?: string | null
+          adj_completed?: number | null
+          adj_max?: number | null
+          adj_pct?: number | null
+          audit_pct?: number | null
+          audits_completed?: number | null
+          created_at?: string | null
+          fiscal_year?: number | null
+          id?: never
+          max_audits?: number | null
+          note?: string | null
+          period_end?: string
+          period_start?: string
+          source_message_id?: string | null
+          store_number?: number
+          tier?: string | null
+          updated_at?: string | null
+          week_number?: number | null
+        }
+        Relationships: []
+      }
       completion_metrics: {
         Row: {
           category: string | null
@@ -12804,6 +12867,60 @@ export type Database = {
           notes?: string | null
           phone?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      weekly_comps: {
+        Row: {
+          created_at: string | null
+          fiscal_year: number
+          id: number
+          metric: string
+          report_date: string | null
+          scope: string
+          source_message_id: string | null
+          unit: string | null
+          updated_at: string | null
+          value_ptd: number | null
+          value_qtd: number | null
+          value_vs_p3w: number | null
+          value_week: number | null
+          value_ytd: number | null
+          week_number: number
+        }
+        Insert: {
+          created_at?: string | null
+          fiscal_year: number
+          id?: never
+          metric: string
+          report_date?: string | null
+          scope: string
+          source_message_id?: string | null
+          unit?: string | null
+          updated_at?: string | null
+          value_ptd?: number | null
+          value_qtd?: number | null
+          value_vs_p3w?: number | null
+          value_week?: number | null
+          value_ytd?: number | null
+          week_number: number
+        }
+        Update: {
+          created_at?: string | null
+          fiscal_year?: number
+          id?: never
+          metric?: string
+          report_date?: string | null
+          scope?: string
+          source_message_id?: string | null
+          unit?: string | null
+          updated_at?: string | null
+          value_ptd?: number | null
+          value_qtd?: number | null
+          value_vs_p3w?: number | null
+          value_week?: number | null
+          value_ytd?: number | null
+          week_number?: number
         }
         Relationships: []
       }
