@@ -12,7 +12,7 @@ import { CustomerFeedbackTable } from "@/components/feedback/CustomerFeedbackTab
 import { SimpleFeedbackFilters } from "@/components/feedback/SimpleFeedbackFilters";
 import { FeedbackDetailsDialog } from "@/components/feedback/FeedbackDetailsDialog";
 import { AccuracyTrendsChart } from "@/components/accuracy/AccuracyTrendsChart";
-import { StoreRankingsTable } from "@/components/accuracy/StoreRankingsTable";
+import { StoreRankingsTable, StoreInfo } from "@/components/accuracy/StoreRankingsTable";
 import { MarketRankingsTable } from "@/components/accuracy/MarketRankingsTable";
 import { CategoryComparisonChart } from "@/components/accuracy/CategoryComparisonChart";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +32,7 @@ export default function Accuracy() {
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
   const [periods, setPeriods] = useState<Period[]>([]);
   const [drillDown, setDrillDown] = useState<{ title: string; feedbacks: CustomerFeedback[] } | null>(null);
+  const [stores, setStores] = useState<StoreInfo[]>([]);
 
   useEffect(() => {
     if (user) {
@@ -67,6 +68,27 @@ export default function Accuracy() {
       setSelectedPeriod(currentPeriod?.id || data[0]?.id); // Fall back to most recent if no match
     }
   };
+
+  const fetchStores = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('stores')
+        .select('store_number, store_name, region, is_active')
+        .eq('is_active', true)
+        .order('store_number');
+
+      if (error) throw error;
+      setStores((data as StoreInfo[]) || []);
+    } catch (error) {
+      console.error("Error fetching stores:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchStores();
+    }
+  }, [user?.id]);
 
   const loadAccuracyFeedback = async () => {
     try {
@@ -399,6 +421,7 @@ export default function Accuracy() {
             feedbacks={feedbacks} 
             periods={periods}
             selectedPeriod={selectedPeriod}
+            stores={stores}
           />
         </TabsContent>
 
