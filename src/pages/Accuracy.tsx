@@ -32,6 +32,7 @@ export default function Accuracy() {
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
   const [periods, setPeriods] = useState<Period[]>([]);
   const [drillDown, setDrillDown] = useState<{ title: string; feedbacks: CustomerFeedback[] } | null>(null);
+  const [stores, setStores] = useState<StoreInfo[]>([]);
 
   useEffect(() => {
     if (user) {
