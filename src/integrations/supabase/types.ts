@@ -5759,6 +5759,7 @@ export type Database = {
       }
       incident_reports: {
         Row: {
+          assigned_to: string | null
           body_part_injured: string | null
           body_part_side: string | null
           closed_at: string | null
@@ -5824,6 +5825,7 @@ export type Database = {
           witnesses: Json | null
         }
         Insert: {
+          assigned_to?: string | null
           body_part_injured?: string | null
           body_part_side?: string | null
           closed_at?: string | null
@@ -5889,6 +5891,7 @@ export type Database = {
           witnesses?: Json | null
         }
         Update: {
+          assigned_to?: string | null
           body_part_injured?: string | null
           body_part_side?: string | null
           closed_at?: string | null
@@ -14195,6 +14198,18 @@ export type Database = {
         }
         Relationships: []
       }
+      store_labor_snapshot: {
+        Row: {
+          dollar_variance_to_target: number | null
+          labor_dollars: number | null
+          labor_pct: number | null
+          sales: number | null
+          store_number: string | null
+          target_labor_dollars_at_26pct: number | null
+          week_ending: string | null
+        }
+        Relationships: []
+      }
       v_daily_deposit_tracking: {
         Row: {
           actual_total: number | null
@@ -14440,6 +14455,10 @@ export type Database = {
           outreach_sent_at: string
         }
         Returns: number
+      }
+      can_access_incident_report: {
+        Args: { _incident_id: string; _user_id: string }
+        Returns: boolean
       }
       can_edit_store_information: {
         Args: { _store_id: number; _user_id: string }
