@@ -186,14 +186,6 @@ export default function Accuracy() {
 
   const stats = [
     {
-      title: "Total Accuracy Issues",
-      value: totalAccuracyIssues,
-      icon: AlertTriangle,
-      color: "text-orange-600",
-      trend: null,
-      onClick: () => openDrill("Total Accuracy Issues", "all"),
-    },
-    {
       title: "Total Order Issues",
       value: totalOrderIssues,
       icon: AlertCircle,
@@ -273,7 +265,7 @@ export default function Accuracy() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {stats.map((stat) => (
           <Card
             key={stat.title}
