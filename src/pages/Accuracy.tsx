@@ -16,6 +16,9 @@ import { StoreRankingsTable } from "@/components/accuracy/StoreRankingsTable";
 import { MarketRankingsTable } from "@/components/accuracy/MarketRankingsTable";
 import { CategoryComparisonChart } from "@/components/accuracy/CategoryComparisonChart";
 import { Badge } from "@/components/ui/badge";
+import { AccuracyDrillDownDialog } from "@/components/accuracy/AccuracyDrillDownDialog";
+import { DistrictBreakdownTable } from "@/components/accuracy/DistrictBreakdownTable";
+import { filterByAccuracyCategory, AccuracyCategory, getDistrict } from "@/lib/accuracyRegions";
 
 export default function Accuracy() {
   const { user } = useAuth();
@@ -28,6 +31,7 @@ export default function Accuracy() {
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
   const [periods, setPeriods] = useState<Period[]>([]);
+  const [drillDown, setDrillDown] = useState<{ title: string; feedbacks: CustomerFeedback[] } | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -174,6 +178,12 @@ export default function Accuracy() {
     ? (((sandwichMadeWrong - prevSandwichWrong) / prevSandwichWrong) * 100).toFixed(1)
     : "0.0";
 
+  const totalOrderIssues = missingItems + sandwichMadeWrong + orderAccuracy;
+
+  const openDrill = (title: string, category: AccuracyCategory | "all") => {
+    setDrillDown({ title, feedbacks: filterByAccuracyCategory(filteredFeedbacks, category) });
+  };
+
   const stats = [
     {
       title: "Total Accuracy Issues",
@@ -181,6 +191,23 @@ export default function Accuracy() {
       icon: AlertTriangle,
       color: "text-orange-600",
       trend: null,
+      onClick: () => openDrill("Total Accuracy Issues", "all"),
+    },
+    {
+      title: "Total Order Issues",
+      value: totalOrderIssues,
+      icon: AlertCircle,
+      color: "text-purple-600",
+      trend: null,
+      onClick: () => openDrill("Total Order Issues", "all"),
+    },
+    {
+      title: "Order Accuracy",
+      value: orderAccuracy,
+      icon: Target,
+      color: "text-blue-600",
+      trend: null,
+      onClick: () => openDrill("Order Accuracy", "accuracy"),
     },
     {
       title: "Missing Items",
@@ -189,6 +216,7 @@ export default function Accuracy() {
       color: "text-red-600",
       trend: parseFloat(missingItemsTrend),
       previousValue: prevMissingItems,
+      onClick: () => openDrill("Missing Items", "missing"),
     },
     {
       title: "Sandwich Made Wrong",
@@ -197,13 +225,7 @@ export default function Accuracy() {
       color: "text-amber-600",
       trend: parseFloat(sandwichWrongTrend),
       previousValue: prevSandwichWrong,
-    },
-    {
-      title: "Order Accuracy",
-      value: orderAccuracy,
-      icon: AlertCircle,
-      color: "text-blue-600",
-      trend: null,
+      onClick: () => openDrill("Sandwich Made Wrong", "sandwich"),
     },
     {
       title: "Resolution Rate",
@@ -251,9 +273,13 @@ export default function Accuracy() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
         {stats.map((stat) => (
-          <Card key={stat.title} className="hover:shadow-md transition-shadow">
+          <Card
+            key={stat.title}
+            className={`hover:shadow-md transition-shadow ${stat.onClick ? "cursor-pointer hover:scale-[1.02] transition-transform" : ""}`}
+            onClick={stat.onClick}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {stat.title}
@@ -360,6 +386,19 @@ export default function Accuracy() {
               </div>
             </CardContent>
           </Card>
+
+
+
+          {/* District Breakdown */}
+          <DistrictBreakdownTable
+            feedbacks={filteredFeedbacks}
+            onSelectDistrict={(district) =>
+              setDrillDown({
+                title: `${district} — Order Issues`,
+                feedbacks: filteredFeedbacks.filter((fb) => getDistrict(fb.market) === district),
+              })
+            }
+          />
         </TabsContent>
 
         {/* Store Rankings Tab */}
@@ -407,6 +446,13 @@ export default function Accuracy() {
         isOpen={isDetailsDialogOpen}
         onClose={handleCloseDialog}
         onUpdate={handleUpdateFeedback}
+      />
+
+      <AccuracyDrillDownDialog
+        isOpen={!!drillDown}
+        onClose={() => setDrillDown(null)}
+        title={drillDown?.title ?? ""}
+        feedbacks={drillDown?.feedbacks ?? []}
       />
     </div>
   );
