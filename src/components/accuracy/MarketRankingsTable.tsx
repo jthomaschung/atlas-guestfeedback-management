@@ -90,7 +90,7 @@ export function MarketRankingsTable({ feedbacks, stores = [] }: MarketRankingsTa
             <TableHead className="text-right">Total</TableHead>
             <TableHead className="text-right">Avg/Store</TableHead>
           </TableRow>
-        </Table ofc>
+        </TableHeader>
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
