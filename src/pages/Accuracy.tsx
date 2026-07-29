@@ -31,6 +31,7 @@ export default function Accuracy() {
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
   const [periods, setPeriods] = useState<Period[]>([]);
+  const [drillDown, setDrillDown] = useState<{ title: string; feedbacks: CustomerFeedback[] } | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -177,6 +178,12 @@ export default function Accuracy() {
     ? (((sandwichMadeWrong - prevSandwichWrong) / prevSandwichWrong) * 100).toFixed(1)
     : "0.0";
 
+  const totalOrderIssues = missingItems + sandwichMadeWrong + orderAccuracy;
+
+  const openDrill = (title: string, category: AccuracyCategory | "all") => {
+    setDrillDown({ title, feedbacks: filterByAccuracyCategory(filteredFeedbacks, category) });
+  };
+
   const stats = [
     {
       title: "Total Accuracy Issues",
@@ -184,6 +191,23 @@ export default function Accuracy() {
       icon: AlertTriangle,
       color: "text-orange-600",
       trend: null,
+      onClick: () => openDrill("Total Accuracy Issues", "all"),
+    },
+    {
+      title: "Total Order Issues",
+      value: totalOrderIssues,
+      icon: AlertCircle,
+      color: "text-purple-600",
+      trend: null,
+      onClick: () => openDrill("Total Order Issues", "all"),
+    },
+    {
+      title: "Order Accuracy",
+      value: orderAccuracy,
+      icon: Target,
+      color: "text-blue-600",
+      trend: null,
+      onClick: () => openDrill("Order Accuracy", "accuracy"),
     },
     {
       title: "Missing Items",
@@ -192,6 +216,7 @@ export default function Accuracy() {
       color: "text-red-600",
       trend: parseFloat(missingItemsTrend),
       previousValue: prevMissingItems,
+      onClick: () => openDrill("Missing Items", "missing"),
     },
     {
       title: "Sandwich Made Wrong",
@@ -200,13 +225,7 @@ export default function Accuracy() {
       color: "text-amber-600",
       trend: parseFloat(sandwichWrongTrend),
       previousValue: prevSandwichWrong,
-    },
-    {
-      title: "Order Accuracy",
-      value: orderAccuracy,
-      icon: AlertCircle,
-      color: "text-blue-600",
-      trend: null,
+      onClick: () => openDrill("Sandwich Made Wrong", "sandwich"),
     },
     {
       title: "Resolution Rate",
