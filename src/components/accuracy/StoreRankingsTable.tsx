@@ -13,6 +13,10 @@ export interface StoreInfo {
   is_active?: boolean;
 }
 
+const EXCLUDED_DISTRICTS = ["catering", "corporate", "facilities"];
+const isExcludedDistrict = (market?: string | null) =>
+  EXCLUDED_DISTRICTS.includes((market || "").trim().toLowerCase());
+
 interface StoreRankingsTableProps {
   feedbacks: CustomerFeedback[];
   periods: Period[];

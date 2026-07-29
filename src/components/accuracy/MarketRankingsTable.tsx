@@ -7,6 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Trophy, TrendingUp, Award } from "lucide-react";
 import { StoreInfo } from "./StoreRankingsTable";
 
+const EXCLUDED_DISTRICTS = ["catering", "corporate", "facilities"];
+const isExcludedDistrict = (market?: string | null) =>
+  EXCLUDED_DISTRICTS.includes((market || "").trim().toLowerCase());
+
 interface MarketRankingsTableProps {
   feedbacks: CustomerFeedback[];
   periods: Period[];
