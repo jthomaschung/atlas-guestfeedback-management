@@ -13,6 +13,10 @@ export interface StoreInfo {
   is_active?: boolean;
 }
 
+const EXCLUDED_DISTRICTS = ["catering", "corporate", "facilities"];
+const isExcludedDistrict = (market?: string | null) =>
+  EXCLUDED_DISTRICTS.includes((market || "").trim().toLowerCase());
+
 interface StoreRankingsTableProps {
   feedbacks: CustomerFeedback[];
   periods: Period[];
@@ -33,6 +37,7 @@ export function StoreRankingsTable({ feedbacks, stores = [] }: StoreRankingsTabl
 
     // Seed every known store with zeros so stores with no issues still appear
     stores.forEach((store) => {
+      if (isExcludedDistrict(store.region)) return;
       const key = store.store_number;
       byStore[key] = {
         storeNumber: store.store_number,
@@ -45,6 +50,7 @@ export function StoreRankingsTable({ feedbacks, stores = [] }: StoreRankingsTabl
     });
 
     feedbacks.forEach((feedback) => {
+      if (isExcludedDistrict(feedback.market)) return;
       const key = feedback.store_number;
       
       if (!byStore[key]) {

@@ -7,6 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Trophy, TrendingUp, Award } from "lucide-react";
 import { StoreInfo } from "./StoreRankingsTable";
 
+const EXCLUDED_DISTRICTS = ["catering", "corporate", "facilities"];
+const isExcludedDistrict = (market?: string | null) =>
+  EXCLUDED_DISTRICTS.includes((market || "").trim().toLowerCase());
+
 interface MarketRankingsTableProps {
   feedbacks: CustomerFeedback[];
   periods: Period[];
@@ -27,6 +31,7 @@ export function MarketRankingsTable({ feedbacks, stores = [] }: MarketRankingsTa
     // Seed every known district from active stores so districts with zero issues still appear
     stores.forEach((store) => {
       const market = store.region?.trim() || "Unknown";
+      if (isExcludedDistrict(market)) return;
       if (!byMarket[market]) {
         byMarket[market] = {
           market,
@@ -43,6 +48,8 @@ export function MarketRankingsTable({ feedbacks, stores = [] }: MarketRankingsTa
 
     feedbacks.forEach((feedback) => {
       const market = feedback.market || "Unknown";
+      if (isExcludedDistrict(market)) return;
+
       
       if (!byMarket[market]) {
         byMarket[market] = {
