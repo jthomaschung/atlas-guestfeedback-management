@@ -338,7 +338,7 @@ export default function Accuracy() {
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="stores">Store Rankings</TabsTrigger>
-          <TabsTrigger value="markets">Market Rankings</TabsTrigger>
+          <TabsTrigger value="districts">District Rankings</TabsTrigger>
           <TabsTrigger value="details">Detailed List</TabsTrigger>
         </TabsList>
 
@@ -425,8 +425,8 @@ export default function Accuracy() {
           />
         </TabsContent>
 
-        {/* Market Rankings Tab */}
-        <TabsContent value="markets" className="space-y-6">
+        {/* District Rankings Tab */}
+        <TabsContent value="districts" className="space-y-6">
           <MarketRankingsTable 
             feedbacks={feedbacks} 
             periods={periods}

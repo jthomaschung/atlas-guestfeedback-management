@@ -57,12 +57,12 @@ export function MarketRankingsTable({ feedbacks }: MarketRankingsTableProps) {
 
   return (
     <div className="grid lg:grid-cols-2 gap-6">
-      {/* Best Performing Markets */}
+      {/* Best Performing Districts */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-green-600">
             <Award className="h-5 w-5" />
-            Most Accurate Markets
+            Most Accurate Districts
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -70,7 +70,7 @@ export function MarketRankingsTable({ feedbacks }: MarketRankingsTableProps) {
             <TableHeader>
               <TableRow>
                 <TableHead>Rank</TableHead>
-                <TableHead>Market</TableHead>
+                <TableHead>District</TableHead>
                 <TableHead className="text-right">Stores</TableHead>
                 <TableHead className="text-right">Missing</TableHead>
                 <TableHead className="text-right">Wrong</TableHead>
@@ -112,12 +112,12 @@ export function MarketRankingsTable({ feedbacks }: MarketRankingsTableProps) {
         </CardContent>
       </Card>
 
-      {/* Markets Needing Improvement */}
+      {/* Districts Needing Improvement */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-red-600">
             <TrendingUp className="h-5 w-5" />
-            Markets Needing Improvement
+            Districts Needing Improvement
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -125,7 +125,7 @@ export function MarketRankingsTable({ feedbacks }: MarketRankingsTableProps) {
             <TableHeader>
               <TableRow>
                 <TableHead>Rank</TableHead>
-                <TableHead>Market</TableHead>
+                <TableHead>District</TableHead>
                 <TableHead className="text-right">Stores</TableHead>
                 <TableHead className="text-right">Missing</TableHead>
                 <TableHead className="text-right">Wrong</TableHead>
