@@ -386,7 +386,8 @@ export default function Accuracy() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+
+
 
           {/* District Breakdown */}
           <DistrictBreakdownTable
