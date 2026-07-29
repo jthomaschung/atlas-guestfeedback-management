@@ -235,8 +235,6 @@ export function AccuracyDrillDownDialog({
           </Table>
         )}
       </DialogContent>
-
-      </DialogContent>
     </Dialog>
   );
 }
