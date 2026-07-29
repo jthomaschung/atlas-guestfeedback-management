@@ -447,6 +447,13 @@ export default function Accuracy() {
         onClose={handleCloseDialog}
         onUpdate={handleUpdateFeedback}
       />
+
+      <AccuracyDrillDownDialog
+        isOpen={!!drillDown}
+        onClose={() => setDrillDown(null)}
+        title={drillDown?.title ?? ""}
+        feedbacks={drillDown?.feedbacks ?? []}
+      />
     </div>
   );
 }
