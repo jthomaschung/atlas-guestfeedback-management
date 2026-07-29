@@ -31,10 +31,17 @@ export function AccuracyTrendsChart({ feedbacks, periods, selectedPeriod }: Accu
         fb => fb.complaint_category?.toLowerCase().includes('sandwich made wrong')
       ).length;
 
+      const orderAccuracy = periodFeedbacks.filter(
+        fb =>
+          fb.type_of_feedback?.toLowerCase().includes('order accuracy') ||
+          fb.complaint_category?.toLowerCase().includes('order accuracy')
+      ).length;
+
       return {
         periodName: period.name,
         missingItems: missingItems,
         sandwichWrong: sandwichWrong,
+        orderAccuracy: orderAccuracy,
       };
     });
 
@@ -82,6 +89,15 @@ export function AccuracyTrendsChart({ feedbacks, periods, selectedPeriod }: Accu
               stroke="hsl(var(--foreground))" 
               strokeWidth={2}
               dot={{ fill: "hsl(var(--foreground))", r: 4 }}
+              activeDot={{ r: 6 }}
+            />
+            <Line 
+              type="monotone" 
+              dataKey="orderAccuracy" 
+              name="Order Accuracy"
+              stroke="hsl(var(--primary))" 
+              strokeWidth={2}
+              dot={{ fill: "hsl(var(--primary))", r: 4 }}
               activeDot={{ r: 6 }}
             />
           </LineChart>
