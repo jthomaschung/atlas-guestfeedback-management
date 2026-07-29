@@ -31,6 +31,7 @@ export function MarketRankingsTable({ feedbacks, stores = [] }: MarketRankingsTa
     // Seed every known district from active stores so districts with zero issues still appear
     stores.forEach((store) => {
       const market = store.region?.trim() || "Unknown";
+      if (isExcludedDistrict(market)) return;
       if (!byMarket[market]) {
         byMarket[market] = {
           market,
@@ -47,6 +48,8 @@ export function MarketRankingsTable({ feedbacks, stores = [] }: MarketRankingsTa
 
     feedbacks.forEach((feedback) => {
       const market = feedback.market || "Unknown";
+      if (isExcludedDistrict(market)) return;
+
       
       if (!byMarket[market]) {
         byMarket[market] = {
