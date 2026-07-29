@@ -388,6 +388,18 @@ export default function Accuracy() {
           </Card>
         </TabsContent>
 
+          {/* District Breakdown */}
+          <DistrictBreakdownTable
+            feedbacks={filteredFeedbacks}
+            onSelectDistrict={(district) =>
+              setDrillDown({
+                title: `${district} — Order Issues`,
+                feedbacks: filteredFeedbacks.filter((fb) => getDistrict(fb.market) === district),
+              })
+            }
+          />
+        </TabsContent>
+
         {/* Store Rankings Tab */}
         <TabsContent value="stores" className="space-y-6">
           <StoreRankingsTable 
