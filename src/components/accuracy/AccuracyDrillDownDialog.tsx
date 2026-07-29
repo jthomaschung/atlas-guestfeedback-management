@@ -94,20 +94,22 @@ export function AccuracyDrillDownDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
-            Drill down by region, district and store to find the biggest offenders.
+            Drill down by region, district and store, then view the actual guest feedback.
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex items-center gap-2 flex-wrap">
-          {(region || district) && (
+          {(region || district || store) && (
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => (district ? setDistrict(null) : setRegion(null))}
+              onClick={() =>
+                store ? setStore(null) : district ? setDistrict(null) : setRegion(null)
+              }
             >
               <ArrowLeft className="h-4 w-4 mr-1" /> Back
             </Button>
@@ -117,6 +119,7 @@ export function AccuracyDrillDownDialog({
             onClick={() => {
               setRegion(null);
               setDistrict(null);
+              setStore(null);
             }}
           >
             All Regions
@@ -126,7 +129,10 @@ export function AccuracyDrillDownDialog({
               <ChevronRight className="h-3 w-3 text-muted-foreground" />
               <button
                 className="text-sm text-muted-foreground hover:text-foreground"
-                onClick={() => setDistrict(null)}
+                onClick={() => {
+                  setDistrict(null);
+                  setStore(null);
+                }}
               >
                 {region}
               </button>
@@ -135,7 +141,18 @@ export function AccuracyDrillDownDialog({
           {district && (
             <>
               <ChevronRight className="h-3 w-3 text-muted-foreground" />
-              <span className="text-sm font-medium">{district}</span>
+              <button
+                className="text-sm text-muted-foreground hover:text-foreground"
+                onClick={() => setStore(null)}
+              >
+                {district}
+              </button>
+            </>
+          )}
+          {store && (
+            <>
+              <ChevronRight className="h-3 w-3 text-muted-foreground" />
+              <span className="text-sm font-medium">Store #{store}</span>
             </>
           )}
           <Badge variant="outline" className="ml-auto">
@@ -143,45 +160,82 @@ export function AccuracyDrillDownDialog({
           </Badge>
         </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{labelForLevel}</TableHead>
-              <TableHead className="text-right">Missing Items</TableHead>
-              <TableHead className="text-right">Sandwich Wrong</TableHead>
-              <TableHead className="text-right">Order Accuracy</TableHead>
-              <TableHead className="text-right">Total</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rows.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground">
-                  No records
-                </TableCell>
-              </TableRow>
+        {level === "feedback" ? (
+          <div className="space-y-3">
+            {feedbackItems.length === 0 && (
+              <p className="text-center text-muted-foreground text-sm py-6">No records</p>
             )}
-            {rows.map((row) => (
-              <TableRow
-                key={row.key}
-                className={level !== "store" ? "cursor-pointer hover:bg-muted/50" : undefined}
-                onClick={() => {
-                  if (level === "region") setRegion(row.key);
-                  else if (level === "district") setDistrict(row.key);
-                }}
-              >
-                <TableCell className="font-medium flex items-center gap-1">
-                  {level === "store" ? `Store #${row.key}` : row.key}
-                  {level !== "store" && <ChevronRight className="h-3 w-3 text-muted-foreground" />}
-                </TableCell>
-                <TableCell className="text-right">{row.missing}</TableCell>
-                <TableCell className="text-right">{row.sandwich}</TableCell>
-                <TableCell className="text-right">{row.accuracy}</TableCell>
-                <TableCell className="text-right font-semibold">{row.total}</TableCell>
-              </TableRow>
+            {feedbackItems.map((fb) => (
+              <div key={fb.id} className="rounded-lg border p-3 space-y-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge variant="secondary">{fb.complaint_category}</Badge>
+                  {fb.type_of_feedback && (
+                    <Badge variant="outline">{fb.type_of_feedback}</Badge>
+                  )}
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(fb.feedback_date).toLocaleDateString()}
+                  </span>
+                  <span className="text-xs text-muted-foreground">#{fb.case_number}</span>
+                  <Badge variant="outline" className="ml-auto capitalize">
+                    {fb.resolution_status}
+                  </Badge>
+                </div>
+                <p className="text-sm whitespace-pre-wrap">
+                  {fb.feedback_text?.trim() || "No comment provided."}
+                </p>
+                <div className="text-xs text-muted-foreground flex gap-3 flex-wrap">
+                  {fb.customer_name && <span>{fb.customer_name}</span>}
+                  {fb.channel && <span>{fb.channel}</span>}
+                  {fb.order_number && <span>Order {fb.order_number}</span>}
+                  {fb.period && <span>{fb.period}</span>}
+                </div>
+              </div>
             ))}
-          </TableBody>
-        </Table>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{labelForLevel}</TableHead>
+                <TableHead className="text-right">Missing Items</TableHead>
+                <TableHead className="text-right">Sandwich Wrong</TableHead>
+                <TableHead className="text-right">Order Accuracy</TableHead>
+                <TableHead className="text-right">Total</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-muted-foreground">
+                    No records
+                  </TableCell>
+                </TableRow>
+              )}
+              {rows.map((row) => (
+                <TableRow
+                  key={row.key}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => {
+                    if (level === "region") setRegion(row.key);
+                    else if (level === "district") setDistrict(row.key);
+                    else setStore(row.key);
+                  }}
+                >
+                  <TableCell className="font-medium flex items-center gap-1">
+                    {level === "store" ? `Store #${row.key}` : row.key}
+                    <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                  </TableCell>
+                  <TableCell className="text-right">{row.missing}</TableCell>
+                  <TableCell className="text-right">{row.sandwich}</TableCell>
+                  <TableCell className="text-right">{row.accuracy}</TableCell>
+                  <TableCell className="text-right font-semibold">{row.total}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </DialogContent>
+
       </DialogContent>
     </Dialog>
   );
