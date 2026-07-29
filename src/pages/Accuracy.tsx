@@ -16,6 +16,9 @@ import { StoreRankingsTable } from "@/components/accuracy/StoreRankingsTable";
 import { MarketRankingsTable } from "@/components/accuracy/MarketRankingsTable";
 import { CategoryComparisonChart } from "@/components/accuracy/CategoryComparisonChart";
 import { Badge } from "@/components/ui/badge";
+import { AccuracyDrillDownDialog } from "@/components/accuracy/AccuracyDrillDownDialog";
+import { DistrictBreakdownTable } from "@/components/accuracy/DistrictBreakdownTable";
+import { filterByAccuracyCategory, AccuracyCategory, getDistrict } from "@/lib/accuracyRegions";
 
 export default function Accuracy() {
   const { user } = useAuth();
