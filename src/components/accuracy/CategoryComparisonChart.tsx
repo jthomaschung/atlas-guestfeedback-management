@@ -34,19 +34,24 @@ const getDistrict = (market: string): string => {
 
 export function CategoryComparisonChart({ feedbacks }: CategoryComparisonChartProps) {
   const chartData = useMemo(() => {
-    const byMarket: Record<string, { missingItems: number; sandwichWrong: number }> = {};
+    const byMarket: Record<string, { missingItems: number; sandwichWrong: number; orderAccuracy: number }> = {};
 
     feedbacks.forEach((feedback) => {
       const market = feedback.market;
       
       if (!byMarket[market]) {
-        byMarket[market] = { missingItems: 0, sandwichWrong: 0 };
+        byMarket[market] = { missingItems: 0, sandwichWrong: 0, orderAccuracy: 0 };
       }
 
-      if (feedback.complaint_category?.toLowerCase().includes('missing item')) {
+      const category = feedback.complaint_category?.toLowerCase() ?? '';
+      const type = feedback.type_of_feedback?.toLowerCase() ?? '';
+
+      if (category.includes('missing item')) {
         byMarket[market].missingItems += 1;
-      } else if (feedback.complaint_category?.toLowerCase().includes('sandwich made wrong')) {
+      } else if (category.includes('sandwich made wrong')) {
         byMarket[market].sandwichWrong += 1;
+      } else if (category.includes('order accuracy') || type.includes('order accuracy')) {
+        byMarket[market].orderAccuracy += 1;
       }
     });
 
@@ -55,7 +60,8 @@ export function CategoryComparisonChart({ feedbacks }: CategoryComparisonChartPr
         market,
         "Missing Items": counts.missingItems,
         "Sandwich Made Wrong": counts.sandwichWrong,
-        total: counts.missingItems + counts.sandwichWrong,
+        "Order Accuracy": counts.orderAccuracy,
+        total: counts.missingItems + counts.sandwichWrong + counts.orderAccuracy,
       }))
       .sort((a, b) => b.total - a.total);
   }, [feedbacks]);
@@ -84,6 +90,7 @@ export function CategoryComparisonChart({ feedbacks }: CategoryComparisonChartPr
             <Legend />
             <Bar dataKey="Missing Items" fill="hsl(var(--destructive))" stackId="a" />
             <Bar dataKey="Sandwich Made Wrong" fill="hsl(var(--foreground))" stackId="a" />
+            <Bar dataKey="Order Accuracy" fill="hsl(var(--primary))" stackId="a" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
