@@ -70,7 +70,7 @@ export function MarketRankingsTable({ feedbacks }: MarketRankingsTableProps) {
             <TableHeader>
               <TableRow>
                 <TableHead>Rank</TableHead>
-                <TableHead>Market</TableHead>
+                <TableHead>District</TableHead>
                 <TableHead className="text-right">Stores</TableHead>
                 <TableHead className="text-right">Missing</TableHead>
                 <TableHead className="text-right">Wrong</TableHead>
@@ -125,7 +125,7 @@ export function MarketRankingsTable({ feedbacks }: MarketRankingsTableProps) {
             <TableHeader>
               <TableRow>
                 <TableHead>Rank</TableHead>
-                <TableHead>Market</TableHead>
+                <TableHead>District</TableHead>
                 <TableHead className="text-right">Stores</TableHead>
                 <TableHead className="text-right">Missing</TableHead>
                 <TableHead className="text-right">Wrong</TableHead>
