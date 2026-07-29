@@ -52,28 +52,43 @@ export function AccuracyDrillDownDialog({
 }: AccuracyDrillDownDialogProps) {
   const [region, setRegion] = useState<string | null>(null);
   const [district, setDistrict] = useState<string | null>(null);
+  const [store, setStore] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       setRegion(null);
       setDistrict(null);
+      setStore(null);
     }
   }, [isOpen]);
 
-  const level: Level = district ? "store" : region ? "district" : "region";
+  const level: Level = store ? "feedback" : district ? "store" : region ? "district" : "region";
 
   const scoped = useMemo(() => {
     let items = feedbacks;
     if (region) items = items.filter((fb) => getRegion(fb.market) === region);
     if (district) items = items.filter((fb) => getDistrict(fb.market) === district);
+    if (store) items = items.filter((fb) => (fb.store_number || "Unknown") === store);
     return items;
-  }, [feedbacks, region, district]);
+  }, [feedbacks, region, district, store]);
 
   const rows = useMemo(() => {
     if (level === "region") return aggregate(scoped, (fb) => getRegion(fb.market));
     if (level === "district") return aggregate(scoped, (fb) => getDistrict(fb.market));
-    return aggregate(scoped, (fb) => fb.store_number || "Unknown");
+    if (level === "store") return aggregate(scoped, (fb) => fb.store_number || "Unknown");
+    return [];
   }, [scoped, level]);
+
+  const feedbackItems = useMemo(
+    () =>
+      level === "feedback"
+        ? [...scoped].sort(
+            (a, b) =>
+              new Date(b.feedback_date).getTime() - new Date(a.feedback_date).getTime()
+          )
+        : [],
+    [scoped, level]
+  );
 
   const labelForLevel = level === "region" ? "Region" : level === "district" ? "District" : "Store";
 
