@@ -69,6 +69,27 @@ export default function Accuracy() {
     }
   };
 
+  const fetchStores = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('stores')
+        .select('store_number, store_name, region, is_active')
+        .eq('is_active', true)
+        .order('store_number');
+
+      if (error) throw error;
+      setStores((data as StoreInfo[]) || []);
+    } catch (error) {
+      console.error("Error fetching stores:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchStores();
+    }
+  }, [user?.id]);
+
   const loadAccuracyFeedback = async () => {
     try {
       setLoading(true);
