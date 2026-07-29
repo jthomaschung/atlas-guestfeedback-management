@@ -5,14 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, TrendingUp, Award } from "lucide-react";
+import { StoreInfo } from "./StoreRankingsTable";
 
 interface MarketRankingsTableProps {
   feedbacks: CustomerFeedback[];
   periods: Period[];
   selectedPeriod: string | null;
+  stores?: StoreInfo[];
 }
 
-export function MarketRankingsTable({ feedbacks }: MarketRankingsTableProps) {
+export function MarketRankingsTable({ feedbacks, stores = [] }: MarketRankingsTableProps) {
   const marketData = useMemo(() => {
     const byMarket: Record<string, {
       market: string;
@@ -21,6 +23,23 @@ export function MarketRankingsTable({ feedbacks }: MarketRankingsTableProps) {
       sandwichWrong: number;
       total: number;
     }> = {};
+
+    // Seed every known district from active stores so districts with zero issues still appear
+    stores.forEach((store) => {
+      const market = store.region?.trim() || "Unknown";
+      if (!byMarket[market]) {
+        byMarket[market] = {
+          market,
+          storeCount: new Set(),
+          missingItems: 0,
+          sandwichWrong: 0,
+          total: 0,
+        };
+      }
+      if (store.store_number) {
+        byMarket[market].storeCount.add(store.store_number);
+      }
+    });
 
     feedbacks.forEach((feedback) => {
       const market = feedback.market || "Unknown";
@@ -35,7 +54,9 @@ export function MarketRankingsTable({ feedbacks }: MarketRankingsTableProps) {
         };
       }
 
-      byMarket[market].storeCount.add(feedback.store_number);
+      if (feedback.store_number) {
+        byMarket[market].storeCount.add(feedback.store_number);
+      }
 
       if (feedback.complaint_category?.toLowerCase().includes('missing item')) {
         byMarket[market].missingItems += 1;
@@ -45,15 +66,72 @@ export function MarketRankingsTable({ feedbacks }: MarketRankingsTableProps) {
       byMarket[market].total += 1;
     });
 
+    // Fewer issues = better accuracy; sort ascending by total
     return Object.values(byMarket).map(data => ({
       ...data,
       stores: data.storeCount.size,
       avgPerStore: data.storeCount.size > 0 ? (data.total / data.storeCount.size).toFixed(1) : "0",
-    })).sort((a, b) => parseFloat(a.avgPerStore) - parseFloat(b.avgPerStore));
-  }, [feedbacks]);
+    })).sort((a, b) => a.total - b.total);
+  }, [feedbacks, stores]);
 
-  const bestPerformers = marketData.slice(0, 8);
-  const worstPerformers = marketData.slice(-8).reverse();
+  const bestPerformers = marketData;
+  const worstPerformers = [...marketData].reverse();
+
+  const renderDistrictTable = (data: typeof marketData, showTrophies = false) => (
+    <div className="rounded-md border overflow-auto max-h-[500px]">
+      <Table>
+        <TableHeader className="bg-muted/50 sticky top-0 z-10">
+          <TableRow>
+            <TableHead className="w-20">Rank</TableHead>
+            <TableHead>District</TableHead>
+            <TableHead className="text-right">Stores</TableHead>
+            <TableHead className="text-right">Missing</TableHead>
+            <TableHead className="text-right">Wrong</TableHead>
+            <TableHead className="text-right">Total</TableHead>
+            <TableHead className="text-right">Avg/Store</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {data.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                No districts found
+              </TableCell>
+            </TableRow>
+          ) : (
+            data.map((market, index) => (
+              <TableRow key={market.market}>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    {showTrophies && index === 0 && <Trophy className="h-4 w-4 text-yellow-500" />}
+                    {showTrophies && index === 1 && <Trophy className="h-4 w-4 text-gray-400" />}
+                    {showTrophies && index === 2 && <Trophy className="h-4 w-4 text-amber-600" />}
+                    <span className="font-medium">#{index + 1}</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="font-medium">{market.market}</Badge>
+                </TableCell>
+                <TableCell className="text-right">{market.stores}</TableCell>
+                <TableCell className="text-right">
+                  <span className="text-red-600">{market.missingItems}</span>
+                </TableCell>
+                <TableCell className="text-right">
+                  <span className="text-amber-600">{market.sandwichWrong}</span>
+                </TableCell>
+                <TableCell className="text-right">
+                  <Badge variant={market.total > 0 ? "secondary" : "default"}>{market.total}</Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  <span className="font-semibold text-green-600">{market.avgPerStore}</span>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  );
 
   return (
     <div className="grid lg:grid-cols-2 gap-6">
@@ -66,49 +144,7 @@ export function MarketRankingsTable({ feedbacks }: MarketRankingsTableProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Rank</TableHead>
-                <TableHead>District</TableHead>
-                <TableHead className="text-right">Stores</TableHead>
-                <TableHead className="text-right">Missing</TableHead>
-                <TableHead className="text-right">Wrong</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-                <TableHead className="text-right">Avg/Store</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {bestPerformers.map((market, index) => (
-                <TableRow key={market.market}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {index === 0 && <Trophy className="h-4 w-4 text-yellow-500" />}
-                      {index === 1 && <Trophy className="h-4 w-4 text-gray-400" />}
-                      {index === 2 && <Trophy className="h-4 w-4 text-amber-600" />}
-                      <span className="font-medium">#{index + 1}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="font-medium">{market.market}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">{market.stores}</TableCell>
-                  <TableCell className="text-right">
-                    <span className="text-red-600">{market.missingItems}</span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className="text-amber-600">{market.sandwichWrong}</span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant="secondary">{market.total}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className="font-semibold text-green-600">{market.avgPerStore}</span>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          {renderDistrictTable(bestPerformers, true)}
         </CardContent>
       </Card>
 
@@ -121,42 +157,7 @@ export function MarketRankingsTable({ feedbacks }: MarketRankingsTableProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Rank</TableHead>
-                <TableHead>District</TableHead>
-                <TableHead className="text-right">Stores</TableHead>
-                <TableHead className="text-right">Missing</TableHead>
-                <TableHead className="text-right">Wrong</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-                <TableHead className="text-right">Avg/Store</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {worstPerformers.map((market, index) => (
-                <TableRow key={market.market} className="bg-red-50 dark:bg-red-950/20">
-                  <TableCell className="font-medium">#{index + 1}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="font-medium">{market.market}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">{market.stores}</TableCell>
-                  <TableCell className="text-right">
-                    <span className="text-red-600 font-semibold">{market.missingItems}</span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className="text-amber-600 font-semibold">{market.sandwichWrong}</span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant="destructive">{market.total}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className="font-bold text-red-600">{market.avgPerStore}</span>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          {renderDistrictTable(worstPerformers, false)}
         </CardContent>
       </Card>
     </div>
