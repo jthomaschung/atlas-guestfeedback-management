@@ -186,14 +186,6 @@ export default function Accuracy() {
 
   const stats = [
     {
-      title: "Total Accuracy Issues",
-      value: totalAccuracyIssues,
-      icon: AlertTriangle,
-      color: "text-orange-600",
-      trend: null,
-      onClick: () => openDrill("Total Accuracy Issues", "all"),
-    },
-    {
       title: "Total Order Issues",
       value: totalOrderIssues,
       icon: AlertCircle,
