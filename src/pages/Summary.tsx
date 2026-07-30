@@ -139,9 +139,9 @@ const Summary = () => {
     const pending = feedbacksToCalculate.filter(fb => fb.resolution_status === 'unopened');
     const critical = feedbacksToCalculate.filter(fb => fb.priority === 'Critical' && fb.resolution_status !== 'resolved');
     
-    // Calculate average response time for responded/resolved feedback
+    // Calculate average response time (acknowledged FYIs are excluded — their clock stops)
     const respondedFeedbacks = feedbacksToCalculate.filter(fb => 
-      fb.resolution_status !== 'unopened'
+      fb.resolution_status !== 'unopened' && fb.resolution_status !== 'acknowledged'
     );
     
     const responseTimes = respondedFeedbacks.map(fb => {
