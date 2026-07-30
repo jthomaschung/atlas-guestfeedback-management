@@ -11268,30 +11268,6 @@ export type Database = {
         }
         Relationships: []
       }
-      store_hierarchy: {
-        Row: {
-          active: boolean
-          district: string
-          region: string
-          store_name: string | null
-          store_number: string
-        }
-        Insert: {
-          active?: boolean
-          district: string
-          region: string
-          store_name?: string | null
-          store_number: string
-        }
-        Update: {
-          active?: boolean
-          district?: string
-          region?: string
-          store_name?: string | null
-          store_number?: string
-        }
-        Relationships: []
-      }
       store_information: {
         Row: {
           alarm_code: string | null
@@ -12738,36 +12714,6 @@ export type Database = {
           assigned_by?: string | null
           id?: string
           portal_role_id?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_profiles: {
-        Row: {
-          created_at: string
-          district: string | null
-          full_name: string | null
-          region: string | null
-          role: string
-          store_number: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          district?: string | null
-          full_name?: string | null
-          region?: string | null
-          role: string
-          store_number?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          district?: string | null
-          full_name?: string | null
-          region?: string | null
-          role?: string
-          store_number?: string | null
           user_id?: string
         }
         Relationships: []
@@ -14734,7 +14680,6 @@ export type Database = {
           category_name: string | null
           district: string | null
           item_name: string | null
-          region: string | null
           store_name: string | null
           store_number: string | null
           theoretical_usage: number | null
@@ -14754,7 +14699,6 @@ export type Database = {
           cogs_variance_pct: number | null
           district: string | null
           fiscal_year: number | null
-          region: string | null
           store_name: string | null
           store_number: string | null
           theoretical_cogs_pct: number | null
@@ -16348,7 +16292,6 @@ export type Database = {
           status: string
         }[]
       }
-      visible_stores: { Args: never; Returns: string[] }
     }
     Enums: {
       access_scope_type: "none" | "store" | "region" | "all"
