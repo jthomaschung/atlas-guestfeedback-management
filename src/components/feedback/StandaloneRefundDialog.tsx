@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DollarSign, Loader2, Camera, X, ImageIcon } from 'lucide-react';
+import { DollarSign, Loader2, Camera, X, ImageIcon, Upload } from 'lucide-react';
 import { ReceiptExampleHint } from './ReceiptExampleHint';
 
 interface StandaloneRefundDialogProps {
@@ -87,6 +87,9 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
   const [bypassReceipt, setBypassReceipt] = useState(false);
   const [bypassReason, setBypassReason] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Separate input without `capture` — on mobile, `capture` forces the
+  // camera and hides the gallery/file picker entirely.
+  const uploadInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -110,6 +113,7 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
     if (receiptPreview) URL.revokeObjectURL(receiptPreview);
     setReceiptPreview(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
+    if (uploadInputRef.current) uploadInputRef.current.value = '';
   };
 
   const resetForm = () => {
@@ -388,6 +392,13 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
               className="hidden"
               onChange={handleFileChange}
             />
+            <input
+              ref={uploadInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileChange}
+            />
 
             {receiptPreview ? (
               <div className="relative rounded-md border border-border overflow-hidden">
@@ -409,14 +420,23 @@ export function StandaloneRefundDialog({ isOpen, onClose }: StandaloneRefundDial
             ) : !bypassReceipt ? (
               <div className="space-y-2">
                 <ReceiptExampleHint />
-                <div
-                  className="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-muted-foreground/30 p-6 cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Camera className="h-8 w-8 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground text-center">
-                    Tap to take a photo or upload receipt
-                  </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex flex-col items-center justify-center gap-1.5 rounded-md border-2 border-dashed border-muted-foreground/30 p-5 hover:border-primary/50 hover:bg-muted/50 transition-colors"
+                  >
+                    <Camera className="h-7 w-7 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">Take photo</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => uploadInputRef.current?.click()}
+                    className="flex flex-col items-center justify-center gap-1.5 rounded-md border-2 border-dashed border-muted-foreground/30 p-5 hover:border-primary/50 hover:bg-muted/50 transition-colors"
+                  >
+                    <Upload className="h-7 w-7 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">Upload image</span>
+                  </button>
                 </div>
               </div>
             ) : (

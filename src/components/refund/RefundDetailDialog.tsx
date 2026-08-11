@@ -91,6 +91,9 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
   const [customerEmail, setCustomerEmail] = useState<string | null>(null);
   const [requesterEmail, setRequesterEmail] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // No `capture` here — that attribute forces the camera on mobile and
+  // removes any way to pick an existing image.
+  const uploadInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (request) {
@@ -394,6 +397,7 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
             ) : (
               <div className="mt-1">
                 <input ref={fileInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileChange} />
+                <input ref={uploadInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
                 {receiptPreview ? (
                   <div className="relative rounded-md border overflow-hidden">
                     <img src={receiptPreview} alt="Preview" className="w-full max-h-40 object-contain bg-muted" />
@@ -402,12 +406,23 @@ export function RefundDetailDialog({ request, isOpen, onClose, onUpdate }: Refun
                     </Button>
                   </div>
                 ) : (
-                  <div
-                    className="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-muted-foreground/30 p-4 cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <Upload className="h-6 w-6 text-muted-foreground" />
-                    <p className="text-xs text-muted-foreground">Upload refund receipt</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex flex-col items-center justify-center gap-1.5 rounded-md border-2 border-dashed border-muted-foreground/30 p-4 hover:border-primary/50 hover:bg-muted/50 transition-colors"
+                    >
+                      <Camera className="h-6 w-6 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">Take photo</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => uploadInputRef.current?.click()}
+                      className="flex flex-col items-center justify-center gap-1.5 rounded-md border-2 border-dashed border-muted-foreground/30 p-4 hover:border-primary/50 hover:bg-muted/50 transition-colors"
+                    >
+                      <Upload className="h-6 w-6 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">Upload image</span>
+                    </button>
                   </div>
                 )}
                 {receiptFile && (
