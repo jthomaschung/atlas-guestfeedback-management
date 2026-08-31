@@ -1,0 +1,4 @@
+DROP TRIGGER IF EXISTS auto_escalate_critical_feedback_before_trigger ON public.customer_feedback;
+CREATE TRIGGER zz_auto_escalate_critical_feedback_before_trigger
+BEFORE INSERT ON public.customer_feedback
+FOR EACH ROW EXECUTE FUNCTION public.auto_escalate_critical_feedback_before_insert();
