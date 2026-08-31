@@ -125,6 +125,524 @@ export type Database = {
         }
         Relationships: []
       }
+      acquisition_onboarding: {
+        Row: {
+          acquisition_group: string
+          acquisition_notes: string | null
+          address: string | null
+          annual_salary: number | null
+          applicant_email: string
+          applicant_phone: string
+          application_source: string | null
+          auto_insurance_carrier: string | null
+          city: string | null
+          created_at: string
+          date_of_birth: string | null
+          drivers_license_number: string | null
+          drivers_license_state: string | null
+          email_address: string
+          employment_type: string | null
+          estimated_start_date: string
+          fhc_expiration: string | null
+          fhc_number: string | null
+          first_name: string
+          has_food_handlers_card: boolean | null
+          has_servsafe: boolean | null
+          hiring_manager: string
+          hours: string | null
+          id: string
+          id_expiration_date: string | null
+          id_number: string | null
+          id_ocr_extracted: Json | null
+          id_ocr_raw: Json | null
+          id_ocr_scanned_at: string | null
+          id_ocr_status: string | null
+          id_ocr_verification: Json | null
+          id_ocr_verified_at: string | null
+          id_ocr_verified_by: string | null
+          id_ocr_verified_note: string | null
+          id_photo_back_url: string | null
+          id_photo_front_url: string | null
+          id_photo_uploaded_at: string | null
+          id_type: string | null
+          id_upload_requested_at: string | null
+          id_upload_token: string | null
+          id_upload_token_expires_at: string | null
+          is_airport_store: boolean | null
+          is_rehire: boolean | null
+          last_name: string
+          license_expiration_date: string | null
+          market: string
+          middle_name: string | null
+          mvr_approval: boolean | null
+          notes: string | null
+          policy_expiration_date: string | null
+          policy_number: string | null
+          position: string
+          preferred_name: string | null
+          referral_name: string | null
+          same_day_hire: boolean
+          security_clearance_notes: string | null
+          security_clearance_required: boolean | null
+          security_clearance_status: string | null
+          servsafe_expiration: string | null
+          servsafe_number: string | null
+          sign_on_bonus: string | null
+          ssn_last_4: string | null
+          state: string | null
+          state_of_residence: string | null
+          status: string | null
+          store_number: string
+          submitted_by: string | null
+          suffix: string | null
+          updated_at: string
+          wage: number | null
+          wage_within_scale: string | null
+          will_be_driving: boolean | null
+          work_schedule: string | null
+          zip: string | null
+        }
+        Insert: {
+          acquisition_group?: string
+          acquisition_notes?: string | null
+          address?: string | null
+          annual_salary?: number | null
+          applicant_email: string
+          applicant_phone: string
+          application_source?: string | null
+          auto_insurance_carrier?: string | null
+          city?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          drivers_license_number?: string | null
+          drivers_license_state?: string | null
+          email_address: string
+          employment_type?: string | null
+          estimated_start_date: string
+          fhc_expiration?: string | null
+          fhc_number?: string | null
+          first_name: string
+          has_food_handlers_card?: boolean | null
+          has_servsafe?: boolean | null
+          hiring_manager: string
+          hours?: string | null
+          id?: string
+          id_expiration_date?: string | null
+          id_number?: string | null
+          id_ocr_extracted?: Json | null
+          id_ocr_raw?: Json | null
+          id_ocr_scanned_at?: string | null
+          id_ocr_status?: string | null
+          id_ocr_verification?: Json | null
+          id_ocr_verified_at?: string | null
+          id_ocr_verified_by?: string | null
+          id_ocr_verified_note?: string | null
+          id_photo_back_url?: string | null
+          id_photo_front_url?: string | null
+          id_photo_uploaded_at?: string | null
+          id_type?: string | null
+          id_upload_requested_at?: string | null
+          id_upload_token?: string | null
+          id_upload_token_expires_at?: string | null
+          is_airport_store?: boolean | null
+          is_rehire?: boolean | null
+          last_name: string
+          license_expiration_date?: string | null
+          market: string
+          middle_name?: string | null
+          mvr_approval?: boolean | null
+          notes?: string | null
+          policy_expiration_date?: string | null
+          policy_number?: string | null
+          position: string
+          preferred_name?: string | null
+          referral_name?: string | null
+          same_day_hire?: boolean
+          security_clearance_notes?: string | null
+          security_clearance_required?: boolean | null
+          security_clearance_status?: string | null
+          servsafe_expiration?: string | null
+          servsafe_number?: string | null
+          sign_on_bonus?: string | null
+          ssn_last_4?: string | null
+          state?: string | null
+          state_of_residence?: string | null
+          status?: string | null
+          store_number: string
+          submitted_by?: string | null
+          suffix?: string | null
+          updated_at?: string
+          wage?: number | null
+          wage_within_scale?: string | null
+          will_be_driving?: boolean | null
+          work_schedule?: string | null
+          zip?: string | null
+        }
+        Update: {
+          acquisition_group?: string
+          acquisition_notes?: string | null
+          address?: string | null
+          annual_salary?: number | null
+          applicant_email?: string
+          applicant_phone?: string
+          application_source?: string | null
+          auto_insurance_carrier?: string | null
+          city?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          drivers_license_number?: string | null
+          drivers_license_state?: string | null
+          email_address?: string
+          employment_type?: string | null
+          estimated_start_date?: string
+          fhc_expiration?: string | null
+          fhc_number?: string | null
+          first_name?: string
+          has_food_handlers_card?: boolean | null
+          has_servsafe?: boolean | null
+          hiring_manager?: string
+          hours?: string | null
+          id?: string
+          id_expiration_date?: string | null
+          id_number?: string | null
+          id_ocr_extracted?: Json | null
+          id_ocr_raw?: Json | null
+          id_ocr_scanned_at?: string | null
+          id_ocr_status?: string | null
+          id_ocr_verification?: Json | null
+          id_ocr_verified_at?: string | null
+          id_ocr_verified_by?: string | null
+          id_ocr_verified_note?: string | null
+          id_photo_back_url?: string | null
+          id_photo_front_url?: string | null
+          id_photo_uploaded_at?: string | null
+          id_type?: string | null
+          id_upload_requested_at?: string | null
+          id_upload_token?: string | null
+          id_upload_token_expires_at?: string | null
+          is_airport_store?: boolean | null
+          is_rehire?: boolean | null
+          last_name?: string
+          license_expiration_date?: string | null
+          market?: string
+          middle_name?: string | null
+          mvr_approval?: boolean | null
+          notes?: string | null
+          policy_expiration_date?: string | null
+          policy_number?: string | null
+          position?: string
+          preferred_name?: string | null
+          referral_name?: string | null
+          same_day_hire?: boolean
+          security_clearance_notes?: string | null
+          security_clearance_required?: boolean | null
+          security_clearance_status?: string | null
+          servsafe_expiration?: string | null
+          servsafe_number?: string | null
+          sign_on_bonus?: string | null
+          ssn_last_4?: string | null
+          state?: string | null
+          state_of_residence?: string | null
+          status?: string | null
+          store_number?: string
+          submitted_by?: string | null
+          suffix?: string | null
+          updated_at?: string
+          wage?: number | null
+          wage_within_scale?: string | null
+          will_be_driving?: boolean | null
+          work_schedule?: string | null
+          zip?: string | null
+        }
+        Relationships: []
+      }
+      acquisition_onboarding_tasks: {
+        Row: {
+          adp_employee_id: string | null
+          adp_user_id: string | null
+          airport_background_check_complete: boolean | null
+          airport_background_check_complete_at: string | null
+          airport_badge_issued: boolean | null
+          airport_badge_issued_at: string | null
+          airport_badge_pickup_appointment_date: string | null
+          airport_badge_request_sent: boolean | null
+          airport_badge_request_sent_at: string | null
+          airport_fingerprint_appointment_date: string | null
+          airport_fingerprinting_complete: boolean | null
+          airport_fingerprinting_complete_at: string | null
+          archive_warning_sent_at: string | null
+          associate_id: string | null
+          auto_archive_waived: boolean
+          clearance_email_sent: boolean | null
+          clearance_email_sent_at: string | null
+          clearance_needed_notice_sent_at: string | null
+          company_email_login: string | null
+          company_email_password: string | null
+          company_email_setup: boolean | null
+          company_email_setup_at: string | null
+          company_policies_complete: boolean | null
+          company_policies_completed_at: string | null
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          drivers_license_verified: boolean | null
+          drivers_license_verified_at: string | null
+          emergency_contacts_complete: boolean | null
+          emergency_contacts_completed_at: string | null
+          fast_track_complete: boolean | null
+          fast_track_completed_at: string | null
+          fast_track_login: string | null
+          fast_track_password: string | null
+          fhc_complete: boolean | null
+          fhc_completed_at: string | null
+          handbook_signed: boolean | null
+          handbook_signed_at: string | null
+          i9_complete: boolean | null
+          i9_completed_at: string | null
+          i9_documents_received: boolean | null
+          i9_list_a_document_number: string | null
+          i9_list_a_document_type: string | null
+          i9_list_a_expiration: string | null
+          i9_list_a_issuing_authority: string | null
+          i9_list_b_document_number: string | null
+          i9_list_b_document_type: string | null
+          i9_list_b_expiration: string | null
+          i9_list_b_issuing_authority: string | null
+          i9_list_c_document_number: string | null
+          i9_list_c_document_type: string | null
+          i9_list_c_expiration: string | null
+          i9_list_c_issuing_authority: string | null
+          i9_section2_complete: boolean | null
+          i9_section2_completed_at: string | null
+          i9_video_call_complete: boolean | null
+          id: string
+          insurance_card_verified: boolean | null
+          insurance_card_verified_at: string | null
+          insurance_info_verified: boolean | null
+          insurance_info_verified_at: string | null
+          makeshift_login: string | null
+          makeshift_password: string | null
+          makeshift_sent: boolean | null
+          makeshift_sent_at: string | null
+          mvr_approved: boolean | null
+          mvr_approved_at: string | null
+          mvr_clearance_at: string | null
+          mvr_clearance_complete: boolean | null
+          new_hire_id: string
+          oe_sent_complete: boolean | null
+          oe_sent_completed_at: string | null
+          onboarding_sent: boolean | null
+          onboarding_sent_at: string | null
+          payment_options_complete: boolean | null
+          payment_options_completed_at: string | null
+          review_documents_complete: boolean | null
+          review_documents_completed_at: string | null
+          servsafe_complete: boolean | null
+          servsafe_completed_at: string | null
+          supervisor_harassment_training_complete: boolean | null
+          supervisor_harassment_training_completed_at: string | null
+          tax_withholding_complete: boolean | null
+          tax_withholding_completed_at: string | null
+          updated_at: string
+          upload_documents_complete: boolean | null
+          upload_documents_completed_at: string | null
+          welcome_text_sent: boolean | null
+          welcome_text_sent_at: string | null
+        }
+        Insert: {
+          adp_employee_id?: string | null
+          adp_user_id?: string | null
+          airport_background_check_complete?: boolean | null
+          airport_background_check_complete_at?: string | null
+          airport_badge_issued?: boolean | null
+          airport_badge_issued_at?: string | null
+          airport_badge_pickup_appointment_date?: string | null
+          airport_badge_request_sent?: boolean | null
+          airport_badge_request_sent_at?: string | null
+          airport_fingerprint_appointment_date?: string | null
+          airport_fingerprinting_complete?: boolean | null
+          airport_fingerprinting_complete_at?: string | null
+          archive_warning_sent_at?: string | null
+          associate_id?: string | null
+          auto_archive_waived?: boolean
+          clearance_email_sent?: boolean | null
+          clearance_email_sent_at?: string | null
+          clearance_needed_notice_sent_at?: string | null
+          company_email_login?: string | null
+          company_email_password?: string | null
+          company_email_setup?: boolean | null
+          company_email_setup_at?: string | null
+          company_policies_complete?: boolean | null
+          company_policies_completed_at?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          drivers_license_verified?: boolean | null
+          drivers_license_verified_at?: string | null
+          emergency_contacts_complete?: boolean | null
+          emergency_contacts_completed_at?: string | null
+          fast_track_complete?: boolean | null
+          fast_track_completed_at?: string | null
+          fast_track_login?: string | null
+          fast_track_password?: string | null
+          fhc_complete?: boolean | null
+          fhc_completed_at?: string | null
+          handbook_signed?: boolean | null
+          handbook_signed_at?: string | null
+          i9_complete?: boolean | null
+          i9_completed_at?: string | null
+          i9_documents_received?: boolean | null
+          i9_list_a_document_number?: string | null
+          i9_list_a_document_type?: string | null
+          i9_list_a_expiration?: string | null
+          i9_list_a_issuing_authority?: string | null
+          i9_list_b_document_number?: string | null
+          i9_list_b_document_type?: string | null
+          i9_list_b_expiration?: string | null
+          i9_list_b_issuing_authority?: string | null
+          i9_list_c_document_number?: string | null
+          i9_list_c_document_type?: string | null
+          i9_list_c_expiration?: string | null
+          i9_list_c_issuing_authority?: string | null
+          i9_section2_complete?: boolean | null
+          i9_section2_completed_at?: string | null
+          i9_video_call_complete?: boolean | null
+          id?: string
+          insurance_card_verified?: boolean | null
+          insurance_card_verified_at?: string | null
+          insurance_info_verified?: boolean | null
+          insurance_info_verified_at?: string | null
+          makeshift_login?: string | null
+          makeshift_password?: string | null
+          makeshift_sent?: boolean | null
+          makeshift_sent_at?: string | null
+          mvr_approved?: boolean | null
+          mvr_approved_at?: string | null
+          mvr_clearance_at?: string | null
+          mvr_clearance_complete?: boolean | null
+          new_hire_id: string
+          oe_sent_complete?: boolean | null
+          oe_sent_completed_at?: string | null
+          onboarding_sent?: boolean | null
+          onboarding_sent_at?: string | null
+          payment_options_complete?: boolean | null
+          payment_options_completed_at?: string | null
+          review_documents_complete?: boolean | null
+          review_documents_completed_at?: string | null
+          servsafe_complete?: boolean | null
+          servsafe_completed_at?: string | null
+          supervisor_harassment_training_complete?: boolean | null
+          supervisor_harassment_training_completed_at?: string | null
+          tax_withholding_complete?: boolean | null
+          tax_withholding_completed_at?: string | null
+          updated_at?: string
+          upload_documents_complete?: boolean | null
+          upload_documents_completed_at?: string | null
+          welcome_text_sent?: boolean | null
+          welcome_text_sent_at?: string | null
+        }
+        Update: {
+          adp_employee_id?: string | null
+          adp_user_id?: string | null
+          airport_background_check_complete?: boolean | null
+          airport_background_check_complete_at?: string | null
+          airport_badge_issued?: boolean | null
+          airport_badge_issued_at?: string | null
+          airport_badge_pickup_appointment_date?: string | null
+          airport_badge_request_sent?: boolean | null
+          airport_badge_request_sent_at?: string | null
+          airport_fingerprint_appointment_date?: string | null
+          airport_fingerprinting_complete?: boolean | null
+          airport_fingerprinting_complete_at?: string | null
+          archive_warning_sent_at?: string | null
+          associate_id?: string | null
+          auto_archive_waived?: boolean
+          clearance_email_sent?: boolean | null
+          clearance_email_sent_at?: string | null
+          clearance_needed_notice_sent_at?: string | null
+          company_email_login?: string | null
+          company_email_password?: string | null
+          company_email_setup?: boolean | null
+          company_email_setup_at?: string | null
+          company_policies_complete?: boolean | null
+          company_policies_completed_at?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          drivers_license_verified?: boolean | null
+          drivers_license_verified_at?: string | null
+          emergency_contacts_complete?: boolean | null
+          emergency_contacts_completed_at?: string | null
+          fast_track_complete?: boolean | null
+          fast_track_completed_at?: string | null
+          fast_track_login?: string | null
+          fast_track_password?: string | null
+          fhc_complete?: boolean | null
+          fhc_completed_at?: string | null
+          handbook_signed?: boolean | null
+          handbook_signed_at?: string | null
+          i9_complete?: boolean | null
+          i9_completed_at?: string | null
+          i9_documents_received?: boolean | null
+          i9_list_a_document_number?: string | null
+          i9_list_a_document_type?: string | null
+          i9_list_a_expiration?: string | null
+          i9_list_a_issuing_authority?: string | null
+          i9_list_b_document_number?: string | null
+          i9_list_b_document_type?: string | null
+          i9_list_b_expiration?: string | null
+          i9_list_b_issuing_authority?: string | null
+          i9_list_c_document_number?: string | null
+          i9_list_c_document_type?: string | null
+          i9_list_c_expiration?: string | null
+          i9_list_c_issuing_authority?: string | null
+          i9_section2_complete?: boolean | null
+          i9_section2_completed_at?: string | null
+          i9_video_call_complete?: boolean | null
+          id?: string
+          insurance_card_verified?: boolean | null
+          insurance_card_verified_at?: string | null
+          insurance_info_verified?: boolean | null
+          insurance_info_verified_at?: string | null
+          makeshift_login?: string | null
+          makeshift_password?: string | null
+          makeshift_sent?: boolean | null
+          makeshift_sent_at?: string | null
+          mvr_approved?: boolean | null
+          mvr_approved_at?: string | null
+          mvr_clearance_at?: string | null
+          mvr_clearance_complete?: boolean | null
+          new_hire_id?: string
+          oe_sent_complete?: boolean | null
+          oe_sent_completed_at?: string | null
+          onboarding_sent?: boolean | null
+          onboarding_sent_at?: string | null
+          payment_options_complete?: boolean | null
+          payment_options_completed_at?: string | null
+          review_documents_complete?: boolean | null
+          review_documents_completed_at?: string | null
+          servsafe_complete?: boolean | null
+          servsafe_completed_at?: string | null
+          supervisor_harassment_training_complete?: boolean | null
+          supervisor_harassment_training_completed_at?: string | null
+          tax_withholding_complete?: boolean | null
+          tax_withholding_completed_at?: string | null
+          updated_at?: string
+          upload_documents_complete?: boolean | null
+          upload_documents_completed_at?: string | null
+          welcome_text_sent?: boolean | null
+          welcome_text_sent_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "acquisition_onboarding_tasks_hire_fk"
+            columns: ["new_hire_id"]
+            isOneToOne: true
+            referencedRelation: "acquisition_onboarding"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       airport_clearance_appointment_history: {
         Row: {
           appointment_type: string
@@ -397,6 +915,27 @@ export type Database = {
           storage_location?: string | null
           updated_at?: string | null
           used_by?: string[] | null
+        }
+        Relationships: []
+      }
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
         }
         Relationships: []
       }
@@ -819,6 +1358,129 @@ export type Database = {
         }
         Update: {
           user_id?: string
+        }
+        Relationships: []
+      }
+      box_lunch_store_visits: {
+        Row: {
+          coaching_needed: boolean | null
+          collateral_displayed: boolean | null
+          collateral_photo_url: string | null
+          contact_name: string | null
+          contest_standings: string | null
+          created_at: string
+          created_by: string
+          follow_up_date: string | null
+          id: string
+          kits_ready: boolean | null
+          leaderboard_reviewed: boolean | null
+          market: string | null
+          opportunities: string | null
+          red_pen_process: boolean | null
+          rep_name: string | null
+          store_number: string | null
+          strengths: string | null
+          team_aware_of_contest: boolean | null
+          tv_display_working: boolean | null
+          updated_at: string
+          using_upsell_pitch: boolean | null
+          visit_date: string
+          visit_type: string | null
+        }
+        Insert: {
+          coaching_needed?: boolean | null
+          collateral_displayed?: boolean | null
+          collateral_photo_url?: string | null
+          contact_name?: string | null
+          contest_standings?: string | null
+          created_at?: string
+          created_by?: string
+          follow_up_date?: string | null
+          id?: string
+          kits_ready?: boolean | null
+          leaderboard_reviewed?: boolean | null
+          market?: string | null
+          opportunities?: string | null
+          red_pen_process?: boolean | null
+          rep_name?: string | null
+          store_number?: string | null
+          strengths?: string | null
+          team_aware_of_contest?: boolean | null
+          tv_display_working?: boolean | null
+          updated_at?: string
+          using_upsell_pitch?: boolean | null
+          visit_date?: string
+          visit_type?: string | null
+        }
+        Update: {
+          coaching_needed?: boolean | null
+          collateral_displayed?: boolean | null
+          collateral_photo_url?: string | null
+          contact_name?: string | null
+          contest_standings?: string | null
+          created_at?: string
+          created_by?: string
+          follow_up_date?: string | null
+          id?: string
+          kits_ready?: boolean | null
+          leaderboard_reviewed?: boolean | null
+          market?: string | null
+          opportunities?: string | null
+          red_pen_process?: boolean | null
+          rep_name?: string | null
+          store_number?: string | null
+          strengths?: string | null
+          team_aware_of_contest?: boolean | null
+          tv_display_working?: boolean | null
+          updated_at?: string
+          using_upsell_pitch?: boolean | null
+          visit_date?: string
+          visit_type?: string | null
+        }
+        Relationships: []
+      }
+      box_lunch_verifications: {
+        Row: {
+          created_at: string
+          created_by: string
+          display_visible: boolean | null
+          id: string
+          market: string | null
+          notes: string | null
+          photo_url: string | null
+          store_number: string
+          team_trained: boolean | null
+          updated_at: string
+          verification_date: string
+          verified_by_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          display_visible?: boolean | null
+          id?: string
+          market?: string | null
+          notes?: string | null
+          photo_url?: string | null
+          store_number: string
+          team_trained?: boolean | null
+          updated_at?: string
+          verification_date?: string
+          verified_by_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          display_visible?: boolean | null
+          id?: string
+          market?: string | null
+          notes?: string | null
+          photo_url?: string | null
+          store_number?: string
+          team_trained?: boolean | null
+          updated_at?: string
+          verification_date?: string
+          verified_by_name?: string | null
         }
         Relationships: []
       }
@@ -2577,6 +3239,30 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_summary_dispatch: {
+        Row: {
+          attempts: number
+          data_through: string
+          dispatched_at: string
+          note: string | null
+          send_date: string
+        }
+        Insert: {
+          attempts?: number
+          data_through: string
+          dispatched_at?: string
+          note?: string | null
+          send_date: string
+        }
+        Update: {
+          attempts?: number
+          data_through?: string
+          dispatched_at?: string
+          note?: string | null
+          send_date?: string
+        }
+        Relationships: []
+      }
       daily_summary_edits: {
         Row: {
           approval_status: string | null
@@ -3193,6 +3879,27 @@ export type Database = {
         }
         Relationships: []
       }
+      dm_phones: {
+        Row: {
+          email: string
+          phone: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          email: string
+          phone?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          email?: string
+          phone?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       dmr_rate_history: {
         Row: {
           am_dmr_rate: number | null
@@ -3242,6 +3949,8 @@ export type Database = {
           sent_at: string
           storage_path: string
           total_approvable_miles: number
+          total_bank_drop_miles: number
+          total_bank_drop_trips: number
           total_miles: number
           total_trips: number
           triggered_by: string
@@ -3268,6 +3977,8 @@ export type Database = {
           sent_at?: string
           storage_path: string
           total_approvable_miles?: number
+          total_bank_drop_miles?: number
+          total_bank_drop_trips?: number
           total_miles?: number
           total_trips?: number
           triggered_by?: string
@@ -3294,6 +4005,8 @@ export type Database = {
           sent_at?: string
           storage_path?: string
           total_approvable_miles?: number
+          total_bank_drop_miles?: number
+          total_bank_drop_trips?: number
           total_miles?: number
           total_trips?: number
           triggered_by?: string
@@ -3612,6 +4325,143 @@ export type Database = {
           updated_by?: string | null
         }
         Relationships: []
+      }
+      employee_change_approval_activity: {
+        Row: {
+          action_type: string
+          approval_task_id: string | null
+          created_at: string
+          details: string | null
+          id: string
+          metadata: Json
+          performed_at: string
+          performed_by: string | null
+          performed_by_name: string | null
+          ticket_id: string
+        }
+        Insert: {
+          action_type: string
+          approval_task_id?: string | null
+          created_at?: string
+          details?: string | null
+          id?: string
+          metadata?: Json
+          performed_at?: string
+          performed_by?: string | null
+          performed_by_name?: string | null
+          ticket_id: string
+        }
+        Update: {
+          action_type?: string
+          approval_task_id?: string | null
+          created_at?: string
+          details?: string | null
+          id?: string
+          metadata?: Json
+          performed_at?: string
+          performed_by?: string | null
+          performed_by_name?: string | null
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_change_approval_activity_approval_task_id_fkey"
+            columns: ["approval_task_id"]
+            isOneToOne: false
+            referencedRelation: "employee_change_approval_tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_change_approval_activity_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "employee_change_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_change_approval_tasks: {
+        Row: {
+          approval_status: string
+          approver_user_id: string | null
+          created_at: string
+          cycle: number
+          deadline_at: string | null
+          escalated: boolean
+          escalated_at: string | null
+          escalated_by: string | null
+          escalation_recipient_id: string | null
+          id: string
+          is_active: boolean
+          last_reminder_at: string | null
+          priority: string
+          reassigned_from_user_id: string | null
+          reminder_count: number
+          requested_at: string
+          responded_at: string | null
+          responded_by: string | null
+          response_comment: string | null
+          task_kind: string
+          ticket_id: string
+          updated_at: string
+        }
+        Insert: {
+          approval_status?: string
+          approver_user_id?: string | null
+          created_at?: string
+          cycle?: number
+          deadline_at?: string | null
+          escalated?: boolean
+          escalated_at?: string | null
+          escalated_by?: string | null
+          escalation_recipient_id?: string | null
+          id?: string
+          is_active?: boolean
+          last_reminder_at?: string | null
+          priority?: string
+          reassigned_from_user_id?: string | null
+          reminder_count?: number
+          requested_at?: string
+          responded_at?: string | null
+          responded_by?: string | null
+          response_comment?: string | null
+          task_kind?: string
+          ticket_id: string
+          updated_at?: string
+        }
+        Update: {
+          approval_status?: string
+          approver_user_id?: string | null
+          created_at?: string
+          cycle?: number
+          deadline_at?: string | null
+          escalated?: boolean
+          escalated_at?: string | null
+          escalated_by?: string | null
+          escalation_recipient_id?: string | null
+          id?: string
+          is_active?: boolean
+          last_reminder_at?: string | null
+          priority?: string
+          reassigned_from_user_id?: string | null
+          reminder_count?: number
+          requested_at?: string
+          responded_at?: string | null
+          responded_by?: string | null
+          response_comment?: string | null
+          task_kind?: string
+          ticket_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_change_approval_tasks_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "employee_change_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       employee_change_comments: {
         Row: {
@@ -4990,6 +5840,123 @@ export type Database = {
           },
         ]
       }
+      expense_receipts: {
+        Row: {
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          approver_id: string | null
+          approver_route: string | null
+          category: string
+          created_at: string
+          denial_reason: string | null
+          description: string | null
+          expense_date: string
+          id: string
+          market: string | null
+          notified_at: string | null
+          paid_at: string | null
+          receipt_path: string
+          rep_email: string
+          rep_name: string
+          report_id: string | null
+          source: string
+          status: string
+          store_number: string | null
+          updated_at: string
+          user_id: string | null
+          vendor: string | null
+        }
+        Insert: {
+          amount: number
+          approved_at?: string | null
+          approved_by?: string | null
+          approver_id?: string | null
+          approver_route?: string | null
+          category: string
+          created_at?: string
+          denial_reason?: string | null
+          description?: string | null
+          expense_date: string
+          id?: string
+          market?: string | null
+          notified_at?: string | null
+          paid_at?: string | null
+          receipt_path: string
+          rep_email: string
+          rep_name: string
+          report_id?: string | null
+          source?: string
+          status?: string
+          store_number?: string | null
+          updated_at?: string
+          user_id?: string | null
+          vendor?: string | null
+        }
+        Update: {
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          approver_id?: string | null
+          approver_route?: string | null
+          category?: string
+          created_at?: string
+          denial_reason?: string | null
+          description?: string | null
+          expense_date?: string
+          id?: string
+          market?: string | null
+          notified_at?: string | null
+          paid_at?: string | null
+          receipt_path?: string
+          rep_email?: string
+          rep_name?: string
+          report_id?: string | null
+          source?: string
+          status?: string
+          store_number?: string | null
+          updated_at?: string
+          user_id?: string | null
+          vendor?: string | null
+        }
+        Relationships: []
+      }
+      expense_report_archives: {
+        Row: {
+          created_at: string
+          file_path: string | null
+          id: string
+          period_end: string
+          period_start: string
+          receipt_count: number
+          recipients: string[] | null
+          sent_at: string
+          total_amount: number
+        }
+        Insert: {
+          created_at?: string
+          file_path?: string | null
+          id?: string
+          period_end: string
+          period_start: string
+          receipt_count?: number
+          recipients?: string[] | null
+          sent_at?: string
+          total_amount?: number
+        }
+        Update: {
+          created_at?: string
+          file_path?: string | null
+          id?: string
+          period_end?: string
+          period_start?: string
+          receipt_count?: number
+          recipients?: string[] | null
+          sent_at?: string
+          total_amount?: number
+        }
+        Relationships: []
+      }
       expense_report_items: {
         Row: {
           created_at: string | null
@@ -5171,6 +6138,60 @@ export type Database = {
           updated_at?: string | null
           updated_by?: string | null
           value?: string
+        }
+        Relationships: []
+      }
+      fbc_assessment_store_department_score: {
+        Row: {
+          audit_date: string
+          bread_baking: number | null
+          cleanliness: number | null
+          customer_service: number | null
+          equipment: number | null
+          formulas_product_freshness: number | null
+          franchisee: string | null
+          id: number
+          ingested_at: string
+          overall_score: number | null
+          sandwich_preparation: number | null
+          source_file: string | null
+          store_number: number
+          systems_procedures: number | null
+          uniforms: number | null
+        }
+        Insert: {
+          audit_date: string
+          bread_baking?: number | null
+          cleanliness?: number | null
+          customer_service?: number | null
+          equipment?: number | null
+          formulas_product_freshness?: number | null
+          franchisee?: string | null
+          id?: never
+          ingested_at?: string
+          overall_score?: number | null
+          sandwich_preparation?: number | null
+          source_file?: string | null
+          store_number: number
+          systems_procedures?: number | null
+          uniforms?: number | null
+        }
+        Update: {
+          audit_date?: string
+          bread_baking?: number | null
+          cleanliness?: number | null
+          customer_service?: number | null
+          equipment?: number | null
+          formulas_product_freshness?: number | null
+          franchisee?: string | null
+          id?: never
+          ingested_at?: string
+          overall_score?: number | null
+          sandwich_preparation?: number | null
+          source_file?: string | null
+          store_number?: number
+          systems_procedures?: number | null
+          uniforms?: number | null
         }
         Relationships: []
       }
@@ -6428,6 +7449,30 @@ export type Database = {
         }
         Relationships: []
       }
+      labor_projection_catering: {
+        Row: {
+          amount: number
+          business_date: string
+          store_number: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          amount?: number
+          business_date: string
+          store_number: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          amount?: number
+          business_date?: string
+          store_number?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       management_training_items: {
         Row: {
           created_at: string | null
@@ -7214,8 +8259,10 @@ export type Database = {
           created_at: string
           decided_at: string | null
           decided_by: string | null
+          denial_reason: string | null
           id: string
           notes: string | null
+          notified_at: string | null
           period_end: string
           period_start: string
           reimbursement: number
@@ -7228,8 +8275,10 @@ export type Database = {
           created_at?: string
           decided_at?: string | null
           decided_by?: string | null
+          denial_reason?: string | null
           id?: string
           notes?: string | null
+          notified_at?: string | null
           period_end: string
           period_start: string
           reimbursement?: number
@@ -7242,8 +8291,10 @@ export type Database = {
           created_at?: string
           decided_at?: string | null
           decided_by?: string | null
+          denial_reason?: string | null
           id?: string
           notes?: string | null
+          notified_at?: string | null
           period_end?: string
           period_start?: string
           reimbursement?: number
@@ -7251,6 +8302,75 @@ export type Database = {
           total_miles?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      mileage_rate_audit: {
+        Row: {
+          action: string
+          changed_at: string
+          changed_by: string | null
+          id: string
+          new_effective_date: string | null
+          new_rate_per_mile: number | null
+          old_effective_date: string | null
+          old_rate_per_mile: number | null
+          rate_id: string | null
+          state: string
+        }
+        Insert: {
+          action: string
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          new_effective_date?: string | null
+          new_rate_per_mile?: number | null
+          old_effective_date?: string | null
+          old_rate_per_mile?: number | null
+          rate_id?: string | null
+          state: string
+        }
+        Update: {
+          action?: string
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          new_effective_date?: string | null
+          new_rate_per_mile?: number | null
+          old_effective_date?: string | null
+          old_rate_per_mile?: number | null
+          rate_id?: string | null
+          state?: string
+        }
+        Relationships: []
+      }
+      mileage_rates: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          effective_date: string
+          id: string
+          rate_per_mile: number
+          state: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          effective_date?: string
+          id?: string
+          rate_per_mile: number
+          state: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          effective_date?: string
+          id?: string
+          rate_per_mile?: number
+          state?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -7297,43 +8417,88 @@ export type Database = {
       }
       mileage_trips: {
         Row: {
+          approver_id: string | null
+          approver_route: string | null
           created_at: string
+          driver_state: string | null
           excluded_at: string | null
           excluded_by: string | null
           excluded_from_approval: boolean
           home_store_number: string
           id: string
           notes: string | null
+          rate_per_mile: number | null
+          reimbursement_amount: number | null
+          rep_email: string | null
+          rep_first_name: string | null
+          rep_last_name: string | null
+          rep_name: string | null
+          rep_phone: string | null
+          source: string
           total_miles: number
           trip_date: string
+          trip_decided_at: string | null
+          trip_decided_by: string | null
+          trip_denial_reason: string | null
+          trip_status: string
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
+          approver_id?: string | null
+          approver_route?: string | null
           created_at?: string
+          driver_state?: string | null
           excluded_at?: string | null
           excluded_by?: string | null
           excluded_from_approval?: boolean
           home_store_number: string
           id?: string
           notes?: string | null
+          rate_per_mile?: number | null
+          reimbursement_amount?: number | null
+          rep_email?: string | null
+          rep_first_name?: string | null
+          rep_last_name?: string | null
+          rep_name?: string | null
+          rep_phone?: string | null
+          source?: string
           total_miles?: number
           trip_date: string
+          trip_decided_at?: string | null
+          trip_decided_by?: string | null
+          trip_denial_reason?: string | null
+          trip_status?: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
+          approver_id?: string | null
+          approver_route?: string | null
           created_at?: string
+          driver_state?: string | null
           excluded_at?: string | null
           excluded_by?: string | null
           excluded_from_approval?: boolean
           home_store_number?: string
           id?: string
           notes?: string | null
+          rate_per_mile?: number | null
+          reimbursement_amount?: number | null
+          rep_email?: string | null
+          rep_first_name?: string | null
+          rep_last_name?: string | null
+          rep_name?: string | null
+          rep_phone?: string | null
+          source?: string
           total_miles?: number
           trip_date?: string
+          trip_decided_at?: string | null
+          trip_decided_by?: string | null
+          trip_denial_reason?: string | null
+          trip_status?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -7893,6 +9058,9 @@ export type Database = {
           notification_type: string
           read_at: string | null
           recipient_email: string
+          resolution_method: string | null
+          resolution_note: string | null
+          resolved_at: string | null
           sent_at: string
           status: string | null
           tagger_name: string | null
@@ -7906,6 +9074,9 @@ export type Database = {
           notification_type: string
           read_at?: string | null
           recipient_email: string
+          resolution_method?: string | null
+          resolution_note?: string | null
+          resolved_at?: string | null
           sent_at?: string
           status?: string | null
           tagger_name?: string | null
@@ -7919,6 +9090,9 @@ export type Database = {
           notification_type?: string
           read_at?: string | null
           recipient_email?: string
+          resolution_method?: string | null
+          resolution_note?: string | null
+          resolved_at?: string | null
           sent_at?: string
           status?: string | null
           tagger_name?: string | null
@@ -8348,6 +9522,66 @@ export type Database = {
         }
         Relationships: []
       }
+      ops_assessments: {
+        Row: {
+          assessment_type: string
+          completed: boolean
+          completed_date: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          period_end_date: string
+          period_number: number
+          period_year: number
+          scheduled_by_email: string | null
+          scheduled_by_name: string | null
+          scheduled_date: string | null
+          scheduled_visit: boolean
+          store_id: string
+          store_number: string
+          updated_at: string
+          visit_notified_at: string | null
+        }
+        Insert: {
+          assessment_type?: string
+          completed?: boolean
+          completed_date?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          period_end_date: string
+          period_number: number
+          period_year: number
+          scheduled_by_email?: string | null
+          scheduled_by_name?: string | null
+          scheduled_date?: string | null
+          scheduled_visit?: boolean
+          store_id: string
+          store_number: string
+          updated_at?: string
+          visit_notified_at?: string | null
+        }
+        Update: {
+          assessment_type?: string
+          completed?: boolean
+          completed_date?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          period_end_date?: string
+          period_number?: number
+          period_year?: number
+          scheduled_by_email?: string | null
+          scheduled_by_name?: string | null
+          scheduled_date?: string | null
+          scheduled_visit?: boolean
+          store_id?: string
+          store_number?: string
+          updated_at?: string
+          visit_notified_at?: string | null
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           business_date: string
@@ -8661,9 +9895,13 @@ export type Database = {
           content: string
           created_at: string
           created_by_email: string | null
+          edited_at: string | null
+          edited_by: string | null
           id: string
           is_internal: boolean
           parent_id: string | null
+          retracted_at: string | null
+          retracted_by: string | null
           ticket_id: string
           updated_at: string
           user_id: string | null
@@ -8673,9 +9911,13 @@ export type Database = {
           content: string
           created_at?: string
           created_by_email?: string | null
+          edited_at?: string | null
+          edited_by?: string | null
           id?: string
           is_internal?: boolean
           parent_id?: string | null
+          retracted_at?: string | null
+          retracted_by?: string | null
           ticket_id: string
           updated_at?: string
           user_id?: string | null
@@ -8685,9 +9927,13 @@ export type Database = {
           content?: string
           created_at?: string
           created_by_email?: string | null
+          edited_at?: string | null
+          edited_by?: string | null
           id?: string
           is_internal?: boolean
           parent_id?: string | null
+          retracted_at?: string | null
+          retracted_by?: string | null
           ticket_id?: string
           updated_at?: string
           user_id?: string | null
@@ -9021,6 +10267,87 @@ export type Database = {
           year?: number
         }
         Relationships: []
+      }
+      pest_management_reports: {
+        Row: {
+          attachment_sha256: string | null
+          created_at: string
+          drive_file_id: string | null
+          file_name: string
+          id: string
+          order_number: string
+          original_file_name: string | null
+          processed_at: string
+          service_date: string
+          source: string
+          source_message_id: string | null
+          storage_bucket: string
+          storage_path: string
+          store_id: number
+          store_number: string
+          time_in: string | null
+          time_out: string | null
+          updated_at: string
+          vendor: string
+        }
+        Insert: {
+          attachment_sha256?: string | null
+          created_at?: string
+          drive_file_id?: string | null
+          file_name: string
+          id?: string
+          order_number: string
+          original_file_name?: string | null
+          processed_at?: string
+          service_date: string
+          source?: string
+          source_message_id?: string | null
+          storage_bucket?: string
+          storage_path: string
+          store_id: number
+          store_number: string
+          time_in?: string | null
+          time_out?: string | null
+          updated_at?: string
+          vendor?: string
+        }
+        Update: {
+          attachment_sha256?: string | null
+          created_at?: string
+          drive_file_id?: string | null
+          file_name?: string
+          id?: string
+          order_number?: string
+          original_file_name?: string | null
+          processed_at?: string
+          service_date?: string
+          source?: string
+          source_message_id?: string | null
+          storage_bucket?: string
+          storage_path?: string
+          store_id?: number
+          store_number?: string
+          time_in?: string | null
+          time_out?: string | null
+          updated_at?: string
+          vendor?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pest_management_reports_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["store_id"]
+          },
+          {
+            foreignKeyName: "pest_management_reports_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "v_store_monthly_spending"
+            referencedColumns: ["store_id"]
+          },
+        ]
       }
       portal_access_audit_log: {
         Row: {
@@ -9846,6 +11173,84 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      reimbursement_action_tokens: {
+        Row: {
+          action: string
+          approver_email: string | null
+          approver_id: string | null
+          created_at: string
+          demo: boolean
+          expires_at: string
+          id: string
+          kind: string
+          record_id: string
+          token: string
+          used_at: string | null
+        }
+        Insert: {
+          action: string
+          approver_email?: string | null
+          approver_id?: string | null
+          created_at?: string
+          demo?: boolean
+          expires_at?: string
+          id?: string
+          kind: string
+          record_id: string
+          token: string
+          used_at?: string | null
+        }
+        Update: {
+          action?: string
+          approver_email?: string | null
+          approver_id?: string | null
+          created_at?: string
+          demo?: boolean
+          expires_at?: string
+          id?: string
+          kind?: string
+          record_id?: string
+          token?: string
+          used_at?: string | null
+        }
+        Relationships: []
+      }
+      reimbursement_reminder_log: {
+        Row: {
+          approver_email: string
+          approver_id: string
+          created_at: string
+          escalated: boolean
+          id: string
+          pending_receipts: number
+          pending_trips: number
+          sent_at: string
+          sent_on: string
+        }
+        Insert: {
+          approver_email: string
+          approver_id: string
+          created_at?: string
+          escalated?: boolean
+          id?: string
+          pending_receipts?: number
+          pending_trips?: number
+          sent_at?: string
+          sent_on?: string
+        }
+        Update: {
+          approver_email?: string
+          approver_id?: string
+          created_at?: string
+          escalated?: boolean
+          id?: string
+          pending_receipts?: number
+          pending_trips?: number
+          sent_at?: string
+          sent_on?: string
+        }
+        Relationships: []
       }
       rewards_transactions: {
         Row: {
@@ -11043,6 +12448,7 @@ export type Database = {
           expected_adjustment_at: string | null
           expected_adjustment_by: string | null
           expected_adjustment_reason: string | null
+          expected_adjustment_receipt_url: string | null
           expected_deposit: number
           id: string
           notes: string | null
@@ -11073,6 +12479,7 @@ export type Database = {
           expected_adjustment_at?: string | null
           expected_adjustment_by?: string | null
           expected_adjustment_reason?: string | null
+          expected_adjustment_receipt_url?: string | null
           expected_deposit?: number
           id?: string
           notes?: string | null
@@ -11103,6 +12510,7 @@ export type Database = {
           expected_adjustment_at?: string | null
           expected_adjustment_by?: string | null
           expected_adjustment_reason?: string | null
+          expected_adjustment_receipt_url?: string | null
           expected_deposit?: number
           id?: string
           notes?: string | null
@@ -11153,6 +12561,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      state_final_pay_rules: {
+        Row: {
+          additional_question: string | null
+          created_at: string
+          final_pay_category: string
+          id: string
+          immediate_payroll_action: boolean
+          is_active: boolean
+          manager_guidance: string | null
+          pay_timing: string
+          payroll_guidance: string | null
+          separation_type: string
+          source_reference: string | null
+          state: string
+          updated_at: string
+        }
+        Insert: {
+          additional_question?: string | null
+          created_at?: string
+          final_pay_category: string
+          id?: string
+          immediate_payroll_action?: boolean
+          is_active?: boolean
+          manager_guidance?: string | null
+          pay_timing?: string
+          payroll_guidance?: string | null
+          separation_type: string
+          source_reference?: string | null
+          state: string
+          updated_at?: string
+        }
+        Update: {
+          additional_question?: string | null
+          created_at?: string
+          final_pay_category?: string
+          id?: string
+          immediate_payroll_action?: boolean
+          is_active?: boolean
+          manager_guidance?: string | null
+          pay_timing?: string
+          payroll_guidance?: string | null
+          separation_type?: string
+          source_reference?: string | null
+          state?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       store_compliance_docs: {
         Row: {
@@ -11681,6 +13137,8 @@ export type Database = {
           business_day_cutoff_hour: number | null
           city: string | null
           created_at: string | null
+          deposit_branch_address: string | null
+          deposit_branch_distance: number | null
           email: string | null
           entity: string | null
           entity_name: string | null
@@ -11707,6 +13165,8 @@ export type Database = {
           business_day_cutoff_hour?: number | null
           city?: string | null
           created_at?: string | null
+          deposit_branch_address?: string | null
+          deposit_branch_distance?: number | null
           email?: string | null
           entity?: string | null
           entity_name?: string | null
@@ -11733,6 +13193,8 @@ export type Database = {
           business_day_cutoff_hour?: number | null
           city?: string | null
           created_at?: string | null
+          deposit_branch_address?: string | null
+          deposit_branch_distance?: number | null
           email?: string | null
           entity?: string | null
           entity_name?: string | null
@@ -13799,6 +15261,7 @@ export type Database = {
       }
       wsr_inventory: {
         Row: {
+          adjusted_sales: number | null
           category: string
           cos_dollars: number | null
           cos_percent: number | null
@@ -13810,6 +15273,7 @@ export type Database = {
           year: number | null
         }
         Insert: {
+          adjusted_sales?: number | null
           category: string
           cos_dollars?: number | null
           cos_percent?: number | null
@@ -13821,6 +15285,7 @@ export type Database = {
           year?: number | null
         }
         Update: {
+          adjusted_sales?: number | null
           category?: string
           cos_dollars?: number | null
           cos_percent?: number | null
@@ -14361,6 +15826,100 @@ export type Database = {
           },
         ]
       }
+      cmx_by_week: {
+        Row: {
+          activity_group: string | null
+          adj_completed: number | null
+          adj_max: number | null
+          adj_pct: number | null
+          cum_completed: number | null
+          cum_max: number | null
+          cum_pct: number | null
+          fiscal_year: number | null
+          note: string | null
+          period_end: string | null
+          period_start: string | null
+          source_message_id: string | null
+          store_number: number | null
+          tier: string | null
+          week_number: number | null
+        }
+        Insert: {
+          activity_group?: string | null
+          adj_completed?: number | null
+          adj_max?: number | null
+          adj_pct?: number | null
+          cum_completed?: number | null
+          cum_max?: number | null
+          cum_pct?: number | null
+          fiscal_year?: number | null
+          note?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          source_message_id?: string | null
+          store_number?: number | null
+          tier?: string | null
+          week_number?: number | null
+        }
+        Update: {
+          activity_group?: string | null
+          adj_completed?: number | null
+          adj_max?: number | null
+          adj_pct?: number | null
+          cum_completed?: number | null
+          cum_max?: number | null
+          cum_pct?: number | null
+          fiscal_year?: number | null
+          note?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          source_message_id?: string | null
+          store_number?: number | null
+          tier?: string | null
+          week_number?: number | null
+        }
+        Relationships: []
+      }
+      cmx_weekly_delta: {
+        Row: {
+          activity_group: string | null
+          adj_completed: number | null
+          adj_max: number | null
+          adj_pct: number | null
+          cum_completed: number | null
+          cum_max: number | null
+          cum_pct: number | null
+          fiscal_year: number | null
+          note: string | null
+          period_end: string | null
+          period_start: string | null
+          store_number: number | null
+          tier: string | null
+          week_completed: number | null
+          week_max: number | null
+          week_number: number | null
+          week_pct: number | null
+        }
+        Relationships: []
+      }
+      department_scores_combined: {
+        Row: {
+          assessment_type: string | null
+          audit_date: string | null
+          bread_baking: number | null
+          cleanliness: number | null
+          customer_service: number | null
+          equipment: number | null
+          formulas_product_freshness: number | null
+          franchisee: string | null
+          overall_score: number | null
+          sandwich_preparation: number | null
+          store_number: number | null
+          systems_procedures: number | null
+          uniforms: number | null
+        }
+        Relationships: []
+      }
       ecosure_assessment_overview: {
         Row: {
           assessor: string | null
@@ -14517,6 +16076,7 @@ export type Database = {
           am_adjustment_reason: string | null
           am_expected: number | null
           am_expected_adjustment: number | null
+          am_expected_adjustment_receipt_url: string | null
           am_expected_source: string | null
           am_receipt_url: string | null
           am_resolution_type: string | null
@@ -14528,8 +16088,10 @@ export type Database = {
           business_date: string | null
           daily_actual: number | null
           daily_expected: number | null
+          director_review_note: string | null
           effective_variance: number | null
           expectation_variance: number | null
+          has_director_review: boolean | null
           has_statement_pending: boolean | null
           has_statement_verified: boolean | null
           overall_status: string | null
@@ -14537,6 +16099,7 @@ export type Database = {
           pm_adjustment_reason: string | null
           pm_expected: number | null
           pm_expected_adjustment: number | null
+          pm_expected_adjustment_receipt_url: string | null
           pm_expected_source: string | null
           pm_receipt_url: string | null
           pm_resolution_type: string | null
@@ -14772,8 +16335,20 @@ export type Database = {
         Args: { _incident_id: string; _user_id: string }
         Returns: boolean
       }
+      can_approve_mileage: {
+        Args: { _approver: string; _trip_approver: string }
+        Returns: boolean
+      }
       can_edit_store_information: {
         Args: { _store_id: number; _user_id: string }
+        Returns: boolean
+      }
+      can_manage_employee_change_approvals: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
+      can_view_employee_change_approval: {
+        Args: { _ticket_id: string; _user_id: string }
         Returns: boolean
       }
       can_view_sensitive_store_information: {
@@ -14807,15 +16382,37 @@ export type Database = {
       }
       cleanup_old_wsr_data: { Args: never; Returns: number }
       cleanup_variances_below_threshold: { Args: never; Returns: undefined }
+      create_employee_change_approval_task: {
+        Args: { _ticket_id: string }
+        Returns: string
+      }
       create_training_snapshot: {
         Args: { p_batch_id: string; p_snapshot_date: string }
         Returns: undefined
+      }
+      decide_employee_change_approval: {
+        Args: {
+          _actor?: string
+          _comment?: string
+          _decision: string
+          _task_id: string
+        }
+        Returns: Json
       }
       distinct_states: {
         Args: never
         Returns: {
           state: string
         }[]
+      }
+      escalate_employee_change_approval: {
+        Args: {
+          _actor?: string
+          _note?: string
+          _recipient?: string
+          _task_id: string
+        }
+        Returns: Json
       }
       execute_market_restructure: {
         Args: {
@@ -14946,6 +16543,22 @@ export type Database = {
           employee_name: string
           store_number: string
         }[]
+      }
+      get_approval_routing_health: {
+        Args: never
+        Returns: {
+          detail: string
+          issue_type: string
+          subject: string
+        }[]
+      }
+      get_approver_for_store: {
+        Args: { _store_number: string }
+        Returns: string
+      }
+      get_approver_for_store_by_role: {
+        Args: { _role: string; _store_number: string }
+        Returns: string
       }
       get_call_activity_stats:
         | { Args: { p_mode: string; p_start: string }; Returns: Json }
@@ -15470,6 +17083,13 @@ export type Database = {
           total_tests: number
           unique_employees: number
         }[]
+      }
+      get_mileage_approver:
+        | { Args: { _email: string }; Returns: string }
+        | { Args: { _email: string; _store_number: string }; Returns: string }
+      get_mileage_rate: {
+        Args: { _on: string; _state: string }
+        Returns: number
       }
       get_million_dollar_stores: {
         Args: { target_year?: number }
@@ -16037,7 +17657,9 @@ export type Database = {
       is_executive: { Args: { user_uuid: string }; Returns: boolean }
       is_jsonb_array_of_strings: { Args: { j: Json }; Returns: boolean }
       is_portal_master_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_recognition_admin: { Args: never; Returns: boolean }
       is_role_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_staffing_edit_admin: { Args: never; Returns: boolean }
       is_system_admin: { Args: { user_id: string }; Returns: boolean }
       jsonb_try_parse: { Args: { txt: string }; Returns: Json }
       list_atlas_users: {
@@ -16048,10 +17670,34 @@ export type Database = {
           id: string
         }[]
       }
+      log_employee_change_approval_activity: {
+        Args: {
+          _action_type: string
+          _details?: string
+          _metadata?: Json
+          _performed_by: string
+          _task_id: string
+          _ticket_id: string
+        }
+        Returns: string
+      }
       normalize_market: { Args: { market_name: string }; Returns: string }
       process_approval: {
         Args: { p_notes?: string; p_notification_id: string; p_status: string }
         Returns: boolean
+      }
+      reassign_employee_change_approval: {
+        Args: {
+          _actor?: string
+          _new_approver: string
+          _note?: string
+          _task_id: string
+        }
+        Returns: Json
+      }
+      record_employee_change_approval_reminder: {
+        Args: { _actor?: string; _task_id: string }
+        Returns: Json
       }
       record_protein_stackers_completion: {
         Args: {
@@ -16084,8 +17730,16 @@ export type Database = {
         Args: { _reason?: string; _workflow_id: string }
         Returns: undefined
       }
+      resolve_mileage_approver: {
+        Args: { _email: string; _store_number: string }
+        Returns: {
+          approver_id: string
+          route: string
+        }[]
+      }
       rollback_work_orders_migration: { Args: never; Returns: undefined }
       run_ring_cleanup: { Args: never; Returns: string }
+      send_daily_summary_when_ready: { Args: never; Returns: string }
       start_archive_workflow:
         | {
             Args: {
