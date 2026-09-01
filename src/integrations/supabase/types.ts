@@ -1484,6 +1484,59 @@ export type Database = {
         }
         Relationships: []
       }
+      bread_waste_entries: {
+        Row: {
+          assignment_id: string | null
+          bread_type: string
+          created_at: string
+          entry_date: string
+          id: string
+          logged_by_email: string | null
+          logged_by_name: string | null
+          logged_by_user_id: string | null
+          notes: string | null
+          sticks_tossed: number
+          store_number: string
+          updated_at: string
+        }
+        Insert: {
+          assignment_id?: string | null
+          bread_type?: string
+          created_at?: string
+          entry_date: string
+          id?: string
+          logged_by_email?: string | null
+          logged_by_name?: string | null
+          logged_by_user_id?: string | null
+          notes?: string | null
+          sticks_tossed: number
+          store_number: string
+          updated_at?: string
+        }
+        Update: {
+          assignment_id?: string | null
+          bread_type?: string
+          created_at?: string
+          entry_date?: string
+          id?: string
+          logged_by_email?: string | null
+          logged_by_name?: string | null
+          logged_by_user_id?: string | null
+          notes?: string | null
+          sticks_tossed?: number
+          store_number?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bread_waste_entries_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "tracker_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_card_submissions: {
         Row: {
           address: string | null
@@ -1840,6 +1893,13 @@ export type Database = {
           validated_by_user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "cash_deposits_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "r2r_store_geo"
+            referencedColumns: ["store_number"]
+          },
           {
             foreignKeyName: "cash_deposits_store_number_fkey"
             columns: ["store_number"]
@@ -3398,6 +3458,13 @@ export type Database = {
             foreignKeyName: "daily_summary_notes_store_number_fkey"
             columns: ["store_number"]
             isOneToOne: false
+            referencedRelation: "r2r_store_geo"
+            referencedColumns: ["store_number"]
+          },
+          {
+            foreignKeyName: "daily_summary_notes_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
             referencedRelation: "stores"
             referencedColumns: ["store_number"]
           },
@@ -3772,6 +3839,13 @@ export type Database = {
           variance_explanation?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "deposit_reconciliations_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "r2r_store_geo"
+            referencedColumns: ["store_number"]
+          },
           {
             foreignKeyName: "deposit_reconciliations_store_number_fkey"
             columns: ["store_number"]
@@ -5124,6 +5198,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "positions"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "r2r_store_geo"
+            referencedColumns: ["store_number"]
           },
           {
             foreignKeyName: "employees_store_number_fkey"
@@ -8150,6 +8231,108 @@ export type Database = {
         }
         Relationships: []
       }
+      meat_yield_entries: {
+        Row: {
+          actual_portions: number
+          assignment_id: string | null
+          created_at: string
+          entry_date: string
+          grams_avg: number
+          id: string
+          ideal_portions: number | null
+          logged_by_email: string | null
+          logged_by_name: string | null
+          logged_by_user_id: string | null
+          notes: string | null
+          product: string
+          slices_per_portion: number
+          store_number: string
+          variance: number | null
+          weight_lbs: number
+        }
+        Insert: {
+          actual_portions: number
+          assignment_id?: string | null
+          created_at?: string
+          entry_date: string
+          grams_avg: number
+          id?: string
+          ideal_portions?: number | null
+          logged_by_email?: string | null
+          logged_by_name?: string | null
+          logged_by_user_id?: string | null
+          notes?: string | null
+          product: string
+          slices_per_portion: number
+          store_number: string
+          variance?: number | null
+          weight_lbs: number
+        }
+        Update: {
+          actual_portions?: number
+          assignment_id?: string | null
+          created_at?: string
+          entry_date?: string
+          grams_avg?: number
+          id?: string
+          ideal_portions?: number | null
+          logged_by_email?: string | null
+          logged_by_name?: string | null
+          logged_by_user_id?: string | null
+          notes?: string | null
+          product?: string
+          slices_per_portion?: number
+          store_number?: string
+          variance?: number | null
+          weight_lbs?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meat_yield_entries_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "tracker_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meat_yield_entries_product_fkey"
+            columns: ["product"]
+            isOneToOne: false
+            referencedRelation: "meat_yield_products"
+            referencedColumns: ["product"]
+          },
+        ]
+      }
+      meat_yield_products: {
+        Row: {
+          active: boolean
+          grams_high: number
+          grams_low: number
+          product: string
+          slices_per_portion: number
+          sort_order: number
+          with_paper: boolean
+        }
+        Insert: {
+          active?: boolean
+          grams_high: number
+          grams_low: number
+          product: string
+          slices_per_portion: number
+          sort_order?: number
+          with_paper?: boolean
+        }
+        Update: {
+          active?: boolean
+          grams_high?: number
+          grams_low?: number
+          product?: string
+          slices_per_portion?: number
+          sort_order?: number
+          with_paper?: boolean
+        }
+        Relationships: []
+      }
       menu_test_compliance_notifications: {
         Row: {
           days_overdue: number | null
@@ -9242,6 +9425,13 @@ export type Database = {
           suggestion_accepted?: boolean | null
         }
         Relationships: [
+          {
+            foreignKeyName: "ocr_date_audit_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
+            referencedRelation: "r2r_store_geo"
+            referencedColumns: ["store_number"]
+          },
           {
             foreignKeyName: "ocr_date_audit_store_number_fkey"
             columns: ["store_number"]
@@ -10964,6 +11154,357 @@ export type Database = {
           user_agent?: string | null
         }
         Relationships: []
+      }
+      r2r_elearning_courses: {
+        Row: {
+          display_name: string | null
+          duration_min: number | null
+          fasttrack_title: string
+          fasttrack_title_key: string | null
+          id: string
+          is_menu_test: boolean
+          is_rockstar_test: boolean
+          notes: string | null
+          sequence: number
+          shift_id: string
+        }
+        Insert: {
+          display_name?: string | null
+          duration_min?: number | null
+          fasttrack_title: string
+          fasttrack_title_key?: string | null
+          id?: string
+          is_menu_test?: boolean
+          is_rockstar_test?: boolean
+          notes?: string | null
+          sequence: number
+          shift_id: string
+        }
+        Update: {
+          display_name?: string | null
+          duration_min?: number | null
+          fasttrack_title?: string
+          fasttrack_title_key?: string | null
+          id?: string
+          is_menu_test?: boolean
+          is_rockstar_test?: boolean
+          notes?: string | null
+          sequence?: number
+          shift_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "r2r_elearning_courses_shift_id_fkey"
+            columns: ["shift_id"]
+            isOneToOne: false
+            referencedRelation: "r2r_shifts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      r2r_elearning_progress: {
+        Row: {
+          completed_date: string | null
+          due_date: string | null
+          employee_name: string
+          id: string
+          import_batch_id: string | null
+          is_completed: boolean | null
+          module_view_time: number | null
+          report_generated_at: string | null
+          source_user_id: string | null
+          source_user_id_key: string | null
+          status_group: string | null
+          store_number: string
+          training_duration: number | null
+          training_title: string
+          training_title_key: string | null
+          updated_at: string
+        }
+        Insert: {
+          completed_date?: string | null
+          due_date?: string | null
+          employee_name: string
+          id?: string
+          import_batch_id?: string | null
+          is_completed?: boolean | null
+          module_view_time?: number | null
+          report_generated_at?: string | null
+          source_user_id?: string | null
+          source_user_id_key?: string | null
+          status_group?: string | null
+          store_number?: string
+          training_duration?: number | null
+          training_title: string
+          training_title_key?: string | null
+          updated_at?: string
+        }
+        Update: {
+          completed_date?: string | null
+          due_date?: string | null
+          employee_name?: string
+          id?: string
+          import_batch_id?: string | null
+          is_completed?: boolean | null
+          module_view_time?: number | null
+          report_generated_at?: string | null
+          source_user_id?: string | null
+          source_user_id_key?: string | null
+          status_group?: string | null
+          store_number?: string
+          training_duration?: number | null
+          training_title?: string
+          training_title_key?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "r2r_elearning_progress_import_batch_id_fkey"
+            columns: ["import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      r2r_handson_signoffs: {
+        Row: {
+          employee_name: string
+          id: string
+          is_complete: boolean
+          note_at: string | null
+          note_by: string | null
+          notes: string | null
+          signed_off_at: string
+          signed_off_by: string | null
+          station_id: string
+          store_number: string | null
+          version_id: string
+        }
+        Insert: {
+          employee_name: string
+          id?: string
+          is_complete?: boolean
+          note_at?: string | null
+          note_by?: string | null
+          notes?: string | null
+          signed_off_at?: string
+          signed_off_by?: string | null
+          station_id: string
+          store_number?: string | null
+          version_id: string
+        }
+        Update: {
+          employee_name?: string
+          id?: string
+          is_complete?: boolean
+          note_at?: string | null
+          note_by?: string | null
+          notes?: string | null
+          signed_off_at?: string
+          signed_off_by?: string | null
+          station_id?: string
+          store_number?: string | null
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "r2r_handson_signoffs_signed_off_by_fkey"
+            columns: ["signed_off_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "r2r_handson_signoffs_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "r2r_handson_stations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "r2r_handson_signoffs_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "r2r_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      r2r_handson_stations: {
+        Row: {
+          id: string
+          name: string
+          sequence: number
+          shift_id: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          sequence: number
+          shift_id: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          sequence?: number
+          shift_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "r2r_handson_stations_shift_id_fkey"
+            columns: ["shift_id"]
+            isOneToOne: false
+            referencedRelation: "r2r_shifts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      r2r_handson_steps: {
+        Row: {
+          id: string
+          phase: string
+          sequence: number
+          station_id: string
+          step_text: string
+        }
+        Insert: {
+          id?: string
+          phase: string
+          sequence: number
+          station_id: string
+          step_text: string
+        }
+        Update: {
+          id?: string
+          phase?: string
+          sequence?: number
+          station_id?: string
+          step_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "r2r_handson_steps_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "r2r_handson_stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      r2r_ingest_rejects: {
+        Row: {
+          created_at: string
+          id: string
+          import_batch_id: string | null
+          raw_row: Json
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          import_batch_id?: string | null
+          raw_row: Json
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          import_batch_id?: string | null
+          raw_row?: Json
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "r2r_ingest_rejects_import_batch_id_fkey"
+            columns: ["import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      r2r_shifts: {
+        Row: {
+          elearning_min: number | null
+          id: string
+          is_optional: boolean
+          recommended_time: string | null
+          sequence: number
+          shift_number: number
+          title: string
+          version_id: string
+        }
+        Insert: {
+          elearning_min?: number | null
+          id?: string
+          is_optional?: boolean
+          recommended_time?: string | null
+          sequence: number
+          shift_number: number
+          title: string
+          version_id: string
+        }
+        Update: {
+          elearning_min?: number | null
+          id?: string
+          is_optional?: boolean
+          recommended_time?: string | null
+          sequence?: number
+          shift_number?: number
+          title?: string
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "r2r_shifts_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "r2r_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      r2r_versions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          effective_date: string | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          source: string | null
+          version_label: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          effective_date?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          source?: string | null
+          version_label: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          effective_date?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          source?: string | null
+          version_label?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "r2r_versions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       refund_requests: {
         Row: {
@@ -13454,6 +13995,57 @@ export type Database = {
         }
         Relationships: []
       }
+      tracker_assignments: {
+        Row: {
+          assigned_by_email: string | null
+          assigned_by_name: string | null
+          assigned_by_user_id: string | null
+          cancelled_at: string | null
+          created_at: string
+          end_date: string | null
+          id: string
+          market: string | null
+          note: string | null
+          start_date: string
+          store_name: string | null
+          store_number: string
+          tracker_type: string
+          weeks: number
+        }
+        Insert: {
+          assigned_by_email?: string | null
+          assigned_by_name?: string | null
+          assigned_by_user_id?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          market?: string | null
+          note?: string | null
+          start_date: string
+          store_name?: string | null
+          store_number: string
+          tracker_type: string
+          weeks: number
+        }
+        Update: {
+          assigned_by_email?: string | null
+          assigned_by_name?: string | null
+          assigned_by_user_id?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          market?: string | null
+          note?: string | null
+          start_date?: string
+          store_name?: string | null
+          store_number?: string
+          tracker_type?: string
+          weeks?: number
+        }
+        Relationships: []
+      }
       training_catalog: {
         Row: {
           career_path_day: number | null
@@ -15807,6 +16399,13 @@ export type Database = {
             foreignKeyName: "employees_store_number_fkey"
             columns: ["store_number"]
             isOneToOne: false
+            referencedRelation: "r2r_store_geo"
+            referencedColumns: ["store_number"]
+          },
+          {
+            foreignKeyName: "employees_store_number_fkey"
+            columns: ["store_number"]
+            isOneToOne: false
             referencedRelation: "stores"
             referencedColumns: ["store_number"]
           },
@@ -16010,6 +16609,64 @@ export type Database = {
           phone?: string | null
           store_number?: string | null
           trans_desc?: string | null
+        }
+        Relationships: []
+      }
+      r2r_employee_progress: {
+        Row: {
+          elearning_done: number | null
+          elearning_total: number | null
+          employee_name: string | null
+          handson_done: number | null
+          handson_total: number | null
+          market: string | null
+          region_group: string | null
+          store_name: string | null
+          store_number: string | null
+        }
+        Relationships: []
+      }
+      r2r_shift_completion_v: {
+        Row: {
+          employee_name: string | null
+          first_el: string | null
+          prev_shift_complete_at: string | null
+          shift_complete_at: string | null
+          shift_number: number | null
+          store_number: string | null
+        }
+        Relationships: []
+      }
+      r2r_store_geo: {
+        Row: {
+          market: string | null
+          region_group: string | null
+          store_name: string | null
+          store_number: string | null
+        }
+        Relationships: []
+      }
+      r2r_trainee_status_v: {
+        Row: {
+          current_el_remaining: number | null
+          current_ho_remaining: number | null
+          current_shift_number: number | null
+          current_shift_title: string | null
+          days_idle: number | null
+          days_to_complete: number | null
+          elearning_done: number | null
+          elearning_total: number | null
+          employee_name: string | null
+          first_activity: string | null
+          handson_done: number | null
+          handson_total: number | null
+          last_activity: string | null
+          market: string | null
+          overall_pct: number | null
+          region_group: string | null
+          status: string | null
+          store_name: string | null
+          store_number: string | null
         }
         Relationships: []
       }
@@ -16476,6 +17133,7 @@ export type Database = {
         }
         Returns: Json
       }
+      fiscal_week_ending: { Args: { d: string }; Returns: string }
       fn_find_dm_for_market: { Args: { _market: string }; Returns: string }
       fn_find_store_assignee: {
         Args: { _store_number: string }
@@ -17685,6 +18343,165 @@ export type Database = {
       process_approval: {
         Args: { p_notes?: string; p_notification_id: string; p_status: string }
         Returns: boolean
+      }
+      r2r_cockpit_kpis: {
+        Args: { p_market?: string; p_region?: string; p_store?: string }
+        Returns: {
+          avg_days_to_complete: number
+          complete: number
+          completion_rate: number
+          median_days_to_complete: number
+          not_started: number
+          on_track: number
+          slowest_shift_avg_days: number
+          slowest_shift_number: number
+          slowest_shift_title: string
+          stalled: number
+          trainees: number
+        }[]
+      }
+      r2r_cockpit_store_pulse: {
+        Args: { p_market?: string; p_region?: string }
+        Returns: {
+          at_risk: number
+          avg_pct: number
+          complete: number
+          market: string
+          not_started: number
+          region_group: string
+          store_name: string
+          store_number: string
+          trainees: number
+          worst_idle_days: number
+          worst_idle_employee: string
+        }[]
+      }
+      r2r_cockpit_trainees: {
+        Args: { p_market?: string; p_region?: string; p_store?: string }
+        Returns: {
+          current_el_remaining: number
+          current_ho_remaining: number
+          current_shift_number: number
+          current_shift_title: string
+          days_idle: number
+          days_to_complete: number
+          elearning_done: number
+          elearning_total: number
+          employee_name: string
+          first_activity: string
+          handson_done: number
+          handson_total: number
+          last_activity: string
+          market: string
+          overall_pct: number
+          region_group: string
+          status: string
+          store_name: string
+          store_number: string
+        }[]
+      }
+      r2r_company_summary: {
+        Args: never
+        Returns: {
+          avg_pct: number
+          elearning_pct: number
+          fully_complete: number
+          handson_pct: number
+          trainees: number
+        }[]
+      }
+      r2r_employee_shift_detail: {
+        Args: { p_employee: string; p_store: string }
+        Returns: {
+          display_name: string
+          is_done: boolean
+          is_optional: boolean
+          item_name: string
+          item_type: string
+          note: string
+          note_at: string
+          note_by_name: string
+          seq: number
+          shift_number: number
+          shift_title: string
+          signed_off_at: string
+          signed_off_by_name: string
+          station_id: string
+        }[]
+      }
+      r2r_ingest_transcript: {
+        Args: {
+          p_batch_name?: string
+          p_file_hash?: string
+          p_report_at?: string
+          p_rows: Json
+        }
+        Returns: Json
+      }
+      r2r_ingest_transcript_compact: {
+        Args: {
+          p_batch_name?: string
+          p_file_hash?: string
+          p_report_at?: string
+          p_rows: Json
+        }
+        Returns: Json
+      }
+      r2r_load_handson_steps: { Args: { p_rows: Json }; Returns: number }
+      r2r_market_summary: {
+        Args: { p_region_group: string }
+        Returns: {
+          avg_pct: number
+          elearning_pct: number
+          handson_pct: number
+          market: string
+          stores: number
+          trainees: number
+        }[]
+      }
+      r2r_region_summary: {
+        Args: never
+        Returns: {
+          avg_pct: number
+          elearning_pct: number
+          handson_pct: number
+          region_group: string
+          stores: number
+          trainees: number
+        }[]
+      }
+      r2r_search_employees: {
+        Args: { p_query: string }
+        Returns: {
+          employee_name: string
+          market: string
+          overall_pct: number
+          region_group: string
+          store_name: string
+          store_number: string
+        }[]
+      }
+      r2r_store_employees: {
+        Args: { p_store: string }
+        Returns: {
+          elearning_done: number
+          elearning_total: number
+          employee_name: string
+          handson_done: number
+          handson_total: number
+          overall_pct: number
+        }[]
+      }
+      r2r_store_summary: {
+        Args: { p_market: string }
+        Returns: {
+          avg_pct: number
+          elearning_pct: number
+          handson_pct: number
+          store_name: string
+          store_number: string
+          trainees: number
+        }[]
       }
       reassign_employee_change_approval: {
         Args: {
