@@ -13,10 +13,15 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Users, Save, Settings, Bell, Map, Store, UserCheck, Shield, Network, X } from 'lucide-react';
 
+// Market names use a space between the region letters and number
+// (e.g. "NE 4", not "NE4") to match the canonical format used across
+// customer_feedback, stores, and the markets table. Using the no-space
+// form here re-introduces the same data drift that required migrations
+// 20251007145816, 20251104172054, and 20251118003823 to clean up.
 const markets = [
-  'AZ1', 'AZ2', 'AZ3', 'AZ4', 'AZ5', 'IE/LA', 'OC', 
-  'MN1', 'MN2', 'NE1', 'NE2', 'NE3', 'NE4', 
-  'FL1', 'FL2', 'FL3', 'PA'
+  'AZ 1', 'AZ 2', 'AZ 3', 'AZ 4', 'AZ 5', 'IE/LA', 'OC',
+  'MN 1', 'MN 2', 'NE 1', 'NE 2', 'NE 3', 'NE 4',
+  'FL 1', 'FL 2', 'FL 3', 'PA'
 ];
 
 const storeNumbers = [

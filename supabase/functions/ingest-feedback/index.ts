@@ -164,6 +164,18 @@ async function findStoreAssignee(store_number: string): Promise<string> {
 }
 
 /**
+ * Canonical market-name normalization (mirrors src/lib/market.ts on the
+ * frontend). Markets should always be stored as e.g. "NE 4", not "NE4".
+ * stores.region has drifted to the no-space form in the past for a
+ * handful of stores; normalizing here means a new feedback record never
+ * writes a bad value onto customer_feedback.market even if that column
+ * regresses again, instead of relying solely on one-off cleanup migrations.
+ */
+function normalizeMarket(market: string): string {
+  return market.trim().replace(/([A-Za-z]+)\s*(\d+)/, '$1 $2')
+}
+
+/**
  * Look up the market (region) for a given store_number from the stores table.
  */
 async function lookupMarketByStore(store_number: string): Promise<string> {
@@ -181,8 +193,9 @@ async function lookupMarketByStore(store_number: string): Promise<string> {
     }
 
     if (data?.region) {
-      console.log(`Found market for store ${store_number}: ${data.region}`)
-      return data.region
+      const normalized = normalizeMarket(data.region)
+      console.log(`Found market for store ${store_number}: ${data.region} -> ${normalized}`)
+      return normalized
     }
 
     console.warn(`No market found for store ${store_number}`)

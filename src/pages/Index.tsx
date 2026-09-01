@@ -16,6 +16,7 @@ import { useFeedbackLikes } from "@/hooks/useFeedbackLikes";
 import { supabase } from "@/integrations/supabase/client";
 import { AddFeedbackDialog } from "@/components/feedback/AddFeedbackDialog";
 import { Database } from "@/integrations/supabase/types";
+import { normalizeMarket } from "@/lib/market";
 
 type FeedbackRow = Database['public']['Tables']['customer_feedback']['Row'];
 
@@ -328,7 +329,7 @@ const Index = () => {
       const matchesChannel = channelFilter.length === 0 || channelFilter.includes(fb.channel);
       const matchesStore = storeFilter.length === 0 || storeFilter.includes(fb.store_number);
       // Normalize market for comparison (e.g., "NE4" -> "NE 4")
-      const normalizedMarket = fb.market.replace(/([A-Z]+)(\d+)/, '$1 $2');
+      const normalizedMarket = normalizeMarket(fb.market);
       const matchesMarket = marketFilter.length === 0 || marketFilter.includes(normalizedMarket);
       const matchesAssignee = assigneeFilter.length === 0 || 
                              (assigneeFilter.includes('unassigned') && (!fb.assignee || fb.assignee === 'Unassigned')) ||
@@ -428,7 +429,7 @@ const Index = () => {
       });
       const matchesChannel = channelFilter.length === 0 || channelFilter.includes(fb.channel);
       const matchesStore = storeFilter.length === 0 || storeFilter.includes(fb.store_number);
-      const normalizedMarket = fb.market.replace(/([A-Z]+)(\d+)/, '$1 $2');
+      const normalizedMarket = normalizeMarket(fb.market);
       const matchesMarket = marketFilter.length === 0 || marketFilter.includes(normalizedMarket);
       const matchesAssignee = assigneeFilter.length === 0 || 
                              (assigneeFilter.includes('unassigned') && (!fb.assignee || fb.assignee === 'Unassigned')) ||
@@ -482,10 +483,6 @@ const Index = () => {
   
   const availableMarkets = useMemo(() => {
     // Normalize market names to ensure consistent spacing (e.g., "NE4" -> "NE 4")
-    const normalizeMarket = (market: string) => {
-      return market.replace(/([A-Z]+)(\d+)/, '$1 $2');
-    };
-    
     const markets = [...new Set(feedbacks.map(fb => normalizeMarket(fb.market)))];
     return markets.sort();
   }, [feedbacks]);

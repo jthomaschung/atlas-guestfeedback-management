@@ -10,6 +10,7 @@ import { FeedbackDetailsDialog } from "@/components/feedback/FeedbackDetailsDial
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { normalizeMarket } from "@/lib/market";
 
 interface SummaryStats {
   averageResponseTime: number;
@@ -68,7 +69,7 @@ const Summary = () => {
       const matchesChannel = channelFilter.length === 0 || channelFilter.includes(fb.channel);
       const matchesStore = storeFilter.length === 0 || storeFilter.includes(fb.store_number);
       // Normalize market for comparison (e.g., "NE4" -> "NE 4")
-      const normalizedMarket = fb.market.replace(/([A-Z]+)(\d+)/, '$1 $2');
+      const normalizedMarket = normalizeMarket(fb.market);
       const matchesMarket = marketFilter.length === 0 || marketFilter.includes(normalizedMarket);
       const matchesAssignee = assigneeFilter.length === 0 || 
                              (assigneeFilter.includes('unassigned') && (!fb.assignee || fb.assignee === 'Unassigned')) ||
@@ -107,10 +108,6 @@ const Summary = () => {
 
   const availableMarkets = useMemo(() => {
     // Normalize market names to ensure consistent spacing (e.g., "NE4" -> "NE 4")
-    const normalizeMarket = (market: string) => {
-      return market.replace(/([A-Z]+)(\d+)/, '$1 $2');
-    };
-    
     const markets = [...new Set(feedbacks.map(fb => normalizeMarket(fb.market)))];
     return markets.sort();
   }, [feedbacks]);

@@ -13,6 +13,7 @@ import { StoreTable } from '@/components/settings/StoreTable';
 import { StoreFilters } from '@/components/settings/StoreFilters';
 import { StoreManagementDialog } from '@/components/settings/StoreManagementDialog';
 import { ManageMarketsDialog } from '@/components/settings/ManageMarketsDialog';
+import { normalizeMarket } from '@/lib/market';
 
 const Settings = () => {
   const { user } = useAuth();
@@ -61,8 +62,12 @@ const Settings = () => {
       setStores(data || []);
       
       // Calculate market statistics
+      // Normalize here so a stray no-space value in stores.region (e.g. "NE4")
+      // doesn't surface as its own selectable market in the UI and get
+      // re-picked into other stores, re-introducing the same drift that
+      // required repeated cleanup migrations.
       const marketStats = (data || []).reduce((acc: any, store: any) => {
-        const market = store.region || 'Unassigned';
+        const market = store.region ? normalizeMarket(store.region) : 'Unassigned';
         if (!acc[market]) {
           acc[market] = 0;
         }
@@ -99,7 +104,7 @@ const Settings = () => {
     let filtered = stores;
 
     if (selectedMarket !== 'all') {
-      filtered = filtered.filter(store => store.region === selectedMarket);
+      filtered = filtered.filter(store => normalizeMarket(store.region) === selectedMarket);
     }
 
     if (searchQuery) {

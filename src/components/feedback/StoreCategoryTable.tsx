@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CustomerFeedback } from "@/types/feedback";
 import { cn } from "@/lib/utils";
+import { normalizeMarket } from "@/lib/market";
 
 interface StoreCategoryTableProps {
   feedbacks: CustomerFeedback[];
@@ -40,7 +41,7 @@ export function StoreCategoryTable({ feedbacks, onCellClick }: StoreCategoryTabl
       if (!storeMap.has(fb.store_number)) {
         storeMap.set(fb.store_number, {
           storeNumber: fb.store_number,
-          market: fb.market,
+          market: normalizeMarket(fb.market),
           categories: {},
           total: 0
         });

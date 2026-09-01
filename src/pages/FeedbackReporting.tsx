@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { normalizeMarket } from "@/lib/market";
 
 interface FeedbackReportingStats {
   averageResponseTime: number;
@@ -63,7 +64,7 @@ const FeedbackReporting = () => {
       const matchesChannel = channelFilter.length === 0 || channelFilter.includes(fb.channel);
       const matchesStore = storeFilter.length === 0 || storeFilter.includes(fb.store_number);
       // Normalize market for comparison (e.g., "NE4" -> "NE 4")
-      const normalizedMarket = fb.market.replace(/([A-Z]+)(\d+)/, '$1 $2');
+      const normalizedMarket = normalizeMarket(fb.market);
       const matchesMarket = marketFilter.length === 0 || marketFilter.includes(normalizedMarket);
       const matchesAssignee = assigneeFilter.length === 0 || 
                              (assigneeFilter.includes('unassigned') && (!fb.assignee || fb.assignee === 'Unassigned')) ||
@@ -102,10 +103,6 @@ const FeedbackReporting = () => {
 
   const availableMarkets = useMemo(() => {
     // Normalize market names to ensure consistent spacing (e.g., "NE4" -> "NE 4")
-    const normalizeMarket = (market: string) => {
-      return market.replace(/([A-Z]+)(\d+)/, '$1 $2');
-    };
-    
     const markets = [...new Set(feedbacks.map(fb => normalizeMarket(fb.market)))];
     return markets.sort();
   }, [feedbacks]);
